@@ -161,7 +161,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Rating")
@@ -194,10 +194,13 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("ComposerStreamId")
+                    b.Property<long>("ComposerStreamId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("InProgressAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsActive")
@@ -206,17 +209,17 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     b.Property<decimal>("NominalAmount")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("OrderType")
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("TakenAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<long?>("TrackId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("TrackUrl")
                         .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.Property<string>("UserComment")
                         .HasColumnType("text");
@@ -673,7 +676,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 {
                     b.HasOne("Faryma.Composer.Infrastructure.Entities.ComposerStream", "ComposerStream")
                         .WithMany("ReviewOrders")
-                        .HasForeignKey("ComposerStreamId");
+                        .HasForeignKey("ComposerStreamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
                         .WithMany("ReviewOrders")
