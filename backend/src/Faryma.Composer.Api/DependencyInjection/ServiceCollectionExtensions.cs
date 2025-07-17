@@ -1,0 +1,116 @@
+﻿using System.Reflection;
+using System.Text;
+using Faryma.Composer.Api.Auth;
+using Faryma.Composer.Api.Auth.Options;
+using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.DependencyInjection;
+using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
+namespace Faryma.Composer.Api.DependencyInjection
+{
+    public static class ServiceCollectionExtensions
+    {
+        public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
+        {
+            services
+                .AddOptionsWithValidateOnStart<JwtOptions>()
+                .Bind(configuration.GetSection("JWT"))
+                .ValidateDataAnnotations();
+
+            services
+                .AddOptionsWithValidateOnStart<PostgreOptions>()
+                .Bind(configuration.GetSection("POSTGRES"))
+                .ValidateDataAnnotations();
+
+            return services;
+        }
+
+        public static IServiceCollection AddPersistenceAndIdentity(this IServiceCollection services, IConfiguration configuration)
+        {
+            services
+                .AddPersistence(configuration)
+                .AddIdentityCore<User>(options => options.Password.RequiredLength = 12)
+                .AddRoles<IdentityRole<Guid>>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
+
+            return services;
+        }
+
+        public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+        {
+            IConfigurationSection jwtSection = configuration.GetSection("JWT");
+
+            services
+                .AddScoped<AuthService>()
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    JwtOptions jwtOptions = jwtSection.Get<JwtOptions>()!;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtOptions.Issuer,
+                        ValidAudience = jwtOptions.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+                    };
+                });
+
+            return services;
+        }
+
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IWebHostEnvironment environment)
+        {
+            services
+                .AddProblemDetails()
+                .AddMemoryCache()
+                .ConfigureSwagger(environment)
+                .AddSignalR();
+
+            return services;
+        }
+
+        private static IServiceCollection ConfigureSwagger(this IServiceCollection services, IWebHostEnvironment environment) => services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = environment.ApplicationName,
+                Version = "v1",
+            });
+
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                string xmlPath = Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
+                if (File.Exists(xmlPath))
+                {
+                    options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+                }
+            }
+
+            OpenApiSecurityScheme scheme = new()
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = JwtBearerDefaults.AuthenticationScheme,
+                Reference = new OpenApiReference
+                {
+                    Id = JwtBearerDefaults.AuthenticationScheme,
+                    Type = ReferenceType.SecurityScheme
+                }
+            };
+
+            options.AddSecurityDefinition(scheme.Reference.Id, scheme);
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                { scheme, Array.Empty<string>() }
+            });
+        });
+    }
+}

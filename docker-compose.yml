@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+
+  webapi:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: composer-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ASPNETCORE_HTTP_PORTS: 8080
+      POSTGRES__HOST: db
+      POSTGRES__PORT: 5432
+      POSTGRES__DATABASE: ${POSTGRES__DATABASE}
+      POSTGRES__USERNAME: ${POSTGRES__USERNAME}
+      POSTGRES__PASSWORD: ${POSTGRES__PASSWORD}
+      JWT__ISSUER: ${JWT__ISSUER}
+      JWT__AUDIENCE: ${JWT__AUDIENCE}
+      JWT__SECRET_KEY: ${JWT__SECRET_KEY}
+      JWT__EXPIRY_IN_MINUTES: ${JWT__EXPIRY_IN_MINUTES}
+    ports:
+      - "${WEBAPI_PORT}:8080"
+    volumes:
+      - webapi-data:/root/.aspnet/DataProtection-Keys
+    networks:
+      - composer-net
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:17
+    container_name: composer-db
+    environment:
+      POSTGRES_DB: ${POSTGRES__DATABASE}
+      POSTGRES_USER: ${POSTGRES__USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES__PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - composer-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${POSTGRES__DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  webapi-data:
+
+networks:
+  composer-net:
+    driver: bridge
