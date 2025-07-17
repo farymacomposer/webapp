@@ -1,0 +1,134 @@
+// Статус стрима
+Enum ComposerStreamStatus {
+  planned [note: 'Запланирован']
+  completed [note: 'Завершен']
+  canceled [note: 'Отменен']
+}
+
+// Тип стрима
+Enum ComposerStreamType {
+  regular [note: 'Обычный']
+  debt [note: 'Долговой']
+  charity [note: 'Благотворительный']
+}
+
+// Тип заказа разбора трека
+Enum ReviewOrderType {
+  order [note: 'Заказ']
+  donation [note: 'Донат']
+  out_of_queue [note: 'Вне очереди']
+  free [note: 'Бесплатный']
+}
+
+// Происхождение трека
+Enum TrackOrigin {
+  band [note: 'От музыкальной группы']
+  movie [note: 'Из фильма']
+  anime [note: 'Из аниме']
+  game [note: 'Из игры']
+}
+
+// Тип операции
+Enum TransactionType {
+  deposit [note: 'Пополнение']
+  payment [note: 'Оплата']
+}
+
+// Роль пользователя
+Enum UserRole {
+  composer [note: 'Композитор']
+  moderator [note: 'Модератор']
+  user [note: 'Обычный пользователь']
+}
+
+
+Table Artist [note: 'Исполнитель музыкального трека'] {
+  id long [pk, increment]
+  name string [note: 'Имя исполнителя']
+}
+
+Table ComposerStream [note: 'Стрим композитора'] {
+  id long [pk, increment]
+  event_date date [note: 'Дата проведения стрима']
+  status ComposerStreamStatus [note: 'Статус стрима']
+  type ComposerStreamType [note: 'Тип стрима']
+}
+
+Table Genre [note: 'Музыкальный жанр'] {
+  id long [pk, increment]
+  name string [note: 'Название жанра']
+}
+
+Table Review [note: 'Результат разбора трека композитором'] {
+  id long [pk, increment]
+  track_id long [ref: > Track.id, note: 'Разбираемый трек']
+  review_order_id long [ref: - ReviewOrder.id, note: 'Связанный заказ']
+  rating_value int [note: 'Оценка']
+  comment string [note: 'Комментарий']
+  created_at datetime [note: 'Дата разбора']
+  updated_at datetime [note: 'Дата последнего обновления']
+}
+
+Table ReviewOrder [note: 'Заказ разбора трека'] {
+  id long [pk, increment]
+  track_id long [null, ref: > Track.id, note: 'Трека для разбора']
+  user_nickname_id uuid [ref: > UserNickname.id, note: 'Пользователь, создавший заказ']
+  composer_stream_id long [null, ref: > ComposerStream.id, note: 'Связанный cтрим композитора']
+  created_at datetime [note: 'Дата создания заказа']
+  taken_at datetime [null, note: 'Дата и время взятия заказа в работу']
+  order_type ReviewOrderType [note: 'Тип заказа']
+  is_active bool [note: 'Флаг активности заказа']
+}
+
+Table Track [note: 'Музыкальный трек'] {
+  id long [pk, increment]
+  title string [null, note: 'Название трека']
+  year int [null, note: 'Год выпуска трека']
+  user_alias_id uuid [ref: > UserNickname.id, note: 'Пользователь, загрузивший трек']
+  uploaded_at datetime [note: 'Дата загрузки']
+  url string [null, note: 'Ссылка на трек']
+  origin TrackOrigin [null, note: 'Происхождение трека']
+}
+
+Table Transaction [note: 'Операция по счету'] {
+  id long [pk, increment]
+  user_alias_account_id uuid [ref: > UserAccount.id]
+  amount decimal [note: "Сумма операции +/-"]
+  type TransactionType [note: "Тип операции"]
+  created_at datetime [note: 'Дата операции']
+}
+
+Table User [note: 'Пользователь'] {
+  id uuid [pk]
+  username string [note: 'Имя пользователя']
+  role UserRole [note: 'Роль пользователя в системе']
+  created_at datetime [note: 'Дата регистрации']
+}
+
+Table UserAccount [note: 'Баланс пользователя'] {
+  id uuid [pk, increment]
+  user_alias_id uuid [unique, ref: - UserNickname.id]
+  balance decimal [note: "Текущий баланс"]
+}
+
+Table UserNickname [note: 'Псевдоним пользователя'] {
+  id uuid [pk, increment]
+  nickname string [note: 'Псевдоним']
+  user_id uuid [null, ref: > User.id, note: 'Пользователь']
+}
+
+Table UserTrackRating [note: 'Пользовательская оценка'] {
+  id long [pk, increment]
+  track_id long [ref: > Track.id, note: 'Оцениваемый трек']
+  user_id uuid [ref: > User.id, note: 'Пользователь, оставивший оценку']
+  rating_value int [note: 'Оценка']
+  comment string [note: 'Комментарий']
+  created_at datetime [note: 'Дата создания оценки']
+  updated_at datetime [note: 'Дата обновления оценки']
+}
+
+
+Ref ReviewOrderTransaction: ReviewOrder.id <> Transaction.id // Связь заказов и транзакций
+Ref TrackArtist: Track.id <> Artist.id // Связь треков и исполнителей
+Ref TrackGenre: Track.id <> Genre.id // Связь треков и жанров
+Ref UserArtist: User.id <> Artist.id // Связь пользователей и исполнителей
