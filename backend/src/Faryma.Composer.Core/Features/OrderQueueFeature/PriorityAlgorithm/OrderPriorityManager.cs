@@ -60,15 +60,14 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 State.Initial when _donationProvider?.HasOrders == true => (State.Donation, true),
                 State.Initial when _debtProvider.HasOrders => (State.Debt, true),
 
-                State.OutOfQueue when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
+                State.OutOfQueue or State.Donation or State.Debt when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
+
                 State.OutOfQueue when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
                 State.OutOfQueue when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
 
-                State.Donation when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
                 State.Donation when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
                 State.Donation when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
 
-                State.Debt when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
                 State.Debt when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
                 State.Debt when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
 
@@ -88,7 +87,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             {
                 State.OutOfQueue => _outOfQueueProvider.TakeNextOrder(_lastIssuedNickname),
                 State.Donation => _donationProvider!.TakeNextOrder(_lastIssuedNickname),
-                State.Debt => _debtProvider.TakeNextOrder(_lastIssuedNickname, isOnlyNicknameLeft),
+                State.Debt when isOnlyNicknameLeft => _debtProvider.TakeNextOrderFromAnyProvider(_lastIssuedNickname),
+                State.Debt when isOnlyNicknameLeft == false => _debtProvider.TakeNextOrder(_lastIssuedNickname),
             };
 
             _lastIssuedNickname = result.UserNickname.NormalizedNickname;

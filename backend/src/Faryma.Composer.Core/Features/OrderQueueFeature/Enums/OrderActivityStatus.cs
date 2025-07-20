@@ -5,9 +5,24 @@
     /// </summary>
     public enum OrderActivityStatus
     {
+        /// <summary>
+        /// Начальный статус
+        /// </summary>
         Initial = 0,
+
+        /// <summary>
+        /// Заказ запланирован на будущий стрим
+        /// </summary>
         Future = 1,
+
+        /// <summary>
+        /// Заказ активен
+        /// </summary>
         Active = 2,
+
+        /// <summary>
+        /// Заказ неактивен
+        /// </summary>
         Inactive = 3
     }
 }

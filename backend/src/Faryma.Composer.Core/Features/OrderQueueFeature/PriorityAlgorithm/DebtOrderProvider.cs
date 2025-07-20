@@ -10,32 +10,38 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
         public bool HasAnotherNickname(string? nicknameToSkip) => orderProviders.Any(x => x.Provider.HasAnotherNickname(nicknameToSkip));
 
-        public ReviewOrder TakeNextOrder(string? nicknameToSkip, bool isOnlyNicknameLeft)
+        public ReviewOrder TakeNextOrderFromAnyProvider(string? nicknameToSkip)
         {
             while (true)
             {
                 int index = _counter % orderProviders.Count;
 
                 (DateOnly streamDate, OrderProvider provider) = orderProviders[index];
-                if (isOnlyNicknameLeft)
+                if (provider.HasOrders)
                 {
-                    if (provider.HasOrders)
-                    {
-                        ReviewOrder order = provider.TakeNextOrder(nicknameToSkip);
-                        _counter++;
+                    ReviewOrder order = provider.TakeNextOrder(nicknameToSkip);
+                    _counter++;
 
-                        return order;
-                    }
+                    return order;
                 }
-                else
-                {
-                    if (provider.HasAnotherNickname(nicknameToSkip))
-                    {
-                        ReviewOrder order = provider.TakeNextOrder(nicknameToSkip);
-                        _counter++;
 
-                        return order;
-                    }
+                _counter++;
+            }
+        }
+
+        public ReviewOrder TakeNextOrder(string? nicknameToSkip)
+        {
+            while (true)
+            {
+                int index = _counter % orderProviders.Count;
+
+                (DateOnly streamDate, OrderProvider provider) = orderProviders[index];
+                if (provider.HasAnotherNickname(nicknameToSkip))
+                {
+                    ReviewOrder order = provider.TakeNextOrder(nicknameToSkip);
+                    _counter++;
+
+                    return order;
                 }
 
                 _counter++;
