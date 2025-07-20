@@ -418,9 +418,53 @@ FodyWeavers.xsd
 *.msp
 
 # === Frontend (Next.js) ===
-frontend/node_modules/
-frontend/.next/
-frontend/.turbo/
-frontend/.env*
-frontend/coverage/
-frontend/dist/
+# dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# build output
+.next/
+out/
+dist/
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# local env files
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# typescript
+*.tsbuildinfo
+
+# editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# misc
+*.swp
+*.bak
+
+# vercel (optional)
+.vercel/
+
+# Tailwind JIT cache (if used)
+.cache/
+
+# Storybook (if used)
+storybook-static/
