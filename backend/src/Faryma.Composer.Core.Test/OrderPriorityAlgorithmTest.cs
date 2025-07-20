@@ -1,11 +1,13 @@
-﻿using Faryma.Composer.Core.Features.OrderQueueFeature;
+﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
+using Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm;
 using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Core.Test
 {
-    public class OrderQueueTest
+    public class OrderPriorityAlgorithmTest
     {
         private readonly UpperInvariantLookupNormalizer _normalizer = new();
 
@@ -15,15 +17,15 @@ namespace Faryma.Composer.Core.Test
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
             [
-                GetDonat("10.01.2000", 1, "Nick1", 900),
-                GetDonat("10.01.2000", 2, "Nick2", 800),
-                GetDonat("10.01.2000", 3, "Nick3", 700),
+                GetDonation("10.01.2000", 1, "Nick1", 900),
+                GetDonation("10.01.2000", 2, "Nick2", 800),
+                GetDonation("10.01.2000", 3, "Nick3", 700),
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             Assert.Equal(0, orderPositions[1].CurrentIndex);
             Assert.Equal(1, orderPositions[2].CurrentIndex);
@@ -36,15 +38,15 @@ namespace Faryma.Composer.Core.Test
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
             [
-                GetDonat("10.01.2000", 1, "Nick1", 900),
-                GetDonat("10.01.2000", 2, "Nick1", 800),
-                GetDonat("10.01.2000", 3, "Nick2", 700),
+                GetDonation("10.01.2000", 1, "Nick1", 900),
+                GetDonation("10.01.2000", 2, "Nick1", 800),
+                GetDonation("10.01.2000", 3, "Nick2", 700),
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             Assert.Equal(0, orderPositions[1].CurrentIndex);
             Assert.Equal(1, orderPositions[3].CurrentIndex);
@@ -52,24 +54,24 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
-        public void Alternation_Donat_Debt()
+        public void Donat_Debt()
         {
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
             [
-                GetDonat("10.01.2000", 1, "Nick1", 900),
-                GetDonat("10.01.2000", 2, "Nick2", 800),
-                GetDonat("10.01.2000", 3, "Nick3", 700),
+                GetDonation("10.01.2000", 1, "Nick1", 900),
+                GetDonation("10.01.2000", 2, "Nick2", 800),
+                GetDonation("10.01.2000", 3, "Nick3", 700),
 
-                GetDonat("09.01.2000", 4, "Nick4", 900), // долг x1
-                GetDonat("09.01.2000", 5, "Nick5", 800), // долг x1
-                GetDonat("09.01.2000", 6, "Nick6", 700), // долг x1
+                GetDonation("09.01.2000", 4, "Nick4", 900), // долг x1
+                GetDonation("09.01.2000", 5, "Nick5", 800), // долг x1
+                GetDonation("09.01.2000", 6, "Nick6", 700), // долг x1
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             Assert.Equal(0, orderPositions[1].CurrentIndex);
             Assert.Equal(1, orderPositions[4].CurrentIndex);
@@ -80,24 +82,24 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
-        public void Alternation_Donat_Debt_Alt1()
+        public void Donat_Debt_Alt1()
         {
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
             [
-                GetDonat("10.01.2000", 1, "Nick1", 900),
-                GetDonat("10.01.2000", 2, "Nick1", 800),
-                GetDonat("10.01.2000", 3, "Nick3", 700),
+                GetDonation("10.01.2000", 1, "Nick1", 900),
+                GetDonation("10.01.2000", 2, "Nick1", 800),
+                GetDonation("10.01.2000", 3, "Nick3", 700),
 
-                GetDonat("09.01.2000", 4, "Nick4", 900), // долг x1
-                GetDonat("09.01.2000", 5, "Nick1", 800), // долг x1
-                GetDonat("09.01.2000", 6, "Nick6", 700), // долг x1
+                GetDonation("09.01.2000", 4, "Nick4", 900), // долг x1
+                GetDonation("09.01.2000", 5, "Nick1", 800), // долг x1
+                GetDonation("09.01.2000", 6, "Nick6", 700), // долг x1
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             Assert.Equal((0, "Nick1"), (orderPositions[1].CurrentIndex, orders[1].UserNickname.Nickname));
             Assert.Equal((1, "Nick4"), (orderPositions[4].CurrentIndex, orders[4].UserNickname.Nickname));
@@ -108,24 +110,24 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
-        public void Alternation_Donat_Debt_IsOnlyNicknameLeft()
+        public void Donat_Debt_IsOnlyNicknameLeft()
         {
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
             [
-                GetDonat("10.01.2000", 1, "Nick1", 900),
-                GetDonat("10.01.2000", 2, "Nick1", 800),
-                GetDonat("10.01.2000", 3, "Nick1", 700),
+                GetDonation("10.01.2000", 1, "Nick1", 900),
+                GetDonation("10.01.2000", 2, "Nick1", 800),
+                GetDonation("10.01.2000", 3, "Nick1", 700),
 
-                GetDonat("09.01.2000", 4, "Nick1", 900), // долг x1
-                GetDonat("09.01.2000", 5, "Nick1", 800), // долг x1
-                GetDonat("09.01.2000", 6, "Nick1", 700), // долг x1
+                GetDonation("09.01.2000", 4, "Nick1", 900), // долг x1
+                GetDonation("09.01.2000", 5, "Nick1", 800), // долг x1
+                GetDonation("09.01.2000", 6, "Nick1", 700), // долг x1
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             (int Current, string Nickname)[] list = items
                 .Select(x => (orderPositions[x.Id].CurrentIndex, orders[x.Id].UserNickname.Nickname))
@@ -141,28 +143,28 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
-        public void Alternation_Donat_Debt_Debt()
+        public void Donat_Debt_Debt()
         {
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
             [
-                GetDonat("10.01.2000", 1, "Nick1", 900),
-                GetDonat("10.01.2000", 2, "Nick2", 800),
-                GetDonat("10.01.2000", 3, "Nick3", 700),
+                GetDonation("10.01.2000", 1, "Nick1", 900),
+                GetDonation("10.01.2000", 2, "Nick2", 800),
+                GetDonation("10.01.2000", 3, "Nick3", 700),
 
-                GetDonat("09.01.2000", 4, "Nick4", 900), // долг x1
-                GetDonat("09.01.2000", 5, "Nick5", 800), // долг x1
-                GetDonat("09.01.2000", 6, "Nick6", 700), // долг x1
+                GetDonation("09.01.2000", 4, "Nick4", 900), // долг x1
+                GetDonation("09.01.2000", 5, "Nick5", 800), // долг x1
+                GetDonation("09.01.2000", 6, "Nick6", 700), // долг x1
 
-                GetDonat("08.01.2000", 7, "Nick7", 900), // долг x2
-                GetDonat("08.01.2000", 8, "Nick8", 800), // долг x2
-                GetDonat("08.01.2000", 9, "Nick9", 700), // долг x2
+                GetDonation("08.01.2000", 7, "Nick7", 900), // долг x2
+                GetDonation("08.01.2000", 8, "Nick8", 800), // долг x2
+                GetDonation("08.01.2000", 9, "Nick9", 700), // долг x2
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             Assert.Equal((0, "Nick1"), (orderPositions[1].CurrentIndex, orders[1].UserNickname.Nickname));
             Assert.Equal((1, "Nick7"), (orderPositions[7].CurrentIndex, orders[7].UserNickname.Nickname));
@@ -178,24 +180,24 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
-        public void Alternation_Debt_Debt()
+        public void Debt_Debt()
         {
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
             [
-                GetDonat("09.01.2000", 4, "Nick4", 900), // долг x1
-                GetDonat("09.01.2000", 5, "Nick5", 800), // долг x1
-                GetDonat("09.01.2000", 6, "Nick6", 700), // долг x1
+                GetDonation("09.01.2000", 4, "Nick4", 900), // долг x1
+                GetDonation("09.01.2000", 5, "Nick5", 800), // долг x1
+                GetDonation("09.01.2000", 6, "Nick6", 700), // долг x1
 
-                GetDonat("08.01.2000", 7, "Nick7", 900), // долг x2
-                GetDonat("08.01.2000", 8, "Nick8", 800), // долг x2
-                GetDonat("08.01.2000", 9, "Nick9", 700), // долг x2
+                GetDonation("08.01.2000", 7, "Nick7", 900), // долг x2
+                GetDonation("08.01.2000", 8, "Nick8", 800), // долг x2
+                GetDonation("08.01.2000", 9, "Nick9", 700), // долг x2
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             Assert.Equal((0, "Nick7"), (orderPositions[7].CurrentIndex, orders[7].UserNickname.Nickname));
             Assert.Equal((1, "Nick4"), (orderPositions[4].CurrentIndex, orders[4].UserNickname.Nickname));
@@ -207,7 +209,7 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
-        public void Alternation_OutOfQueue_Donat()
+        public void OutOfQueue_Donat()
         {
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
@@ -216,15 +218,15 @@ namespace Faryma.Composer.Core.Test
                 GetOutOfQueue("01.01.2000", 2, "Nick1"),
                 GetOutOfQueue("01.01.2000", 3, "Nick2"),
 
-                GetDonat("10.01.2000", 4, "Nick1", 900),
-                GetDonat("10.01.2000", 5, "Nick1", 800),
-                GetDonat("10.01.2000", 6, "Nick2", 700),
+                GetDonation("10.01.2000", 4, "Nick1", 900),
+                GetDonation("10.01.2000", 5, "Nick1", 800),
+                GetDonation("10.01.2000", 6, "Nick2", 700),
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             Assert.Equal((0, "Nick1"), (orderPositions[1].CurrentIndex, orders[1].UserNickname.Nickname));
             Assert.Equal((1, "Nick2"), (orderPositions[3].CurrentIndex, orders[3].UserNickname.Nickname));
@@ -236,7 +238,7 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
-        public void Alternation_OutOfQueue_Donat_Debt_Debt()
+        public void OutOfQueue_Donat_Debt_Debt()
         {
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
@@ -245,23 +247,23 @@ namespace Faryma.Composer.Core.Test
                 GetOutOfQueue("01.01.2000", 2, "Nick1"),
                 GetOutOfQueue("01.01.2000", 3, "Nick2"),
 
-                GetDonat("10.01.2000", 4, "Nick1", 900),
-                GetDonat("10.01.2000", 5, "Nick1", 800),
-                GetDonat("10.01.2000", 6, "Nick2", 700),
+                GetDonation("10.01.2000", 4, "Nick1", 900),
+                GetDonation("10.01.2000", 5, "Nick1", 800),
+                GetDonation("10.01.2000", 6, "Nick2", 700),
 
-                GetDonat("09.01.2000", 7, "Nick4", 900), // долг x1
-                GetDonat("09.01.2000", 8, "Nick5", 800), // долг x1
-                GetDonat("09.01.2000", 9, "Nick6", 700), // долг x1
+                GetDonation("09.01.2000", 7, "Nick4", 900), // долг x1
+                GetDonation("09.01.2000", 8, "Nick5", 800), // долг x1
+                GetDonation("09.01.2000", 9, "Nick6", 700), // долг x1
 
-                GetDonat("08.01.2000", 10, "Nick7", 900), // долг x2
-                GetDonat("08.01.2000", 11, "Nick8", 800), // долг x2
-                GetDonat("08.01.2000", 12, "Nick9", 700), // долг x2
+                GetDonation("08.01.2000", 10, "Nick7", 900), // долг x2
+                GetDonation("08.01.2000", 11, "Nick8", 800), // долг x2
+                GetDonation("08.01.2000", 12, "Nick9", 700), // долг x2
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             Assert.Equal(0, orderPositions[1].CurrentIndex);
             Assert.Equal(1, orderPositions[3].CurrentIndex);
@@ -269,7 +271,7 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
-        public void Alternation_OutOfQueue_FutureDonat_Debt_Debt()
+        public void OutOfQueue_FutureDonat_Debt_Debt_Inactive()
         {
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
@@ -278,27 +280,27 @@ namespace Faryma.Composer.Core.Test
                 GetOutOfQueue("01.01.2000", 2, "Nick1"),
                 GetOutOfQueue("01.01.2000", 3, "Nick2"),
 
-                GetDonat("20.01.2000", 4, "Nick1", 900),
-                GetDonat("20.01.2000", 5, "Nick1", 800),
-                GetDonat("20.01.2000", 6, "Nick2", 700),
+                GetDonation("20.01.2000", 4, "Nick1", 900),
+                GetDonation("20.01.2000", 5, "Nick1", 800),
+                GetDonation("20.01.2000", 6, "Nick2", 700),
 
-                GetDonat("09.01.2000", 7, "Nick2", 900), // долг x1
-                GetDonat("09.01.2000", 8, "Nick2", 800), // долг x1
-                GetDonat("09.01.2000", 9, "Nick6", 700), // долг x1
+                GetDonation("09.01.2000", 7, "Nick2", 900), // долг x1
+                GetDonation("09.01.2000", 8, "Nick2", 800), // долг x1
+                GetDonation("09.01.2000", 9, "Nick6", 700), // долг x1
 
-                GetDonat("08.01.2000", 10, "Nick1", 900), // долг x2
-                GetDonat("08.01.2000", 11, "Nick2", 800), // долг x2
-                GetDonat("08.01.2000", 12, "Nick9", 700), // долг x2
+                GetDonation("08.01.2000", 10, "Nick1", 900), // долг x2
+                GetDonation("08.01.2000", 11, "Nick2", 800), // долг x2
+                GetDonation("08.01.2000", 12, "Nick9", 700), // долг x2
 
-                GetDonat("20.01.2000", 13, "Nick2", 900, false),
-                GetDonat("10.01.2000", 14, "Nick2", 800, false),
-                GetDonat("08.01.2000", 15, "Nick9", 700, false),
+                GetDonation("20.01.2000", 13, "Nick2", 900, false),
+                GetDonation("10.01.2000", 14, "Nick2", 800, false),
+                GetDonation("08.01.2000", 15, "Nick9", 700, false),
             ];
 
             Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
-            Dictionary<long, OrderPosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderPosition());
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
 
-            OrderQueueService.Refresh(currentStreamDate, orders, orderPositions);
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
             Assert.Equal((0, OrderActivityStatus.Future, "Nick1"), (orderPositions[4].CurrentIndex, orderPositions[4].CurrentActivityStatus, orders[4].UserNickname.Nickname));
             Assert.Equal((1, OrderActivityStatus.Future, "Nick1"), (orderPositions[5].CurrentIndex, orderPositions[5].CurrentActivityStatus, orders[5].UserNickname.Nickname));
@@ -321,7 +323,7 @@ namespace Faryma.Composer.Core.Test
             Assert.Equal((2, OrderActivityStatus.Inactive, "Nick9"), (orderPositions[15].CurrentIndex, orderPositions[15].CurrentActivityStatus, orders[15].UserNickname.Nickname));
         }
 
-        private ReviewOrder GetDonat(string eventDate, long id, string name, int amount, bool isActive = true)
+        private ReviewOrder GetDonation(string eventDate, long id, string name, int amount, bool isActive = true)
         {
             return new()
             {

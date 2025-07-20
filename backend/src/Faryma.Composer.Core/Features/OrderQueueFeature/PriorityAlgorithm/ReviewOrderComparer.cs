@@ -2,7 +2,7 @@
 using Faryma.Composer.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Core.Features.OrderQueueFeature
+namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
     public sealed class ReviewOrderComparer : IComparer<ReviewOrder>
     {
@@ -11,7 +11,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             decimal xAmount = x.NominalAmount + x.Payments.Sum(x => x.Amount);
             decimal yAmount = y.NominalAmount + y.Payments.Sum(y => y.Amount);
 
-            int result = decimal.Compare(xAmount, yAmount) * (-1);
+            int result = decimal.Compare(xAmount, yAmount) * -1;
             if (result != 0)
             {
                 return result;

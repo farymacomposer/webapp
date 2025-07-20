@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 
-namespace Faryma.Composer.Core.Features.OrderQueueFeature
+namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
     public sealed class OrderProvider(List<ReviewOrder> ordersQueue)
     {

@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Core.Features.OrderQueueFeature
+namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
     public sealed class OrderPriorityManager
     {
@@ -52,13 +52,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             _debtProvider = new DebtOrderProvider(providers);
         }
 
-        public (State, bool) DetermineNextState()
+        public (State State, bool IsOnlyNicknameLeft) DetermineNextState()
         {
             (_currentState, bool isOnlyNicknameLeft) = _currentState switch
             {
-                State.Initial or State.Debt when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
-                State.Initial or State.Debt when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
-                State.Initial or State.Debt when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
+                State.Initial when _outOfQueueProvider.HasOrders => (State.OutOfQueue, true),
+                State.Initial when _donationProvider?.HasOrders == true => (State.Donation, true),
+                State.Initial when _debtProvider.HasOrders => (State.Debt, true),
 
                 State.OutOfQueue when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
                 State.OutOfQueue when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
@@ -68,9 +68,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 State.Donation when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
                 State.Donation when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
 
-                State.Initial or State.Debt or State.OutOfQueue or State.Donation when _outOfQueueProvider.HasOrders => (State.OutOfQueue, true),
-                State.Initial or State.Debt or State.OutOfQueue or State.Donation when _donationProvider?.HasOrders == true => (State.Donation, true),
-                State.Initial or State.Debt or State.OutOfQueue or State.Donation when _debtProvider.HasOrders => (State.Debt, true),
+                State.Debt when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
+                State.Debt when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
+                State.Debt when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
+
+                not State.Completed when _outOfQueueProvider.HasOrders => (State.OutOfQueue, true),
+                not State.Completed when _donationProvider?.HasOrders == true => (State.Donation, true),
+                not State.Completed when _debtProvider.HasOrders => (State.Debt, true),
 
                 _ => (State.Completed, false),
             };
@@ -80,16 +84,16 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
         public ReviewOrder TakeNextOrder(bool isOnlyNicknameLeft)
         {
-            ReviewOrder order = _currentState switch
+            ReviewOrder result = _currentState switch
             {
                 State.OutOfQueue => _outOfQueueProvider.TakeNextOrder(_lastIssuedNickname),
                 State.Donation => _donationProvider!.TakeNextOrder(_lastIssuedNickname),
                 State.Debt => _debtProvider.TakeNextOrder(_lastIssuedNickname, isOnlyNicknameLeft),
             };
 
-            _lastIssuedNickname = order.UserNickname.NormalizedNickname;
+            _lastIssuedNickname = result.UserNickname.NormalizedNickname;
 
-            return order;
+            return result;
         }
     }
 }

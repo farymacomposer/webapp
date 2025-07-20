@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 
-namespace Faryma.Composer.Core.Features.OrderQueueFeature
+namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
     public sealed class DebtOrderProvider(List<(DateOnly StreamDate, OrderProvider Provider)> orderProviders)
     {
@@ -8,7 +8,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
         public bool HasOrders => orderProviders.Any(x => x.Provider.HasOrders);
 
-        public bool HasAnotherNickname(string? lastIssuedNickname) => orderProviders.Any(x => x.Provider.HasAnotherNickname(lastIssuedNickname));
+        public bool HasAnotherNickname(string? nicknameToSkip) => orderProviders.Any(x => x.Provider.HasAnotherNickname(nicknameToSkip));
 
         public ReviewOrder TakeNextOrder(string? nicknameToSkip, bool isOnlyNicknameLeft)
         {
