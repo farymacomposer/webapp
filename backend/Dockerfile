@@ -27,6 +27,6 @@ EXPOSE 8080
 COPY --from=publish /app/publish .
 COPY --from=migrations /app/migrations-bundle ./migrations-bundle
 
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
-ENTRYPOINT ["./entrypoint.sh"]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
