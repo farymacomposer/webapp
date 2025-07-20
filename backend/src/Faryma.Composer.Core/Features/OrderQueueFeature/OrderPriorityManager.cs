@@ -31,7 +31,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             ReviewOrderComparer comparer = new();
             List<(DateOnly, OrderProvider)> providers = orders
                 .Select(x => x.Value)
-                .Where(x => x.IsActive && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free)
+                .Where(x => x.IsActive
+                    && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
+                    && x.ComposerStream.EventDate <= currentStreamDate)
                 .GroupBy(x => x.ComposerStream.EventDate)
                 .Select(x => (x.Key, new OrderProvider(x.Order(comparer).ToList())))
                 .OrderBy(x => x.Key)
@@ -50,35 +52,39 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             _debtProvider = new DebtOrderProvider(providers);
         }
 
-        public State DetermineNextState()
+        public (State, bool) DetermineNextState()
         {
-            _currentState = _currentState switch
+            (_currentState, bool isOnlyNicknameLeft) = _currentState switch
             {
-                State.Initial or State.Debt when _outOfQueueProvider.HasOrders => State.OutOfQueue,
-                State.Initial or State.Debt when _donationProvider?.HasOrders == true => State.Donation,
-                State.Initial or State.Debt when _debtProvider.HasOrders => State.Debt,
+                State.Initial or State.Debt when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
+                State.Initial or State.Debt when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
+                State.Initial or State.Debt when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
 
-                State.OutOfQueue when _donationProvider?.HasOrders == true => State.Donation,
-                State.OutOfQueue when _debtProvider.HasOrders => State.Debt,
-                State.OutOfQueue when _outOfQueueProvider.HasOrders => State.OutOfQueue,
+                State.OutOfQueue when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
+                State.OutOfQueue when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
+                State.OutOfQueue when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
 
-                State.Donation when _outOfQueueProvider.HasOrders => State.OutOfQueue,
-                State.Donation when _debtProvider.HasOrders => State.Debt,
-                State.Donation when _donationProvider?.HasOrders == true => State.Donation,
+                State.Donation when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
+                State.Donation when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
+                State.Donation when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
 
-                _ => State.Completed,
+                State.Initial or State.Debt or State.OutOfQueue or State.Donation when _outOfQueueProvider.HasOrders => (State.OutOfQueue, true),
+                State.Initial or State.Debt or State.OutOfQueue or State.Donation when _donationProvider?.HasOrders == true => (State.Donation, true),
+                State.Initial or State.Debt or State.OutOfQueue or State.Donation when _debtProvider.HasOrders => (State.Debt, true),
+
+                _ => (State.Completed, false),
             };
 
-            return _currentState;
+            return (_currentState, isOnlyNicknameLeft);
         }
 
-        public ReviewOrder TakeNextOrder()
+        public ReviewOrder TakeNextOrder(bool isOnlyNicknameLeft)
         {
             ReviewOrder order = _currentState switch
             {
                 State.OutOfQueue => _outOfQueueProvider.TakeNextOrder(_lastIssuedNickname),
                 State.Donation => _donationProvider!.TakeNextOrder(_lastIssuedNickname),
-                State.Debt => _debtProvider.TakeNextOrder(_lastIssuedNickname),
+                State.Debt => _debtProvider.TakeNextOrder(_lastIssuedNickname, isOnlyNicknameLeft),
             };
 
             _lastIssuedNickname = order.UserNickname.NormalizedNickname;

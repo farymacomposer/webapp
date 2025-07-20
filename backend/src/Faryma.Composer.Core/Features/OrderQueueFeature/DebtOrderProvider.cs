@@ -8,32 +8,38 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
         public bool HasOrders => orderProviders.Any(x => x.Provider.HasOrders);
 
-        public ReviewOrder TakeNextOrder(string? nicknameToSkip)
+        public bool HasAnotherNickname(string? lastIssuedNickname) => orderProviders.Any(x => x.Provider.HasAnotherNickname(lastIssuedNickname));
+
+        public ReviewOrder TakeNextOrder(string? nicknameToSkip, bool isOnlyNicknameLeft)
         {
-            int index = _counter % orderProviders.Count;
-
-            while (orderProviders.Count > 0)
+            while (true)
             {
-                if (index > orderProviders.Count - 1)
-                {
-                    index--;
-                }
+                int index = _counter % orderProviders.Count;
 
-                (DateOnly StreamDate, OrderProvider Provider) item = orderProviders[index];
-                if (item.Provider.HasOrders)
+                (DateOnly streamDate, OrderProvider provider) = orderProviders[index];
+                if (isOnlyNicknameLeft)
                 {
-                    ReviewOrder order = item.Provider.TakeNextOrder(nicknameToSkip);
-                    _counter++;
+                    if (provider.HasOrders)
+                    {
+                        ReviewOrder order = provider.TakeNextOrder(nicknameToSkip);
+                        _counter++;
 
-                    return order;
+                        return order;
+                    }
                 }
                 else
                 {
-                    orderProviders.Remove(item);
-                }
-            }
+                    if (provider.HasAnotherNickname(nicknameToSkip))
+                    {
+                        ReviewOrder order = provider.TakeNextOrder(nicknameToSkip);
+                        _counter++;
 
-            return null!;
+                        return order;
+                    }
+                }
+
+                _counter++;
+            }
         }
     }
 }
