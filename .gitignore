@@ -416,3 +416,11 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# === Frontend (Next.js) ===
+frontend/node_modules/
+frontend/.next/
+frontend/.turbo/
+frontend/.env*
+frontend/coverage/
+frontend/dist/
