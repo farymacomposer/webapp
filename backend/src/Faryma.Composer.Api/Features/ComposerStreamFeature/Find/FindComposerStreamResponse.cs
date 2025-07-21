@@ -3,7 +3,7 @@
     /// <summary>
     /// Ответ на запрос поиска стримов композитора
     /// </summary>
-    public sealed class FindComposerStreamResponse
+    public sealed record FindComposerStreamResponse
     {
         /// <summary>
         /// Список стримов

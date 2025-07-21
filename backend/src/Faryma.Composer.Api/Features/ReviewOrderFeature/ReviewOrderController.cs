@@ -22,9 +22,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// <param name="request">Запрос создания заказа</param>
         [HttpPost(nameof(CreateReviewOrder))]
         [AuthorizeAdmins]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
             [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
             [FromBody] CreateReviewOrderRequest request)
@@ -54,9 +51,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// <param name="request">Запрос поднятия заказа в очереди</param>
         [HttpPost(nameof(UpReviewOrder))]
         [AuthorizeAdmins]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<UpReviewOrderResponse>> UpReviewOrder(
             [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
             [FromBody] UpReviewOrderRequest request)

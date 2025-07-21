@@ -3,7 +3,7 @@
     /// <summary>
     /// Ответ на запрос создания заказа на разбор
     /// </summary>
-    public sealed class CreateReviewOrderResponse
+    public sealed record CreateReviewOrderResponse
     {
         /// <summary>
         /// Id заказа на разбора трека

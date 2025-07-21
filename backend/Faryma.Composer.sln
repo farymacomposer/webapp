@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6 d17.14
+VisualStudioVersion = 17.14.36301.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Api", "src\Faryma.Composer.Api\Faryma.Composer.Api.csproj", "{3D869AF8-5502-A32E-F794-B487CE4696E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Core", "src\Faryma.Composer.Core\Faryma.Composer.Core.csproj", "{4EB1C40A-C953-14F3-3330-70F5816814CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Infrastructure", "src\Faryma.Composer.Infrastructure\Faryma.Composer.Infrastructure.csproj", "{6FD4945A-2232-0D0D-0BDC-DDC583E464A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Core.Test", "src\Faryma.Composer.Core.Test\Faryma.Composer.Core.Test.csproj", "{C7B206A0-3BF3-4BB0-A42C-7381982FE487}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{6FD4945A-2232-0D0D-0BDC-DDC583E464A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FD4945A-2232-0D0D-0BDC-DDC583E464A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FD4945A-2232-0D0D-0BDC-DDC583E464A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

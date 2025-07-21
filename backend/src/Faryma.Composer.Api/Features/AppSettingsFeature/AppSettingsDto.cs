@@ -5,7 +5,7 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
     /// <summary>
     /// Настройки приложения
     /// </summary>
-    public sealed class AppSettingsDto
+    public sealed record AppSettingsDto
     {
         /// <summary>
         /// Номинальная стоимость заказа (для бесплатных разборов)

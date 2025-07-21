@@ -5,7 +5,7 @@ namespace Faryma.Composer.Api.Auth.Login
     /// <summary>
     /// Запрос входа в систему
     /// </summary>
-    public sealed class LoginRequest
+    public sealed record LoginRequest
     {
         /// <summary>
         /// Имя пользователя

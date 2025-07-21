@@ -19,9 +19,6 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         /// </summary>
         [HttpPost(nameof(CreateComposerStream))]
         [AuthorizeComposer]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<CreateComposerStreamResponse>> CreateComposerStream(CreateComposerStreamRequest request)
         {
             ComposerStream item = await composerStreamService.Create(request.EventDate, request.Type);
@@ -33,8 +30,6 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         /// Возвращает список стримов
         /// </summary>
         [HttpGet(nameof(FindComposerStream))]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<FindComposerStreamResponse>> FindComposerStream([FromQuery] FindComposerStreamRequest request)
         {
             IReadOnlyCollection<ComposerStream> items = await composerStreamService.Find(request.DateFrom, request.DateTo);

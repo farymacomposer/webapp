@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using Faryma.Composer.Infrastructure.Abstractions;
 using Faryma.Composer.Infrastructure.Enums;
 
@@ -7,6 +8,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// <summary>
     /// Заказ разбора трека
     /// </summary>
+    [DebuggerDisplay("Nickname = {UserNickname.Nickname}")]
     public sealed class ReviewOrder : BaseEntity
     {
         /// <summary>

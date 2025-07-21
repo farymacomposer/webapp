@@ -5,7 +5,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Up
     /// <summary>
     /// Запрос поднятия заказа в очереди
     /// </summary>
-    public sealed class UpReviewOrderRequest : IValidatableObject
+    public sealed record UpReviewOrderRequest : IValidatableObject
     {
         /// <summary>
         /// Псевдоним пользователя

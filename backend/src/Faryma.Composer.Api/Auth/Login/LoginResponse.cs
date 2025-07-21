@@ -5,7 +5,7 @@ namespace Faryma.Composer.Api.Auth.Login
     /// <summary>
     /// Ответ на запрос входа в систему
     /// </summary>
-    public sealed class LoginResponse
+    public sealed record LoginResponse
     {
         /// <summary>
         /// JWT-токен

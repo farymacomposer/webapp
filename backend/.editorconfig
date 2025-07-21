@@ -1,12 +1,9 @@
-# main v1.1.11 Roslynator v4.13.1
-
 root = true
 
 [*.{cs,xaml,ts,js,proto,md}]
 charset = utf-8-bom
 spelling_languages = en-us,ru-ru
 spelling_checkable_types = strings,identifiers,comments
-spelling_exclusion_path = .\exclusion.dic
 
 # Файлы C#
 [*.cs]
