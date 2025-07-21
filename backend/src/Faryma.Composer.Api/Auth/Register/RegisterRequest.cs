@@ -5,7 +5,7 @@ namespace Faryma.Composer.Api.Auth.Register
     /// <summary>
     /// Запрос регистрации пользователя
     /// </summary>
-    public sealed class RegisterRequest
+    public sealed record RegisterRequest
     {
         /// <summary>
         /// Имя пользователя

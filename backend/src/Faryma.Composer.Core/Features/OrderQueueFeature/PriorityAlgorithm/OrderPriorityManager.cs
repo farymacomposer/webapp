@@ -60,17 +60,17 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 State.Initial when _donationProvider?.HasOrders == true => (State.Donation, true),
                 State.Initial when _debtProvider.HasOrders => (State.Debt, true),
 
-                State.OutOfQueue when _outOfQueueProvider.HasAnotherNickname(_lastIssuedNickname) => (State.OutOfQueue, false),
-                State.OutOfQueue when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
-                State.OutOfQueue when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
+                State.OutOfQueue when _outOfQueueProvider.HasAnotherNicknameComparedWithLastIssued(_lastIssuedNickname) => (State.OutOfQueue, false),
+                State.OutOfQueue when _donationProvider?.HasAnotherNicknameComparedWithLastIssued(_lastIssuedNickname) == true => (State.Donation, false),
+                State.OutOfQueue when _debtProvider.HasAnotherNicknameComparedWithLastIssued(_lastIssuedNickname) => (State.Debt, false),
 
                 State.Donation when _outOfQueueProvider.HasOrders => (State.OutOfQueue, true),
-                State.Donation when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
-                State.Donation when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
+                State.Donation when _debtProvider.HasAnotherNicknameComparedWithLastIssued(_lastIssuedNickname) => (State.Debt, false),
+                State.Donation when _donationProvider?.HasAnotherNicknameComparedWithLastIssued(_lastIssuedNickname) == true => (State.Donation, false),
 
                 State.Debt when _outOfQueueProvider.HasOrders => (State.OutOfQueue, true),
                 State.Debt when _donationProvider?.HasAnotherNickname(_lastIssuedNickname) == true => (State.Donation, false),
-                State.Debt when _debtProvider.HasAnotherNickname(_lastIssuedNickname) => (State.Debt, false),
+                State.Debt when _debtProvider.HasAnotherNicknameComparedWithLastIssued(_lastIssuedNickname) => (State.Debt, false),
 
                 not State.Completed when _outOfQueueProvider.HasOrders => (State.OutOfQueue, true),
                 not State.Completed when _donationProvider?.HasOrders == true => (State.Donation, true),

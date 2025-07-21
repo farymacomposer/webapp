@@ -3,7 +3,7 @@
     /// <summary>
     /// Запрос поднятия заказа в очереди
     /// </summary>
-    public sealed class UpCommand
+    public sealed record UpCommand
     {
         /// <summary>
         /// Псевдоним пользователя

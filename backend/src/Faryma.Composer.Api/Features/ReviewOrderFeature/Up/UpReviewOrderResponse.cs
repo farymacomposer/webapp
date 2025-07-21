@@ -3,7 +3,7 @@
     /// <summary>
     /// Ответ на запрос поднятия заказа в очереди
     /// </summary>
-    public sealed class UpReviewOrderResponse
+    public sealed record UpReviewOrderResponse
     {
         /// <summary>
         /// Id платежа

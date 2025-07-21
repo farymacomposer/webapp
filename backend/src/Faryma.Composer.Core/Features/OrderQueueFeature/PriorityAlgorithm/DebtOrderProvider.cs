@@ -8,7 +8,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
         public bool HasOrders => orderProviders.Any(x => x.Provider.HasOrders);
 
-        public bool HasAnotherNickname(string? nicknameToSkip) => orderProviders.Any(x => x.Provider.HasAnotherNickname(nicknameToSkip));
+        public bool HasAnotherNicknameComparedWithLastIssued(string? nicknameToSkip) => orderProviders.Any(x => x.Provider.HasAnotherNicknameComparedWithLastIssued(nicknameToSkip));
 
         public ReviewOrder TakeNextOrderFromAnyProvider(string? nicknameToSkip)
         {
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 int index = _counter % orderProviders.Count;
 
                 (DateOnly streamDate, OrderProvider provider) = orderProviders[index];
-                if (provider.HasAnotherNickname(nicknameToSkip))
+                if (provider.HasAnotherNicknameComparedWithLastIssued(nicknameToSkip))
                 {
                     ReviewOrder order = provider.TakeNextOrder(nicknameToSkip);
                     _counter++;

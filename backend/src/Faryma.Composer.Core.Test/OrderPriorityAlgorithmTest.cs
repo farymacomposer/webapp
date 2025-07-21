@@ -110,9 +110,9 @@ namespace Faryma.Composer.Core.Test
             Check([
                 (1, "Nick1"),
                 (6, "Nick2"), // долг x1
-                (4, "Nick1"), // долг x1
-                (3, "Nick2"),
                 (2, "Nick1"),
+                (3, "Nick2"),
+                (4, "Nick1"), // долг x1
                 (5, "Nick1"), // долг x1
             ], orders, orderPositions);
         }
@@ -242,11 +242,11 @@ namespace Faryma.Composer.Core.Test
             Check([
                 (1, "Nick1"),
                 (9, "Nick2"), // долг x2
-                (4, "Nick1"), // долг x1
-                (3, "Nick2"),
-                (7, "Nick1"), // долг x2
-                (6, "Nick2"), // долг x1
                 (2, "Nick1"),
+                (6, "Nick2"), // долг x1
+                (7, "Nick1"), // долг x2
+                (3, "Nick2"),
+                (4, "Nick1"), // долг x1
                 (8, "Nick1"), // долг x2
                 (5, "Nick1"), // долг x1
             ], orders, orderPositions);
@@ -281,8 +281,8 @@ namespace Faryma.Composer.Core.Test
                 (4, "Nick2"), // долг x1
                 (2, "Nick1"),
                 (7, "Nick2"), // долг x2
-                (5, "Nick1"), // долг x1
                 (3, "Nick1"),
+                (5, "Nick1"), // долг x1
                 (9, "Nick1"), // долг x2
                 (6, "Nick1"), // долг x1
             ], orders, orderPositions);
@@ -316,21 +316,17 @@ namespace Faryma.Composer.Core.Test
 
             Check([
                 (1,  "Nick1"),
-
                 (11, "Nick4"), // долг x2
-                (7,  "Nick1"), // долг x1
-
-                (12, "Nick5"), // долг x2
-                (8,  "Nick2"), // долг x1
-
-                (10, "Nick1"), // долг x2
-                (9,  "Nick3"), // долг x1
-
                 (2,  "Nick1"),
+                (8,  "Nick2"), // долг x1
                 (3,  "Nick1"),
+                (12, "Nick5"), // долг x2
                 (4,  "Nick1"),
+                (9,  "Nick3"), // долг x1
                 (5,  "Nick1"),
                 (6,  "Nick1"),
+                (10, "Nick1"), // долг x2
+                (7,  "Nick1"), // долг x1
             ], orders, orderPositions);
         }
 
@@ -366,24 +362,22 @@ namespace Faryma.Composer.Core.Test
 
             Check([
                 (1,  "Nick1"),
-
                 (13, "Nick8"), // долг x3
+                (2,  "Nick1"),
                 (10, "Nick5"), // долг x2
+                (3,  "Nick1"),
                 (7,  "Nick2"), // долг x1
 
+                (4,  "Nick1"),
                 (14, "Nick9"), // долг x3
+                (5,  "Nick1"),
                 (11, "Nick6"), // долг x2
+                (6,  "Nick1"),
                 (8,  "Nick3"), // долг x1
 
                 (15, "Nick10"), // долг x3
                 (12, "Nick7"), // долг x2
                 (9,  "Nick4"), // долг x1
-
-                (2,  "Nick1"),
-                (3,  "Nick1"),
-                (4,  "Nick1"),
-                (5,  "Nick1"),
-                (6,  "Nick1"),
             ], orders, orderPositions);
         }
 
@@ -420,21 +414,19 @@ namespace Faryma.Composer.Core.Test
             Check([
                 (1,  "Nick10"),
                 (13, "Nick7"), // долг x3
-                (2,  "Nick10"),
-                (10, "Nick4"), // долг x2
                 (3,  "Nick11"),
+                (10, "Nick4"), // долг x2
+                (2,  "Nick10"),
                 (7,  "Nick1"), // долг x1
-
                 (4,  "Nick11"),
                 (14, "Nick8"), // долг x3
                 (5,  "Nick12"),
                 (11, "Nick5"), // долг x2
+                (6,  "Nick12"),
                 (8,  "Nick2"), // долг x1
-
                 (15, "Nick9"), // долг x3
                 (12, "Nick6"), // долг x2
                 (9,  "Nick3"), // долг x1
-                (6,  "Nick12"),
             ], orders, orderPositions);
         }
 
@@ -470,6 +462,28 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
+        public void OutOfQueue()
+        {
+            var currentStreamDate = DateOnly.Parse("10.01.2000");
+            ReviewOrder[] items =
+            [
+                GetOutOfQueue("01.01.2000", 1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("01.01.2000", 2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("01.01.2000", 3, "Nick1"), // ВНЕ ОЧЕРЕДИ
+            ];
+
+            Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
+
+            Check([
+                (1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (3, "Nick1"), // ВНЕ ОЧЕРЕДИ
+            ], orders, orderPositions);
+        }
+
+        [Fact]
         public void OutOfQueue_Donat()
         {
             var currentStreamDate = DateOnly.Parse("10.01.2000");
@@ -495,6 +509,35 @@ namespace Faryma.Composer.Core.Test
                 (6, "Nick2"),
                 (4, "Nick1"),
                 (5, "Nick1"),
+            ], orders, orderPositions);
+        }
+
+        [Fact]
+        public void OutOfQueue_Donat_Alt1()
+        {
+            var currentStreamDate = DateOnly.Parse("10.01.2000");
+            ReviewOrder[] items =
+            [
+                GetOutOfQueue("01.01.2000", 1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("01.01.2000", 2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("01.01.2000", 3, "Nick1"), // ВНЕ ОЧЕРЕДИ
+
+                GetDonation("10.01.2000", 4, "Nick2", 900),
+                GetDonation("10.01.2000", 5, "Nick3", 800),
+                GetDonation("10.01.2000", 6, "Nick4", 700),
+            ];
+
+            Dictionary<long, ReviewOrder> orders = items.ToDictionary(k => k.Id);
+            Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
+            Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
+
+            Check([
+                (1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (4, "Nick2"),
+                (2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (5, "Nick3"),
+                (3, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (6, "Nick4"),
             ], orders, orderPositions);
         }
 

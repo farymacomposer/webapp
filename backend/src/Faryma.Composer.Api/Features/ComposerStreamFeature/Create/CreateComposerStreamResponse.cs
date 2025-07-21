@@ -3,7 +3,7 @@
     /// <summary>
     /// Ответ на запрос создания стрима
     /// </summary>
-    public sealed class CreateComposerStreamResponse
+    public sealed record CreateComposerStreamResponse
     {
         /// <summary>
         /// Стрим композитора

@@ -3,7 +3,7 @@
     /// <summary>
     /// Настройки приложения
     /// </summary>
-    public sealed class AppSettingsModel
+    public sealed record AppSettingsModel
     {
         /// <summary>
         /// Номинальная стоимость заказа (для бесплатных)

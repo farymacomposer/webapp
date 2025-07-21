@@ -16,7 +16,6 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
         /// </summary>
         [HttpGet(nameof(GetAppSettings))]
         [AuthorizeComposer]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<AppSettingsDto> GetAppSettings() => Ok(Mapper.Map(appSettingsService.Settings));
 
         /// <summary>
@@ -24,8 +23,6 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
         /// </summary>
         [HttpPost(nameof(UpdateAppSettings))]
         [AuthorizeComposer]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateAppSettings(AppSettingsDto dto)
         {
             await appSettingsService.Update(Mapper.Map(dto));

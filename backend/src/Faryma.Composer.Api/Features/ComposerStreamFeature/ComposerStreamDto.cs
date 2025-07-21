@@ -5,7 +5,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
     /// <summary>
     /// Стрим композитора
     /// </summary>
-    public sealed class ComposerStreamDto
+    public sealed record ComposerStreamDto
     {
         /// <summary>
         /// Id стрима
