@@ -475,9 +475,9 @@ namespace Faryma.Composer.Core.Test
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
             [
-                GetOutOfQueue("01.01.2000", 1, "Nick1"),
-                GetOutOfQueue("01.01.2000", 2, "Nick1"),
-                GetOutOfQueue("01.01.2000", 3, "Nick2"),
+                GetOutOfQueue("01.01.2000", 1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("01.01.2000", 2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("01.01.2000", 3, "Nick2"), // ВНЕ ОЧЕРЕДИ
 
                 GetDonation("10.01.2000", 4, "Nick1", 900),
                 GetDonation("10.01.2000", 5, "Nick1", 800),
@@ -488,13 +488,14 @@ namespace Faryma.Composer.Core.Test
             Dictionary<long, OrderQueuePosition> orderPositions = orders.ToDictionary(k => k.Key, _ => new OrderQueuePosition());
             Algorithm.RefreshOrderPositions(currentStreamDate, orders, orderPositions);
 
-            Assert.Equal((0, "Nick1"), (orderPositions[1].CurrentIndex, orders[1].UserNickname.Nickname));
-            Assert.Equal((1, "Nick2"), (orderPositions[3].CurrentIndex, orders[3].UserNickname.Nickname));
-            Assert.Equal((2, "Nick1"), (orderPositions[2].CurrentIndex, orders[2].UserNickname.Nickname));
-
-            Assert.Equal((3, "Nick2"), (orderPositions[6].CurrentIndex, orders[6].UserNickname.Nickname));
-            Assert.Equal((4, "Nick1"), (orderPositions[4].CurrentIndex, orders[4].UserNickname.Nickname));
-            Assert.Equal((5, "Nick1"), (orderPositions[5].CurrentIndex, orders[5].UserNickname.Nickname));
+            Check([
+                (1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (3, "Nick2"), // ВНЕ ОЧЕРЕДИ
+                (2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (6, "Nick2"),
+                (4, "Nick1"),
+                (5, "Nick1"),
+            ], orders, orderPositions);
         }
 
         [Fact]
@@ -503,12 +504,12 @@ namespace Faryma.Composer.Core.Test
             var currentStreamDate = DateOnly.Parse("20.01.2000");
             ReviewOrder[] items =
             [
-                GetOutOfQueue("10.01.2000", 1, "Nick1"),
-                GetOutOfQueue("10.01.2000", 2, "Nick1"),
-                GetOutOfQueue("10.01.2000", 3, "Nick1"),
-                GetOutOfQueue("10.01.2000", 4, "Nick1"),
-                GetOutOfQueue("10.01.2000", 5, "Nick1"),
-                GetOutOfQueue("10.01.2000", 6, "Nick1"),
+                GetOutOfQueue("10.01.2000", 1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 3, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 4, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 5, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 6, "Nick1"), // ВНЕ ОЧЕРЕДИ
 
                 GetDonation("09.01.2000", 7, "Nick2", 900), // долг x1
                 GetDonation("09.01.2000", 8, "Nick3", 800), // долг x1
@@ -555,12 +556,12 @@ namespace Faryma.Composer.Core.Test
             var currentStreamDate = DateOnly.Parse("20.01.2000");
             ReviewOrder[] items =
             [
-                GetOutOfQueue("10.01.2000", 1, "Nick10"),
-                GetOutOfQueue("10.01.2000", 2, "Nick10"),
-                GetOutOfQueue("10.01.2000", 3, "Nick11"),
-                GetOutOfQueue("10.01.2000", 4, "Nick11"),
-                GetOutOfQueue("10.01.2000", 5, "Nick12"),
-                GetOutOfQueue("10.01.2000", 6, "Nick12"),
+                GetOutOfQueue("10.01.2000", 1, "Nick10"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 2, "Nick10"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 3, "Nick11"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 4, "Nick11"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 5, "Nick12"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("10.01.2000", 6, "Nick12"), // ВНЕ ОЧЕРЕДИ
 
                 GetDonation("09.01.2000", 7, "Nick1", 900), // долг x1
                 GetDonation("09.01.2000", 8, "Nick2", 800), // долг x1
@@ -607,9 +608,9 @@ namespace Faryma.Composer.Core.Test
             var currentStreamDate = DateOnly.Parse("10.01.2000");
             ReviewOrder[] items =
             [
-                GetOutOfQueue("01.01.2000", 1, "Nick1"),
-                GetOutOfQueue("01.01.2000", 2, "Nick1"),
-                GetOutOfQueue("01.01.2000", 3, "Nick2"),
+                GetOutOfQueue("01.01.2000", 1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("01.01.2000", 2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                GetOutOfQueue("01.01.2000", 3, "Nick2"), // ВНЕ ОЧЕРЕДИ
 
                 GetDonation("20.01.2000", 4, "Nick1", 900),
                 GetDonation("20.01.2000", 5, "Nick1", 800),
