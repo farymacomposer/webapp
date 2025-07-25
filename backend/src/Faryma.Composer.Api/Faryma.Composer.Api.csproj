@@ -10,17 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Features\TrackFeature\**" />
-    <Compile Remove="Features\UserNicknameFeature\**" />
-    <Content Remove="Features\TrackFeature\**" />
-    <Content Remove="Features\UserNicknameFeature\**" />
-    <EmbeddedResource Remove="Features\TrackFeature\**" />
-    <EmbeddedResource Remove="Features\UserNicknameFeature\**" />
-    <None Remove="Features\TrackFeature\**" />
-    <None Remove="Features\UserNicknameFeature\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
