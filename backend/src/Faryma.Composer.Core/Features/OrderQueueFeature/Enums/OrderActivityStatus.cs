@@ -6,9 +6,9 @@
     public enum OrderActivityStatus
     {
         /// <summary>
-        /// Начальный статус
+        /// Статус не задан
         /// </summary>
-        Initial = 0,
+        Unspecified = 0,
 
         /// <summary>
         /// Заказ запланирован на будущий стрим

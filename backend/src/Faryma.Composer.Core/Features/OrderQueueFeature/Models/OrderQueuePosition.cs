@@ -3,28 +3,36 @@
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
 {
     /// <summary>
-    /// Позиция заказа в очереди на разбор
+    /// Позиция заказа в очереди, включая его индекс, статус активности и категорию
     /// </summary>
     public sealed class OrderQueuePosition
     {
         /// <summary>
-        /// Предыдущая позиция в очереди
+        /// Позиция заказа в очереди
         /// </summary>
-        public int PrevIndex { get; set; }
+        public int Index { get; set; }
 
         /// <summary>
-        /// Текущая позиция в очереди
+        /// Статус активности заказа
         /// </summary>
-        public int CurrentIndex { get; set; }
+        public OrderActivityStatus ActivityStatus { get; set; }
 
         /// <summary>
-        /// Предыдущий статус активности заказа
+        /// Категория заказа
         /// </summary>
-        public OrderActivityStatus PrevActivityStatus { get; set; }
+        public OrderCategory Category { get; set; } = new();
 
-        /// <summary>
-        /// Текущий статус активности заказа
-        /// </summary>
-        public OrderActivityStatus CurrentActivityStatus { get; set; }
+        public void Swap(OrderQueuePosition current)
+        {
+            Index = current.Index;
+            ActivityStatus = current.ActivityStatus;
+            Category = current.Category;
+        }
+
+        public void Set(int index, OrderActivityStatus status)
+        {
+            Index = index;
+            ActivityStatus = status;
+        }
     }
 }

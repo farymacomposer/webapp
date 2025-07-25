@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
-    public sealed class ReviewOrderComparer : IComparer<ReviewOrder>
+    public sealed class OrderPriorityComparer : IComparer<ReviewOrder>
     {
         public int Compare(ReviewOrder x, ReviewOrder y)
         {

@@ -15,6 +15,8 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
     [ApiController]
     public sealed class ReviewOrderController(ReviewOrderService reviewOrderService, IMemoryCache cache) : ControllerBase
     {
+        private static readonly TimeSpan _idempotencyKeyExpiration = TimeSpan.FromHours(1);
+
         /// <summary>
         /// Создает заказ разбора трека
         /// </summary>
@@ -37,9 +39,9 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 return Ok(new CreateReviewOrderResponse { ReviewOrderId = id });
             }
 
-            ReviewOrder order = await reviewOrderService.Create(Mapper.Map(request));
+            ReviewOrder order = await reviewOrderService.Create(request.Map());
 
-            cache.Set(key, order.Id, TimeSpan.FromHours(1));
+            cache.Set(key, order.Id, _idempotencyKeyExpiration);
 
             return Ok(new CreateReviewOrderResponse { ReviewOrderId = order.Id });
         }
@@ -66,9 +68,9 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 return Ok(new UpReviewOrderResponse { PaymentTransactionId = id });
             }
 
-            Transaction transaction = await reviewOrderService.Up(Mapper.Map(request));
+            Transaction transaction = await reviewOrderService.Up(request.Map());
 
-            cache.Set(key, transaction.Id, TimeSpan.FromHours(1));
+            cache.Set(key, transaction.Id, _idempotencyKeyExpiration);
 
             return Ok(new UpReviewOrderResponse { PaymentTransactionId = transaction.Id });
         }

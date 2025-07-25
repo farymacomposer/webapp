@@ -30,6 +30,7 @@ namespace Faryma.Composer.Infrastructure.Entities
 
         public long ReviewOrderId { get; set; }
         public long TrackId { get; set; }
+        public long ComposerStreamId { get; set; }
 
         // Навигационные свойства
 
@@ -44,5 +45,11 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// </summary>
         [ForeignKey(nameof(TrackId))]
         public required Track Track { get; set; }
+
+        /// <summary>
+        /// Связанный cтрим композитора
+        /// </summary>
+        [ForeignKey(nameof(ComposerStreamId))]
+        public required ComposerStream ComposerStream { get; set; }
     }
 }

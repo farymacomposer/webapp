@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Infrastructure.Enums;
+﻿using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Api.Features.ComposerStreamFeature
 {
@@ -26,5 +27,16 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         /// Тип стрима
         /// </summary>
         public required ComposerStreamType Type { get; set; }
+
+        public static ComposerStreamDto Map(ComposerStream item)
+        {
+            return new()
+            {
+                Id = item.Id,
+                EventDate = item.EventDate,
+                Status = item.Status,
+                Type = item.Type,
+            };
+        }
     }
 }
