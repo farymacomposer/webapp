@@ -7,9 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
-    /// <summary>
-    /// Контекст очереди заказов
-    /// </summary>
     public sealed class OrderQueueManager
     {
         /// <summary>
