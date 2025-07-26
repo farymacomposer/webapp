@@ -16,12 +16,12 @@ const genres = ["поп", "рок", "метал", "рэп", "электронн�
 
 export const SidebarFilters: React.FC = () => {
   const [ratingChecks, setRatingChecks] = useState<Record<string, boolean>>({
-    Гениально: false,
-    Атлична: false,
-    Хорошечно: false,
-    Нормас: false,
-    "Ну такое": false,
-    "Кринж-контент": false,
+    гениально: false,
+    атлична: false,
+    хорошечно: false,
+    нормас: false,
+    "ну такое": false,
+    "кринж-контент": false,
   });
 
   const [genreChecks, setGenreChecks] = useState<Record<string, boolean>>({
