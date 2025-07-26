@@ -44,20 +44,19 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
             Dictionary<long, ReviewOrder> ordersById = await context.ReviewOrders
                 .AsNoTracking()
-                .Where(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending)
                 .Include(x => x.ComposerStream)
                 .Include(x => x.UserNickname)
                 .Include(x => x.Payments)
+                .Where(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending)
                 .ToDictionaryAsync(k => k.Id);
 
             Dictionary<long, OrderPositionTracker> orderPositionsById = ordersById.ToDictionary(k => k.Key, _ => new OrderPositionTracker());
 
             Dictionary<DateOnly, string> lastNicknameByStreamDate = await context.ComposerStreams
-                .Include(x => x.ReviewOrders)
-                .Include(x => x.Reviews)
-                .Where(x => x.ReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending)
-                    && x.Reviews.Count > 0)
-                .ToDictionaryAsync(k => k.EventDate, v => v.Reviews.OrderBy(x => x.CompletedAt).Last().ReviewOrder.UserNickname.NormalizedNickname);
+                .Where(x => x.Reviews.Count > 0
+                    && x.ReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
+                .Select(x => new { x.EventDate, x.Reviews.OrderBy(x => x.CompletedAt).Last().ReviewOrder.UserNickname.NormalizedNickname })
+                .ToDictionaryAsync(k => k.EventDate, v => v.NormalizedNickname);
 
             return new OrderQueueManager
             {
