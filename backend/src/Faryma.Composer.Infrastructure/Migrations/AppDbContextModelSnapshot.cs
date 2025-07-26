@@ -164,6 +164,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     b.Property<DateTime>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<long>("ComposerStreamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
 
@@ -177,6 +180,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ComposerStreamId");
 
                     b.HasIndex("ReviewOrderId")
                         .IsUnique();
@@ -655,6 +660,12 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Review", b =>
                 {
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ComposerStream", "ComposerStream")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ComposerStreamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Faryma.Composer.Infrastructure.Entities.ReviewOrder", "ReviewOrder")
                         .WithOne("Review")
                         .HasForeignKey("Faryma.Composer.Infrastructure.Entities.Review", "ReviewOrderId")
@@ -666,6 +677,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ComposerStream");
 
                     b.Navigation("ReviewOrder");
 
@@ -833,6 +846,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ComposerStream", b =>
                 {
                     b.Navigation("ReviewOrders");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrder", b =>
