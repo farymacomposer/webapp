@@ -1,4 +1,9 @@
-﻿namespace Faryma.Composer.Core.Features.OrderQueueFeature.Contracts
+﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
+
+namespace Faryma.Composer.Core.Features.OrderQueueFeature.Contracts
 {
-    public interface INotificationService;
+    public interface INotificationService
+    {
+        Task SendOrderPosition(OrderPositionTracker orderPositionTracker);
+    }
 }

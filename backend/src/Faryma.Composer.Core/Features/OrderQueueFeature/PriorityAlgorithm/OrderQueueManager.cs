@@ -53,8 +53,10 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             Dictionary<long, OrderPositionTracker> orderPositionsById = ordersById.ToDictionary(k => k.Key, _ => new OrderPositionTracker());
 
             Dictionary<DateOnly, string> lastNicknameByStreamDate = await context.ComposerStreams
-                .Include(x => x.ReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
-                .Include(x => x.Reviews.Count > 0)
+                .Include(x => x.ReviewOrders)
+                .Include(x => x.Reviews)
+                .Where(x => x.ReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending)
+                    && x.Reviews.Count > 0)
                 .ToDictionaryAsync(k => k.EventDate, v => v.Reviews.OrderBy(x => x.CompletedAt).Last().ReviewOrder.UserNickname.NormalizedNickname);
 
             return new OrderQueueManager
@@ -67,8 +69,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             };
         }
 
-        public void Add(ReviewOrder order) => OrdersById.Add(order.Id, order);
         public void Up(Transaction payment) => OrdersById[payment.ReviewOrder!.Id].Payments.Add(payment);
+
+        public void Add(ReviewOrder order)
+        {
+            OrdersById.Add(order.Id, order);
+            OrderPositionsById.Add(order.Id, new OrderPositionTracker());
+        }
 
         public void UpdateOrderPositions()
         {
@@ -81,6 +88,17 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdateFutureOrdersPositions();
             UpdateActiveOrdersPositions();
             UpdateInactiveOrdersPositions();
+        }
+
+        public IReadOnlyCollection<OrderQueueItem> GetOrderQueue()
+        {
+            return OrdersById
+                .Select(x => new OrderQueueItem
+                {
+                    Order = OrdersById[x.Key],
+                    Position = OrderPositionsById[x.Key].Current,
+                })
+                .ToArray();
         }
 
         private void SwapOrderPositions()
