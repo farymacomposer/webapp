@@ -1,9 +1,9 @@
-
+import { Track } from "@/lib/models";
 import Image from "next/image";
 
 export default function TrackCard({ track }: { track: Track }) {
   return (
-    <div className="bg-[#2a223a] rounded-lg p-3 flex flex-col">
+    <div className="bg-header h-[380] rounded-lg p-3 flex flex-col">
       <Image
         src={track.cover}
         alt={track.title}
