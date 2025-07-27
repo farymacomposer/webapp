@@ -6,28 +6,33 @@
     public enum ReviewOrderStatus
     {
         /// <summary>
+        /// Не задан
+        /// </summary>
+        Unspecified = 0,
+
+        /// <summary>
         /// Предзаказ
         /// </summary>
-        Preorder = 0,
+        Preorder = 1,
 
         /// <summary>
         /// Трек ожидает разбора
         /// </summary>
-        Pending = 1,
+        Pending = 2,
 
         /// <summary>
         /// Трек в процессе разбора
         /// </summary>
-        InProgress = 2,
+        InProgress = 3,
 
         /// <summary>
         /// Разбор трека выполнен
         /// </summary>
-        Completed = 3,
+        Completed = 4,
 
         /// <summary>
         /// Заказ отменен
         /// </summary>
-        Canceled = 4
+        Canceled = 5
     }
 }

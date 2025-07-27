@@ -6,7 +6,7 @@
     public enum OrderActivityStatus
     {
         /// <summary>
-        /// Статус не задан
+        /// Не задан
         /// </summary>
         Unspecified = 0,
 

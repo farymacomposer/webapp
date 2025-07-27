@@ -8,11 +8,12 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
     {
         public enum State
         {
-            Initial = 0,
-            PriorityQueue = 1,
-            DonationQueue = 2,
-            DebtQueues = 3,
-            Completed = 4,
+            Unspecified = 0,
+            Initial = 1,
+            PriorityQueue = 2,
+            DonationQueue = 3,
+            DebtQueues = 4,
+            Completed = 5,
         }
 
         private readonly OrderQueueManager _queueManager;

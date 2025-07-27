@@ -6,18 +6,23 @@
     public enum ReviewOrderType
     {
         /// <summary>
+        /// Не задан
+        /// </summary>
+        Unspecified = 0,
+
+        /// <summary>
         /// Донат
         /// </summary>
-        Donation = 0,
+        Donation = 1,
 
         /// <summary>
         /// Вне очереди
         /// </summary>
-        OutOfQueue = 1,
+        OutOfQueue = 2,
 
         /// <summary>
         /// Бесплатный
         /// </summary>
-        Free = 2
+        Free = 3
     }
 }

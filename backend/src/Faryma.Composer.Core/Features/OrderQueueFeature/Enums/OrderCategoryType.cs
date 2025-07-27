@@ -6,7 +6,7 @@
     public enum OrderCategoryType
     {
         /// <summary>
-        /// Категория не задана
+        /// Не задан
         /// </summary>
         Unspecified = 0,
 

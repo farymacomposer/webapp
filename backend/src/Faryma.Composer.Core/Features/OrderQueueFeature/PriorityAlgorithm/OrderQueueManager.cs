@@ -1,9 +1,6 @@
 ﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
-using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Entities;
-using Faryma.Composer.Infrastructure.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
@@ -33,40 +30,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// Последний никнейм в категории (по дате стрима)
         /// </summary>
         public required Dictionary<DateOnly, string> LastNicknameByStreamDate { get; init; }
-
-        public static async Task<OrderQueueManager> CreateFromDatabase(AppDbContext context)
-        {
-            DateOnly currentStreamDate = await context.ComposerStreams
-                .Where(x => x.Status == ComposerStreamStatus.Planned)
-                .OrderBy(x => x.EventDate)
-                .Select(x => x.EventDate)
-                .FirstOrDefaultAsync();
-
-            Dictionary<long, ReviewOrder> ordersById = await context.ReviewOrders
-                .AsNoTracking()
-                .Include(x => x.ComposerStream)
-                .Include(x => x.UserNickname)
-                .Include(x => x.Payments)
-                .Where(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending)
-                .ToDictionaryAsync(k => k.Id);
-
-            Dictionary<long, OrderPositionTracker> orderPositionsById = ordersById.ToDictionary(k => k.Key, _ => new OrderPositionTracker());
-
-            Dictionary<DateOnly, string> lastNicknameByStreamDate = await context.ComposerStreams
-                .Where(x => x.Reviews.Count > 0
-                    && x.ReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
-                .Select(x => new { x.EventDate, x.Reviews.OrderBy(x => x.CompletedAt).Last().ReviewOrder.UserNickname.NormalizedNickname })
-                .ToDictionaryAsync(k => k.EventDate, v => v.NormalizedNickname);
-
-            return new OrderQueueManager
-            {
-                CurrentStreamDate = currentStreamDate,
-                OrdersById = ordersById,
-                OrderPositionsById = orderPositionsById,
-                LastNicknameByStreamDate = lastNicknameByStreamDate,
-                LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,
-            };
-        }
 
         public void Up(Transaction payment) => OrdersById[payment.ReviewOrder!.Id].Payments.Add(payment);
 

@@ -6,18 +6,23 @@
     public enum ComposerStreamType
     {
         /// <summary>
+        /// Не задан
+        /// </summary>
+        Unspecified = 0,
+
+        /// <summary>
         /// Обычный
         /// </summary>
-        Regular = 0,
+        Regular = 1,
 
         /// <summary>
         /// Долговой
         /// </summary>
-        Debt = 1,
+        Debt = 2,
 
         /// <summary>
         /// Благотворительный
         /// </summary>
-        Charity = 2
+        Charity = 3
     }
 }
