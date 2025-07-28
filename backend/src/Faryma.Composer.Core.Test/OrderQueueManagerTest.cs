@@ -791,7 +791,7 @@ namespace Faryma.Composer.Core.Test
                 ComposerStream = new ComposerStream
                 {
                     EventDate = DateOnly.Parse(eventDate),
-                    Type = ComposerStreamType.Regular,
+                    Type = ComposerStreamType.Donation,
                     Status = ComposerStreamStatus.Planned,
                 }
             };
@@ -810,7 +810,7 @@ namespace Faryma.Composer.Core.Test
                 ComposerStream = new ComposerStream
                 {
                     EventDate = DateOnly.Parse(eventDate),
-                    Type = ComposerStreamType.Regular,
+                    Type = ComposerStreamType.Donation,
                     Status = ComposerStreamStatus.Planned,
                 }
             };

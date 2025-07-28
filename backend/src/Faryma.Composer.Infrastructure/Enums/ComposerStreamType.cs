@@ -11,9 +11,9 @@
         Unspecified = 0,
 
         /// <summary>
-        /// Обычный
+        /// Донатный
         /// </summary>
-        Regular = 1,
+        Donation = 1,
 
         /// <summary>
         /// Долговой
