@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature
 {
-    public sealed class OrderQueueService(IDbContextFactory<AppDbContext> contextFactory, INotificationService notificationService)
+    public sealed class OrderQueueService(IDbContextFactory<AppDbContext> contextFactory, IOrderQueueNotificationService notificationService)
     {
         private OrderQueueManager _queueManager = null!;
 

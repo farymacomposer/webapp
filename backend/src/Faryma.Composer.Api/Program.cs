@@ -6,7 +6,6 @@ using Faryma.Composer.Api.Features.OrderQueueFeature;
 using Faryma.Composer.Core.DependencyInjection;
 using Faryma.Composer.Core.Features.AppSettings;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
-using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
@@ -34,8 +33,7 @@ namespace Faryma.Composer.Api
                         .AddPersistenceAndIdentity(context.Configuration)
                         .AddAuthentication(context.Configuration)
                         .AddAuthorization()
-                        .AddCoreServices()
-                        .AddSingleton<INotificationService, OrderQueueHub>();
+                        .AddCoreServices();
 
                     if (builder.Environment.IsDevelopment())
                     {
@@ -57,7 +55,7 @@ namespace Faryma.Composer.Api
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-            app.MapHub<OrderQueueHub>($"/api/{nameof(OrderQueueHub)}");
+            app.MapHub<OrderQueueNotificationHub>($"/api/{nameof(OrderQueueNotificationHub)}");
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();

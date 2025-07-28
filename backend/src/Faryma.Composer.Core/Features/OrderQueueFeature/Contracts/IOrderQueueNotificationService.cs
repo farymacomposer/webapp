@@ -2,7 +2,7 @@
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.Contracts
 {
-    public interface INotificationService
+    public interface IOrderQueueNotificationService
     {
         Task SendOrderPosition(OrderPositionTracker orderPositionTracker);
     }
