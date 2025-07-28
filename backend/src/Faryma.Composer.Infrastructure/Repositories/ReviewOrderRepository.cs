@@ -13,7 +13,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,
-                IsActive = trackUrl is not null,
+                IsFrozen = false,
                 Type = type,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
                 UserNickname = transaction.Account.UserNickname,
@@ -29,7 +29,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,
-                IsActive = trackUrl is not null,
+                IsFrozen = false,
                 Type = type,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
                 UserNickname = userNickname,

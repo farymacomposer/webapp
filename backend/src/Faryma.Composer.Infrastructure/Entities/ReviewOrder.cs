@@ -32,9 +32,9 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required ReviewOrderStatus Status { get; set; }
 
         /// <summary>
-        /// Флаг активности заказа
+        /// Заказ заморожен
         /// </summary>
-        public required bool IsActive { get; set; }
+        public required bool IsFrozen { get; set; }
 
         /// <summary>
         /// Ссылка на трек

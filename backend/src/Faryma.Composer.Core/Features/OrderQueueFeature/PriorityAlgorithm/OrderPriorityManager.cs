@@ -30,14 +30,14 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
             _priorityQueue = new OrderQueue(queueManager.OrdersById
                 .Select(x => x.Value)
-                .Where(x => x.IsActive && x.Type == ReviewOrderType.OutOfQueue)
+                .Where(x => !x.IsFrozen && x.Type == ReviewOrderType.OutOfQueue)
                 .OrderBy(x => x.CreatedAt)
                 .ToList());
 
             OrderPriorityComparer comparer = new();
             List<(DateOnly, OrderQueue)> queues = queueManager.OrdersById
                 .Select(x => x.Value)
-                .Where(x => x.IsActive
+                .Where(x => !x.IsFrozen
                     && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
                     && x.ComposerStream.EventDate <= queueManager.CurrentStreamDate)
                 .GroupBy(x => x.ComposerStream.EventDate)

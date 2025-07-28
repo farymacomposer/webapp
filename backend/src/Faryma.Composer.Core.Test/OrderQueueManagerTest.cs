@@ -730,9 +730,9 @@ namespace Faryma.Composer.Core.Test
                 GetDonation("08.01.2000", 11, "Nick2", 800), // долг x2
                 GetDonation("08.01.2000", 12, "Nick9", 700), // долг x2
 
-                GetDonation("20.01.2000", 13, "Nick2", 900, false),
-                GetDonation("10.01.2000", 14, "Nick2", 800, false),
-                GetDonation("08.01.2000", 15, "Nick9", 700, false),
+                GetDonation("20.01.2000", 13, "Nick2", 900, true),
+                GetDonation("10.01.2000", 14, "Nick2", 800, true),
+                GetDonation("08.01.2000", 15, "Nick9", 700, true),
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
@@ -777,13 +777,13 @@ namespace Faryma.Composer.Core.Test
             }
         }
 
-        private ReviewOrder GetDonation(string eventDate, long id, string name, int amount, bool isActive = true)
+        private ReviewOrder GetDonation(string eventDate, long id, string name, int amount, bool isFrozen = false)
         {
             return new()
             {
                 Id = id,
                 CreatedAt = DateTime.Now,
-                IsActive = isActive,
+                IsFrozen = isFrozen,
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.Donation,
                 NominalAmount = amount,
@@ -807,7 +807,7 @@ namespace Faryma.Composer.Core.Test
             {
                 Id = id,
                 CreatedAt = DateTime.Now,
-                IsActive = true,
+                IsFrozen = false,
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.OutOfQueue,
                 UserNickname = new UserNickname

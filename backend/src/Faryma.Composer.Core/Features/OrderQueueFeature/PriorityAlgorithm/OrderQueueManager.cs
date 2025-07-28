@@ -75,7 +75,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             ReviewOrder[] futureOrders = OrdersById
                 .Select(x => x.Value)
-                .Where(x => x.IsActive && x.ComposerStream.EventDate > CurrentStreamDate)
+                .Where(x => !x.IsFrozen && x.ComposerStream.EventDate > CurrentStreamDate)
                 .Order(new OrderPriorityComparer())
                 .ToArray();
 
@@ -111,7 +111,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             ReviewOrder[] inactiveOrders = OrdersById
                 .Select(x => x.Value)
-                .Where(x => !x.IsActive)
+                .Where(x => x.IsFrozen)
                 .Order(new OrderPriorityComparer())
                 .ToArray();
 
