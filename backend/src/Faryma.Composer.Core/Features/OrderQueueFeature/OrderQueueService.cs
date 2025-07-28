@@ -25,7 +25,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             Dictionary<long, ReviewOrder> ordersById = await context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.ComposerStream)
-                .Include(x => x.UserNickname)
+                .Include(x => x.NormalizedNickname)
                 .Include(x => x.Payments)
                 .Where(x => x.Status == ReviewOrderStatus.Preorder
                     || x.Status == ReviewOrderStatus.Pending
@@ -41,7 +41,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 .Select(x => new
                 {
                     x.EventDate,
-                    x.Reviews.OrderBy(x => x.CompletedAt).Last().ReviewOrder.UserNickname.NormalizedNickname
+                    x.Reviews.OrderBy(x => x.CompletedAt).Last().ReviewOrder.NormalizedNickname
                 })
                 .ToDictionaryAsync(k => k.EventDate, v => v.NormalizedNickname);
 

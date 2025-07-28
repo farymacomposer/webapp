@@ -14,13 +14,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// В очереди существует заказ с другим никнеймом
         /// </summary>
         public bool HasOrderFromOtherNickname(string? nicknameToSkip) =>
-            orders.Any(x => x.UserNickname.NormalizedNickname != nicknameToSkip);
+            orders.Any(x => x.NormalizedNickname != nicknameToSkip);
 
         /// <summary>
         /// В очереди существует заказ с другим никнеймом и никнейм не совпадает с последним выданным из очереди
         /// </summary>
         public bool HasOrderFromNewNickname(string? nicknameToSkip) =>
-            orders.Any(x => x.UserNickname.NormalizedNickname != nicknameToSkip && x.UserNickname.NormalizedNickname != _lastIssuedNickname);
+            orders.Any(x => x.NormalizedNickname != nicknameToSkip && x.NormalizedNickname != _lastIssuedNickname);
 
         public ReviewOrder Dequeue(string? nicknameToSkip)
         {
@@ -29,9 +29,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
             foreach (ReviewOrder order in orders)
             {
-                if (order.UserNickname.NormalizedNickname != nicknameToSkip)
+                if (order.NormalizedNickname != nicknameToSkip)
                 {
-                    if (order.UserNickname.NormalizedNickname != _lastIssuedNickname)
+                    if (order.NormalizedNickname != _lastIssuedNickname)
                     {
                         bestMatch = order;
                         break;
@@ -44,7 +44,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             ReviewOrder result = bestMatch ?? fallback ?? orders[0];
             orders.Remove(result);
 
-            _lastIssuedNickname = result.UserNickname.NormalizedNickname;
+            _lastIssuedNickname = result.NormalizedNickname;
 
             return result;
         }

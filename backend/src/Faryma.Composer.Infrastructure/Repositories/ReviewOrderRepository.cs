@@ -16,10 +16,11 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 IsFrozen = false,
                 Type = type,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
-                UserNickname = transaction.Account.UserNickname,
+                NormalizedNickname = transaction.Account.UserNickname.NormalizedNickname,
                 TrackUrl = trackUrl,
                 UserComment = userComment,
                 ComposerStream = stream,
+                UserNicknames = { transaction.Account.UserNickname },
                 Payments = { transaction },
             }).Entity;
         }
@@ -32,10 +33,11 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 IsFrozen = false,
                 Type = type,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
-                UserNickname = userNickname,
+                NormalizedNickname = userNickname.NormalizedNickname,
                 TrackUrl = trackUrl,
                 UserComment = userComment,
                 ComposerStream = stream,
+                UserNicknames = { userNickname },
                 NominalAmount = nominalAmount,
             }).Entity;
         }

@@ -105,7 +105,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 State.DebtQueues when isOnlyNicknameLeft == false => _debtQueues.DequeueRoundRobinFromOtherNickname(_lastIssuedNickname),
             };
 
-            _lastIssuedNickname = result.UserNickname.NormalizedNickname;
+            _lastIssuedNickname = result.NormalizedNickname;
 
             return result;
         }

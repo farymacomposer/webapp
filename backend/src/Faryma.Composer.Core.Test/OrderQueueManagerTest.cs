@@ -764,7 +764,7 @@ namespace Faryma.Composer.Core.Test
             int index = 0;
             foreach ((long id, string nick) in values)
             {
-                Assert.Equal((index, id, nick), (queueManager.OrderPositionsById[id].Current.Index, id, queueManager.OrdersById[id].UserNickname.Nickname));
+                Assert.Equal((index, id, _normalizer.NormalizeName(nick)), (queueManager.OrderPositionsById[id].Current.Index, id, queueManager.OrdersById[id].NormalizedNickname));
                 index++;
             }
         }
@@ -773,7 +773,7 @@ namespace Faryma.Composer.Core.Test
         {
             foreach ((int index, long id, OrderActivityStatus status, string nick) in values)
             {
-                Assert.Equal((index, id, status, nick), (queueManager.OrderPositionsById[id].Current.Index, id, queueManager.OrderPositionsById[id].Current.ActivityStatus, queueManager.OrdersById[id].UserNickname.Nickname));
+                Assert.Equal((index, id, status, _normalizer.NormalizeName(nick)), (queueManager.OrderPositionsById[id].Current.Index, id, queueManager.OrderPositionsById[id].Current.ActivityStatus, queueManager.OrdersById[id].NormalizedNickname));
             }
         }
 
@@ -787,11 +787,7 @@ namespace Faryma.Composer.Core.Test
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.Donation,
                 NominalAmount = amount,
-                UserNickname = new UserNickname
-                {
-                    Nickname = name,
-                    NormalizedNickname = _normalizer.NormalizeName(name),
-                },
+                NormalizedNickname = _normalizer.NormalizeName(name),
                 ComposerStream = new ComposerStream
                 {
                     EventDate = DateOnly.Parse(eventDate),
@@ -810,11 +806,7 @@ namespace Faryma.Composer.Core.Test
                 IsFrozen = false,
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.OutOfQueue,
-                UserNickname = new UserNickname
-                {
-                    Nickname = name,
-                    NormalizedNickname = _normalizer.NormalizeName(name),
-                },
+                NormalizedNickname = _normalizer.NormalizeName(name),
                 ComposerStream = new ComposerStream
                 {
                     EventDate = DateOnly.Parse(eventDate),

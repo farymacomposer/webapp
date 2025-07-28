@@ -51,8 +51,12 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// </summary>
         public string? UserComment { get; set; }
 
+        /// <summary>
+        /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
+        /// </summary>
+        public required string NormalizedNickname { get; set; }
+
         public long? TrackId { get; set; }
-        public Guid UserNicknameId { get; set; }
         public long ComposerStreamId { get; set; }
 
         // Навигационные свойства
@@ -69,16 +73,15 @@ namespace Faryma.Composer.Infrastructure.Entities
         public Track? Track { get; set; }
 
         /// <summary>
-        /// Пользователь, создавший заказ
-        /// </summary>
-        [ForeignKey(nameof(UserNicknameId))]
-        public required UserNickname UserNickname { get; set; }
-
-        /// <summary>
         /// Связанный cтрим композитора
         /// </summary>
         [ForeignKey(nameof(ComposerStreamId))]
         public required ComposerStream ComposerStream { get; set; }
+
+        /// <summary>
+        /// Пользователь или пользователи, создавшие заказ
+        /// </summary>
+        public ICollection<UserNickname> UserNicknames { get; set; } = [];
 
         /// <summary>
         /// Платежи
