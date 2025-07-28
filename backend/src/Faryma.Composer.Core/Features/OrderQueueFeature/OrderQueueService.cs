@@ -25,7 +25,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             Dictionary<long, ReviewOrder> ordersById = await context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.ComposerStream)
-                .Include(x => x.NormalizedNickname)
+                .Include(x => x.UserNicknames)
                 .Include(x => x.Payments)
                 .Where(x => x.Status == ReviewOrderStatus.Preorder
                     || x.Status == ReviewOrderStatus.Pending
