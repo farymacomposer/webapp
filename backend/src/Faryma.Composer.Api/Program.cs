@@ -55,7 +55,7 @@ namespace Faryma.Composer.Api
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-            app.MapHub<OrderQueueHub>($"/api/{nameof(OrderQueueHub)}");
+            app.MapHub<OrderQueueNotificationHub>($"/api/{nameof(OrderQueueNotificationHub)}");
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();

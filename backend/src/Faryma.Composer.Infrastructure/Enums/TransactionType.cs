@@ -6,13 +6,18 @@
     public enum TransactionType
     {
         /// <summary>
+        /// Не задан
+        /// </summary>
+        Unspecified = 0,
+
+        /// <summary>
         /// Пополнение
         /// </summary>
-        Deposit = 0,
+        Deposit = 1,
 
         /// <summary>
         /// Оплата
         /// </summary>
-        Payment = 1
+        Payment = 2
     }
 }

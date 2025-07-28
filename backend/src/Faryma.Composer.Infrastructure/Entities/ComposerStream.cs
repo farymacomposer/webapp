@@ -31,5 +31,10 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Заказы разборов треков
         /// </summary>
         public ICollection<ReviewOrder> ReviewOrders { get; set; } = [];
+
+        /// <summary>
+        /// Результаты разборов треков
+        /// </summary>
+        public ICollection<Review> Reviews { get; set; } = [];
     }
 }

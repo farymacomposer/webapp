@@ -1,9 +1,9 @@
 ﻿namespace Faryma.Composer.Core.Features.OrderQueueFeature.Enums
 {
     /// <summary>
-    /// Статус активности заказа
+    /// Тип категории заказа
     /// </summary>
-    public enum OrderActivityStatus
+    public enum OrderCategoryType
     {
         /// <summary>
         /// Не задан
@@ -11,18 +11,18 @@
         Unspecified = 0,
 
         /// <summary>
-        /// Заказ запланирован на будущий стрим
+        /// Вне очереди
         /// </summary>
-        Future = 1,
+        OutOfQueue = 1,
 
         /// <summary>
-        /// Заказ активен
+        /// Донат
         /// </summary>
-        Active = 2,
+        Donation = 2,
 
         /// <summary>
-        /// Заказ неактивен
+        /// Долг
         /// </summary>
-        Inactive = 3
+        Debt = 3,
     }
 }

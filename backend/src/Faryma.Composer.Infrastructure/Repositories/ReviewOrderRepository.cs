@@ -13,13 +13,14 @@ namespace Faryma.Composer.Infrastructure.Repositories
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,
-                IsActive = trackUrl is not null,
+                IsFrozen = false,
                 Type = type,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
-                UserNickname = transaction.Account.UserNickname,
+                NormalizedNickname = transaction.Account.UserNickname.NormalizedNickname,
                 TrackUrl = trackUrl,
                 UserComment = userComment,
                 ComposerStream = stream,
+                UserNicknames = { transaction.Account.UserNickname },
                 Payments = { transaction },
             }).Entity;
         }
@@ -29,13 +30,14 @@ namespace Faryma.Composer.Infrastructure.Repositories
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,
-                IsActive = trackUrl is not null,
+                IsFrozen = false,
                 Type = type,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
-                UserNickname = userNickname,
+                NormalizedNickname = userNickname.NormalizedNickname,
                 TrackUrl = trackUrl,
                 UserComment = userComment,
                 ComposerStream = stream,
+                UserNicknames = { userNickname },
                 NominalAmount = nominalAmount,
             }).Entity;
         }

@@ -16,7 +16,7 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
         /// </summary>
         [HttpGet(nameof(GetAppSettings))]
         [AuthorizeComposer]
-        public ActionResult<AppSettingsDto> GetAppSettings() => Ok(Mapper.Map(appSettingsService.Settings));
+        public ActionResult<AppSettingsDto> GetAppSettings() => Ok(AppSettingsDto.Map(appSettingsService.Settings));
 
         /// <summary>
         /// Обновляет настройки
@@ -25,7 +25,7 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
         [AuthorizeComposer]
         public async Task<IActionResult> UpdateAppSettings(AppSettingsDto dto)
         {
-            await appSettingsService.Update(Mapper.Map(dto));
+            await appSettingsService.Update(dto.Map());
 
             return Ok(new { });
         }

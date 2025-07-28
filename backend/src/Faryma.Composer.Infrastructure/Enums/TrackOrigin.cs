@@ -6,23 +6,28 @@
     public enum TrackOrigin
     {
         /// <summary>
+        /// Не задано
+        /// </summary>
+        Unspecified = 0,
+
+        /// <summary>
         /// От музыкальной группы
         /// </summary>
-        Band = 0,
+        Band = 1,
 
         /// <summary>
         /// Из фильма
         /// </summary>
-        Movie = 1,
+        Movie = 2,
 
         /// <summary>
         /// Из аниме
         /// </summary>
-        Anime = 2,
+        Anime = 3,
 
         /// <summary>
         /// Из игры
         /// </summary>
-        Game = 3
+        Game = 4
     }
 }

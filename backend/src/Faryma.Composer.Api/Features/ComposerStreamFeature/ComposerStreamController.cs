@@ -23,7 +23,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         {
             ComposerStream item = await composerStreamService.Create(request.EventDate, request.Type);
 
-            return Ok(new CreateComposerStreamResponse { ComposerStream = Mapper.Map(item) });
+            return Ok(new CreateComposerStreamResponse { ComposerStream = ComposerStreamDto.Map(item) });
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         {
             IReadOnlyCollection<ComposerStream> items = await composerStreamService.Find(request.DateFrom, request.DateTo);
 
-            return Ok(new FindComposerStreamResponse { Items = items.Select(Mapper.Map) });
+            return Ok(new FindComposerStreamResponse { Items = items.Select(ComposerStreamDto.Map) });
         }
     }
 }

@@ -2,6 +2,8 @@
 using System.Text;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
+using Faryma.Composer.Api.Features.OrderQueueFeature;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
 using Faryma.Composer.Infrastructure.Entities;
@@ -73,6 +75,7 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .AddProblemDetails()
                 .AddMemoryCache()
                 .ConfigureSwagger(environment)
+                .AddSingleton<IOrderQueueNotificationService, OrderQueueNotificationService>()
                 .AddSignalR();
 
             return services;

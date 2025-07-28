@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Up
 {
@@ -29,6 +30,16 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Up
             {
                 yield return new ValidationResult("Сумма платежа не может быть равна нулю");
             }
+        }
+
+        public UpCommand Map()
+        {
+            return new()
+            {
+                Nickname = Nickname,
+                ReviewOrderId = ReviewOrderId,
+                PaymentAmount = PaymentAmount,
+            };
         }
     }
 }

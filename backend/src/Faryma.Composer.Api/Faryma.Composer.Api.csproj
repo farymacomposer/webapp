@@ -19,9 +19,4 @@
     <ProjectReference Include="..\Faryma.Composer.Core\Faryma.Composer.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\UserNicknameFeature\" />
-    <Folder Include="Features\TrackFeature\" />
-  </ItemGroup>
-
 </Project>
