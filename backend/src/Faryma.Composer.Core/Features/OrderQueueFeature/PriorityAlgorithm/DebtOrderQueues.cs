@@ -3,7 +3,10 @@ using Faryma.Composer.Infrastructure.Entities;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
-    public sealed class DebtOrderQueues(List<(DateOnly StreamDate, OrderQueue Queue)> queuesByStreamDate)
+    /// <summary>
+    /// Очередь долговых стримов
+    /// </summary>
+    public sealed class DebtOrderQueues(List<(DateOnly StreamDate, OrderCategory Queue)> queuesByStreamDate)
     {
         private int _roundRobinCounter;
 
@@ -17,7 +20,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             {
                 int index = _roundRobinCounter % queuesByStreamDate.Count;
 
-                (DateOnly streamDate, OrderQueue queue) = queuesByStreamDate[index];
+                (DateOnly streamDate, OrderCategory queue) = queuesByStreamDate[index];
                 if (queue.HasOrders)
                 {
                     ReviewOrder order = queue.Dequeue(nicknameToSkip);
@@ -36,7 +39,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             {
                 int index = _roundRobinCounter % queuesByStreamDate.Count;
 
-                (DateOnly streamDate, OrderQueue queue) = queuesByStreamDate[index];
+                (DateOnly streamDate, OrderCategory queue) = queuesByStreamDate[index];
                 if (queue.HasOrderFromOtherNickname(nicknameToSkip))
                 {
                     ReviewOrder order = queue.Dequeue(nicknameToSkip);
@@ -52,7 +55,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public void UpdateOrdersCategory(OrderQueueManager queueManager)
         {
             int debtNumber = 1;
-            foreach ((DateOnly streamDate, OrderQueue queue) in queuesByStreamDate.AsEnumerable().Reverse())
+            foreach ((DateOnly streamDate, OrderCategory queue) in queuesByStreamDate.AsEnumerable().Reverse())
             {
                 queue.UpdateOrdersCategory(queueManager, OrderCategoryType.Debt, debtNumber);
                 debtNumber++;

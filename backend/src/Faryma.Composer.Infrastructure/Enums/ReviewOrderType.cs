@@ -11,14 +11,14 @@
         Unspecified = 0,
 
         /// <summary>
-        /// Донат
-        /// </summary>
-        Donation = 1,
-
-        /// <summary>
         /// Вне очереди
         /// </summary>
-        OutOfQueue = 2,
+        OutOfQueue = 1,
+
+        /// <summary>
+        /// Донат
+        /// </summary>
+        Donation = 2,
 
         /// <summary>
         /// Бесплатный

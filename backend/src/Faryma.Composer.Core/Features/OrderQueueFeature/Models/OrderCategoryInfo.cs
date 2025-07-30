@@ -5,7 +5,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
     /// <summary>
     /// Категория заказа
     /// </summary>
-    public sealed record OrderCategory
+    public sealed record OrderCategoryInfo
     {
         /// <summary>
         /// Тип категории заказа

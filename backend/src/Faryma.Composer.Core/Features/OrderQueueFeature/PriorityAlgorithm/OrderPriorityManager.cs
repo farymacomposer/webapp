@@ -17,8 +17,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         }
 
         private readonly OrderQueueManager _queueManager;
-        private readonly OrderQueue _priorityQueue;
-        private readonly OrderQueue? _donationQueue;
+        private readonly OrderCategory _priorityQueue;
+        private readonly OrderCategory? _donationQueue;
         private readonly DebtOrderQueues _debtQueues;
         private State _currentState;
         private string? _lastIssuedNickname;
@@ -28,26 +28,26 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             _queueManager = queueManager;
             _currentState = queueManager.LastOrderPriorityManagerState;
 
-            _priorityQueue = new OrderQueue(queueManager.OrdersById
+            _priorityQueue = new OrderCategory(queueManager.OrdersById
                 .Select(x => x.Value)
                 .Where(x => !x.IsFrozen && x.Type == ReviewOrderType.OutOfQueue)
                 .OrderBy(x => x.CreatedAt)
                 .ToList());
 
             OrderPriorityComparer comparer = new();
-            List<(DateOnly, OrderQueue)> queues = queueManager.OrdersById
+            List<(DateOnly, OrderCategory)> queues = queueManager.OrdersById
                 .Select(x => x.Value)
                 .Where(x => !x.IsFrozen
                     && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
                     && x.ComposerStream.EventDate <= queueManager.CurrentStreamDate)
                 .GroupBy(x => x.ComposerStream.EventDate)
-                .Select(x => (x.Key, new OrderQueue(x.Order(comparer).ToList())))
+                .Select(x => (x.Key, new OrderCategory(x.Order(comparer).ToList())))
                 .OrderBy(x => x.Key)
                 .ToList();
 
             if (queues.Count > 0)
             {
-                (DateOnly StreamDate, OrderQueue Provider) item = queues.Last();
+                (DateOnly StreamDate, OrderCategory Provider) item = queues.Last();
                 if (item.StreamDate == queueManager.CurrentStreamDate)
                 {
                     queues.Remove(item);

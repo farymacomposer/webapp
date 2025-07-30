@@ -46,14 +46,12 @@ namespace Faryma.Composer.Api.DependencyInjection
 
         public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            IConfigurationSection jwtSection = configuration.GetSection("JWT");
-
             services
                 .AddScoped<AuthService>()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    JwtOptions jwtOptions = jwtSection.Get<JwtOptions>()!;
+                    JwtOptions jwtOptions = configuration.GetSection("JWT").Get<JwtOptions>()!;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,

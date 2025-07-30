@@ -6,6 +6,8 @@ namespace Faryma.Composer.Infrastructure.Repositories
 {
     public sealed class UserNicknameRepository(AppDbContext context, ILookupNormalizer normalizer)
     {
+        public Task<bool> HasOrders(UserNickname userNickname) => context.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0);
+
         public UserNickname Create(string nickname)
         {
             return context.Add(new UserNickname

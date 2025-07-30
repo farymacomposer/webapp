@@ -20,7 +20,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         {
             AppSettingsEntity appSettings = appSettingsService.Settings;
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
-            ComposerStream stream = composerStreamService.GetStreamForOrder();
+            ComposerStream stream = await composerStreamService.GetOrCreateForOrder(userNickname, command.OrderType);
 
             ReviewOrder? result = null;
             switch (command.OrderType)
@@ -30,7 +30,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     Transaction deposit = ofw.TransactionRepository.CreateDeposit(userNickname.Account, command.PaymentAmount!.Value);
                     Transaction payment = ofw.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount!.Value);
 
-                    result = ofw.ReviewOrderRepository.CreateOrder(
+                    result = ofw.ReviewOrderRepository.Create(
                         stream,
                         payment,
                         command.OrderType,
@@ -40,7 +40,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
                 case ReviewOrderType.OutOfQueue:
 
-                    result = ofw.ReviewOrderRepository.CreateOrder(
+                    result = ofw.ReviewOrderRepository.Create(
                         stream,
                         userNickname,
                         command.OrderType,
@@ -51,7 +51,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
                 case ReviewOrderType.Free:
 
-                    result = ofw.ReviewOrderRepository.CreateOrder(
+                    result = ofw.ReviewOrderRepository.Create(
                         stream,
                         userNickname,
                         command.OrderType,
@@ -64,7 +64,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await ofw.SaveChangesAsync();
 
-            orderQueueService.Add(result!);
+            await orderQueueService.Add(result!);
 
             return result!;
         }
@@ -89,7 +89,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await ofw.SaveChangesAsync();
 
-            orderQueueService.Up(payment);
+            await orderQueueService.Up(payment);
 
             return payment;
         }

@@ -8,7 +8,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
     {
         public Task<ReviewOrder?> Find(long id) => context.ReviewOrders.FirstOrDefaultAsync(x => x.Id == id);
 
-        public ReviewOrder CreateOrder(ComposerStream stream, Transaction transaction, ReviewOrderType type, string? trackUrl, string? userComment)
+        public ReviewOrder Create(ComposerStream stream, Transaction transaction, ReviewOrderType type, string? trackUrl, string? userComment)
         {
             return context.Add(new ReviewOrder
             {
@@ -25,7 +25,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             }).Entity;
         }
 
-        public ReviewOrder CreateOrder(ComposerStream stream, UserNickname userNickname, ReviewOrderType type, decimal nominalAmount, string? trackUrl, string? userComment)
+        public ReviewOrder Create(ComposerStream stream, UserNickname userNickname, ReviewOrderType type, decimal nominalAmount, string? trackUrl, string? userComment)
         {
             return context.Add(new ReviewOrder
             {
