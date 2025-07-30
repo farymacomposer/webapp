@@ -58,15 +58,18 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             async Task<ComposerStream> GetOrCreate((DateOnly EventDate, ComposerStreamType Type) item)
             {
+                ComposerStream result = ofw.ComposerStreamRepository.Create(item.EventDate, item.Type);
+
                 try
                 {
-                    ComposerStream result = ofw.ComposerStreamRepository.Create(item.EventDate, item.Type);
                     await ofw.SaveChangesAsync();
 
                     return result;
                 }
                 catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
                 {
+                    ofw.Remove(result);
+
                     return await ofw.ComposerStreamRepository.Get(item.EventDate);
                 }
             }
