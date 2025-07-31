@@ -8,7 +8,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// <summary>
     /// Заказ разбора трека
     /// </summary>
-    [DebuggerDisplay("Nickname = {UserNickname.Nickname}")]
+    [DebuggerDisplay("MainNickname = {MainNickname}")]
     public sealed class ReviewOrder : BaseEntity
     {
         /// <summary>
@@ -54,7 +54,8 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
         /// </summary>
-        public required string NormalizedNickname { get; set; }
+        public required string MainNickname { get; set; }
+        public required string MainNormalizedNickname { get; set; }
 
         public long? TrackId { get; set; }
         public long ComposerStreamId { get; set; }
@@ -87,5 +88,10 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Платежи
         /// </summary>
         public ICollection<Transaction> Payments { get; set; } = [];
+
+        /// <summary>
+        /// Возвращает общую стоимость заказа
+        /// </summary>
+        public decimal GetTotalAmount() => NominalAmount + Payments.Sum(x => x.Amount);
     }
 }

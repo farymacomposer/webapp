@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250728083703_Init")]
+    [Migration("20250731073836_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -214,12 +214,16 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     b.Property<bool>("IsFrozen")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal>("NominalAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("NormalizedNickname")
+                    b.Property<string>("MainNickname")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("MainNormalizedNickname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("NominalAmount")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");

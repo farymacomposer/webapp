@@ -1,9 +1,9 @@
 ﻿namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
 {
     /// <summary>
-    /// Представляет изменение позиции заказа в очереди между двумя состояниями
+    /// Представляет историю изменений позиции заказа в очереди, включая предыдущее и текущее состояние
     /// </summary>
-    public sealed class OrderPositionTracker
+    public sealed record OrderPositionHistory
     {
         /// <summary>
         /// Предыдущая позиция заказа в очереди

@@ -19,9 +19,9 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         [AuthorizeComposer]
         public async Task<ActionResult<GetOrderQueueResponse>> GetOrderQueue()
         {
-            IReadOnlyCollection<OrderQueueItem> queue = orderQueueService.GetOrderQueue();
+            IReadOnlyDictionary<long, OrderPosition> orders = orderQueueService.GetOrderQueue();
 
-            return Ok();
+            return Ok(GetOrderQueueResponse.Map(orders));
         }
     }
 }

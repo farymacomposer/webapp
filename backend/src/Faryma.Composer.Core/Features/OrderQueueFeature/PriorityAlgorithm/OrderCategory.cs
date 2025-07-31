@@ -1,5 +1,4 @@
 ﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Faryma.Composer.Infrastructure.Entities;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
@@ -24,13 +23,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// В категории существует заказ с другим никнеймом
         /// </summary>
         public bool HasOrderFromOtherNickname(string? nicknameToSkip) =>
-            orders.Any(x => x.NormalizedNickname != nicknameToSkip);
+            orders.Any(x => x.MainNormalizedNickname != nicknameToSkip);
 
         /// <summary>
         /// В категории существует заказ с другим никнеймом и никнейм не совпадает с последним выданным никнеймом из данной категории
         /// </summary>
         public bool HasOrderFromNewNickname(string? nicknameToSkip) =>
-            orders.Any(x => x.NormalizedNickname != nicknameToSkip && x.NormalizedNickname != _lastIssuedNickname);
+            orders.Any(x => x.MainNormalizedNickname != nicknameToSkip && x.MainNormalizedNickname != _lastIssuedNickname);
 
         /// <summary>
         /// Извлекает заказ из категории
@@ -46,9 +45,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             // first - если в категории остались заказы, совпадающие с `nicknameToSkip`
             foreach (ReviewOrder order in orders)
             {
-                if (order.NormalizedNickname != nicknameToSkip)
+                if (order.MainNormalizedNickname != nicknameToSkip)
                 {
-                    if (order.NormalizedNickname != _lastIssuedNickname)
+                    if (order.MainNormalizedNickname != _lastIssuedNickname)
                     {
                         bestMatch = order;
                         break;
@@ -61,7 +60,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             ReviewOrder result = bestMatch ?? fallback ?? first;
             orders.Remove(result);
 
-            _lastIssuedNickname = result.NormalizedNickname;
+            _lastIssuedNickname = result.MainNormalizedNickname;
 
             return result;
         }
@@ -69,15 +68,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// <summary>
         /// Обновляет категорию заказов
         /// </summary>
-        public void UpdateOrdersCategory(OrderQueueManager queueManager, OrderCategoryType orderCategoryType, int debtNumber = 0)
+        public void UpdateOrdersCategory(OrderQueueManager queueManager, OrderCategoryType type, int debtNumber = 0)
         {
             foreach (ReviewOrder item in orders)
             {
-                queueManager.OrderPositionsById[item.Id].Current.Category = new OrderCategoryInfo
-                {
-                    Type = orderCategoryType,
-                    DebtNumber = debtNumber
-                };
+                queueManager.OrderPositionsById[item.Id].SetCurrentCategory(type, debtNumber);
             }
         }
     }

@@ -400,7 +400,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
                     NominalAmount = table.Column<decimal>(type: "numeric", nullable: false),
                     UserComment = table.Column<string>(type: "text", nullable: true),
-                    NormalizedNickname = table.Column<string>(type: "text", nullable: false),
+                    MainNickname = table.Column<string>(type: "text", nullable: false),
+                    MainNormalizedNickname = table.Column<string>(type: "text", nullable: false),
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
                     ComposerStreamId = table.Column<long>(type: "bigint", nullable: false)
                 },

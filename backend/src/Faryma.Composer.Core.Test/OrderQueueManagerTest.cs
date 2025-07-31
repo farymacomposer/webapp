@@ -739,9 +739,9 @@ namespace Faryma.Composer.Core.Test
             queueManager.UpdateOrderPositions();
 
             Check([
-                (0, 4, OrderActivityStatus.Future,    "Nick1"),
-                (1, 5, OrderActivityStatus.Future,    "Nick1"),
-                (2, 6, OrderActivityStatus.Future,    "Nick2"),
+                (0, 4, OrderActivityStatus.Scheduled,    "Nick1"),
+                (1, 5, OrderActivityStatus.Scheduled,    "Nick1"),
+                (2, 6, OrderActivityStatus.Scheduled,    "Nick2"),
 
                 (0, 1, OrderActivityStatus.Active,    "Nick1"),
                 (1, 3, OrderActivityStatus.Active,    "Nick2"),
@@ -753,9 +753,9 @@ namespace Faryma.Composer.Core.Test
                 (7, 12, OrderActivityStatus.Active,   "Nick9"), // долг x2
                 (8, 8, OrderActivityStatus.Active,    "Nick2"), // долг x1
 
-                (0, 13, OrderActivityStatus.Inactive, "Nick2"),
-                (1, 14, OrderActivityStatus.Inactive, "Nick2"),
-                (2, 15, OrderActivityStatus.Inactive, "Nick9"),
+                (0, 13, OrderActivityStatus.Frozen, "Nick2"),
+                (1, 14, OrderActivityStatus.Frozen, "Nick2"),
+                (2, 15, OrderActivityStatus.Frozen, "Nick9"),
             ], queueManager);
         }
 
@@ -764,7 +764,11 @@ namespace Faryma.Composer.Core.Test
             int index = 0;
             foreach ((long id, string nick) in values)
             {
-                Assert.Equal((index, id, _normalizer.NormalizeName(nick)), (queueManager.OrderPositionsById[id].Current.Index, id, queueManager.OrdersById[id].NormalizedNickname));
+                OrderPosition item = queueManager.OrderPositionsById[id];
+
+                Assert.Equal(
+                    (index, id, _normalizer.NormalizeName(nick)),
+                    (item.PositionHistory.Current.QueueIndex, id, item.Order.MainNormalizedNickname));
                 index++;
             }
         }
@@ -773,7 +777,11 @@ namespace Faryma.Composer.Core.Test
         {
             foreach ((int index, long id, OrderActivityStatus status, string nick) in values)
             {
-                Assert.Equal((index, id, status, _normalizer.NormalizeName(nick)), (queueManager.OrderPositionsById[id].Current.Index, id, queueManager.OrderPositionsById[id].Current.ActivityStatus, queueManager.OrdersById[id].NormalizedNickname));
+                OrderPosition item = queueManager.OrderPositionsById[id];
+
+                Assert.Equal(
+                    (index, id, status, _normalizer.NormalizeName(nick)),
+                    (item.PositionHistory.Current.QueueIndex, id, item.PositionHistory.Current.ActivityStatus, item.Order.MainNormalizedNickname));
             }
         }
 
@@ -787,7 +795,8 @@ namespace Faryma.Composer.Core.Test
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.Donation,
                 NominalAmount = amount,
-                NormalizedNickname = _normalizer.NormalizeName(name),
+                MainNickname = name,
+                MainNormalizedNickname = _normalizer.NormalizeName(name),
                 ComposerStream = new ComposerStream
                 {
                     EventDate = DateOnly.Parse(eventDate),
@@ -806,7 +815,8 @@ namespace Faryma.Composer.Core.Test
                 IsFrozen = false,
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.OutOfQueue,
-                NormalizedNickname = _normalizer.NormalizeName(name),
+                MainNickname = name,
+                MainNormalizedNickname = _normalizer.NormalizeName(name),
                 ComposerStream = new ComposerStream
                 {
                     EventDate = DateOnly.Parse(eventDate),
@@ -816,13 +826,12 @@ namespace Faryma.Composer.Core.Test
             };
         }
 
-        private OrderQueueManager GetManager(ReviewOrder[] items, string currentStreamDate)
+        private OrderQueueManager GetManager(ReviewOrder[] orders, string currentStreamDate)
         {
             return new()
             {
                 CurrentStreamDate = DateOnly.Parse(currentStreamDate),
-                OrdersById = items.ToDictionary(k => k.Id),
-                OrderPositionsById = items.ToDictionary(k => k.Id, _ => new OrderPositionTracker()),
+                OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
                 LastNicknameByStreamDate = new Dictionary<DateOnly, string>(),
                 LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,
             };
