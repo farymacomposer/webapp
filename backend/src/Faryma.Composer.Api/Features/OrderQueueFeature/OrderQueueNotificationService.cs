@@ -18,9 +18,9 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
             });
         }
 
-        public async Task NotifyOrderUpped(OrderPosition orderPosition)
+        public async Task NotifyOrderPositionChanged(OrderPosition orderPosition)
         {
-            await context.Clients.All.SendAsync("OrderUpped", new
+            await context.Clients.All.SendAsync("OrderPositionChanged", new
             {
                 Order = ReviewOrderDto.Map(orderPosition.Order),
                 CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),

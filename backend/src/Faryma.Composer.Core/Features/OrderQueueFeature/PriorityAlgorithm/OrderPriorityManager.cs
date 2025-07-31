@@ -34,7 +34,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 .OrderBy(x => x.CreatedAt)
                 .ToList());
 
-            List<(DateOnly, OrderCategory)> queues = queueManager.OrderPositionsById
+            List<(DateOnly, OrderCategory)> categories = queueManager.OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen
                     && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
@@ -44,17 +44,17 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 .OrderBy(x => x.Key)
                 .ToList();
 
-            if (queues.Count > 0)
+            if (categories.Count > 0)
             {
-                (DateOnly StreamDate, OrderCategory Provider) item = queues.Last();
+                (DateOnly StreamDate, OrderCategory Provider) item = categories.Last();
                 if (item.StreamDate == queueManager.CurrentStreamDate)
                 {
-                    queues.Remove(item);
+                    categories.Remove(item);
                     _donationCategory = item.Provider;
                 }
             }
 
-            _debtCategories = new DebtOrderCategories(queues);
+            _debtCategories = new DebtOrderCategories(categories);
         }
 
         public void UpdateOrdersCategories()

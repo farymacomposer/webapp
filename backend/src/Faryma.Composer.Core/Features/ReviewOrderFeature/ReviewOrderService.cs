@@ -30,7 +30,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     Transaction deposit = ofw.TransactionRepository.CreateDeposit(userNickname.Account, command.PaymentAmount!.Value);
                     Transaction payment = ofw.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount!.Value);
 
-                    result = ofw.ReviewOrderRepository.Create(
+                    result = ofw.ReviewOrderRepository.CreateDonation(
                         stream,
                         payment,
                         command.OrderType,
@@ -40,7 +40,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
                 case ReviewOrderType.OutOfQueue:
 
-                    result = ofw.ReviewOrderRepository.Create(
+                    result = ofw.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
                         command.OrderType,
@@ -51,7 +51,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
                 case ReviewOrderType.Free:
 
-                    result = ofw.ReviewOrderRepository.Create(
+                    result = ofw.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
                         command.OrderType,
@@ -64,7 +64,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.Add(result!);
+            await orderQueueService.AddOrder(result!);
 
             return result!;
         }
@@ -74,10 +74,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
                 ?? throw new ReviewOrderException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
 
-            if (order.Status
-                is ReviewOrderStatus.InProgress
-                or ReviewOrderStatus.Completed
-                or ReviewOrderStatus.Canceled)
+            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
             {
                 throw new ReviewOrderException($"Невозможно поднять заказ в статусе '{order.Status}'");
             }
@@ -89,9 +86,61 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.Up(payment);
+            await orderQueueService.UpdateOrder(order);
 
             return payment;
+        }
+
+        public async Task Freeze(FreezeCommand command)
+        {
+            ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
+                ?? throw new ReviewOrderException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
+
+            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            {
+                throw new ReviewOrderException($"Невозможно поднять заказ в статусе '{order.Status}'");
+            }
+
+            order.IsFrozen = true;
+
+            await ofw.SaveChangesAsync();
+
+            await orderQueueService.UpdateOrder(order);
+        }
+
+        public async Task Cancel(CancelCommand command)
+        {
+            ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
+                ?? throw new ReviewOrderException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
+
+            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            {
+                throw new ReviewOrderException($"Невозможно поднять заказ в статусе '{order.Status}'");
+            }
+
+            order.Status = ReviewOrderStatus.Canceled;
+
+            await ofw.SaveChangesAsync();
+
+            await orderQueueService.RemoveOrder(order);
+        }
+
+        public async Task StartReview(CancelCommand command)
+        {
+            ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
+                ?? throw new ReviewOrderException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
+
+            if (order.Status != ReviewOrderStatus.Pending)
+            {
+                throw new ReviewOrderException($"Невозможно поднять заказ в статусе '{order.Status}'");
+            }
+
+            order.Status = ReviewOrderStatus.InProgress;
+            order.InProgressAt = DateTime.UtcNow;
+
+            await ofw.SaveChangesAsync();
+
+            await orderQueueService.StartReview(order);
         }
     }
 }

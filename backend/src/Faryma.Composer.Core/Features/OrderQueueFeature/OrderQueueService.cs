@@ -14,19 +14,23 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
         public IReadOnlyDictionary<long, OrderPosition> GetOrderQueue() => _queueManager.OrderPositionsById;
 
-        public async Task Add(ReviewOrder order)
+        public async Task AddOrder(ReviewOrder order)
         {
-            _queueManager.Add(order);
+            _queueManager.AddOrder(order);
 
             await notificationService.NotifyNewOrderAdded(_queueManager.OrderPositionsById[order.Id]);
         }
 
-        public async Task Up(Transaction payment)
+        public async Task UpdateOrder(ReviewOrder order)
         {
-            _queueManager.Up(payment);
+            _queueManager.UpdateOrder(order);
 
-            await notificationService.NotifyOrderUpped(_queueManager.OrderPositionsById[payment.ReviewOrderId!.Value]);
+            await notificationService.NotifyOrderPositionChanged(_queueManager.OrderPositionsById[order!.Id]);
         }
+
+        public async Task RemoveOrder(ReviewOrder order) => throw new NotImplementedException();
+        public async Task StartReview(ReviewOrder order) => throw new NotImplementedException();
+        public async Task CompleteReview(ReviewOrder order) => throw new NotImplementedException();
 
         public async Task Initialize()
         {

@@ -11,7 +11,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// <summary>
         /// Заказ разбора трека
         /// </summary>
-        public required ReviewOrder Order { get; init; }
+        public required ReviewOrder Order { get; set; }
 
         /// <summary>
         /// История изменений позиции заказа в очереди
