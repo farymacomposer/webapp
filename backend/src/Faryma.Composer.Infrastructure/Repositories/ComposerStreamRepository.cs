@@ -26,7 +26,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 .ToArrayAsync();
         }
 
-        public Task<ComposerStream?> FindNearest(DateOnly dateFrom)
+        public Task<ComposerStream?> FindNearestInWeekRange(DateOnly dateFrom)
         {
             DateOnly dateTo = dateFrom.AddDays(6);
 
