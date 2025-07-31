@@ -6,7 +6,14 @@ namespace Faryma.Composer.Infrastructure.Repositories
 {
     public sealed class ReviewOrderRepository(AppDbContext context)
     {
-        public Task<ReviewOrder?> Find(long id) => context.ReviewOrders.FirstOrDefaultAsync(x => x.Id == id);
+        public Task<ReviewOrder?> Find(long id)
+        {
+            return context.ReviewOrders
+                .Include(x => x.ComposerStream)
+                .Include(x => x.UserNicknames)
+                .Include(x => x.Payments)
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
 
         public ReviewOrder CreateDonation(ComposerStream stream, Transaction transaction, ReviewOrderType type, string? trackUrl, string? userComment)
         {

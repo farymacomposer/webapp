@@ -5,7 +5,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
     /// <summary>
     /// Категория заказов
-    /// <para>в одной категории может быть только один тип заказов, с одного стрима</para>
+    /// <para>в одной категории может быть только один тип заказов</para>
     /// </summary>
     public sealed class OrderCategory(List<ReviewOrder> orders)
     {

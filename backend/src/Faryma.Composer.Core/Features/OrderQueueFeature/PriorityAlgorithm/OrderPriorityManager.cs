@@ -10,14 +10,26 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             Unspecified = 0,
             Initial = 1,
-            PriorityCategory = 2,
+
+            /// <summary>
+            /// Категория - вне очереди
+            /// </summary>
+            OutOfQueueCategory = 2,
+
+            /// <summary>
+            /// Донатная категория
+            /// </summary>
             DonationCategory = 3,
+
+            /// <summary>
+            /// Долговые категории
+            /// </summary>
             DebtCategories = 4,
             Completed = 5,
         }
 
         private readonly OrderQueueManager _queueManager;
-        private readonly OrderCategory _priorityCategory;
+        private readonly OrderCategory _outOfQueueCategory;
         private readonly OrderCategory? _donationCategory;
         private readonly DebtOrderCategories _debtCategories;
         private State _currentState;
@@ -28,7 +40,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             _queueManager = queueManager;
             _currentState = queueManager.LastOrderPriorityManagerState;
 
-            _priorityCategory = new OrderCategory(queueManager.OrderPositionsById
+            _outOfQueueCategory = new OrderCategory(queueManager.OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen && x.Type == ReviewOrderType.OutOfQueue)
                 .OrderBy(x => x.CreatedAt)
@@ -59,7 +71,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
         public void UpdateOrdersCategories()
         {
-            _priorityCategory.UpdateOrdersCategory(_queueManager, OrderCategoryType.OutOfQueue);
+            _outOfQueueCategory.UpdateOrdersCategory(_queueManager, OrderCategoryType.OutOfQueue);
             _donationCategory?.UpdateOrdersCategory(_queueManager, OrderCategoryType.Donation);
             _debtCategories.UpdateOrdersCategory(_queueManager);
         }
@@ -68,23 +80,23 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             (_currentState, bool isOnlyNicknameLeft) = _currentState switch
             {
-                State.Initial when _priorityCategory.HasOrders => (State.PriorityCategory, true),
+                State.Initial when _outOfQueueCategory.HasOrders => (State.OutOfQueueCategory, true),
                 State.Initial when _donationCategory?.HasOrders == true => (State.DonationCategory, true),
                 State.Initial when _debtCategories.HasOrders => (State.DebtCategories, true),
 
-                State.PriorityCategory when _priorityCategory.HasOrderFromNewNickname(_lastIssuedNickname) => (State.PriorityCategory, false),
-                State.PriorityCategory when _donationCategory?.HasOrderFromNewNickname(_lastIssuedNickname) == true => (State.DonationCategory, false),
-                State.PriorityCategory when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtCategories, false),
+                State.OutOfQueueCategory when _outOfQueueCategory.HasOrderFromNewNickname(_lastIssuedNickname) => (State.OutOfQueueCategory, false),
+                State.OutOfQueueCategory when _donationCategory?.HasOrderFromNewNickname(_lastIssuedNickname) == true => (State.DonationCategory, false),
+                State.OutOfQueueCategory when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtCategories, false),
 
-                State.DonationCategory when _priorityCategory.HasOrders => (State.PriorityCategory, true),
+                State.DonationCategory when _outOfQueueCategory.HasOrders => (State.OutOfQueueCategory, true),
                 State.DonationCategory when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtCategories, false),
                 State.DonationCategory when _donationCategory?.HasOrderFromNewNickname(_lastIssuedNickname) == true => (State.DonationCategory, false),
 
-                State.DebtCategories when _priorityCategory.HasOrders => (State.PriorityCategory, true),
+                State.DebtCategories when _outOfQueueCategory.HasOrders => (State.OutOfQueueCategory, true),
                 State.DebtCategories when _donationCategory?.HasOrderFromOtherNickname(_lastIssuedNickname) == true => (State.DonationCategory, false),
                 State.DebtCategories when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtCategories, false),
 
-                not State.Completed when _priorityCategory.HasOrders => (State.PriorityCategory, true),
+                not State.Completed when _outOfQueueCategory.HasOrders => (State.OutOfQueueCategory, true),
                 not State.Completed when _donationCategory?.HasOrders == true => (State.DonationCategory, true),
                 not State.Completed when _debtCategories.HasOrders => (State.DebtCategories, true),
 
@@ -98,7 +110,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             ReviewOrder result = _currentState switch
             {
-                State.PriorityCategory => _priorityCategory.Dequeue(_lastIssuedNickname),
+                State.OutOfQueueCategory => _outOfQueueCategory.Dequeue(_lastIssuedNickname),
                 State.DonationCategory => _donationCategory!.Dequeue(_lastIssuedNickname),
                 State.DebtCategories when isOnlyNicknameLeft => _debtCategories.DequeueRoundRobin(_lastIssuedNickname),
                 State.DebtCategories when isOnlyNicknameLeft == false => _debtCategories.DequeueRoundRobinFromOtherNickname(_lastIssuedNickname),
