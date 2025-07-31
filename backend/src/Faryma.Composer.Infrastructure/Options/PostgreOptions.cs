@@ -24,7 +24,6 @@ namespace Faryma.Composer.Infrastructure.Options
 
         [ConfigurationKeyName("PASSWORD")]
         [Required]
-        [MinLength(12)]
         public required string Password { get; set; }
 
         public string GetConnectionString()
