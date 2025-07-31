@@ -22,6 +22,8 @@ namespace Faryma.Composer.Infrastructure.Options
         [Required]
         public required string Username { get; set; }
 
+        //TODO: Для локальной разработки ограничение пароля может мешать, когда будет релиз, в целях безопасности стоит вернуть
+        // [MinLength(12)]
         [ConfigurationKeyName("PASSWORD")]
         [Required]
         public required string Password { get; set; }
