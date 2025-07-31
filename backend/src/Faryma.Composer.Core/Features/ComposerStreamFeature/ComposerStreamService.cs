@@ -9,9 +9,6 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 {
     public sealed class ComposerStreamService(UnitOfWork ofw)
     {
-        public const DayOfWeek DebtStreamDay = DayOfWeek.Tuesday;
-        public const DayOfWeek DonationStreamDay = DayOfWeek.Saturday;
-
         public Task<IReadOnlyCollection<ComposerStream>> Find(DateOnly dateFrom, DateOnly dateTo) => ofw.ComposerStreamRepository.Find(dateFrom, dateTo);
 
         public async Task<ComposerStream> Create(DateOnly eventDate, ComposerStreamType type)
@@ -31,43 +28,50 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
         public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname, ReviewOrderType orderType)
         {
-            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-            DateOnly debtStreamDate = today.GetNextDateForDay(DebtStreamDay);
-            DateOnly donationStreamDate = today.GetNextDateForDay(DonationStreamDay);
+            const DayOfWeek debtStreamDay = DayOfWeek.Tuesday;
+            const DayOfWeek donationStreamDay = DayOfWeek.Saturday;
 
-            (DateOnly EventDate, ComposerStreamType Type) nearestStreamInfo = (debtStreamDate < donationStreamDate)
-                ? (debtStreamDate, ComposerStreamType.Debt)
-                : (donationStreamDate, ComposerStreamType.Donation);
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            DateOnly debtStreamDate = today.GetNextDateForDay(debtStreamDay);
+            DateOnly donationStreamDate = today.GetNextDateForDay(donationStreamDay);
+
+            (DateOnly EventDate, ComposerStreamType Type) debtStreamInfo = (debtStreamDate, ComposerStreamType.Debt);
+            (DateOnly EventDate, ComposerStreamType Type) donationStreamInfo = (donationStreamDate, ComposerStreamType.Donation);
+            (DateOnly EventDate, ComposerStreamType Type) nearestStreamInfo = (debtStreamDate < donationStreamDate) ? debtStreamInfo : donationStreamInfo;
 
             ComposerStream? nearestStream = await ofw.ComposerStreamRepository.FindNearestInWeekRange(today);
 
             switch (orderType)
             {
                 case ReviewOrderType.OutOfQueue:
-                    return nearestStream ?? await GetOrCreateStream(nearestStreamInfo.EventDate, nearestStreamInfo.Type);
+
+                    return nearestStream ?? await GetOrCreateStream(nearestStreamInfo);
 
                 case ReviewOrderType.Donation or ReviewOrderType.Free:
+
                     if (await ofw.UserNicknameRepository.HasOrders(userNickname))
                     {
-                        return await GetOrCreateStream(donationStreamDate, ComposerStreamType.Donation);
+                        return await GetOrCreateStream(donationStreamInfo);
                     }
-
-                    return nearestStream ?? await GetOrCreateStream(nearestStreamInfo.EventDate, nearestStreamInfo.Type);
+                    else
+                    {
+                        return nearestStream ?? await GetOrCreateStream(nearestStreamInfo);
+                    }
 
                 default:
                     throw new ComposerStreamException($"Типа заказа {orderType} не поддерживается");
             }
         }
 
-        private async Task<ComposerStream> GetOrCreateStream(DateOnly eventDate, ComposerStreamType streamType)
+        private async Task<ComposerStream> GetOrCreateStream((DateOnly EventDate, ComposerStreamType Type) streamInfo)
         {
-            ComposerStream? stream = await ofw.ComposerStreamRepository.Find(eventDate);
+            ComposerStream? stream = await ofw.ComposerStreamRepository.Find(streamInfo.EventDate);
             if (stream is not null)
             {
                 return stream;
             }
 
-            stream = ofw.ComposerStreamRepository.Create(eventDate, streamType);
+            stream = ofw.ComposerStreamRepository.Create(streamInfo.EventDate, streamInfo.Type);
 
             try
             {
@@ -79,7 +83,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             {
                 ofw.Remove(stream);
 
-                return await ofw.ComposerStreamRepository.Get(eventDate);
+                return await ofw.ComposerStreamRepository.Get(streamInfo.EventDate);
             }
         }
     }
