@@ -28,56 +28,62 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
         public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname, ReviewOrderType orderType)
         {
-            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-            (DateOnly EventDate, ComposerStreamType Type) debt = (today.GetNextDateForDay(DayOfWeek.Tuesday), ComposerStreamType.Debt);
-            (DateOnly EventDate, ComposerStreamType Type) donation = (today.GetNextDateForDay(DayOfWeek.Saturday), ComposerStreamType.Donation);
-            (DateOnly EventDate, ComposerStreamType Type) nearest = (debt.EventDate < donation.EventDate) ? debt : donation;
+            const DayOfWeek debtStreamDay = DayOfWeek.Tuesday;
+            const DayOfWeek donationStreamDay = DayOfWeek.Saturday;
 
-            ComposerStream? result = await ofw.ComposerStreamRepository.FindNearest(today);
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            DateOnly debtStreamDate = today.GetNextDateForDay(debtStreamDay);
+            DateOnly donationStreamDate = today.GetNextDateForDay(donationStreamDay);
+
+            (DateOnly EventDate, ComposerStreamType Type) debtStreamInfo = (debtStreamDate, ComposerStreamType.Debt);
+            (DateOnly EventDate, ComposerStreamType Type) donationStreamInfo = (donationStreamDate, ComposerStreamType.Donation);
+            (DateOnly EventDate, ComposerStreamType Type) nearestStreamInfo = (debtStreamDate < donationStreamDate) ? debtStreamInfo : donationStreamInfo;
+
+            ComposerStream? nearestStream = await ofw.ComposerStreamRepository.FindNearestInWeekRange(today);
 
             switch (orderType)
             {
                 case ReviewOrderType.OutOfQueue:
 
-                    return result ?? await GetOrCreate(nearest);
+                    return nearestStream ?? await GetOrCreateStream(nearestStreamInfo);
 
                 case ReviewOrderType.Donation or ReviewOrderType.Free:
 
                     if (await ofw.UserNicknameRepository.HasOrders(userNickname))
                     {
-                        return await GetOrCreate(donation);
+                        return await GetOrCreateStream(donationStreamInfo);
                     }
                     else
                     {
-                        return result ?? await GetOrCreate(nearest);
+                        return nearestStream ?? await GetOrCreateStream(nearestStreamInfo);
                     }
 
                 default:
                     throw new ComposerStreamException($"Типа заказа {orderType} не поддерживается");
             }
+        }
 
-            async Task<ComposerStream> GetOrCreate((DateOnly EventDate, ComposerStreamType Type) item)
+        private async Task<ComposerStream> GetOrCreateStream((DateOnly EventDate, ComposerStreamType Type) streamInfo)
+        {
+            ComposerStream? stream = await ofw.ComposerStreamRepository.Find(streamInfo.EventDate);
+            if (stream is not null)
             {
-                ComposerStream? result = await ofw.ComposerStreamRepository.Find(item.EventDate);
-                if (result is not null)
-                {
-                    return result;
-                }
+                return stream;
+            }
 
-                result = ofw.ComposerStreamRepository.Create(item.EventDate, item.Type);
+            stream = ofw.ComposerStreamRepository.Create(streamInfo.EventDate, streamInfo.Type);
 
-                try
-                {
-                    await ofw.SaveChangesAsync();
+            try
+            {
+                await ofw.SaveChangesAsync();
 
-                    return result;
-                }
-                catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
-                {
-                    ofw.Remove(result);
+                return stream;
+            }
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
+            {
+                ofw.Remove(stream);
 
-                    return await ofw.ComposerStreamRepository.Get(item.EventDate);
-                }
+                return await ofw.ComposerStreamRepository.Get(streamInfo.EventDate);
             }
         }
     }
