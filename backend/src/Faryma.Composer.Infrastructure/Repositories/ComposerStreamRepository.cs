@@ -7,6 +7,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
     public sealed class ComposerStreamRepository(AppDbContext context)
     {
         public Task<ComposerStream> Get(DateOnly eventDate) => context.ComposerStreams.FirstAsync(x => x.EventDate == eventDate);
+        public Task<ComposerStream?> Find(DateOnly eventDate) => context.ComposerStreams.FirstOrDefaultAsync(x => x.EventDate == eventDate);
 
         public ComposerStream Create(DateOnly eventDate, ComposerStreamType type)
         {

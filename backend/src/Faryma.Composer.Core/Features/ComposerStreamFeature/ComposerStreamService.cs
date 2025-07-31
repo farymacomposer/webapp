@@ -58,7 +58,13 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             async Task<ComposerStream> GetOrCreate((DateOnly EventDate, ComposerStreamType Type) item)
             {
-                ComposerStream result = ofw.ComposerStreamRepository.Create(item.EventDate, item.Type);
+                ComposerStream? result = await ofw.ComposerStreamRepository.Find(item.EventDate);
+                if (result is not null)
+                {
+                    return result;
+                }
+
+                result = ofw.ComposerStreamRepository.Create(item.EventDate, item.Type);
 
                 try
                 {
