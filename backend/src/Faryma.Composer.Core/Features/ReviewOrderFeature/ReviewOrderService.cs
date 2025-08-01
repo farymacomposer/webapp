@@ -125,7 +125,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             await orderQueueService.RemoveOrder(order);
         }
 
-        public async Task StartReview(CancelCommand command)
+        public async Task StartReview(StartReviewCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
                 ?? throw new ReviewOrderException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
@@ -133,6 +133,12 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             if (order.Status != ReviewOrderStatus.Pending)
             {
                 throw new ReviewOrderException($"Невозможно поднять заказ в статусе '{order.Status}'");
+            }
+
+            ReviewOrder? currentInProgressReview = await ofw.ReviewOrderRepository.FindInProgress(order.ComposerStreamId);
+            if (currentInProgressReview is not null)
+            {
+                throw new ReviewOrderException($"Предыдущий заказ {currentInProgressReview.Id} еще не разобран.");
             }
 
             order.Status = ReviewOrderStatus.InProgress;

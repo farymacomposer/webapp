@@ -15,12 +15,40 @@ namespace Faryma.Composer.Core.Features.ReviewFeature
             ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
                 ?? throw new ReviewException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
 
-            if (order.Status != ReviewOrderStatus.Pending)
+            if (order.Status != ReviewOrderStatus.InProgress)
             {
-                throw new ReviewException($"Невозможно поднять заказ в статусе '{order.Status}'");
+                throw new ReviewException("Невозможно оценить заказ т.к. его статус не в процессе");
             }
 
-            // ...
+            Track track;
+
+            if (order.TrackId.HasValue)
+            {
+                track = await ofw.TrackRepository.Find(order.TrackId.Value)
+                    ?? throw new ReviewException($"Трека {order.TrackId.Value} не существует");
+            }
+            else if (!string.IsNullOrWhiteSpace(order.TrackUrl))
+            {
+                UserNickname userNickname = order.UserNicknames.First();
+                track = await ofw.TrackRepository.GetOrCreateByUrl(userNickname, order.TrackUrl);
+            }
+            else
+            {
+                throw new ReviewException($"У заказа {order.Id} нет трека");
+            }
+
+            Review trackReview = new()
+            {
+                Comment = command.Comment,
+                CompletedAt = DateTime.UtcNow,
+                ComposerStream = order.ComposerStream,
+                ReviewOrder = order,
+                Rating = command.Rating,
+                Track = track,
+                UpdatedAt = DateTime.UtcNow,
+            };
+
+            ofw.ReviewRepository.Add(trackReview);
 
             await ofw.SaveChangesAsync();
 

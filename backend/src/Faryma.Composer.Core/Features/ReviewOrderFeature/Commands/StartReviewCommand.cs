@@ -1,7 +1,7 @@
 ﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
 {
-    public sealed class StartReviewCommand
+    public sealed record StartReviewCommand
     {
-        public long ReviewOrderId { get; internal set; }
+        public long ReviewOrderId { get; init; }
     }
 }
