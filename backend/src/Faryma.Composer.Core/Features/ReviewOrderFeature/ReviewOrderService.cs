@@ -62,9 +62,9 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
             }
 
-            await orderQueueService.AddOrder(result!);
-
             await ofw.SaveChangesAsync();
+
+            await orderQueueService.AddOrder(result!);
 
             return result!;
         }
