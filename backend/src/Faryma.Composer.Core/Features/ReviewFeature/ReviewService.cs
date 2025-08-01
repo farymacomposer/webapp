@@ -57,10 +57,7 @@ namespace Faryma.Composer.Core.Features.ReviewFeature
                 CompletedAt = DateTime.UtcNow,
                 ComposerStream = order.ComposerStream,
                 ReviewOrder = order,
-
-                //TODO: Узнать макс мин значения рейтинга и добавить валидацию
                 Rating = command.Rating,
-
                 Track = track,
                 UpdatedAt = DateTime.UtcNow,
             };
