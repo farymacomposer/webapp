@@ -11,7 +11,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel
         /// <summary>
         /// ID заказа разбора трека
         /// </summary>
-        [Required]
         public required long ReviewOrderId { get; set; }
 
         public CancelCommand Map()

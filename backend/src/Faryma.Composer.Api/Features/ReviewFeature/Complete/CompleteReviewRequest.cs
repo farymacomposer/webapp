@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Core.Features.ReviewFeature.Commands;
 
 namespace Faryma.Composer.Api.Features.ReviewFeature.Complete
 {
     /// <summary>
     /// Запрос завершения разбора трека
     /// </summary>
-    public sealed record CompleteReviewRequest : IValidatableObject
+    public sealed record CompleteReviewRequest
     {
         /// <summary>
         /// ID заказа разбора трека
@@ -26,20 +27,7 @@ namespace Faryma.Composer.Api.Features.ReviewFeature.Complete
         [MinLength(1, ErrorMessage = "Комментарий не может быть пустым")]
         public required string Comment { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (Rating < 1 || Rating > 10)
-            {
-                yield return new ValidationResult("Оценка должна быть от 1 до 10");
-            }
-
-            if (string.IsNullOrWhiteSpace(Comment))
-            {
-                yield return new ValidationResult("Комментарий не может быть пустым");
-            }
-        }
-
-        public Core.Features.ReviewFeature.Commands.CompleteReviewCommand Map()
+        public CompleteReviewCommand Map()
         {
             return new()
             {

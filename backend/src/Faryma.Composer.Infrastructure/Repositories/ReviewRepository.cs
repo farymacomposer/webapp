@@ -8,5 +8,26 @@ namespace Faryma.Composer.Infrastructure.Repositories
         {
             return context.Reviews.Add(review).Entity;
         }
+
+        public Review Create(
+            string comment,
+            ComposerStream composerStream,
+            ReviewOrder reviewOrder,
+            int rating,
+            Track track)
+        {
+            Review review = new()
+            {
+                Comment = comment,
+                CompletedAt = DateTime.UtcNow,
+                ComposerStream = composerStream,
+                ReviewOrder = reviewOrder,
+                Rating = rating,
+                Track = track,
+                UpdatedAt = DateTime.UtcNow,
+            };
+
+            return context.Reviews.Add(review).Entity;
+        }
     }
 }

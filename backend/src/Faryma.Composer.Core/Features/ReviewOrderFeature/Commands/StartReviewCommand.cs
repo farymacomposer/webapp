@@ -8,6 +8,6 @@
         /// <summary>
         /// ID заказа разбора трека
         /// </summary>
-        public long ReviewOrderId { get; init; }
+        public required long ReviewOrderId { get; init; }
     }
 }

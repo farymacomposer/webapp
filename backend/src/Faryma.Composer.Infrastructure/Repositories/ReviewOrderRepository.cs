@@ -9,9 +9,10 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public Task<ReviewOrder?> Find(long id) => context.ReviewOrders
             .Include(x => x.ComposerStream)
             .Include(x => x.UserNicknames)
+            .Include(x => x.Payments)
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        public Task<ReviewOrder?> FindInProgress(long streamId) => context.ReviewOrders.SingleOrDefaultAsync(x => x.ComposerStreamId == streamId && x.Status == ReviewOrderStatus.InProgress);
+        public Task<ReviewOrder?> FindInProgress(long streamId) => context.ReviewOrders.FirstOrDefaultAsync(x => x.ComposerStreamId == streamId && x.Status == ReviewOrderStatus.InProgress);
 
         public ReviewOrder CreateDonation(ComposerStream stream, Transaction transaction, ReviewOrderType type, string? trackUrl, string? userComment)
         {

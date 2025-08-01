@@ -30,23 +30,29 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
         public async Task RemoveOrder(ReviewOrder order)
         {
-            _queueManager.UpdateOrder(order);
+            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
 
-            await notificationService.NotifyOrderRemoved(_queueManager.OrderPositionsById[order!.Id]);
+            _queueManager.RemoveOrder(order);
+
+            await notificationService.NotifyOrderRemoved(position);
         }
 
         public async Task StartReview(ReviewOrder order)
         {
             _queueManager.UpdateOrder(order);
 
-            await notificationService.NotifyReviewStarted(order);
+            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
+
+            await notificationService.NotifyReviewStarted(position);
         }
 
         public async Task CompleteReview(ReviewOrder order)
         {
             _queueManager.UpdateOrder(order);
 
-            await notificationService.NotifyReviewCompleted(order);
+            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
+
+            await notificationService.NotifyReviewCompleted(position);
         }
 
         public async Task Initialize()

@@ -17,7 +17,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             }).Entity;
         }
 
-        public async Task<Track> GetOrCreateByUrl(UserNickname userNickname, string url)
+        public async Task<Track> GetOrCreate(UserNickname userNickname, string url)
         {
             Track? track = await context.Tracks.FirstOrDefaultAsync(x => x.Url == url);
 

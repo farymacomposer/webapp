@@ -132,7 +132,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             if (order.Status != ReviewOrderStatus.Pending)
             {
-                throw new ReviewOrderException($"Невозможно поднять заказ в статусе '{order.Status}'");
+                throw new ReviewOrderException($"Невозможно начать оценивать заказ в статусе '{order.Status}'");
             }
 
             ReviewOrder? currentInProgressReview = await ofw.ReviewOrderRepository.FindInProgress(order.ComposerStreamId);

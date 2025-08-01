@@ -8,12 +8,12 @@
         /// <summary>
         /// ID заказа разбора трека
         /// </summary>
-        public long ReviewOrderId { get; init; }
+        public required long ReviewOrderId { get; init; }
 
         /// <summary>
         /// Оценка трека
         /// </summary>
-        public int Rating { get; init; }
+        public required int Rating { get; init; }
 
         /// <summary>
         /// Комментарий к разбору
