@@ -10,7 +10,7 @@ namespace Faryma.Composer.Core.Features.ReviewFeature
         UnitOfWork ofw,
         OrderQueueService orderQueueService)
     {
-        public async Task CompleteReview(CompleteReviewCommand command)
+        public async Task<Review> CompleteReview(CompleteReviewCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
                 ?? throw new ReviewException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
@@ -20,6 +20,20 @@ namespace Faryma.Composer.Core.Features.ReviewFeature
                 throw new ReviewException("Невозможно оценить заказ т.к. его статус не в процессе");
             }
 
+            Review review = await CreateReview(command, order);
+
+            order.Status = ReviewOrderStatus.Completed;
+            order.Review = review;
+
+            await ofw.SaveChangesAsync();
+
+            await orderQueueService.CompleteReview(order);
+
+            return review;
+        }
+
+        private async Task<Review> CreateReview(CompleteReviewCommand command, ReviewOrder order)
+        {
             Track track;
 
             if (order.TrackId.HasValue)
@@ -43,16 +57,17 @@ namespace Faryma.Composer.Core.Features.ReviewFeature
                 CompletedAt = DateTime.UtcNow,
                 ComposerStream = order.ComposerStream,
                 ReviewOrder = order,
+
+                //TODO: Узнать макс мин значения рейтинга и добавить валидацию
                 Rating = command.Rating,
+
                 Track = track,
                 UpdatedAt = DateTime.UtcNow,
             };
 
             ofw.ReviewRepository.Add(trackReview);
 
-            await ofw.SaveChangesAsync();
-
-            await orderQueueService.CompleteReview(order);
+            return trackReview;
         }
     }
 }

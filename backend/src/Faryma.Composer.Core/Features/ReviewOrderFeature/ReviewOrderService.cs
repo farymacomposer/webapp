@@ -62,9 +62,9 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
             }
 
-            await ofw.SaveChangesAsync();
-
             await orderQueueService.AddOrder(result!);
+
+            await ofw.SaveChangesAsync();
 
             return result!;
         }
@@ -84,9 +84,9 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             Transaction payment = ofw.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount);
             order.Payments.Add(payment);
 
-            await ofw.SaveChangesAsync();
-
             await orderQueueService.UpdateOrder(order);
+
+            await ofw.SaveChangesAsync();
 
             return payment;
         }
@@ -103,9 +103,9 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             order.IsFrozen = true;
 
-            await ofw.SaveChangesAsync();
-
             await orderQueueService.UpdateOrder(order);
+
+            await ofw.SaveChangesAsync();
         }
 
         public async Task Cancel(CancelCommand command)
@@ -120,9 +120,9 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             order.Status = ReviewOrderStatus.Canceled;
 
-            await ofw.SaveChangesAsync();
-
             await orderQueueService.RemoveOrder(order);
+
+            await ofw.SaveChangesAsync();
         }
 
         public async Task StartReview(StartReviewCommand command)
@@ -144,9 +144,9 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             order.Status = ReviewOrderStatus.InProgress;
             order.InProgressAt = DateTime.UtcNow;
 
-            await ofw.SaveChangesAsync();
-
             await orderQueueService.StartReview(order);
+
+            await ofw.SaveChangesAsync();
         }
     }
 }

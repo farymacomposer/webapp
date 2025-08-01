@@ -6,7 +6,10 @@ namespace Faryma.Composer.Infrastructure.Repositories
 {
     public sealed class ReviewOrderRepository(AppDbContext context)
     {
-        public Task<ReviewOrder?> Find(long id) => context.ReviewOrders.FirstOrDefaultAsync(x => x.Id == id);
+        public Task<ReviewOrder?> Find(long id) => context.ReviewOrders
+            .Include(x => x.ComposerStream)
+            .Include(x => x.UserNicknames)
+            .FirstOrDefaultAsync(x => x.Id == id);
 
         public Task<ReviewOrder?> FindInProgress(long streamId) => context.ReviewOrders.SingleOrDefaultAsync(x => x.ComposerStreamId == streamId && x.Status == ReviewOrderStatus.InProgress);
 
