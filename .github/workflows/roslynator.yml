@@ -1,0 +1,24 @@
+name: Roslynator Analysis
+
+on:
+  pull_request:
+    branches: [ main, dev ]
+    paths:
+      - '**.cs'
+      - '**.props'
+      - '**.editorconfig'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Pull Roslynator image
+        run: |
+          docker pull ghcr.io/mnham/roslynatoranalyzer:latest
+
+      - name: Run Roslynator Analyzer
+        run: |
+          docker run -t --rm -v "$(pwd):/src" ghcr.io/mnham/roslynatoranalyzer:latest
