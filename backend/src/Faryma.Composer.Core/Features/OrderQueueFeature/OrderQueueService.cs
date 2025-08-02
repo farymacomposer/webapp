@@ -32,7 +32,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
 
-            //_queueManager.RemoveOrder(order);
+            _queueManager.RemoveOrder(order);
 
             await notificationService.NotifyOrderRemoved(position);
         }
