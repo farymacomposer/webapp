@@ -402,8 +402,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     UserComment = table.Column<string>(type: "text", nullable: true),
                     MainNickname = table.Column<string>(type: "text", nullable: false),
                     MainNormalizedNickname = table.Column<string>(type: "text", nullable: false),
-                    TrackId = table.Column<long>(type: "bigint", nullable: true),
-                    ComposerStreamId = table.Column<long>(type: "bigint", nullable: false)
+                    ComposerStreamId = table.Column<long>(type: "bigint", nullable: false),
+                    TrackId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -491,11 +491,12 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Rating = table.Column<int>(type: "integer", nullable: false),
+                    TrackUrl = table.Column<string>(type: "text", nullable: false),
                     Comment = table.Column<string>(type: "text", nullable: false),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: false),
-                    TrackId = table.Column<long>(type: "bigint", nullable: false),
+                    TrackId = table.Column<long>(type: "bigint", nullable: true),
                     ComposerStreamId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -520,8 +521,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         column: x => x.TrackId,
                         principalSchema: "app",
                         principalTable: "Tracks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(

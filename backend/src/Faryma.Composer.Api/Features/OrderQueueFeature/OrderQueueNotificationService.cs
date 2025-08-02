@@ -36,23 +36,5 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
                 PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),
             });
         }
-
-        public async Task NotifyReviewStarted(OrderPosition orderPosition)
-        {
-            await context.Clients.All.SendAsync("ReviewStarted", new
-            {
-                Order = ReviewOrderDto.Map(orderPosition.Order),
-                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
-            });
-        }
-
-        public async Task NotifyReviewCompleted(OrderPosition orderPosition)
-        {
-            await context.Clients.All.SendAsync("ReviewCompleted", new
-            {
-                Order = ReviewOrderDto.Map(orderPosition.Order),
-                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
-            });
-        }
     }
 }

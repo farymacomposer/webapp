@@ -11,13 +11,12 @@ namespace Faryma.Composer.Api.Features.ReviewFeature.Complete
         /// <summary>
         /// ID заказа разбора трека
         /// </summary>
-        [Required]
         public required long ReviewOrderId { get; set; }
 
         /// <summary>
-        /// Оценка трека (1-10)
+        /// Оценка трека (1-26)
         /// </summary>
-        [Range(1, 10, ErrorMessage = "Оценка должна быть от 1 до 10")]
+        [Range(1, 26, ErrorMessage = "Оценка должна быть от 1 до 26")]
         public required int Rating { get; set; }
 
         /// <summary>

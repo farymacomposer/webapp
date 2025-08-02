@@ -57,7 +57,6 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required string MainNickname { get; set; }
         public required string MainNormalizedNickname { get; set; }
 
-        public long? TrackId { get; set; }
         public long ComposerStreamId { get; set; }
 
         // Навигационные свойства
@@ -66,12 +65,6 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Результат разбора
         /// </summary>
         public Review? Review { get; set; }
-
-        /// <summary>
-        /// Трек для разбора
-        /// </summary>
-        [ForeignKey(nameof(TrackId))]
-        public Track? Track { get; set; }
 
         /// <summary>
         /// Связанный cтрим композитора

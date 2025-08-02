@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250731073836_Init")]
+    [Migration("20250802083556_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -176,8 +176,12 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     b.Property<long>("ReviewOrderId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("TrackId")
+                    b.Property<long?>("TrackId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("TrackUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -695,9 +699,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
                         .WithMany("Reviews")
-                        .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TrackId");
 
                     b.Navigation("ComposerStream");
 
@@ -714,13 +716,11 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", null)
                         .WithMany("ReviewOrders")
                         .HasForeignKey("TrackId");
 
                     b.Navigation("ComposerStream");
-
-                    b.Navigation("Track");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Track", b =>

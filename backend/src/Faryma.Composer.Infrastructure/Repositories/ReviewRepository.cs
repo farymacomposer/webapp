@@ -9,17 +9,19 @@ namespace Faryma.Composer.Infrastructure.Repositories
             ComposerStream composerStream,
             ReviewOrder reviewOrder,
             int rating,
-            Track track)
+            string trackUrl)
         {
+            DateTime creationDate = DateTime.UtcNow;
+
             Review review = new()
             {
                 Comment = comment,
-                CompletedAt = DateTime.UtcNow,
+                CompletedAt = creationDate,
                 ComposerStream = composerStream,
                 ReviewOrder = reviewOrder,
                 Rating = rating,
-                Track = track,
-                UpdatedAt = DateTime.UtcNow,
+                UpdatedAt = creationDate,
+                TrackUrl = trackUrl
             };
 
             return context.Reviews.Add(review).Entity;

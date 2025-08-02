@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
+﻿using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze
 {
@@ -11,7 +10,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze
         /// <summary>
         /// ID заказа разбора трека
         /// </summary>
-        [Required]
         public required long ReviewOrderId { get; set; }
 
         public FreezeCommand Map()

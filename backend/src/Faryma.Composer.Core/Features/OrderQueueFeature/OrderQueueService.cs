@@ -32,7 +32,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
 
-            _queueManager.RemoveOrder(order);
+            //_queueManager.RemoveOrder(order);
 
             await notificationService.NotifyOrderRemoved(position);
         }
@@ -43,7 +43,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
             OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
 
-            await notificationService.NotifyReviewStarted(position);
+            await notificationService.NotifyOrderPositionChanged(position);
         }
 
         public async Task CompleteReview(ReviewOrder order)
@@ -52,7 +52,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
             OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
 
-            await notificationService.NotifyReviewCompleted(position);
+            await notificationService.NotifyOrderPositionChanged(position);
         }
 
         public async Task Initialize()
