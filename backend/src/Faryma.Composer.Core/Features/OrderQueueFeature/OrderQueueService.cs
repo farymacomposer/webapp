@@ -31,8 +31,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         public async Task RemoveOrder(ReviewOrder order)
         {
             OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
-
-            _queueManager.RemoveOrder(order);
+            //TODO Вернуть удаление когда появится функционал в очереди
+            //_queueManager.RemoveOrder(order);
 
             await notificationService.NotifyOrderRemoved(position);
         }

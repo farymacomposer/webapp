@@ -713,11 +713,13 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
                         .WithMany("ReviewOrders")
                         .HasForeignKey("TrackId");
 
                     b.Navigation("ComposerStream");
+
+                    b.Navigation("Track");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Track", b =>

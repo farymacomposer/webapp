@@ -402,8 +402,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     UserComment = table.Column<string>(type: "text", nullable: true),
                     MainNickname = table.Column<string>(type: "text", nullable: false),
                     MainNormalizedNickname = table.Column<string>(type: "text", nullable: false),
-                    ComposerStreamId = table.Column<long>(type: "bigint", nullable: false),
-                    TrackId = table.Column<long>(type: "bigint", nullable: true)
+                    TrackId = table.Column<long>(type: "bigint", nullable: true),
+                    ComposerStreamId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {

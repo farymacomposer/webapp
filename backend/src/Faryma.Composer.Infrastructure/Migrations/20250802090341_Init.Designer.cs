@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250802083556_Init")]
+    [Migration("20250802090341_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -716,11 +716,13 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
                         .WithMany("ReviewOrders")
                         .HasForeignKey("TrackId");
 
                     b.Navigation("ComposerStream");
+
+                    b.Navigation("Track");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Track", b =>
