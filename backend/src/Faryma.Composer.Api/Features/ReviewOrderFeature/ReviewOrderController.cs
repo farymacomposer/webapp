@@ -3,6 +3,7 @@ using Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Create;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.StartReview;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Up;
 using Faryma.Composer.Core.Features.ReviewOrderFeature;
 using Faryma.Composer.Infrastructure.Entities;
@@ -104,6 +105,20 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
             await reviewOrderService.Freeze(request.Map());
 
             return Ok(new FreezeReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
+        }
+
+        /// <summary>
+        /// Размораживает заказ разбора трека
+        /// </summary>
+        /// <param name="request">Запрос разморозки заказа</param>
+        [HttpPost(nameof(UnfreezeReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(
+            [FromBody] UnfreezeReviewOrderRequest request)
+        {
+            await reviewOrderService.Unfreeze(request.Map());
+
+            return Ok(new UnfreezeReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
         }
 
         /// <summary>

@@ -98,10 +98,27 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
             {
-                throw new ReviewOrderException($"Невозможно поднять заказ в статусе '{order.Status}'");
+                throw new ReviewOrderException($"Невозможно заморозить заказ в статусе '{order.Status}'");
             }
 
             order.IsFrozen = true;
+
+            await ofw.SaveChangesAsync();
+
+            await orderQueueService.UpdateOrder(order);
+        }
+
+        public async Task Unfreeze(UnfreezeCommand command)
+        {
+            ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
+                ?? throw new ReviewOrderException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
+
+            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            {
+                throw new ReviewOrderException($"Невозможно разморозить заказ в статусе '{order.Status}'");
+            }
+
+            order.IsFrozen = false;
 
             await ofw.SaveChangesAsync();
 
