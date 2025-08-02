@@ -9,6 +9,7 @@ spelling_checkable_types = strings,identifiers,comments
 [*.cs]
 
 
+
 #### Основные параметры EditorConfig ####
 
 
