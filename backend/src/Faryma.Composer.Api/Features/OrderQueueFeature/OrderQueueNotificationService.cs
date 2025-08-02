@@ -18,15 +18,6 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
             });
         }
 
-        public async Task NotifyOrderRemoved(OrderPosition orderPosition)
-        {
-            await context.Clients.All.SendAsync("OrderRemoved", new
-            {
-                Order = ReviewOrderDto.Map(orderPosition.Order),
-                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),
-            });
-        }
-
         public async Task NotifyOrderPositionChanged(OrderPosition orderPosition)
         {
             await context.Clients.All.SendAsync("OrderPositionChanged", new
@@ -37,21 +28,12 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
             });
         }
 
-        public async Task NotifyReviewStarted(OrderPosition orderPosition)
+        public async Task NotifyOrderRemoved(OrderPosition orderPosition)
         {
-            await context.Clients.All.SendAsync("ReviewStarted", new
+            await context.Clients.All.SendAsync("OrderRemoved", new
             {
                 Order = ReviewOrderDto.Map(orderPosition.Order),
-                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
-            });
-        }
-
-        public async Task NotifyReviewCompleted(OrderPosition orderPosition)
-        {
-            await context.Clients.All.SendAsync("ReviewCompleted", new
-            {
-                Order = ReviewOrderDto.Map(orderPosition.Order),
-                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
+                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),
             });
         }
     }
