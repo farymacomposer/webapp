@@ -14,7 +14,7 @@ namespace Faryma.Composer.Api.Features.ReviewFeature.Complete
         public required long ReviewOrderId { get; set; }
 
         /// <summary>
-        /// Оценка трека (1-26)
+        /// Оценка трека (0-26)
         /// </summary>
         [Range(0, 26, ErrorMessage = "Оценка должна быть от 0 до 26")]
         public required int Rating { get; set; }
