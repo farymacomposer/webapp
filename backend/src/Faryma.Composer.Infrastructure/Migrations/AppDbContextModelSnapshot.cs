@@ -694,15 +694,13 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", null)
                         .WithMany("Reviews")
                         .HasForeignKey("TrackId");
 
                     b.Navigation("ComposerStream");
 
                     b.Navigation("ReviewOrder");
-
-                    b.Navigation("Track");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrder", b =>

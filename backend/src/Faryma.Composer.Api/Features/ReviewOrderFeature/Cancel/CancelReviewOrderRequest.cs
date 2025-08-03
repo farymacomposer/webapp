@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
+﻿using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel
 {

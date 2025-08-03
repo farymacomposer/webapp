@@ -1,10 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace Faryma.Composer.Infrastructure.Migrations
 {
@@ -496,8 +494,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: false),
-                    TrackId = table.Column<long>(type: "bigint", nullable: true),
-                    ComposerStreamId = table.Column<long>(type: "bigint", nullable: false)
+                    ComposerStreamId = table.Column<long>(type: "bigint", nullable: false),
+                    TrackId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
