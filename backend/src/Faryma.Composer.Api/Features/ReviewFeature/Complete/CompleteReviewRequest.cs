@@ -16,7 +16,7 @@ namespace Faryma.Composer.Api.Features.ReviewFeature.Complete
         /// <summary>
         /// Оценка трека (1-26)
         /// </summary>
-        [Range(1, 26, ErrorMessage = "Оценка должна быть от 1 до 26")]
+        [Range(0, 26, ErrorMessage = "Оценка должна быть от 0 до 26")]
         public required int Rating { get; set; }
 
         /// <summary>
