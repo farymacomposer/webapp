@@ -1,6 +1,8 @@
-﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature
+﻿using Faryma.Composer.Infrastructure.Exceptions;
+
+namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 {
-    public sealed class ReviewOrderException : Exception
+    public sealed class ReviewOrderException : AppException
     {
         public ReviewOrderException() : base()
         {
