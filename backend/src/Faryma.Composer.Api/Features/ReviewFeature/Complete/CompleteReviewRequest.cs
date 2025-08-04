@@ -22,8 +22,7 @@ namespace Faryma.Composer.Api.Features.ReviewFeature.Complete
         /// <summary>
         /// Комментарий к разбору
         /// </summary>
-        [Required]
-        [MinLength(1, ErrorMessage = "Комментарий не может быть пустым")]
+        [StringLength(300, MinimumLength = 1, ErrorMessage = "Обязательно наличие комментария, но не более 300 символов")]
         public required string Comment { get; set; }
 
         public CompleteReviewCommand Map()
