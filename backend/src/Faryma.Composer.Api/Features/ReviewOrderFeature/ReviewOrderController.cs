@@ -22,7 +22,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         private static readonly TimeSpan _idempotencyKeyExpiration = TimeSpan.FromHours(1);
 
         /// <summary>
-        /// Создает заказ разбора трека
+        /// Создает заказ
         /// </summary>
         /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос создания заказа</param>
@@ -80,13 +80,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         }
 
         /// <summary>
-        /// Отменяет заказ разбора трека
+        /// Отменяет заказ
         /// </summary>
-        /// <param name="request">Запрос отмены заказа</param>
         [HttpPost(nameof(CancelReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(
-            [FromBody] CancelReviewOrderRequest request)
+        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder([FromBody] CancelReviewOrderRequest request)
         {
             await reviewOrderService.Cancel(request.Map());
 
@@ -94,13 +92,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         }
 
         /// <summary>
-        /// Замораживает заказ разбора трека
+        /// Замораживает заказ
         /// </summary>
-        /// <param name="request">Запрос заморозки заказа</param>
         [HttpPost(nameof(FreezeReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(
-            [FromBody] FreezeReviewOrderRequest request)
+        public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder([FromBody] FreezeReviewOrderRequest request)
         {
             await reviewOrderService.Freeze(request.Map());
 
@@ -108,13 +104,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         }
 
         /// <summary>
-        /// Размораживает заказ разбора трека
+        /// Размораживает заказ
         /// </summary>
-        /// <param name="request">Запрос разморозки заказа</param>
         [HttpPost(nameof(UnfreezeReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(
-            [FromBody] UnfreezeReviewOrderRequest request)
+        public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder([FromBody] UnfreezeReviewOrderRequest request)
         {
             await reviewOrderService.Unfreeze(request.Map());
 
@@ -124,11 +118,9 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// <summary>
         /// Начинает разбор трека
         /// </summary>
-        /// <param name="request">Запрос начала разбора</param>
         [HttpPost(nameof(StartReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<StartReviewOrderResponse>> StartReviewOrder(
-            [FromBody] StartReviewOrderRequest request)
+        public async Task<ActionResult<StartReviewOrderResponse>> StartReviewOrder([FromBody] StartReviewOrderRequest request)
         {
             await reviewOrderService.StartReview(request.Map());
 

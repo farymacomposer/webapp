@@ -34,6 +34,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
         /// <summary>
         /// Комментарий пользователя
         /// </summary>
+        [StringLength(200, ErrorMessage = "Максимальная длина комментария - 200 символов")]
         public string? UserComment { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -43,9 +44,13 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
                 yield return new ValidationResult("Для донатных заказов сумма платежа не может быть равна нулю");
             }
 
-            if (OrderType is ReviewOrderType.Free or ReviewOrderType.OutOfQueue && PaymentAmount > 0)
+            if (OrderType
+                is ReviewOrderType.Free
+                or ReviewOrderType.OutOfQueue
+                or ReviewOrderType.Charity
+                && PaymentAmount > 0)
             {
-                yield return new ValidationResult("Для бесплатных и внеочередных заказов сумма платежа должна быть равна нулю");
+                yield return new ValidationResult("Для бесплатных, внеочередных и благотворительных заказов сумма платежа должна быть равна нулю");
             }
         }
 

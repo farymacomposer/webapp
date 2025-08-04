@@ -23,6 +23,11 @@
         /// <summary>
         /// Бесплатный
         /// </summary>
-        Free = 3
+        Free = 3,
+
+        /// <summary>
+        /// Благотворительный
+        /// </summary>
+        Charity = 4
     }
 }
