@@ -5,26 +5,23 @@ namespace Faryma.Composer.Infrastructure.Repositories
     public sealed class ReviewRepository(AppDbContext context)
     {
         public Review Create(
-            string comment,
-            ComposerStream composerStream,
-            ReviewOrder reviewOrder,
+            ReviewOrder inProgressOrder,
+            ComposerStream liveStream,
             int rating,
-            string trackUrl)
+            string comment)
         {
-            DateTime creationDate = DateTime.UtcNow;
+            DateTime now = DateTime.UtcNow;
 
-            Review review = new()
+            return context.Reviews.Add(new Review
             {
-                Comment = comment,
-                CompletedAt = creationDate,
-                ComposerStream = composerStream,
-                ReviewOrder = reviewOrder,
+                ReviewOrder = inProgressOrder,
+                TrackUrl = inProgressOrder.TrackUrl!,
+                ComposerStream = liveStream,
                 Rating = rating,
-                UpdatedAt = creationDate,
-                TrackUrl = trackUrl
-            };
-
-            return context.Reviews.Add(review).Entity;
+                Comment = comment,
+                CompletedAt = now,
+                UpdatedAt = now,
+            }).Entity;
         }
     }
 }

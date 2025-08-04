@@ -12,29 +12,24 @@ namespace Faryma.Composer.Core.Features.ReviewFeature
     {
         public async Task<Review> CompleteReview(CompleteReviewCommand command)
         {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
-                ?? throw new ReviewException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
+            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
             if (order.Status != ReviewOrderStatus.InProgress)
             {
-                throw new ReviewException($"Невозможно оценить заказ в статусе '{order.Status}'");
+                throw new ReviewException($"Невозможно выполнить заказ в статусе '{order.Status}'");
             }
 
-            Review review = ofw.ReviewRepository.Create(
-                command.Comment,
-                order.ComposerStream,
-                order,
-                command.Rating,
-                order.TrackUrl!);
+            ComposerStream? liveStream = await ofw.ComposerStreamRepository.FindLiveStream()
+                ?? throw new ReviewException("Невозможно выполнить заказ вне активного стрима");
 
+            order.Review = ofw.ReviewRepository.Create(order, liveStream, command.Rating, command.Comment);
             order.Status = ReviewOrderStatus.Completed;
-            order.Review = review;
 
             await ofw.SaveChangesAsync();
 
             await orderQueueService.CompleteReview(order);
 
-            return review;
+            return order.Review;
         }
     }
 }

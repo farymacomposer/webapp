@@ -58,7 +58,6 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required string MainNormalizedNickname { get; set; }
 
         public long? TrackId { get; set; }
-
         public long ComposerStreamId { get; set; }
 
         // Навигационные свойства
