@@ -4,7 +4,7 @@ using Faryma.Composer.Infrastructure.Entities;
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
     /// <summary>
-    /// Базовая приоритезация для любых заказов, по сумме и по дате
+    /// Базовая приоритезация для заказов, по сумме и по дате
     /// </summary>
     public sealed class OrderPriorityComparer : IComparer<ReviewOrder>
     {

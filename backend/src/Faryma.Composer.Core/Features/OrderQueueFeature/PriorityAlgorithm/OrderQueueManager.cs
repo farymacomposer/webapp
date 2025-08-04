@@ -26,25 +26,29 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// </summary>
         public required Dictionary<DateOnly, string> LastNicknameByStreamDate { get; init; }
 
+        /// <summary>
+        /// Добавляет заказ
+        /// </summary>
         public void AddOrder(ReviewOrder order)
         {
             OrderPositionsById.Add(order.Id, new OrderPosition { Order = order });
             UpdateOrderPositions();
         }
 
+        /// <summary>
+        /// Обновляет заказ
+        /// </summary>
         public void UpdateOrder(ReviewOrder order)
         {
             OrderPositionsById[order.Id].Order = order;
             UpdateOrderPositions();
         }
 
+        /// <summary>
+        /// Обновляет позиции заказов
+        /// </summary>
         public void UpdateOrderPositions()
         {
-            if (OrderPositionsById.Count == 0)
-            {
-                return;
-            }
-
             SwapOrderPositions();
             UpdateScheduledOrdersPositions();
             UpdateActiveOrdersPositions();

@@ -78,13 +78,21 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
             Dictionary<long, OrderPosition> orderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v });
 
+            string? lastOutOfQueueCategoryNickname = await context.Reviews
+                .Where(x => x.ReviewOrder.Type == ReviewOrderType.OutOfQueue)
+                .OrderBy(x => x.CompletedAt)
+                .Select(x => x.ReviewOrder.MainNormalizedNickname)
+                .LastOrDefaultAsync();
+
             Dictionary<DateOnly, string> lastNicknameByStreamDate = await context.ComposerStreams
-                .Where(x => x.Reviews.Count > 0
+                .Where(x => x.Reviews.Any(x => x.ReviewOrder.Type != ReviewOrderType.OutOfQueue)
                     && x.ReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
                 .Select(x => new
                 {
                     x.EventDate,
-                    x.Reviews.OrderBy(x => x.CompletedAt).Last().ReviewOrder.MainNormalizedNickname
+                    x.Reviews.Where(x => x.ReviewOrder.Type != ReviewOrderType.OutOfQueue)
+                        .OrderBy(x => x.CompletedAt)
+                        .Last().ReviewOrder.MainNormalizedNickname
                 })
                 .ToDictionaryAsync(k => k.EventDate, v => v.MainNormalizedNickname);
 
@@ -96,7 +104,10 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,
             };
 
-            _queueManager.UpdateOrderPositions();
+            if (orderPositionsById.Count > 0)
+            {
+                _queueManager.UpdateOrderPositions();
+            }
         }
     }
 }
