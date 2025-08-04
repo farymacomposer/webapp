@@ -68,16 +68,16 @@ namespace Faryma.Composer.Infrastructure.Entities
         public Review? Review { get; set; }
 
         /// <summary>
-        /// Связанный cтрим композитора
-        /// </summary>
-        [ForeignKey(nameof(ComposerStreamId))]
-        public required ComposerStream ComposerStream { get; set; }
-
-        /// <summary>
         /// Трек для разбора
         /// </summary>
         [ForeignKey(nameof(TrackId))]
         public Track? Track { get; set; }
+
+        /// <summary>
+        /// Связанный cтрим композитора
+        /// </summary>
+        [ForeignKey(nameof(ComposerStreamId))]
+        public required ComposerStream ComposerStream { get; set; }
 
         /// <summary>
         /// Пользователь или пользователи, создавшие заказ
