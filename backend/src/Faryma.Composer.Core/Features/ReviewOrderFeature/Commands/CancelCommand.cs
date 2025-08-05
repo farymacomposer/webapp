@@ -1,7 +1,13 @@
 ﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
 {
-    public sealed class CancelCommand
+    /// <summary>
+    /// Команда отмены заказа разбора трека
+    /// </summary>
+    public sealed record CancelCommand
     {
-        public long ReviewOrderId { get; internal set; }
+        /// <summary>
+        /// ID заказа разбора трека
+        /// </summary>
+        public required long ReviewOrderId { get; init; }
     }
 }

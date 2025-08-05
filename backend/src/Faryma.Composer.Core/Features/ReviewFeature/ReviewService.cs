@@ -10,21 +10,26 @@ namespace Faryma.Composer.Core.Features.ReviewFeature
         UnitOfWork ofw,
         OrderQueueService orderQueueService)
     {
-        public async Task CompleteReview(CompleteReviewCommand command)
+        public async Task<Review> CompleteReview(CompleteReviewCommand command)
         {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Find(command.ReviewOrderId)
-                ?? throw new ReviewException($"Заказ разбора трека Id: {command.ReviewOrderId}, не существует");
+            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
-            if (order.Status != ReviewOrderStatus.Pending)
+            if (order.Status != ReviewOrderStatus.InProgress)
             {
-                throw new ReviewException($"Невозможно поднять заказ в статусе '{order.Status}'");
+                throw new ReviewException($"Невозможно выполнить заказ в статусе '{order.Status}'");
             }
 
-            // ...
+            ComposerStream? liveStream = await ofw.ComposerStreamRepository.FindLiveStream()
+                ?? throw new ReviewException("Невозможно выполнить заказ вне активного стрима");
+
+            order.Review = ofw.ReviewRepository.Create(order, liveStream, command.Rating, command.Comment);
+            order.Status = ReviewOrderStatus.Completed;
 
             await ofw.SaveChangesAsync();
 
             await orderQueueService.CompleteReview(order);
+
+            return order.Review;
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
+﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.StartReview
 {
     /// <summary>
-    /// Команда начала разбора трека
+    /// Ответ на запрос начала разбора трека
     /// </summary>
-    public sealed record StartReviewCommand
+    public sealed record StartReviewOrderResponse
     {
         /// <summary>
         /// ID заказа разбора трека

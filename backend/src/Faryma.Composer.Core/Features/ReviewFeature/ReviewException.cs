@@ -1,6 +1,8 @@
-﻿namespace Faryma.Composer.Core.Features.ReviewFeature
+﻿using Faryma.Composer.Infrastructure.Exceptions;
+
+namespace Faryma.Composer.Core.Features.ReviewFeature
 {
-    public sealed class ReviewException : Exception
+    public sealed class ReviewException : AppException
     {
         public ReviewException() : base()
         {

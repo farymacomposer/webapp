@@ -18,6 +18,15 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
             });
         }
 
+        public async Task NotifyOrderRemoved(OrderPosition orderPosition)
+        {
+            await context.Clients.All.SendAsync("OrderRemoved", new
+            {
+                Order = ReviewOrderDto.Map(orderPosition.Order),
+                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),
+            });
+        }
+
         public async Task NotifyOrderPositionChanged(OrderPosition orderPosition)
         {
             await context.Clients.All.SendAsync("OrderPositionChanged", new

@@ -6,5 +6,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Contracts
     {
         Task NotifyNewOrderAdded(OrderPosition orderPosition);
         Task NotifyOrderPositionChanged(OrderPosition orderPosition);
+        Task NotifyOrderRemoved(OrderPosition orderPosition);
     }
 }

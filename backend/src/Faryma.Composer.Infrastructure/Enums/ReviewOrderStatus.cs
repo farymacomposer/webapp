@@ -16,22 +16,22 @@
         Preorder = 1,
 
         /// <summary>
-        /// Трек ожидает разбора
+        /// Ожидает взятия в работу
         /// </summary>
         Pending = 2,
 
         /// <summary>
-        /// Трек в процессе разбора
+        /// В работе
         /// </summary>
         InProgress = 3,
 
         /// <summary>
-        /// Разбор трека выполнен
+        /// Выполнен
         /// </summary>
         Completed = 4,
 
         /// <summary>
-        /// Заказ отменен
+        /// Отменен
         /// </summary>
         Canceled = 5
     }
