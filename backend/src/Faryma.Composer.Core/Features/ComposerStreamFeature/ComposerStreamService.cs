@@ -26,6 +26,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             }
         }
 
+        // TODO: нельзя создать Charity заказ, если не запущен Charity стрим
         public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname, ReviewOrderType orderType)
         {
             const DayOfWeek debtStreamDay = DayOfWeek.Tuesday;
@@ -59,7 +60,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
                     }
 
                 default:
-                    throw new ComposerStreamException($"Типа заказа {orderType} не поддерживается");
+                    throw new ComposerStreamException($"Типа заказа '{orderType}' не поддерживается");
             }
         }
 

@@ -37,7 +37,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             }).Entity;
         }
 
-        public ReviewOrder CreateFree(ComposerStream stream, UserNickname userNickname, ReviewOrderType type, decimal nominalAmount, string? trackUrl, string? userComment)
+        public ReviewOrder CreateFree(ComposerStream stream, UserNickname userNickname, decimal nominalAmount, ReviewOrderType type, string? trackUrl, string? userComment)
         {
             return context.Add(new ReviewOrder
             {

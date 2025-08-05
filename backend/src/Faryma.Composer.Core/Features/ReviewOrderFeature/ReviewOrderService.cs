@@ -18,7 +18,6 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
     {
         public async Task<ReviewOrder> Create(CreateCommand command)
         {
-            AppSettingsEntity appSettings = appSettingsService.Settings;
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
             ComposerStream stream = await composerStreamService.GetOrCreateForOrder(userNickname, command.OrderType);
 
@@ -38,13 +37,13 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                         command.UserComment);
 
                     break;
-                case ReviewOrderType.OutOfQueue:
+                case ReviewOrderType.OutOfQueue or ReviewOrderType.Charity:
 
                     result = ofw.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
-                        command.OrderType,
                         nominalAmount: 0,
+                        command.OrderType,
                         command.TrackUrl,
                         command.UserComment);
 
@@ -54,12 +53,15 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     result = ofw.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
+                        appSettingsService.Settings.ReviewOrderNominalAmount,
                         command.OrderType,
-                        appSettings.ReviewOrderNominalAmount,
                         command.TrackUrl,
                         command.UserComment);
 
                     break;
+
+                default:
+                    throw new ReviewOrderException($"Типа заказа '{command.OrderType}' не поддерживается");
             }
 
             await ofw.SaveChangesAsync();
