@@ -66,9 +66,9 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.AddOrder(result!);
+            await orderQueueService.AddOrder(result);
 
-            return result!;
+            return result;
         }
 
         public async Task<Transaction> Up(UpCommand command)
