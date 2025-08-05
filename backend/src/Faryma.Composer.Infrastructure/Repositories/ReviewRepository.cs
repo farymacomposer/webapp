@@ -7,17 +7,16 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public Review Create(
             ReviewOrder inProgressOrder,
             int rating,
-            string comment)
+            string comment,
+            DateTime updatedAt)
         {
-            DateTime now = DateTime.UtcNow;
-
             return context.Reviews.Add(new Review
             {
                 ReviewOrder = inProgressOrder,
                 TrackUrl = inProgressOrder.TrackUrl!,
                 Rating = rating,
                 Comment = comment,
-                UpdatedAt = now,
+                UpdatedAt = updatedAt,
             }).Entity;
         }
     }

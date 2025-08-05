@@ -19,7 +19,10 @@ namespace Faryma.Composer.Core.Features.ReviewFeature
                 throw new ReviewException($"Невозможно выполнить заказ в статусе '{order.Status}'");
             }
 
-            order.Review = ofw.ReviewRepository.Create(order, command.Rating, command.Comment);
+            DateTime now = DateTime.UtcNow;
+
+            order.Review = ofw.ReviewRepository.Create(order, command.Rating, command.Comment, now);
+            order.CompletedAt = now;
             order.Status = ReviewOrderStatus.Completed;
 
             await ofw.SaveChangesAsync();
