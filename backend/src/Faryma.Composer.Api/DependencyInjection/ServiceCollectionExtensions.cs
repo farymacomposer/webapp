@@ -96,6 +96,9 @@ namespace Faryma.Composer.Api.DependencyInjection
                 }
             }
 
+            options.CustomSchemaIds(x => x.FullName);
+            options.UseAllOfToExtendReferenceSchemas();
+
             OpenApiSecurityScheme scheme = new()
             {
                 Type = SecuritySchemeType.Http,
