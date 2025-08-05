@@ -12,6 +12,49 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
     {
         private OrderQueueManager _queueManager = null!;
 
+        public IReadOnlyDictionary<long, OrderPosition> GetOrderQueue() => _queueManager.OrderPositionsById;
+
+        public async Task AddOrder(ReviewOrder order)
+        {
+            _queueManager.AddOrder(order);
+
+            await notificationService.NotifyNewOrderAdded(_queueManager.OrderPositionsById[order.Id]);
+        }
+
+        public async Task UpdateOrder(ReviewOrder order)
+        {
+            _queueManager.UpdateOrder(order);
+
+            await notificationService.NotifyOrderPositionChanged(_queueManager.OrderPositionsById[order!.Id]);
+        }
+
+        public async Task RemoveOrder(ReviewOrder order)
+        {
+            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
+            //TODO Вернуть удаление когда появится функционал в очереди
+            //_queueManager.RemoveOrder(order);
+
+            await notificationService.NotifyOrderRemoved(position);
+        }
+
+        public async Task StartReview(ReviewOrder order)
+        {
+            _queueManager.UpdateOrder(order);
+
+            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
+
+            await notificationService.NotifyOrderPositionChanged(position);
+        }
+
+        public async Task CompleteReview(ReviewOrder order)
+        {
+            _queueManager.UpdateOrder(order);
+
+            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
+
+            await notificationService.NotifyOrderPositionChanged(position);
+        }
+
         public async Task Initialize()
         {
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
@@ -22,7 +65,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 .Select(x => x.EventDate)
                 .FirstOrDefaultAsync();
 
-            Dictionary<long, ReviewOrder> ordersById = await context.ReviewOrders
+            ReviewOrder[] orders = await context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.ComposerStream)
                 .Include(x => x.UserNicknames)
@@ -31,48 +74,40 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                     || x.Status == ReviewOrderStatus.Pending
                     || x.Status == ReviewOrderStatus.InProgress
                     || (x.Review != null && x.Review.ComposerStream.Status == ComposerStreamStatus.Live))
-                .ToDictionaryAsync(k => k.Id);
+                .ToArrayAsync();
 
-            Dictionary<long, OrderPositionTracker> orderPositionsById = ordersById.ToDictionary(k => k.Key, _ => new OrderPositionTracker());
+            Dictionary<long, OrderPosition> orderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v });
+
+            string? lastOutOfQueueCategoryNickname = await context.Reviews
+                .Where(x => x.ReviewOrder.Type == ReviewOrderType.OutOfQueue)
+                .OrderBy(x => x.CompletedAt)
+                .Select(x => x.ReviewOrder.MainNormalizedNickname)
+                .LastOrDefaultAsync();
 
             Dictionary<DateOnly, string> lastNicknameByStreamDate = await context.ComposerStreams
-                .Where(x => x.Reviews.Count > 0
+                .Where(x => x.Reviews.Any(x => x.ReviewOrder.Type != ReviewOrderType.OutOfQueue)
                     && x.ReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
                 .Select(x => new
                 {
                     x.EventDate,
-                    x.Reviews.OrderBy(x => x.CompletedAt).Last().ReviewOrder.NormalizedNickname
+                    x.Reviews.Where(x => x.ReviewOrder.Type != ReviewOrderType.OutOfQueue)
+                        .OrderBy(x => x.CompletedAt)
+                        .Last().ReviewOrder.MainNormalizedNickname
                 })
-                .ToDictionaryAsync(k => k.EventDate, v => v.NormalizedNickname);
+                .ToDictionaryAsync(k => k.EventDate, v => v.MainNormalizedNickname);
 
             _queueManager = new OrderQueueManager
             {
                 CurrentStreamDate = currentStreamDate,
-                OrdersById = ordersById,
                 OrderPositionsById = orderPositionsById,
                 LastNicknameByStreamDate = lastNicknameByStreamDate,
                 LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,
             };
 
-            _queueManager.UpdateOrderPositions();
+            if (orderPositionsById.Count > 0)
+            {
+                _queueManager.UpdateOrderPositions();
+            }
         }
-
-        public async Task Add(ReviewOrder order)
-        {
-            _queueManager.Add(order);
-            _queueManager.UpdateOrderPositions();
-
-            await notificationService.SendOrderPosition(_queueManager.OrderPositionsById[order.Id]);
-        }
-
-        public async Task Up(Transaction payment)
-        {
-            _queueManager.Up(payment);
-            _queueManager.UpdateOrderPositions();
-
-            await notificationService.SendOrderPosition(_queueManager.OrderPositionsById[payment.ReviewOrderId!.Value]);
-        }
-
-        public IReadOnlyCollection<OrderQueueItem> GetOrderQueue() => _queueManager.GetOrderQueue();
     }
 }

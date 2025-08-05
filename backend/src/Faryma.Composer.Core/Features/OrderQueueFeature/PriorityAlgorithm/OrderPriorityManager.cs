@@ -10,16 +10,28 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             Unspecified = 0,
             Initial = 1,
-            PriorityQueue = 2,
-            DonationQueue = 3,
-            DebtQueues = 4,
+
+            /// <summary>
+            /// Категория - вне очереди
+            /// </summary>
+            OutOfQueueCategory = 2,
+
+            /// <summary>
+            /// Донатная категория
+            /// </summary>
+            DonationCategory = 3,
+
+            /// <summary>
+            /// Долговые категории
+            /// </summary>
+            DebtCategories = 4,
             Completed = 5,
         }
 
         private readonly OrderQueueManager _queueManager;
-        private readonly OrderQueue _priorityQueue;
-        private readonly OrderQueue? _donationQueue;
-        private readonly DebtOrderQueues _debtQueues;
+        private readonly OrderCategory _outOfQueueCategory;
+        private readonly OrderCategory? _donationCategory;
+        private readonly DebtOrderCategories _debtCategories;
         private State _currentState;
         private string? _lastIssuedNickname;
 
@@ -28,66 +40,65 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             _queueManager = queueManager;
             _currentState = queueManager.LastOrderPriorityManagerState;
 
-            _priorityQueue = new OrderQueue(queueManager.OrdersById
-                .Select(x => x.Value)
+            _outOfQueueCategory = new OrderCategory(queueManager.OrderPositionsById
+                .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen && x.Type == ReviewOrderType.OutOfQueue)
                 .OrderBy(x => x.CreatedAt)
                 .ToList());
 
-            OrderPriorityComparer comparer = new();
-            List<(DateOnly, OrderQueue)> queues = queueManager.OrdersById
-                .Select(x => x.Value)
+            List<(DateOnly, OrderCategory)> categories = queueManager.OrderPositionsById
+                .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen
                     && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
                     && x.ComposerStream.EventDate <= queueManager.CurrentStreamDate)
                 .GroupBy(x => x.ComposerStream.EventDate)
-                .Select(x => (x.Key, new OrderQueue(x.Order(comparer).ToList())))
+                .Select(x => (x.Key, new OrderCategory(x.Order(new OrderPriorityComparer()).ToList())))
                 .OrderBy(x => x.Key)
                 .ToList();
 
-            if (queues.Count > 0)
+            if (categories.Count > 0)
             {
-                (DateOnly StreamDate, OrderQueue Provider) item = queues.Last();
+                (DateOnly StreamDate, OrderCategory Provider) item = categories.Last();
                 if (item.StreamDate == queueManager.CurrentStreamDate)
                 {
-                    queues.Remove(item);
-                    _donationQueue = item.Provider;
+                    categories.Remove(item);
+                    _donationCategory = item.Provider;
                 }
             }
 
-            _debtQueues = new DebtOrderQueues(queues);
+            _debtCategories = new DebtOrderCategories(categories);
         }
 
         public void UpdateOrdersCategories()
         {
-            _priorityQueue.UpdateOrdersCategory(_queueManager, OrderCategoryType.OutOfQueue);
-            _donationQueue?.UpdateOrdersCategory(_queueManager, OrderCategoryType.Donation);
-            _debtQueues.UpdateOrdersCategory(_queueManager);
+            _outOfQueueCategory.UpdateOrdersCategory(_queueManager, OrderCategoryType.OutOfQueue);
+            _donationCategory?.UpdateOrdersCategory(_queueManager, OrderCategoryType.Donation);
+            _debtCategories.UpdateOrdersCategory(_queueManager);
         }
 
         public (State NextState, bool IsOnlyNicknameLeft) DetermineNextState()
         {
             (_currentState, bool isOnlyNicknameLeft) = _currentState switch
             {
-                State.Initial when _priorityQueue.HasOrders => (State.PriorityQueue, true),
-                State.Initial when _donationQueue?.HasOrders == true => (State.DonationQueue, true),
-                State.Initial when _debtQueues.HasOrders => (State.DebtQueues, true),
+                State.Initial when _outOfQueueCategory.HasOrders => (State.OutOfQueueCategory, true),
+                State.Initial when _donationCategory?.HasOrders == true => (State.DonationCategory, true),
+                State.Initial when _debtCategories.HasOrders => (State.DebtCategories, true),
 
-                State.PriorityQueue when _priorityQueue.HasOrderFromNewNickname(_lastIssuedNickname) => (State.PriorityQueue, false),
-                State.PriorityQueue when _donationQueue?.HasOrderFromNewNickname(_lastIssuedNickname) == true => (State.DonationQueue, false),
-                State.PriorityQueue when _debtQueues.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtQueues, false),
+                State.OutOfQueueCategory when _outOfQueueCategory.HasOrderFromNewNickname(_lastIssuedNickname) => (State.OutOfQueueCategory, false),
+                State.OutOfQueueCategory when _donationCategory?.HasOrderFromNewNickname(_lastIssuedNickname) == true => (State.DonationCategory, false),
+                State.OutOfQueueCategory when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtCategories, false),
 
-                State.DonationQueue when _priorityQueue.HasOrders => (State.PriorityQueue, true),
-                State.DonationQueue when _debtQueues.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtQueues, false),
-                State.DonationQueue when _donationQueue?.HasOrderFromNewNickname(_lastIssuedNickname) == true => (State.DonationQueue, false),
+                State.DonationCategory when _outOfQueueCategory.HasOrders => (State.OutOfQueueCategory, true),
+                State.DonationCategory when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtCategories, false),
+                State.DonationCategory when _donationCategory?.HasOrderFromNewNickname(_lastIssuedNickname) == true => (State.DonationCategory, false),
 
-                State.DebtQueues when _priorityQueue.HasOrders => (State.PriorityQueue, true),
-                State.DebtQueues when _donationQueue?.HasOrderFromOtherNickname(_lastIssuedNickname) == true => (State.DonationQueue, false),
-                State.DebtQueues when _debtQueues.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtQueues, false),
+                State.DebtCategories when _outOfQueueCategory.HasOrders => (State.OutOfQueueCategory, true),
+                State.DebtCategories when _donationCategory?.HasOrderFromOtherNickname(_lastIssuedNickname) == true => (State.DonationCategory, false),
+                State.DebtCategories when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (State.DebtCategories, false),
 
-                not State.Completed when _priorityQueue.HasOrders => (State.PriorityQueue, true),
-                not State.Completed when _donationQueue?.HasOrders == true => (State.DonationQueue, true),
-                not State.Completed when _debtQueues.HasOrders => (State.DebtQueues, true),
+                not State.Completed when _outOfQueueCategory.HasOrders => (State.OutOfQueueCategory, true),
+                not State.Completed when _donationCategory?.HasOrders == true => (State.DonationCategory, true),
+                not State.Completed when _debtCategories.HasOrders => (State.DebtCategories, true),
 
                 _ => (State.Completed, false),
             };
@@ -99,13 +110,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             ReviewOrder result = _currentState switch
             {
-                State.PriorityQueue => _priorityQueue.Dequeue(_lastIssuedNickname),
-                State.DonationQueue => _donationQueue!.Dequeue(_lastIssuedNickname),
-                State.DebtQueues when isOnlyNicknameLeft => _debtQueues.DequeueRoundRobin(_lastIssuedNickname),
-                State.DebtQueues when isOnlyNicknameLeft == false => _debtQueues.DequeueRoundRobinFromOtherNickname(_lastIssuedNickname),
+                State.OutOfQueueCategory => _outOfQueueCategory.Dequeue(_lastIssuedNickname),
+                State.DonationCategory => _donationCategory!.Dequeue(_lastIssuedNickname),
+                State.DebtCategories when isOnlyNicknameLeft => _debtCategories.DequeueRoundRobin(_lastIssuedNickname),
+                State.DebtCategories when isOnlyNicknameLeft == false => _debtCategories.DequeueRoundRobinFromOtherNickname(_lastIssuedNickname),
             };
 
-            _lastIssuedNickname = result.NormalizedNickname;
+            _lastIssuedNickname = result.MainNormalizedNickname;
 
             return result;
         }

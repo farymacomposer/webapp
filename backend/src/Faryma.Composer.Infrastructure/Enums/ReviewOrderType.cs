@@ -11,18 +11,23 @@
         Unspecified = 0,
 
         /// <summary>
-        /// Донат
-        /// </summary>
-        Donation = 1,
-
-        /// <summary>
         /// Вне очереди
         /// </summary>
-        OutOfQueue = 2,
+        OutOfQueue = 1,
+
+        /// <summary>
+        /// Донат
+        /// </summary>
+        Donation = 2,
 
         /// <summary>
         /// Бесплатный
         /// </summary>
-        Free = 3
+        Free = 3,
+
+        /// <summary>
+        /// Благотворительный
+        /// </summary>
+        Charity = 4
     }
 }

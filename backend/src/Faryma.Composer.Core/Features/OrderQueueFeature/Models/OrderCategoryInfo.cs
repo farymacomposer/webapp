@@ -3,9 +3,9 @@
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
 {
     /// <summary>
-    /// Категория заказа
+    /// Содержит информацию о категории заказа, включая тип категории и номер (для долговых категорий)
     /// </summary>
-    public sealed record OrderCategory
+    public sealed record OrderCategoryInfo
     {
         /// <summary>
         /// Тип категории заказа
@@ -13,7 +13,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         public OrderCategoryType Type { get; init; }
 
         /// <summary>
-        /// Номер долговой категории
+        /// Номер категории, если заказ относится к долговой категории
         /// </summary>
         public int DebtNumber { get; init; }
     }

@@ -3,6 +3,7 @@ using Faryma.Composer.Core.Features.ArtistFeature;
 using Faryma.Composer.Core.Features.ComposerStreamFeature;
 using Faryma.Composer.Core.Features.GenreFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
+using Faryma.Composer.Core.Features.ReviewFeature;
 using Faryma.Composer.Core.Features.ReviewOrderFeature;
 using Faryma.Composer.Core.Features.TrackFeature;
 using Faryma.Composer.Core.Features.UserNicknameFeature;
@@ -22,7 +23,8 @@ namespace Faryma.Composer.Core.DependencyInjection
                 .AddScoped<GenreService>()
                 .AddScoped<ReviewOrderService>()
                 .AddScoped<TrackService>()
-                .AddScoped<UserNicknameService>();
+                .AddScoped<UserNicknameService>()
+                .AddScoped<ReviewService>();
 
             return services;
         }

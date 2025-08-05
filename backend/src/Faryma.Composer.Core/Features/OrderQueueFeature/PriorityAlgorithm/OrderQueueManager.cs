@@ -17,72 +17,64 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public required OrderPriorityManager.State LastOrderPriorityManagerState { get; set; }
 
         /// <summary>
-        /// Заказы на разбор
+        ///
         /// </summary>
-        public required Dictionary<long, ReviewOrder> OrdersById { get; init; }
-
-        /// <summary>
-        /// Позиции заказов в очереди на разбор
-        /// </summary>
-        public required Dictionary<long, OrderPositionTracker> OrderPositionsById { get; init; }
+        public required Dictionary<long, OrderPosition> OrderPositionsById { get; init; }
 
         /// <summary>
         /// Последний никнейм в категории (по дате стрима)
         /// </summary>
         public required Dictionary<DateOnly, string> LastNicknameByStreamDate { get; init; }
 
-        public void Up(Transaction payment) => OrdersById[payment.ReviewOrder!.Id].Payments.Add(payment);
-
-        public void Add(ReviewOrder order)
+        /// <summary>
+        /// Добавляет заказ
+        /// </summary>
+        public void AddOrder(ReviewOrder order)
         {
-            OrdersById.Add(order.Id, order);
-            OrderPositionsById.Add(order.Id, new OrderPositionTracker());
+            OrderPositionsById.Add(order.Id, new OrderPosition { Order = order });
+            UpdateOrderPositions();
         }
 
+        /// <summary>
+        /// Обновляет заказ
+        /// </summary>
+        public void UpdateOrder(ReviewOrder order)
+        {
+            OrderPositionsById[order.Id].Order = order;
+            UpdateOrderPositions();
+        }
+
+        /// <summary>
+        /// Обновляет позиции заказов
+        /// </summary>
         public void UpdateOrderPositions()
         {
-            if (OrdersById.Count == 0)
-            {
-                return;
-            }
-
             SwapOrderPositions();
-            UpdateFutureOrdersPositions();
+            UpdateScheduledOrdersPositions();
             UpdateActiveOrdersPositions();
-            UpdateInactiveOrdersPositions();
-        }
-
-        public IReadOnlyCollection<OrderQueueItem> GetOrderQueue()
-        {
-            return OrdersById
-                .Select(x => new OrderQueueItem
-                {
-                    Order = OrdersById[x.Key],
-                    Position = OrderPositionsById[x.Key].Current,
-                })
-                .ToArray();
+            UpdateFrozenOrdersPositions();
         }
 
         private void SwapOrderPositions()
         {
-            foreach (KeyValuePair<long, OrderPositionTracker> item in OrderPositionsById)
+            foreach (KeyValuePair<long, OrderPosition> item in OrderPositionsById)
             {
-                item.Value.Previous.Swap(item.Value.Current);
+                item.Value.Swap();
             }
         }
 
-        private void UpdateFutureOrdersPositions()
+        private void UpdateScheduledOrdersPositions()
         {
-            ReviewOrder[] futureOrders = OrdersById
-                .Select(x => x.Value)
+            ReviewOrder[] orders = OrderPositionsById
+                .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen && x.ComposerStream.EventDate > CurrentStreamDate)
                 .Order(new OrderPriorityComparer())
                 .ToArray();
 
             int index = 0;
-            foreach (ReviewOrder order in futureOrders)
+            foreach (ReviewOrder order in orders)
             {
-                OrderPositionsById[order.Id].Current.Set(index, OrderActivityStatus.Future);
+                OrderPositionsById[order.Id].SetCurrentPosition(index, OrderActivityStatus.Scheduled);
                 index++;
             }
         }
@@ -102,23 +94,23 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 }
 
                 ReviewOrder order = manager.TakeNextOrder(isOnlyNicknameLeft);
-                OrderPositionsById[order.Id].Current.Set(index, OrderActivityStatus.Active);
+                OrderPositionsById[order.Id].SetCurrentPosition(index, OrderActivityStatus.Active);
                 index++;
             }
         }
 
-        private void UpdateInactiveOrdersPositions()
+        private void UpdateFrozenOrdersPositions()
         {
-            ReviewOrder[] inactiveOrders = OrdersById
-                .Select(x => x.Value)
+            ReviewOrder[] orders = OrderPositionsById
+                .Select(x => x.Value.Order)
                 .Where(x => x.IsFrozen)
                 .Order(new OrderPriorityComparer())
                 .ToArray();
 
             int index = 0;
-            foreach (ReviewOrder order in inactiveOrders)
+            foreach (ReviewOrder order in orders)
             {
-                OrderPositionsById[order.Id].Current.Set(index, OrderActivityStatus.Inactive);
+                OrderPositionsById[order.Id].SetCurrentPosition(index, OrderActivityStatus.Frozen);
                 index++;
             }
         }

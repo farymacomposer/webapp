@@ -1,15 +1,17 @@
 ﻿# nullable disable
 using Faryma.Composer.Infrastructure.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
+    /// <summary>
+    /// Базовая приоритезация для заказов, по сумме и по дате
+    /// </summary>
     public sealed class OrderPriorityComparer : IComparer<ReviewOrder>
     {
         public int Compare(ReviewOrder x, ReviewOrder y)
         {
-            decimal xAmount = x.NominalAmount + x.Payments.Sum(x => x.Amount);
-            decimal yAmount = y.NominalAmount + y.Payments.Sum(y => y.Amount);
+            decimal xAmount = x.GetTotalAmount();
+            decimal yAmount = y.GetTotalAmount();
 
             int result = decimal.Compare(xAmount, yAmount) * -1;
             if (result != 0)

@@ -14,6 +14,11 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required int Rating { get; set; }
 
         /// <summary>
+        /// Ссылка на трек
+        /// </summary>
+        public required string TrackUrl { get; set; }
+
+        /// <summary>
         /// Комментарий
         /// </summary>
         public required string Comment { get; set; }
@@ -29,7 +34,6 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required DateTime UpdatedAt { get; set; }
 
         public long ReviewOrderId { get; set; }
-        public long TrackId { get; set; }
         public long ComposerStreamId { get; set; }
 
         // Навигационные свойства
@@ -39,12 +43,6 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// </summary>
         [ForeignKey(nameof(ReviewOrderId))]
         public required ReviewOrder ReviewOrder { get; set; }
-
-        /// <summary>
-        /// Разбираемый трек
-        /// </summary>
-        [ForeignKey(nameof(TrackId))]
-        public required Track Track { get; set; }
 
         /// <summary>
         /// Связанный cтрим композитора
