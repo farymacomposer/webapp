@@ -6,7 +6,6 @@ namespace Faryma.Composer.Infrastructure.Repositories
     {
         public Review Create(
             ReviewOrder inProgressOrder,
-            ComposerStream liveStream,
             int rating,
             string comment)
         {
@@ -16,10 +15,8 @@ namespace Faryma.Composer.Infrastructure.Repositories
             {
                 ReviewOrder = inProgressOrder,
                 TrackUrl = inProgressOrder.TrackUrl!,
-                ComposerStream = liveStream,
                 Rating = rating,
                 Comment = comment,
-                CompletedAt = now,
                 UpdatedAt = now,
             }).Entity;
         }

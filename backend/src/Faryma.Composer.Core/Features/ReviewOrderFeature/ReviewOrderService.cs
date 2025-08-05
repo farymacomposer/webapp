@@ -160,6 +160,10 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 throw new ReviewOrderException($"Невозможно взять в работу заказ Id: {command.ReviewOrderId}, пока заказ Id: {inProgress.Id} находится в работе");
             }
 
+            ComposerStream liveStream = await ofw.ComposerStreamRepository.FindLiveStream()
+                ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима");
+
+            order.ProcessingStream = liveStream;
             order.Status = ReviewOrderStatus.InProgress;
             order.InProgressAt = DateTime.UtcNow;
 

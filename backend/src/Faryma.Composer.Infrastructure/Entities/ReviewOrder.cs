@@ -17,9 +17,14 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// Дата и время начала разбора трека
+        /// Дата и время взятия заказа в работу
         /// </summary>
         public DateTime? InProgressAt { get; set; }
+
+        /// <summary>
+        /// Дата и время выполнения заказа
+        /// </summary>
+        public DateTime? CompletedAt { get; set; }
 
         /// <summary>
         /// Тип заказа
@@ -58,7 +63,8 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required string MainNormalizedNickname { get; set; }
 
         public long? TrackId { get; set; }
-        public long ComposerStreamId { get; set; }
+        public long CreationStreamId { get; set; }
+        public long? ProcessingStreamId { get; set; }
 
         // Навигационные свойства
 
@@ -74,10 +80,16 @@ namespace Faryma.Composer.Infrastructure.Entities
         public Track? Track { get; set; }
 
         /// <summary>
-        /// Связанный cтрим композитора
+        /// Связанный cтрим композитора, где создан заказ
         /// </summary>
-        [ForeignKey(nameof(ComposerStreamId))]
-        public required ComposerStream ComposerStream { get; set; }
+        [ForeignKey(nameof(CreationStreamId))]
+        public required ComposerStream CreationStream { get; set; }
+
+        /// <summary>
+        /// Связанный cтрим композитора, где заказ взят в работу
+        /// </summary>
+        [ForeignKey(nameof(ProcessingStreamId))]
+        public ComposerStream? ProcessingStream { get; set; }
 
         /// <summary>
         /// Пользователь или пользователи, создавшие заказ

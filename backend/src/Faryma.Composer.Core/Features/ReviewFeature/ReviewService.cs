@@ -19,10 +19,7 @@ namespace Faryma.Composer.Core.Features.ReviewFeature
                 throw new ReviewException($"Невозможно выполнить заказ в статусе '{order.Status}'");
             }
 
-            ComposerStream? liveStream = await ofw.ComposerStreamRepository.FindLiveStream()
-                ?? throw new ReviewException("Невозможно выполнить заказ вне активного стрима");
-
-            order.Review = ofw.ReviewRepository.Create(order, liveStream, command.Rating, command.Comment);
+            order.Review = ofw.ReviewRepository.Create(order, command.Rating, command.Comment);
             order.Status = ReviewOrderStatus.Completed;
 
             await ofw.SaveChangesAsync();
