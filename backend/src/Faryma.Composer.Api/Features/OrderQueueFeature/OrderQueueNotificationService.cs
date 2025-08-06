@@ -2,39 +2,50 @@
 using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Microsoft.AspNetCore.SignalR;
+using Saunter.Attributes;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature
 {
     public sealed class OrderQueueNotificationHub : Hub;
 
+    [AsyncApi]
     public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub> context) : IOrderQueueNotificationService
     {
+        [Channel("order-queue/new-order", Servers = new[] { "signalr-hub" })]
+        [PublishOperation(typeof(NewOrderAddedMessage), Summary = "Уведомление о новом заказе")]
         public async Task NotifyNewOrderAdded(OrderPosition orderPosition)
         {
-            await context.Clients.All.SendAsync("NewOrderAdded", new
+            NewOrderAddedMessage message = new()
             {
                 Order = ReviewOrderDto.Map(orderPosition.Order),
-                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
-            });
+                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current)
+            };
+            await context.Clients.All.SendAsync("NewOrderAdded", message);
         }
 
+        [Channel("order-queue/order-removed", Servers = new[] { "signalr-hub" })]
+        [PublishOperation(typeof(OrderRemovedMessage), Summary = "Уведомление об удалении заказа")]
         public async Task NotifyOrderRemoved(OrderPosition orderPosition)
         {
-            await context.Clients.All.SendAsync("OrderRemoved", new
+            OrderRemovedMessage message = new()
             {
                 Order = ReviewOrderDto.Map(orderPosition.Order),
-                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),
-            });
+                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous)
+            };
+            await context.Clients.All.SendAsync("OrderRemoved", message);
         }
 
+        [Channel("order-queue/position-changed", Servers = new[] { "signalr-hub" })]
+        [PublishOperation(typeof(OrderPositionChangedMessage), Summary = "Уведомление об изменении позиции заказа")]
         public async Task NotifyOrderPositionChanged(OrderPosition orderPosition)
         {
-            await context.Clients.All.SendAsync("OrderPositionChanged", new
+            OrderPositionChangedMessage message = new()
             {
                 Order = ReviewOrderDto.Map(orderPosition.Order),
                 CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
-                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),
-            });
+                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous)
+            };
+            await context.Clients.All.SendAsync("OrderPositionChanged", message);
         }
     }
 }

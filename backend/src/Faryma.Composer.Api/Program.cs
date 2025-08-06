@@ -7,6 +7,8 @@ using Faryma.Composer.Core.DependencyInjection;
 using Faryma.Composer.Core.Features.AppSettings;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
 using Microsoft.AspNetCore.Authorization;
+using Saunter;
+using Saunter.AsyncApiSchema.v2;
 using Serilog;
 
 namespace Faryma.Composer.Api
@@ -44,6 +46,25 @@ namespace Faryma.Composer.Api
                         .AddControllers()
                         .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+                    services.AddAsyncApiSchemaGeneration(options =>
+                    {
+                        options.AssemblyMarkerTypes = new[] { typeof(OrderQueueNotificationService) };
+                        options.AsyncApi = new AsyncApiDocument
+                        {
+                            Info = new Info("Faryma Composer API", "1.0.0")
+                            {
+                                Description = "Async API для системы управления очередью заказов"
+                            },
+                            Servers =
+                            {
+                                ["signalr-hub"] = new Server("/api/OrderQueueNotificationHub", "websocket")
+                                {
+                                    Description = "SignalR WebSocket Hub для уведомлений о состоянии очереди заказов"
+                                }
+                            }
+                        };
+                    });
+
                     services.AddInfrastructure(builder.Environment);
                 });
 
@@ -56,6 +77,8 @@ namespace Faryma.Composer.Api
             app.UseAuthorization();
             app.MapControllers();
             app.MapHub<OrderQueueNotificationHub>($"/api/{nameof(OrderQueueNotificationHub)}");
+            app.MapAsyncApiDocuments();
+            app.MapAsyncApiUi();
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();
