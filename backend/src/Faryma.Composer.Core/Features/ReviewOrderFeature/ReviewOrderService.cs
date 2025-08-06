@@ -165,5 +165,24 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await orderQueueService.StartReview(order);
         }
+
+        public async Task<string> AddTrackUrl(AddTrackUrlCommand command)
+        {
+            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+
+            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            {
+                throw new ReviewOrderException($"Невозможно добавить ссылку на трек в статусе '{order.Status}'");
+            }
+
+            order.TrackUrl = command.TrackUrl;
+            order.Status = ReviewOrderStatus.Pending;
+
+            await ofw.SaveChangesAsync();
+
+            await orderQueueService.UpdateOrder(order);
+
+            return order.TrackUrl;
+        }
     }
 }
