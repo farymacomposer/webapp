@@ -12,7 +12,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
         /// <summary>
         /// Псевдоним пользователя
         /// </summary>
-        [Required]
+        [StringLength(40, MinimumLength = 1, ErrorMessage = "Длина псевдонима должна быть в пределах от 1 до 40 символов")]
         public required string Nickname { get; set; }
 
         /// <summary>
@@ -39,6 +39,16 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            if (TrackUrl is not null && !Uri.TryCreate(TrackUrl, UriKind.Absolute, out _))
+            {
+                yield return new ValidationResult("Некорректная ссылка на трек");
+            }
+
+            if (PaymentAmount < 0)
+            {
+                yield return new ValidationResult("Сумма платежа не может быть отрицательной");
+            }
+
             if (OrderType == ReviewOrderType.Donation && PaymentAmount == 0)
             {
                 yield return new ValidationResult("Для донатных заказов сумма платежа не может быть равна нулю");
@@ -58,11 +68,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
         {
             return new()
             {
-                Nickname = Nickname,
+                Nickname = Nickname.Trim(),
                 OrderType = OrderType,
                 PaymentAmount = PaymentAmount,
                 TrackUrl = TrackUrl,
-                UserComment = UserComment,
+                UserComment = UserComment?.Trim(),
             };
         }
     }

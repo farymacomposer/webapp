@@ -797,7 +797,7 @@ namespace Faryma.Composer.Core.Test
                 NominalAmount = amount,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
-                ComposerStream = new ComposerStream
+                CreationStream = new ComposerStream
                 {
                     EventDate = DateOnly.Parse(eventDate),
                     Type = ComposerStreamType.Donation,
@@ -817,7 +817,7 @@ namespace Faryma.Composer.Core.Test
                 Type = ReviewOrderType.OutOfQueue,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
-                ComposerStream = new ComposerStream
+                CreationStream = new ComposerStream
                 {
                     EventDate = DateOnly.Parse(eventDate),
                     Type = ComposerStreamType.Donation,

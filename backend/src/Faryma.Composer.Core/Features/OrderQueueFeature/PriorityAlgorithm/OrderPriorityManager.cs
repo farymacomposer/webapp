@@ -50,8 +50,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen
                     && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
-                    && x.ComposerStream.EventDate <= queueManager.CurrentStreamDate)
-                .GroupBy(x => x.ComposerStream.EventDate)
+                    && x.CreationStream.EventDate <= queueManager.CurrentStreamDate)
+                .GroupBy(x => x.CreationStream.EventDate)
                 .Select(x => (x.Key, new OrderCategory(x.Order(new OrderPriorityComparer()).ToList())))
                 .OrderBy(x => x.Key)
                 .ToList();

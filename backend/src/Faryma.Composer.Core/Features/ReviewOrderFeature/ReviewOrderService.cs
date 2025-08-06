@@ -18,7 +18,6 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
     {
         public async Task<ReviewOrder> Create(CreateCommand command)
         {
-            AppSettingsEntity appSettings = appSettingsService.Settings;
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
             ComposerStream stream = await composerStreamService.GetOrCreateForOrder(userNickname, command.OrderType);
 
@@ -38,13 +37,13 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                         command.UserComment);
 
                     break;
-                case ReviewOrderType.OutOfQueue:
+                case ReviewOrderType.OutOfQueue or ReviewOrderType.Charity:
 
                     result = ofw.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
-                        command.OrderType,
                         nominalAmount: 0,
+                        command.OrderType,
                         command.TrackUrl,
                         command.UserComment);
 
@@ -54,19 +53,22 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     result = ofw.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
+                        appSettingsService.Settings.ReviewOrderNominalAmount,
                         command.OrderType,
-                        appSettings.ReviewOrderNominalAmount,
                         command.TrackUrl,
                         command.UserComment);
 
                     break;
+
+                default:
+                    throw new ReviewOrderException($"Типа заказа '{command.OrderType}' не поддерживается");
             }
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.AddOrder(result!);
+            await orderQueueService.AddOrder(result);
 
-            return result!;
+            return result;
         }
 
         public async Task<Transaction> Up(UpCommand command)
@@ -158,6 +160,10 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 throw new ReviewOrderException($"Невозможно взять в работу заказ Id: {command.ReviewOrderId}, пока заказ Id: {inProgress.Id} находится в работе");
             }
 
+            ComposerStream liveStream = await ofw.ComposerStreamRepository.FindLiveStream()
+                ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима");
+
+            order.ProcessingStream = liveStream;
             order.Status = ReviewOrderStatus.InProgress;
             order.InProgressAt = DateTime.UtcNow;
 

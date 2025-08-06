@@ -31,7 +31,7 @@ namespace Faryma.Composer.Api.Features.ReviewFeature.Complete
             {
                 ReviewOrderId = ReviewOrderId,
                 Rating = Rating,
-                Comment = Comment,
+                Comment = Comment.Trim(),
             };
         }
     }
