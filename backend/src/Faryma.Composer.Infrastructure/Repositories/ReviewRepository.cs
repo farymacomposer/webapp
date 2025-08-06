@@ -15,7 +15,6 @@ namespace Faryma.Composer.Infrastructure.Repositories
             return context.Reviews.Add(new Review
             {
                 ReviewOrder = inProgressOrder,
-                TrackUrl = inProgressOrder.TrackUrl!,
                 ComposerStream = liveStream,
                 Rating = rating,
                 Comment = comment,

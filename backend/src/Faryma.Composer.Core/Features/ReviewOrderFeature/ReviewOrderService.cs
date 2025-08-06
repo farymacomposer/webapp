@@ -170,7 +170,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder or ReviewOrderStatus.InProgress))
             {
                 throw new ReviewOrderException($"Невозможно добавить ссылку на трек в статусе '{order.Status}'");
             }
