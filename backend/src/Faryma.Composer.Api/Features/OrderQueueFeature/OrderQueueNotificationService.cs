@@ -12,7 +12,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
     public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub> context) : IOrderQueueNotificationService
     {
         [Channel("order-queue/new-order", Servers = new[] { "signalr-hub" })]
-        [PublishOperation(typeof(NewOrderAddedMessage), Summary = "Уведомление о новом заказе")]
+        [SubscribeOperation(typeof(NewOrderAddedMessage), Summary = "Уведомление о новом заказе")]
         public async Task NotifyNewOrderAdded(OrderPosition orderPosition)
         {
             NewOrderAddedMessage message = new()
@@ -24,7 +24,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         }
 
         [Channel("order-queue/order-removed", Servers = new[] { "signalr-hub" })]
-        [PublishOperation(typeof(OrderRemovedMessage), Summary = "Уведомление об удалении заказа")]
+        [SubscribeOperation(typeof(OrderRemovedMessage), Summary = "Уведомление об удалении заказа")]
         public async Task NotifyOrderRemoved(OrderPosition orderPosition)
         {
             OrderRemovedMessage message = new()
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         }
 
         [Channel("order-queue/position-changed", Servers = new[] { "signalr-hub" })]
-        [PublishOperation(typeof(OrderPositionChangedMessage), Summary = "Уведомление об изменении позиции заказа")]
+        [SubscribeOperation(typeof(OrderPositionChangedMessage), Summary = "Уведомление об изменении позиции заказа")]
         public async Task NotifyOrderPositionChanged(OrderPosition orderPosition)
         {
             OrderPositionChangedMessage message = new()
