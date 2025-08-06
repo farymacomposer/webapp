@@ -28,13 +28,13 @@ namespace Faryma.Composer.Infrastructure.Entities
         // Навигационные свойства
 
         /// <summary>
-        /// Заказы разборов треков
+        /// Заказы, созданные в этом стриме
         /// </summary>
-        public ICollection<ReviewOrder> ReviewOrders { get; set; } = [];
+        public ICollection<ReviewOrder> CreatedReviewOrders { get; set; } = [];
 
         /// <summary>
-        /// Результаты разборов треков
+        /// Заказы, взятые в работу в этом стриме
         /// </summary>
-        public ICollection<Review> Reviews { get; set; } = [];
+        public ICollection<ReviewOrder> ProcessedReviewOrders { get; set; } = [];
     }
 }
