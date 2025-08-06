@@ -1,10 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace Faryma.Composer.Infrastructure.Migrations
 {
@@ -500,7 +498,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Rating = table.Column<int>(type: "integer", nullable: false),
-                    TrackUrl = table.Column<string>(type: "text", nullable: false),
                     Comment = table.Column<string>(type: "text", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: false),

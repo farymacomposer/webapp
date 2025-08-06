@@ -170,10 +170,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     b.Property<long?>("TrackId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("TrackUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
