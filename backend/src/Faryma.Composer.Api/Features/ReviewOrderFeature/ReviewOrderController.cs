@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Api.Auth;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Create;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze;
@@ -125,6 +126,18 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
             await reviewOrderService.StartReview(request.Map());
 
             return Ok(new StartReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
+        }
+
+        /// <summary>
+        /// Добавляет или изменяет ссылку на трек
+        /// </summary>
+        [HttpPost(nameof(AddTrackUrl))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl([FromBody] AddTrackUrlRequest request)
+        {
+            string trackUrl = await reviewOrderService.AddTrackUrl(request.Map());
+
+            return Ok(new AddTrackUrlResponse { ReviewOrderId = request.ReviewOrderId, TrackUrl = trackUrl });
         }
     }
 }

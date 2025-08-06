@@ -14,11 +14,6 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required int Rating { get; set; }
 
         /// <summary>
-        /// Ссылка на трек
-        /// </summary>
-        public required string TrackUrl { get; set; }
-
-        /// <summary>
         /// Комментарий
         /// </summary>
         public required string Comment { get; set; }

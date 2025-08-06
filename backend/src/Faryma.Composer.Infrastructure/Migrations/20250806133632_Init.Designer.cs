@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250805161114_Init")]
+    [Migration("20250806133632_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -172,10 +172,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     b.Property<long?>("TrackId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("TrackUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
