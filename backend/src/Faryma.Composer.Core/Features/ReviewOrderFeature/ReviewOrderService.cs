@@ -176,7 +176,9 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             }
 
             order.TrackUrl = command.TrackUrl;
-            order.Status = order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder) ? ReviewOrderStatus.Pending : ReviewOrderStatus.InProgress;
+            order.Status = order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder)
+                ? ReviewOrderStatus.Pending
+                : ReviewOrderStatus.InProgress;
 
             await ofw.SaveChangesAsync();
 
