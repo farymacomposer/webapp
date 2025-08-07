@@ -28,6 +28,15 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
         public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname, ReviewOrderType orderType)
         {
+            if (orderType == ReviewOrderType.Charity)
+            {
+                ComposerStream? live = await ofw.ComposerStreamRepository.FindLiveStream();
+                if (live is null || live.Type == ComposerStreamType.Charity)
+                {
+                    throw new ComposerStreamException("Благотворительный заказ можно создать только на благотворительном стриме");
+                }
+            }
+
             const DayOfWeek debtStreamDay = DayOfWeek.Tuesday;
             const DayOfWeek donationStreamDay = DayOfWeek.Saturday;
 
@@ -59,7 +68,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
                     }
 
                 default:
-                    throw new ComposerStreamException($"Типа заказа {orderType} не поддерживается");
+                    throw new ComposerStreamException($"Типа заказа '{orderType}' не поддерживается");
             }
         }
 

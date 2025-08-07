@@ -392,6 +392,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     InProgressAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
@@ -401,18 +402,26 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     MainNickname = table.Column<string>(type: "text", nullable: false),
                     MainNormalizedNickname = table.Column<string>(type: "text", nullable: false),
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
-                    ComposerStreamId = table.Column<long>(type: "bigint", nullable: false)
+                    CreationStreamId = table.Column<long>(type: "bigint", nullable: false),
+                    ProcessingStreamId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ReviewOrders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReviewOrders_ComposerStreams_ComposerStreamId",
-                        column: x => x.ComposerStreamId,
+                        name: "FK_ReviewOrders_ComposerStreams_CreationStreamId",
+                        column: x => x.CreationStreamId,
                         principalSchema: "app",
                         principalTable: "ComposerStreams",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ReviewOrders_ComposerStreams_ProcessingStreamId",
+                        column: x => x.ProcessingStreamId,
+                        principalSchema: "app",
+                        principalTable: "ComposerStreams",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ReviewOrders_Tracks_TrackId",
                         column: x => x.TrackId,
@@ -489,24 +498,14 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Rating = table.Column<int>(type: "integer", nullable: false),
-                    TrackUrl = table.Column<string>(type: "text", nullable: false),
                     Comment = table.Column<string>(type: "text", nullable: false),
-                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: false),
-                    ComposerStreamId = table.Column<long>(type: "bigint", nullable: false),
                     TrackId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reviews", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Reviews_ComposerStreams_ComposerStreamId",
-                        column: x => x.ComposerStreamId,
-                        principalSchema: "app",
-                        principalTable: "ComposerStreams",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reviews_ReviewOrders_ReviewOrderId",
                         column: x => x.ReviewOrderId,
@@ -654,10 +653,16 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 column: "TracksId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReviewOrders_ComposerStreamId",
+                name: "IX_ReviewOrders_CreationStreamId",
                 schema: "app",
                 table: "ReviewOrders",
-                column: "ComposerStreamId");
+                column: "CreationStreamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReviewOrders_ProcessingStreamId",
+                schema: "app",
+                table: "ReviewOrders",
+                column: "ProcessingStreamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReviewOrders_TrackId",
@@ -670,12 +675,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 schema: "app",
                 table: "ReviewOrderUserNickname",
                 column: "UserNicknamesId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reviews_ComposerStreamId",
-                schema: "app",
-                table: "Reviews",
-                column: "ComposerStreamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_ReviewOrderId",

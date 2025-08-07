@@ -11,7 +11,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             ?? throw new NotFoundException($"Заказ разбора трека Id: {reviewOrderId}, не существует");
 
         public Task<ReviewOrder?> Find(long id) => context.ReviewOrders
-            .Include(x => x.ComposerStream)
+            .Include(x => x.CreationStream)
             .Include(x => x.UserNicknames)
             .Include(x => x.Payments)
             .FirstOrDefaultAsync(x => x.Id == id);
@@ -31,13 +31,13 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 MainNormalizedNickname = transaction.Account.UserNickname.NormalizedNickname,
                 TrackUrl = trackUrl,
                 UserComment = userComment,
-                ComposerStream = stream,
+                CreationStream = stream,
                 UserNicknames = { transaction.Account.UserNickname },
                 Payments = { transaction },
             }).Entity;
         }
 
-        public ReviewOrder CreateFree(ComposerStream stream, UserNickname userNickname, ReviewOrderType type, decimal nominalAmount, string? trackUrl, string? userComment)
+        public ReviewOrder CreateFree(ComposerStream stream, UserNickname userNickname, decimal nominalAmount, ReviewOrderType type, string? trackUrl, string? userComment)
         {
             return context.Add(new ReviewOrder
             {
@@ -49,7 +49,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 MainNormalizedNickname = userNickname.NormalizedNickname,
                 TrackUrl = trackUrl,
                 UserComment = userComment,
-                ComposerStream = stream,
+                CreationStream = stream,
                 UserNicknames = { userNickname },
                 NominalAmount = nominalAmount,
             }).Entity;

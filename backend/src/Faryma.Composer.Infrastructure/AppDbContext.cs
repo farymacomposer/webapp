@@ -72,6 +72,18 @@ namespace Faryma.Composer.Infrastructure
             builder.HasDefaultSchema("app");
             base.OnModelCreating(builder);
 
+            builder.Entity<ComposerStream>()
+                .HasMany(cs => cs.CreatedReviewOrders)
+                .WithOne(ro => ro.CreationStream)
+                .HasForeignKey(ro => ro.CreationStreamId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ComposerStream>()
+                .HasMany(cs => cs.ProcessedReviewOrders)
+                .WithOne(ro => ro.ProcessingStream)
+                .HasForeignKey(ro => ro.ProcessingStreamId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<IdentityRole<Guid>>().HasData(
                 new IdentityRole<Guid>
                 {

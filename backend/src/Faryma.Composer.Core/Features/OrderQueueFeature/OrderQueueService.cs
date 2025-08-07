@@ -67,32 +67,32 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
             ReviewOrder[] orders = await context.ReviewOrders
                 .AsNoTracking()
-                .Include(x => x.ComposerStream)
+                .Include(x => x.CreationStream)
                 .Include(x => x.UserNicknames)
                 .Include(x => x.Payments)
                 .Where(x => x.Status == ReviewOrderStatus.Preorder
                     || x.Status == ReviewOrderStatus.Pending
                     || x.Status == ReviewOrderStatus.InProgress
-                    || (x.Review != null && x.Review.ComposerStream.Status == ComposerStreamStatus.Live))
+                    || (x.ProcessingStream != null && x.ProcessingStream.Status == ComposerStreamStatus.Live))
                 .ToArrayAsync();
 
             Dictionary<long, OrderPosition> orderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v });
 
-            string? lastOutOfQueueCategoryNickname = await context.Reviews
-                .Where(x => x.ReviewOrder.Type == ReviewOrderType.OutOfQueue)
+            string? lastOutOfQueueCategoryNickname = await context.ReviewOrders
+                .Where(x => x.Type == ReviewOrderType.OutOfQueue)
                 .OrderBy(x => x.CompletedAt)
-                .Select(x => x.ReviewOrder.MainNormalizedNickname)
+                .Select(x => x.MainNormalizedNickname)
                 .LastOrDefaultAsync();
 
             Dictionary<DateOnly, string> lastNicknameByStreamDate = await context.ComposerStreams
-                .Where(x => x.Reviews.Any(x => x.ReviewOrder.Type != ReviewOrderType.OutOfQueue)
-                    && x.ReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
+                .Where(x => x.ProcessedReviewOrders.Any(x => x.Type != ReviewOrderType.OutOfQueue)
+                    && x.CreatedReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
                 .Select(x => new
                 {
                     x.EventDate,
-                    x.Reviews.Where(x => x.ReviewOrder.Type != ReviewOrderType.OutOfQueue)
+                    x.ProcessedReviewOrders.Where(x => x.Type != ReviewOrderType.OutOfQueue)
                         .OrderBy(x => x.CompletedAt)
-                        .Last().ReviewOrder.MainNormalizedNickname
+                        .Last().MainNormalizedNickname
                 })
                 .ToDictionaryAsync(k => k.EventDate, v => v.MainNormalizedNickname);
 
