@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
+﻿using Faryma.Composer.Api.Constants;
+using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Microsoft.AspNetCore.SignalR;
@@ -11,7 +12,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
     [AsyncApi]
     public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub> context) : IOrderQueueNotificationService
     {
-        [Channel("order-queue/new-order", Servers = new[] { "signalr-hub" })]
+        [Channel("order-queue/new-order", Servers = new[] { SignalRConstants.SignalRHubAsyncApiServer })]
         [SubscribeOperation(typeof(NewOrderAddedMessage), Summary = "Уведомление о новом заказе")]
         public async Task NotifyNewOrderAdded(OrderPosition orderPosition)
         {
@@ -23,7 +24,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
             await context.Clients.All.SendAsync("NewOrderAdded", message);
         }
 
-        [Channel("order-queue/order-removed", Servers = new[] { "signalr-hub" })]
+        [Channel("order-queue/order-removed", Servers = new[] { SignalRConstants.SignalRHubAsyncApiServer })]
         [SubscribeOperation(typeof(OrderRemovedMessage), Summary = "Уведомление об удалении заказа")]
         public async Task NotifyOrderRemoved(OrderPosition orderPosition)
         {
@@ -35,7 +36,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
             await context.Clients.All.SendAsync("OrderRemoved", message);
         }
 
-        [Channel("order-queue/position-changed", Servers = new[] { "signalr-hub" })]
+        [Channel("order-queue/position-changed", Servers = new[] { SignalRConstants.SignalRHubAsyncApiServer })]
         [SubscribeOperation(typeof(OrderPositionChangedMessage), Summary = "Уведомление об изменении позиции заказа")]
         public async Task NotifyOrderPositionChanged(OrderPosition orderPosition)
         {
