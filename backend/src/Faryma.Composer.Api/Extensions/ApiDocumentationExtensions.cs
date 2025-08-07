@@ -18,7 +18,7 @@ namespace Faryma.Composer.Api.Extensions
                     options.RoutePrefix = "api/swagger";
                 });
 
-                app.UseReDoc(options => options.RoutePrefix = "api/docs");
+                app.UseReDoc(options => options.RoutePrefix = "api/redoc");
             }
         }
     }
