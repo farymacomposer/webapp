@@ -746,8 +746,8 @@ namespace Faryma.Composer.Core.Test
 
                 (0, 1, OrderActivityStatus.Active,    "Nick1"),
                 (1, 3, OrderActivityStatus.Active,    "Nick2"),
-                (3, 11, OrderActivityStatus.Active,   "Nick2"), // долг x2
-                (2, 2, OrderActivityStatus.Active,    "Nick1"),
+                (3, 2, OrderActivityStatus.Active,    "Nick1"),
+                (2, 11, OrderActivityStatus.Active,   "Nick2"), // долг x2
                 (4, 9, OrderActivityStatus.Active,    "Nick6"), // долг x1
                 (5, 10, OrderActivityStatus.Active,   "Nick1"), // долг x2
                 (6, 7, OrderActivityStatus.Active,    "Nick2"), // долг x1
