@@ -2,8 +2,8 @@
 {
     public class OrderPositionChangedMessage
     {
-        public ReviewOrderDto Order { get; set; } = null!;
-        public OrderQueuePositionDto CurrentPosition { get; set; } = null!;
-        public OrderQueuePositionDto PreviousPosition { get; set; } = null!;
+        public required ReviewOrderDto Order { get; set; }
+        public required OrderQueuePositionDto CurrentPosition { get; set; }
+        public required OrderQueuePositionDto PreviousPosition { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 {
     public class NewOrderAddedMessage
     {
-        public ReviewOrderDto Order { get; set; } = null!;
-        public OrderQueuePositionDto CurrentPosition { get; set; } = null!;
+        public required ReviewOrderDto Order { get; set; }
+        public required OrderQueuePositionDto CurrentPosition { get; set; }
     }
 }
