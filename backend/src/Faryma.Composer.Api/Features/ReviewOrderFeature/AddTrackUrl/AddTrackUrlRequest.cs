@@ -9,7 +9,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl
     public sealed record AddTrackUrlRequest
     {
         /// <summary>
-        /// ID заказа разбора трека
+        /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; set; }
 

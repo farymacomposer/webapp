@@ -1,12 +1,12 @@
-﻿namespace Faryma.Composer.Core.Features.ReviewFeature.Commands
+﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
 {
     /// <summary>
     /// Команда завершения разбора трека
     /// </summary>
-    public sealed record CompleteReviewCommand
+    public sealed record CompleteCommand
     {
         /// <summary>
-        /// ID заказа разбора трека
+        /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; init; }
 

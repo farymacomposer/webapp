@@ -8,7 +8,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze
     public sealed record UnfreezeReviewOrderRequest
     {
         /// <summary>
-        /// ID заказа разбора трека
+        /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; set; }
 

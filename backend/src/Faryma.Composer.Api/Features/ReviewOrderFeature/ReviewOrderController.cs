@@ -1,9 +1,10 @@
 ﻿using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.Complete;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Create;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze;
-using Faryma.Composer.Api.Features.ReviewOrderFeature.StartReview;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Up;
 using Faryma.Composer.Core.Features.ReviewOrderFeature;
@@ -81,15 +82,39 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         }
 
         /// <summary>
-        /// Отменяет заказ
+        /// Добавляет или изменяет ссылку на трек
         /// </summary>
-        [HttpPost(nameof(CancelReviewOrder))]
+        [HttpPost(nameof(AddTrackUrl))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder([FromBody] CancelReviewOrderRequest request)
+        public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl([FromBody] AddTrackUrlRequest request)
         {
-            await reviewOrderService.Cancel(request.Map());
+            string trackUrl = await reviewOrderService.AddTrackUrl(request.Map());
 
-            return Ok(new CancelReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
+            return Ok(new AddTrackUrlResponse { ReviewOrderId = request.ReviewOrderId, TrackUrl = trackUrl });
+        }
+
+        /// <summary>
+        /// Взятие заказа в работу
+        /// </summary>
+        [HttpPost(nameof(TakeOrderInProgress))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress([FromBody] TakeOrderInProgressRequest request)
+        {
+            await reviewOrderService.TakeInProgress(request.Map());
+
+            return Ok(new TakeOrderInProgressResponse { ReviewOrderId = request.ReviewOrderId });
+        }
+
+        /// <summary>
+        /// Выполнение заказа
+        /// </summary>
+        [HttpPost(nameof(CompleteReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder([FromBody] CompleteReviewOrderRequest request)
+        {
+            await reviewOrderService.Complete(request.Map());
+
+            return Ok(new TakeOrderInProgressResponse { ReviewOrderId = request.ReviewOrderId });
         }
 
         /// <summary>
@@ -117,27 +142,15 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         }
 
         /// <summary>
-        /// Начинает разбор трека
+        /// Отменяет заказ
         /// </summary>
-        [HttpPost(nameof(StartReviewOrder))]
+        [HttpPost(nameof(CancelReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<StartReviewOrderResponse>> StartReviewOrder([FromBody] StartReviewOrderRequest request)
+        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder([FromBody] CancelReviewOrderRequest request)
         {
-            await reviewOrderService.StartReview(request.Map());
+            await reviewOrderService.Cancel(request.Map());
 
-            return Ok(new StartReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
-        }
-
-        /// <summary>
-        /// Добавляет или изменяет ссылку на трек
-        /// </summary>
-        [HttpPost(nameof(AddTrackUrl))]
-        [AuthorizeAdmins]
-        public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl([FromBody] AddTrackUrlRequest request)
-        {
-            string trackUrl = await reviewOrderService.AddTrackUrl(request.Map());
-
-            return Ok(new AddTrackUrlResponse { ReviewOrderId = request.ReviewOrderId, TrackUrl = trackUrl });
+            return Ok(new CancelReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
         }
     }
 }

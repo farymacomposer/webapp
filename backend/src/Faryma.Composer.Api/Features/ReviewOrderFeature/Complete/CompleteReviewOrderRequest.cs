@@ -1,15 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Core.Features.ReviewFeature.Commands;
+using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 
-namespace Faryma.Composer.Api.Features.ReviewFeature.Complete
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Complete
 {
     /// <summary>
-    /// Запрос завершения разбора трека
+    /// Запрос выполнения заказа
     /// </summary>
-    public sealed record CompleteReviewRequest
+    public sealed record CompleteReviewOrderRequest
     {
         /// <summary>
-        /// ID заказа разбора трека
+        /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; set; }
 
@@ -22,10 +22,11 @@ namespace Faryma.Composer.Api.Features.ReviewFeature.Complete
         /// <summary>
         /// Комментарий к разбору
         /// </summary>
+        [Required]
         [StringLength(300, MinimumLength = 1, ErrorMessage = "Обязательно наличие комментария, но не более 300 символов")]
         public required string Comment { get; set; }
 
-        public CompleteReviewCommand Map()
+        public CompleteCommand Map()
         {
             return new()
             {

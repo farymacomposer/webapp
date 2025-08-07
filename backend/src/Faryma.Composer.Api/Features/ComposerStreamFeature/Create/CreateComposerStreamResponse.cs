@@ -1,4 +1,6 @@
-﻿namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Create
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Create
 {
     /// <summary>
     /// Ответ на запрос создания стрима
@@ -8,6 +10,7 @@
         /// <summary>
         /// Стрим композитора
         /// </summary>
+        [Required]
         public required ComposerStreamDto ComposerStream { get; init; }
     }
 }

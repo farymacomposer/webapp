@@ -4,8 +4,6 @@ using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
 using Faryma.Composer.Core.DependencyInjection;
-using Faryma.Composer.Core.Features.AppSettings;
-using Faryma.Composer.Core.Features.OrderQueueFeature;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
@@ -57,8 +55,8 @@ namespace Faryma.Composer.Api
             app.MapControllers();
             app.MapHub<OrderQueueNotificationHub>("/api/OrderQueueNotificationHub");
 
-            await app.Services.GetRequiredService<AppSettingsService>().Initialize();
-            await app.Services.GetRequiredService<OrderQueueService>().Initialize();
+            //await app.Services.GetRequiredService<AppSettingsService>().Initialize();
+            //await app.Services.GetRequiredService<OrderQueueService>().Initialize();
             await app.RunAsync();
         }
     }

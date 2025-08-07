@@ -6,7 +6,7 @@
     public sealed record CancelReviewOrderResponse
     {
         /// <summary>
-        /// ID отмененного заказа разбора трека
+        /// Id отмененного заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; init; }
     }
