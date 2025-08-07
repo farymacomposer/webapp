@@ -4,7 +4,7 @@ namespace Faryma.Composer.Api.Extensions
 {
     public static class ApiDocumentationExtensions
     {
-        public static void UseCustomApiDocumentation(this WebApplication app)
+        public static void UseApiDocumentation(this WebApplication app)
         {
             if (app.Environment.IsDevelopment())
             {

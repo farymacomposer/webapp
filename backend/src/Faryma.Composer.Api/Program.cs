@@ -50,7 +50,7 @@ namespace Faryma.Composer.Api
             WebApplication app = builder.Build();
 
             app.UseRouting();
-            app.UseCustomApiDocumentation();
+            app.UseApiDocumentation();
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
