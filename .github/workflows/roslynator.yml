@@ -1,4 +1,4 @@
-name: 🔍 Linters → 🧪 Tests
+name: 🔍 → 🧪
 
 on:
   pull_request:
