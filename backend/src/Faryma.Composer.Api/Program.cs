@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Api.Constants;
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
@@ -51,14 +50,13 @@ namespace Faryma.Composer.Api
             WebApplication app = builder.Build();
 
             app.UseRouting();
-            app.UseCustomSwagger();
+            app.UseCustomApiDocumentation();
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-            app.UseCustomAsyncApi();
 
-            app.MapHub<OrderQueueNotificationHub>(SignalRConstants.OrderQueueHubPath);
+            app.MapHub<OrderQueueNotificationHub>(OrderQueueNotificationHub.RoutePattern);
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();

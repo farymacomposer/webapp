@@ -2,7 +2,6 @@
 using System.Text;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
-using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
 using Faryma.Composer.Infrastructure;
@@ -13,6 +12,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Saunter;
+using Saunter.AsyncApiSchema.v2;
 
 namespace Faryma.Composer.Api.DependencyInjection
 {
@@ -81,42 +82,64 @@ namespace Faryma.Composer.Api.DependencyInjection
             return services;
         }
 
-        private static IServiceCollection ConfigureSwagger(this IServiceCollection services, IWebHostEnvironment environment) => services.AddSwaggerGen(options =>
+        private static IServiceCollection ConfigureSwagger(this IServiceCollection services, IWebHostEnvironment environment)
         {
-            options.SwaggerDoc("v1", new OpenApiInfo
+            return services.AddSwaggerGen(options =>
             {
-                Title = environment.ApplicationName,
-                Version = "v1",
-            });
-
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                string xmlPath = Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
-                if (File.Exists(xmlPath))
+                options.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
-                }
-            }
+                    Title = environment.ApplicationName,
+                    Version = "v1",
+                });
 
-            options.CustomSchemaIds(x => x.FullName);
-            options.UseAllOfToExtendReferenceSchemas();
-
-            OpenApiSecurityScheme scheme = new()
-            {
-                Type = SecuritySchemeType.Http,
-                Scheme = JwtBearerDefaults.AuthenticationScheme,
-                Reference = new OpenApiReference
+                foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    Id = JwtBearerDefaults.AuthenticationScheme,
-                    Type = ReferenceType.SecurityScheme
+                    string xmlPath = Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
+                    if (File.Exists(xmlPath))
+                    {
+                        options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+                    }
                 }
-            };
 
-            options.AddSecurityDefinition(scheme.Reference.Id, scheme);
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                { scheme, Array.Empty<string>() }
+                options.CustomSchemaIds(x => x.FullName);
+                options.UseAllOfToExtendReferenceSchemas();
+
+                OpenApiSecurityScheme scheme = new()
+                {
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                options.AddSecurityDefinition(scheme.Reference.Id, scheme);
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement { { scheme, Array.Empty<string>() } });
             });
-        });
+        }
+
+        private static IServiceCollection AddAsyncApiSpecification(this IServiceCollection services)
+        {
+            return services.AddAsyncApiSchemaGeneration(options =>
+            {
+                options.AssemblyMarkerTypes = new[] { typeof(OrderQueueNotificationService) };
+                options.AsyncApi = new AsyncApiDocument
+                {
+                    Info = new Info("Faryma Composer API", "1.0.0")
+                    {
+                        Description = "Async API для системы управления очередью заказов"
+                    },
+                    Servers =
+                    {
+                        [Globals.SignalrApiServer] = new Server(OrderQueueNotificationHub.RoutePattern, "websocket")
+                        {
+                            Description = "Уведомления о состоянии очереди заказов"
+                        }
+                    }
+                };
+            });
+        }
     }
 }

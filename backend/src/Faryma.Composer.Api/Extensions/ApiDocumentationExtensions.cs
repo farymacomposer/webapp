@@ -1,11 +1,16 @@
-﻿namespace Faryma.Composer.Api.Extensions
+﻿using Saunter;
+
+namespace Faryma.Composer.Api.Extensions
 {
-    public static class SwaggerExtensions
+    public static class ApiDocumentationExtensions
     {
-        public static void UseCustomSwagger(this WebApplication app)
+        public static void UseCustomApiDocumentation(this WebApplication app)
         {
             if (app.Environment.IsDevelopment())
             {
+                app.MapAsyncApiDocuments();
+                app.MapAsyncApiUi();
+
                 app.UseSwagger(x => x.RouteTemplate = "api/swagger/{documentname}/swagger.json");
                 app.UseSwaggerUI(options =>
                 {
