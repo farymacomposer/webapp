@@ -1,4 +1,4 @@
-name: Roslynator Analysis
+name: 🔍 Linters → 🧪 Tests
 
 on:
   pull_request:
