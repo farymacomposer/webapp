@@ -11,12 +11,14 @@ namespace Faryma.Composer.Api.Extensions
                 app.MapAsyncApiDocuments();
                 app.MapAsyncApiUi();
 
-                app.UseSwagger(x => x.RouteTemplate = "api/swagger/{documentname}/swagger.json");
+                app.UseSwagger(options => options.RouteTemplate = "api/swagger/{documentname}/swagger.json");
                 app.UseSwaggerUI(options =>
                 {
                     options.SwaggerEndpoint("/api/swagger/v1/swagger.json", $"{app.Environment.ApplicationName} API v1");
                     options.RoutePrefix = "api/swagger";
                 });
+
+                app.UseReDoc(options => options.RoutePrefix = "api/docs");
             }
         }
     }
