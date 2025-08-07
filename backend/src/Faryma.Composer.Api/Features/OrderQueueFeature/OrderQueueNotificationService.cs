@@ -14,19 +14,21 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
     [AsyncApi]
     public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub> context) : IOrderQueueNotificationService
     {
-        [Channel("order-queue/new-order", Servers = new[] { Globals.SignalrApiServer })]
-        [SubscribeOperation(typeof(NewOrderAddedEvent), OperationId = "NewOrderAdded", Summary = "Добавлен новый заказ")]
-        public async Task NotifyNewOrderAdded(OrderPosition orderPosition) =>
-            await context.Clients.All.SendAsync("NewOrderAdded", NewOrderAddedEvent.Map(orderPosition));
+        public const string HubServerName = "OrderQueueNotificationHub";
 
-        [Channel("order-queue/order-removed", Servers = new[] { Globals.SignalrApiServer })]
-        [SubscribeOperation(typeof(OrderRemovedEvent), OperationId = "OrderRemoved", Summary = "Заказ удален")]
-        public async Task NotifyOrderRemoved(OrderPosition orderPosition) =>
-            await context.Clients.All.SendAsync("OrderRemoved", OrderRemovedEvent.Map(orderPosition));
+        [Channel("NewOrderAdded", Servers = new[] { HubServerName })]
+        [PublishOperation(typeof(NewOrderAddedEvent))]
+        public Task NotifyNewOrderAdded(OrderPosition orderPosition) =>
+            context.Clients.All.SendAsync("NewOrderAdded", NewOrderAddedEvent.Map(orderPosition));
 
-        [Channel("order-queue/position-changed", Servers = new[] { Globals.SignalrApiServer })]
-        [SubscribeOperation(typeof(OrderPositionChangedEvent), OperationId = "OrderPositionChanged", Summary = "Изменена позиция заказа")]
-        public async Task NotifyOrderPositionChanged(OrderPosition orderPosition) =>
-            await context.Clients.All.SendAsync("OrderPositionChanged", OrderPositionChangedEvent.Map(orderPosition));
+        [Channel("OrderRemoved", Servers = new[] { HubServerName })]
+        [PublishOperation(typeof(OrderRemovedEvent))]
+        public Task NotifyOrderRemoved(OrderPosition orderPosition) =>
+            context.Clients.All.SendAsync("OrderRemoved", OrderRemovedEvent.Map(orderPosition));
+
+        [Channel("OrderPositionChanged", Servers = new[] { HubServerName })]
+        [PublishOperation(typeof(OrderPositionChangedEvent))]
+        public Task NotifyOrderPositionChanged(OrderPosition orderPosition) =>
+            context.Clients.All.SendAsync("OrderPositionChanged", OrderPositionChangedEvent.Map(orderPosition));
     }
 }

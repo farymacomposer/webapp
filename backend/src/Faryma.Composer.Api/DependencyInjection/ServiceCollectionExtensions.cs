@@ -75,7 +75,7 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .AddProblemDetails()
                 .AddMemoryCache()
                 .ConfigureSwagger(environment)
-                .AddAsyncApiSpecification()
+                .AddAsyncApiSpecification(environment)
                 .AddSingleton<IOrderQueueNotificationService, OrderQueueNotificationService>()
                 .AddSignalR();
 
@@ -120,22 +120,19 @@ namespace Faryma.Composer.Api.DependencyInjection
             });
         }
 
-        private static IServiceCollection AddAsyncApiSpecification(this IServiceCollection services)
+        private static IServiceCollection AddAsyncApiSpecification(this IServiceCollection services, IWebHostEnvironment environment)
         {
             return services.AddAsyncApiSchemaGeneration(options =>
             {
                 options.AssemblyMarkerTypes = new[] { typeof(OrderQueueNotificationService) };
                 options.AsyncApi = new AsyncApiDocument
                 {
-                    Info = new Info("Faryma Composer API", "1.0.0")
-                    {
-                        Description = "Async API для системы управления очередью заказов"
-                    },
+                    Info = new Info(environment.ApplicationName, "v1"),
                     Servers =
                     {
-                        [Globals.SignalrApiServer] = new Server(OrderQueueNotificationHub.RoutePattern, "websocket")
+                        [OrderQueueNotificationService.HubServerName] = new Server(OrderQueueNotificationHub.RoutePattern, "signalr")
                         {
-                            Description = "Уведомления о состоянии очереди заказов"
+                            Description = "События очереди заказов"
                         }
                     }
                 };
