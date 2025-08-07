@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
 {
@@ -21,5 +22,15 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// Предыдущая позиция заказа в очереди
         /// </summary>
         public required OrderQueuePositionDto PreviousPosition { get; init; }
+
+        public static OrderPositionChangedEvent Map(OrderPosition orderPosition)
+        {
+            return new()
+            {
+                Order = ReviewOrderDto.Map(orderPosition.Order),
+                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
+                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous)
+            };
+        }
     }
 }
