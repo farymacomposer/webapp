@@ -8,7 +8,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel
     public sealed record CancelReviewOrderRequest
     {
         /// <summary>
-        /// ID заказа разбора трека
+        /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; set; }
 

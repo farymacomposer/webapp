@@ -12,6 +12,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Up
         /// Псевдоним пользователя
         /// </summary>
         [Required]
+        [StringLength(40, MinimumLength = 1, ErrorMessage = "Длина псевдонима должна быть в пределах от 1 до 40 символов")]
         public required string Nickname { get; set; }
 
         /// <summary>
@@ -26,9 +27,9 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Up
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (PaymentAmount == 0)
+            if (PaymentAmount <= 0)
             {
-                yield return new ValidationResult("Сумма платежа не может быть равна нулю");
+                yield return new ValidationResult("Сумма платежа должна быть больше нуля");
             }
         }
 

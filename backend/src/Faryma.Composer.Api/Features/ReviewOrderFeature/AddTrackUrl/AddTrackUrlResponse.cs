@@ -1,4 +1,6 @@
-﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl
 {
     /// <summary>
     /// Ответ на запрос добавления ссылки на трек
@@ -13,6 +15,8 @@
         /// <summary>
         /// Ссылка на трек
         /// </summary>
+        [Required]
+        [Url]
         public required string TrackUrl { get; init; }
     }
 }

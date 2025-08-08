@@ -1,18 +1,18 @@
 ﻿using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 
-namespace Faryma.Composer.Api.Features.ReviewOrderFeature.StartReview
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress
 {
     /// <summary>
-    /// Запрос начала разбора трека
+    /// Запрос взятия заказа в работу
     /// </summary>
-    public sealed record StartReviewOrderRequest
+    public sealed record TakeOrderInProgressRequest
     {
         /// <summary>
-        /// ID заказа разбора трека
+        /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; set; }
 
-        public StartReviewCommand Map()
+        public TakeInProgressCommand Map()
         {
             return new()
             {

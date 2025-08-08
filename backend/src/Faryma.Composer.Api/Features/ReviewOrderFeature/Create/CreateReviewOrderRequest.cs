@@ -12,6 +12,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
         /// <summary>
         /// Псевдоним пользователя
         /// </summary>
+        [Required]
         [StringLength(40, MinimumLength = 1, ErrorMessage = "Длина псевдонима должна быть в пределах от 1 до 40 символов")]
         public required string Nickname { get; set; }
 
@@ -39,6 +40,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            if (OrderType == ReviewOrderType.Unspecified)
+            {
+                yield return new ValidationResult("Недопустимый тип заказа");
+            }
+
             if (TrackUrl is not null && !Uri.TryCreate(TrackUrl, UriKind.Absolute, out _))
             {
                 yield return new ValidationResult("Некорректная ссылка на трек");

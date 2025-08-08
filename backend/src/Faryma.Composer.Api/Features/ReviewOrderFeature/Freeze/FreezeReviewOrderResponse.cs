@@ -6,7 +6,7 @@
     public sealed record FreezeReviewOrderResponse
     {
         /// <summary>
-        /// ID замороженного заказа разбора трека
+        /// Id замороженного заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; init; }
     }

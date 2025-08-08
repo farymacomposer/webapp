@@ -1,9 +1,9 @@
-﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
+﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress
 {
     /// <summary>
-    /// Команда заморозки заказа разбора трека
+    /// Ответ на запрос взятия заказа в работу
     /// </summary>
-    public sealed record FreezeCommand
+    public sealed record TakeOrderInProgressResponse
     {
         /// <summary>
         /// Id заказа разбора трека

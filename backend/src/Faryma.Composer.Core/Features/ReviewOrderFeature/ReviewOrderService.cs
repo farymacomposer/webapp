@@ -92,6 +92,83 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             return payment;
         }
 
+        public async Task<string> AddTrackUrl(AddTrackUrlCommand command)
+        {
+            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+
+            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder or ReviewOrderStatus.InProgress))
+            {
+                throw new ReviewOrderException($"Невозможно добавить ссылку на трек в статусе '{order.Status}'");
+            }
+
+            order.TrackUrl = command.TrackUrl;
+
+            if (order.Status is ReviewOrderStatus.Preorder)
+            {
+                order.Status = ReviewOrderStatus.Pending;
+            }
+
+            await ofw.SaveChangesAsync();
+
+            await orderQueueService.UpdateOrder(order);
+
+            return order.TrackUrl;
+        }
+
+        public async Task TakeInProgress(TakeInProgressCommand command)
+        {
+            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+
+            if (order.IsFrozen)
+            {
+                throw new ReviewOrderException("Невозможно взять в работу замороженный заказ");
+            }
+
+            if (order.Status != ReviewOrderStatus.Pending)
+            {
+                throw new ReviewOrderException($"Невозможно взять в работу заказ в статусе '{order.Status}'");
+            }
+
+            ReviewOrder? inProgress = await ofw.ReviewOrderRepository.FindAnotherOrderInProgress(command.ReviewOrderId);
+            if (inProgress is not null)
+            {
+                throw new ReviewOrderException($"Невозможно взять в работу заказ Id: {command.ReviewOrderId}, пока заказ Id: {inProgress.Id} находится в работе");
+            }
+
+            ComposerStream liveStream = await ofw.ComposerStreamRepository.FindLiveStream()
+                ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима");
+
+            order.ProcessingStream = liveStream;
+            order.Status = ReviewOrderStatus.InProgress;
+            order.InProgressAt = DateTime.UtcNow;
+
+            await ofw.SaveChangesAsync();
+
+            await orderQueueService.StartReview(order);
+        }
+
+        public async Task<Review> Complete(CompleteCommand command)
+        {
+            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+
+            if (order.Status != ReviewOrderStatus.InProgress)
+            {
+                throw new ReviewOrderException($"Невозможно выполнить заказ в статусе '{order.Status}'");
+            }
+
+            DateTime now = DateTime.UtcNow;
+
+            order.Review = ofw.ReviewRepository.Create(order, command.Rating, command.Comment, now);
+            order.CompletedAt = now;
+            order.Status = ReviewOrderStatus.Completed;
+
+            await ofw.SaveChangesAsync();
+
+            await orderQueueService.CompleteReview(order);
+
+            return order.Review;
+        }
+
         public async Task Freeze(FreezeCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
@@ -138,61 +215,6 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             await ofw.SaveChangesAsync();
 
             await orderQueueService.RemoveOrder(order);
-        }
-
-        public async Task StartReview(StartReviewCommand command)
-        {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
-
-            if (order.IsFrozen)
-            {
-                throw new ReviewOrderException("Невозможно взять в работу замороженный заказ");
-            }
-
-            if (order.Status != ReviewOrderStatus.Pending)
-            {
-                throw new ReviewOrderException($"Невозможно взять в работу заказ в статусе '{order.Status}'");
-            }
-
-            ReviewOrder? inProgress = await ofw.ReviewOrderRepository.FindAnotherOrderInProgress(command.ReviewOrderId);
-            if (inProgress is not null)
-            {
-                throw new ReviewOrderException($"Невозможно взять в работу заказ Id: {command.ReviewOrderId}, пока заказ Id: {inProgress.Id} находится в работе");
-            }
-
-            ComposerStream liveStream = await ofw.ComposerStreamRepository.FindLiveStream()
-                ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима");
-
-            order.ProcessingStream = liveStream;
-            order.Status = ReviewOrderStatus.InProgress;
-            order.InProgressAt = DateTime.UtcNow;
-
-            await ofw.SaveChangesAsync();
-
-            await orderQueueService.StartReview(order);
-        }
-
-        public async Task<string> AddTrackUrl(AddTrackUrlCommand command)
-        {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
-
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder or ReviewOrderStatus.InProgress))
-            {
-                throw new ReviewOrderException($"Невозможно добавить ссылку на трек в статусе '{order.Status}'");
-            }
-
-            order.TrackUrl = command.TrackUrl;
-
-            if (order.Status is ReviewOrderStatus.Preorder)
-            {
-                order.Status = ReviewOrderStatus.Pending;
-            }
-
-            await ofw.SaveChangesAsync();
-
-            await orderQueueService.UpdateOrder(order);
-
-            return order.TrackUrl;
         }
     }
 }

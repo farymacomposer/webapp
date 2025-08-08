@@ -3,10 +3,10 @@
     /// <summary>
     /// Команда начала разбора трека
     /// </summary>
-    public sealed record StartReviewCommand
+    public sealed record TakeInProgressCommand
     {
         /// <summary>
-        /// ID заказа разбора трека
+        /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; init; }
     }

@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
+﻿using System.Globalization;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm;
 using Faryma.Composer.Infrastructure.Entities;
@@ -799,7 +800,7 @@ namespace Faryma.Composer.Core.Test
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreationStream = new ComposerStream
                 {
-                    EventDate = DateOnly.Parse(eventDate),
+                    EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,
                     Status = ComposerStreamStatus.Planned,
                 }
@@ -819,7 +820,7 @@ namespace Faryma.Composer.Core.Test
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreationStream = new ComposerStream
                 {
-                    EventDate = DateOnly.Parse(eventDate),
+                    EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,
                     Status = ComposerStreamStatus.Planned,
                 }
@@ -830,7 +831,7 @@ namespace Faryma.Composer.Core.Test
         {
             return new()
             {
-                CurrentStreamDate = DateOnly.Parse(currentStreamDate),
+                CurrentStreamDate = DateOnly.Parse(currentStreamDate, CultureInfo.GetCultureInfo("ru-RU")),
                 OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
                 LastNicknameByStreamDate = new Dictionary<DateOnly, string>(),
                 LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,

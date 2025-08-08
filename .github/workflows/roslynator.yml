@@ -1,4 +1,4 @@
-name: Roslynator Analysis
+name: 🔍 → 🧪
 
 on:
   pull_request:
@@ -16,9 +16,22 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: Pull Roslynator image
-        run: |
-          docker pull ghcr.io/mnham/roslynatoranalyzer:latest
+        run: docker pull ghcr.io/mnham/roslynatoranalyzer:latest
 
       - name: Run Roslynator Analyzer
-        run: |
-          docker run -t --rm -v "$(pwd):/src" ghcr.io/mnham/roslynatoranalyzer:latest
+        run: docker run -t --rm -v "$(pwd):/src" ghcr.io/mnham/roslynatoranalyzer:latest
+
+  tests:
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Run Tests
+        run: dotnet test backend/src/Faryma.Composer.Core.Test/Faryma.Composer.Core.Test.csproj --configuration Release
