@@ -6,7 +6,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Create
     /// <summary>
     /// Запрос создания стрима
     /// </summary>
-    public sealed class CreateComposerStreamRequest : IValidatableObject
+    public sealed record CreateComposerStreamRequest : IValidatableObject
     {
         /// <summary>
         /// Дата проведения стрима
@@ -21,6 +21,11 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Create
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            if (Type == ComposerStreamType.Unspecified)
+            {
+                yield return new ValidationResult("Недопустимый тип стрима");
+            }
+
             if (EventDate < DateOnly.FromDateTime(DateTime.UtcNow))
             {
                 yield return new ValidationResult("Дата стрима не может быть в прошлом, выберите другую дату");

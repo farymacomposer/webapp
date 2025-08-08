@@ -19,27 +19,22 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         /// </summary>
         [HttpPost(nameof(CreateComposerStream))]
         [AuthorizeComposer]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<CreateComposerStreamResponse>> CreateComposerStream(CreateComposerStreamRequest request)
         {
             ComposerStream item = await composerStreamService.Create(request.EventDate, request.Type);
 
-            return Ok(new CreateComposerStreamResponse { ComposerStream = Mapper.Map(item) });
+            return Ok(new CreateComposerStreamResponse { ComposerStream = ComposerStreamDto.Map(item) });
         }
 
         /// <summary>
         /// Возвращает список стримов
         /// </summary>
         [HttpGet(nameof(FindComposerStream))]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<FindComposerStreamResponse>> FindComposerStream([FromQuery] FindComposerStreamRequest request)
         {
             IReadOnlyCollection<ComposerStream> items = await composerStreamService.Find(request.DateFrom, request.DateTo);
 
-            return Ok(new FindComposerStreamResponse { Items = items.Select(Mapper.Map) });
+            return Ok(new FindComposerStreamResponse { Items = items.Select(ComposerStreamDto.Map) });
         }
     }
 }

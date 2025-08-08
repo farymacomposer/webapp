@@ -1,5 +1,11 @@
 ﻿using Faryma.Composer.Api.Auth;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.Complete;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Create;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Up;
 using Faryma.Composer.Core.Features.ReviewOrderFeature;
 using Faryma.Composer.Infrastructure.Entities;
@@ -15,16 +21,15 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
     [ApiController]
     public sealed class ReviewOrderController(ReviewOrderService reviewOrderService, IMemoryCache cache) : ControllerBase
     {
+        private static readonly TimeSpan _idempotencyKeyExpiration = TimeSpan.FromHours(1);
+
         /// <summary>
-        /// Создает заказ разбора трека
+        /// Создает заказ
         /// </summary>
         /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос создания заказа</param>
         [HttpPost(nameof(CreateReviewOrder))]
         [AuthorizeAdmins]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
             [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
             [FromBody] CreateReviewOrderRequest request)
@@ -40,9 +45,9 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 return Ok(new CreateReviewOrderResponse { ReviewOrderId = id });
             }
 
-            ReviewOrder order = await reviewOrderService.Create(Mapper.Map(request));
+            ReviewOrder order = await reviewOrderService.Create(request.Map());
 
-            cache.Set(key, order.Id, TimeSpan.FromHours(1));
+            cache.Set(key, order.Id, _idempotencyKeyExpiration);
 
             return Ok(new CreateReviewOrderResponse { ReviewOrderId = order.Id });
         }
@@ -54,9 +59,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// <param name="request">Запрос поднятия заказа в очереди</param>
         [HttpPost(nameof(UpReviewOrder))]
         [AuthorizeAdmins]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<UpReviewOrderResponse>> UpReviewOrder(
             [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
             [FromBody] UpReviewOrderRequest request)
@@ -72,11 +74,83 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 return Ok(new UpReviewOrderResponse { PaymentTransactionId = id });
             }
 
-            Transaction transaction = await reviewOrderService.Up(Mapper.Map(request));
+            Transaction transaction = await reviewOrderService.Up(request.Map());
 
-            cache.Set(key, transaction.Id, TimeSpan.FromHours(1));
+            cache.Set(key, transaction.Id, _idempotencyKeyExpiration);
 
             return Ok(new UpReviewOrderResponse { PaymentTransactionId = transaction.Id });
+        }
+
+        /// <summary>
+        /// Добавляет или изменяет ссылку на трек
+        /// </summary>
+        [HttpPost(nameof(AddTrackUrl))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl([FromBody] AddTrackUrlRequest request)
+        {
+            string trackUrl = await reviewOrderService.AddTrackUrl(request.Map());
+
+            return Ok(new AddTrackUrlResponse { ReviewOrderId = request.ReviewOrderId, TrackUrl = trackUrl });
+        }
+
+        /// <summary>
+        /// Взятие заказа в работу
+        /// </summary>
+        [HttpPost(nameof(TakeOrderInProgress))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress([FromBody] TakeOrderInProgressRequest request)
+        {
+            await reviewOrderService.TakeInProgress(request.Map());
+
+            return Ok(new TakeOrderInProgressResponse { ReviewOrderId = request.ReviewOrderId });
+        }
+
+        /// <summary>
+        /// Выполнение заказа
+        /// </summary>
+        [HttpPost(nameof(CompleteReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder([FromBody] CompleteReviewOrderRequest request)
+        {
+            await reviewOrderService.Complete(request.Map());
+
+            return Ok(new TakeOrderInProgressResponse { ReviewOrderId = request.ReviewOrderId });
+        }
+
+        /// <summary>
+        /// Замораживает заказ
+        /// </summary>
+        [HttpPost(nameof(FreezeReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder([FromBody] FreezeReviewOrderRequest request)
+        {
+            await reviewOrderService.Freeze(request.Map());
+
+            return Ok(new FreezeReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
+        }
+
+        /// <summary>
+        /// Размораживает заказ
+        /// </summary>
+        [HttpPost(nameof(UnfreezeReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder([FromBody] UnfreezeReviewOrderRequest request)
+        {
+            await reviewOrderService.Unfreeze(request.Map());
+
+            return Ok(new UnfreezeReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
+        }
+
+        /// <summary>
+        /// Отменяет заказ
+        /// </summary>
+        [HttpPost(nameof(CancelReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder([FromBody] CancelReviewOrderRequest request)
+        {
+            await reviewOrderService.Cancel(request.Map());
+
+            return Ok(new CancelReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
         }
     }
 }

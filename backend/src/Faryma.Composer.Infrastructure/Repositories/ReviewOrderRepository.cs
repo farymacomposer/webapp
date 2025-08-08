@@ -1,41 +1,56 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Repositories
 {
     public sealed class ReviewOrderRepository(AppDbContext context)
     {
-        public Task<ReviewOrder?> Find(long id) => context.ReviewOrders.FirstOrDefaultAsync(x => x.Id == id);
+        public async Task<ReviewOrder> Get(long reviewOrderId) => await Find(reviewOrderId)
+            ?? throw new NotFoundException($"Заказ разбора трека Id: {reviewOrderId}, не существует");
 
-        public ReviewOrder CreateOrder(ComposerStream stream, Transaction transaction, ReviewOrderType type, string? trackUrl, string? userComment)
+        public Task<ReviewOrder?> Find(long id) => context.ReviewOrders
+            .Include(x => x.CreationStream)
+            .Include(x => x.UserNicknames)
+            .Include(x => x.Payments)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        public Task<ReviewOrder?> FindAnotherOrderInProgress(long reviewOrderId) =>
+            context.ReviewOrders.FirstOrDefaultAsync(x => x.Id != reviewOrderId && x.Status == ReviewOrderStatus.InProgress);
+
+        public ReviewOrder CreateDonation(ComposerStream stream, Transaction transaction, ReviewOrderType type, string? trackUrl, string? userComment)
         {
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,
-                IsActive = trackUrl is not null,
+                IsFrozen = false,
                 Type = type,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
-                UserNickname = transaction.Account.UserNickname,
+                MainNickname = transaction.Account.UserNickname.Nickname,
+                MainNormalizedNickname = transaction.Account.UserNickname.NormalizedNickname,
                 TrackUrl = trackUrl,
                 UserComment = userComment,
-                ComposerStream = stream,
+                CreationStream = stream,
+                UserNicknames = { transaction.Account.UserNickname },
                 Payments = { transaction },
             }).Entity;
         }
 
-        public ReviewOrder CreateOrder(ComposerStream stream, UserNickname userNickname, ReviewOrderType type, decimal nominalAmount, string? trackUrl, string? userComment)
+        public ReviewOrder CreateFree(ComposerStream stream, UserNickname userNickname, decimal nominalAmount, ReviewOrderType type, string? trackUrl, string? userComment)
         {
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,
-                IsActive = trackUrl is not null,
+                IsFrozen = false,
                 Type = type,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
-                UserNickname = userNickname,
+                MainNickname = userNickname.Nickname,
+                MainNormalizedNickname = userNickname.NormalizedNickname,
                 TrackUrl = trackUrl,
                 UserComment = userComment,
-                ComposerStream = stream,
+                CreationStream = stream,
+                UserNicknames = { userNickname },
                 NominalAmount = nominalAmount,
             }).Entity;
         }

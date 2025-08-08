@@ -17,8 +17,6 @@ namespace Faryma.Composer.Api.Auth
         /// Регистрирует нового пользователя в системе
         /// </summary>
         [HttpPost(nameof(Register))]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
             User user = new()
@@ -42,9 +40,6 @@ namespace Faryma.Composer.Api.Auth
         /// Выполняет аутентификацию пользователя и возвращает JWT токен
         /// </summary>
         [HttpPost(nameof(Login))]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
         {
             User? user = await userManager.FindByNameAsync(request.UserName);

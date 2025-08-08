@@ -50,12 +50,13 @@ namespace Faryma.Composer.Api
             WebApplication app = builder.Build();
 
             app.UseRouting();
-            app.UseCustomSwagger();
+            app.UseApiDocumentation();
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-            app.MapHub<OrderQueueHub>($"/api/{nameof(OrderQueueHub)}");
+
+            app.MapHub<OrderQueueNotificationHub>(OrderQueueNotificationHub.RoutePattern);
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();

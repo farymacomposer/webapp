@@ -6,9 +6,9 @@
     public enum ReviewOrderType
     {
         /// <summary>
-        /// Донат
+        /// Не задан
         /// </summary>
-        Donation = 0,
+        Unspecified = 0,
 
         /// <summary>
         /// Вне очереди
@@ -16,8 +16,18 @@
         OutOfQueue = 1,
 
         /// <summary>
+        /// Донат
+        /// </summary>
+        Donation = 2,
+
+        /// <summary>
         /// Бесплатный
         /// </summary>
-        Free = 2
+        Free = 3,
+
+        /// <summary>
+        /// Благотворительный
+        /// </summary>
+        Charity = 4
     }
 }

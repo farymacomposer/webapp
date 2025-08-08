@@ -31,5 +31,6 @@ namespace Faryma.Composer.Infrastructure
 
         public Task<IDbContextTransaction> BeginTransaction() => context.Database.BeginTransactionAsync();
         public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) => context.SaveChangesAsync(cancellationToken);
+        public void Remove<TEntity>(TEntity entity) where TEntity : class => context.Remove(entity);
     }
 }

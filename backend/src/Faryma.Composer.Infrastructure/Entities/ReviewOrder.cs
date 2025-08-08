@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using Faryma.Composer.Infrastructure.Abstractions;
 using Faryma.Composer.Infrastructure.Enums;
 
@@ -7,6 +8,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// <summary>
     /// Заказ разбора трека
     /// </summary>
+    [DebuggerDisplay("MainNickname = {MainNickname}")]
     public sealed class ReviewOrder : BaseEntity
     {
         /// <summary>
@@ -15,9 +17,14 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// Дата и время начала разбора трека
+        /// Дата и время взятия заказа в работу
         /// </summary>
         public DateTime? InProgressAt { get; set; }
+
+        /// <summary>
+        /// Дата и время выполнения заказа
+        /// </summary>
+        public DateTime? CompletedAt { get; set; }
 
         /// <summary>
         /// Тип заказа
@@ -30,9 +37,9 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required ReviewOrderStatus Status { get; set; }
 
         /// <summary>
-        /// Флаг активности заказа
+        /// Заказ заморожен
         /// </summary>
-        public required bool IsActive { get; set; }
+        public required bool IsFrozen { get; set; }
 
         /// <summary>
         /// Ссылка на трек
@@ -49,9 +56,15 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// </summary>
         public string? UserComment { get; set; }
 
+        /// <summary>
+        /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
+        /// </summary>
+        public required string MainNickname { get; set; }
+        public required string MainNormalizedNickname { get; set; }
+
         public long? TrackId { get; set; }
-        public Guid UserNicknameId { get; set; }
-        public long ComposerStreamId { get; set; }
+        public long CreationStreamId { get; set; }
+        public long? ProcessingStreamId { get; set; }
 
         // Навигационные свойства
 
@@ -67,20 +80,30 @@ namespace Faryma.Composer.Infrastructure.Entities
         public Track? Track { get; set; }
 
         /// <summary>
-        /// Пользователь, создавший заказ
+        /// Связанный cтрим композитора, где создан заказ
         /// </summary>
-        [ForeignKey(nameof(UserNicknameId))]
-        public required UserNickname UserNickname { get; set; }
+        [ForeignKey(nameof(CreationStreamId))]
+        public required ComposerStream CreationStream { get; set; }
 
         /// <summary>
-        /// Связанный cтрим композитора
+        /// Связанный cтрим композитора, где заказ взят в работу
         /// </summary>
-        [ForeignKey(nameof(ComposerStreamId))]
-        public required ComposerStream ComposerStream { get; set; }
+        [ForeignKey(nameof(ProcessingStreamId))]
+        public ComposerStream? ProcessingStream { get; set; }
+
+        /// <summary>
+        /// Пользователь или пользователи, создавшие заказ
+        /// </summary>
+        public ICollection<UserNickname> UserNicknames { get; set; } = [];
 
         /// <summary>
         /// Платежи
         /// </summary>
         public ICollection<Transaction> Payments { get; set; } = [];
+
+        /// <summary>
+        /// Возвращает общую стоимость заказа
+        /// </summary>
+        public decimal GetTotalAmount() => NominalAmount + Payments.Sum(x => x.Amount);
     }
 }
