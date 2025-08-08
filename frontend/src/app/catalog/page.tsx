@@ -7,7 +7,8 @@ export default function CatalogPage() {
       id: 1,
       title: "Ussewa",
       artist: "Ado",
-      cover: "/images/ussewa.jpg",
+      cover:
+        "https://lastfm.freetls.fastly.net/i/u/ar0/38ee277844d2211f8cc7db9791639592.jpg",
       rating: "Гениально",
       likes: 6,
       comments: 13,
@@ -16,7 +17,8 @@ export default function CatalogPage() {
       id: 2,
       title: "Bohemian Rhapsody",
       artist: "Queen",
-      cover: "/images/bohemian.jpg",
+      cover:
+        "https://avatars.dzeninfra.ru/get-zen_doc/9505890/pub_641f6c668e063c1a40faae0a_641f6d09d4b1f54fcf543e6f/scale_1200",
       rating: "Отлично",
       likes: 54,
       comments: 23,

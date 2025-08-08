@@ -1,7 +1,11 @@
 import { Track } from "@/lib/models";
 import Image from "next/image";
 
-export default function TrackCard({ track }: { track: Track }) {
+interface TrackCardProps {
+  track: Track;
+}
+
+export const TrackCard: React.FC<TrackCardProps> = ({ track }) => {
   return (
     <div className="bg-header h-[380] rounded-lg p-3 flex flex-col">
       <Image
@@ -19,4 +23,4 @@ export default function TrackCard({ track }: { track: Track }) {
       </div>
     </div>
   );
-}
+};

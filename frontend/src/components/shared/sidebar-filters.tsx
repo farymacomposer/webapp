@@ -6,6 +6,10 @@ import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+interface Props {
+  className?: string;
+}
+
 const ratings = [
   "гениально",
   "атлична",
@@ -20,7 +24,7 @@ const userRatings = ["отлично", "нормально", "так себе", 
 const tags = ["разнос от композитора", "рецензии пользователей"];
 const origins = ["игровой ost", "аниме op/ed/ost", "фильм/сериал ost"];
 
-export const SidebarFilters: React.FC = () => {
+export const SidebarFilters: React.FC<Props> = ({ className }) => {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     rating: true,
     userRating: true,
@@ -61,7 +65,12 @@ export const SidebarFilters: React.FC = () => {
   };
 
   return (
-    <div className="rounded-xl bg-header px-4 py-6 space-y-4 shadow-md min-w-[250px]">
+    <div
+      className={cn(
+        "rounded-xl bg-header px-4 py-6 space-y-4 shadow-md min-w-[250px]",
+        className
+      )}
+    >
       {/* Оценка композитора */}
       <div>
         <button

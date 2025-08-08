@@ -1,5 +1,6 @@
 
-import TrackCard from "./track-card";
+import { Track } from "@/lib/models";
+import { TrackCard } from "./track-card";
 
 export default function TrackList({ tracks }: { tracks: Track[] }) {
   return (
