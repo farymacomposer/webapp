@@ -68,7 +68,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
                     }
 
                 default:
-                    throw new ComposerStreamException($"Типа заказа '{orderType}' не поддерживается");
+                    throw new ComposerStreamException($"Тип заказа '{orderType}' не поддерживается");
             }
         }
 

@@ -4,25 +4,12 @@
     {
         private readonly SemaphoreSlim _semaphore = new(1, 1);
 
-        public async Task<T> Lock<T>(Func<Task<T>> action)
+        public async Task Lock(Func<Task> action)
         {
             await _semaphore.WaitAsync();
             try
             {
-                return await action();
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
-
-        public async Task Lock(Action action)
-        {
-            await _semaphore.WaitAsync();
-            try
-            {
-                action();
+                await action();
             }
             finally
             {

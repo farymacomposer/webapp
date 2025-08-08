@@ -20,6 +20,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public bool HasOrders => orders.Count > 0;
 
         /// <summary>
+        ///
+        /// </summary>
+        public void SetLastIssuedNickname(string? nickname) => _lastIssuedNickname = nickname;
+
+        /// <summary>
         /// В категории существует заказ с другим никнеймом
         /// </summary>
         public bool HasOrderFromOtherNickname(string? nicknameToSkip) =>

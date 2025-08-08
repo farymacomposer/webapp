@@ -833,6 +833,7 @@ namespace Faryma.Composer.Core.Test
             {
                 CurrentStreamDate = DateOnly.Parse(currentStreamDate, CultureInfo.GetCultureInfo("ru-RU")),
                 OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
+                LastOutOfQueueCategoryNickname = null,
                 LastNicknameByStreamDate = new Dictionary<DateOnly, string>(),
                 LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,
             };

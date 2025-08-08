@@ -28,7 +28,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             Completed = 5,
         }
 
-        private readonly OrderQueueManager _queueManager;
         private readonly OrderCategory _outOfQueueCategory;
         private readonly OrderCategory? _donationCategory;
         private readonly DebtOrderCategories _debtCategories;
@@ -37,43 +36,51 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
         public OrderPriorityManager(OrderQueueManager queueManager)
         {
-            _queueManager = queueManager;
             _currentState = queueManager.LastOrderPriorityManagerState;
 
             _outOfQueueCategory = new OrderCategory(queueManager.OrderPositionsById
                 .Select(x => x.Value.Order)
-                .Where(x => !x.IsFrozen && x.Type == ReviewOrderType.OutOfQueue)
+                .Where(x => !x.IsFrozen
+                    && x.Type == ReviewOrderType.OutOfQueue
+                    && x.Status is ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending)
                 .OrderBy(x => x.CreatedAt)
                 .ToList());
+
+            _outOfQueueCategory.SetLastIssuedNickname(queueManager.LastOutOfQueueCategoryNickname);
+            _outOfQueueCategory.UpdateOrdersCategory(queueManager, OrderCategoryType.OutOfQueue);
 
             List<(DateOnly, OrderCategory)> categories = queueManager.OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen
                     && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
+                    && x.Status is ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending
                     && x.CreationStream.EventDate <= queueManager.CurrentStreamDate)
                 .GroupBy(x => x.CreationStream.EventDate)
-                .Select(x => (x.Key, new OrderCategory(x.Order(new OrderPriorityComparer()).ToList())))
+                .Select(x => (x.Key, new OrderCategory(x.Order(OrderPriorityComparer.Default).ToList())))
                 .OrderBy(x => x.Key)
                 .ToList();
 
             if (categories.Count > 0)
             {
+                foreach ((DateOnly streamDate, OrderCategory provider) in categories)
+                {
+                    if (queueManager.LastNicknameByStreamDate.TryGetValue(streamDate, out string? nickname))
+                    {
+                        provider.SetLastIssuedNickname(nickname);
+                    }
+                }
+
                 (DateOnly StreamDate, OrderCategory Provider) item = categories.Last();
                 if (item.StreamDate == queueManager.CurrentStreamDate)
                 {
                     categories.Remove(item);
                     _donationCategory = item.Provider;
+                    _donationCategory.UpdateOrdersCategory(queueManager, OrderCategoryType.Donation);
                 }
             }
 
             _debtCategories = new DebtOrderCategories(categories);
-        }
-
-        public void UpdateOrdersCategories()
-        {
-            _outOfQueueCategory.UpdateOrdersCategory(_queueManager, OrderCategoryType.OutOfQueue);
-            _donationCategory?.UpdateOrdersCategory(_queueManager, OrderCategoryType.Donation);
-            _debtCategories.UpdateOrdersCategory(_queueManager);
+            _debtCategories.UpdateOrdersCategory(queueManager);
         }
 
         public (State NextState, bool IsOnlyNicknameLeft) DetermineNextState()
@@ -114,6 +121,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 State.DonationCategory => _donationCategory!.Dequeue(_lastIssuedNickname),
                 State.DebtCategories when isOnlyNicknameLeft => _debtCategories.DequeueRoundRobin(_lastIssuedNickname),
                 State.DebtCategories when isOnlyNicknameLeft == false => _debtCategories.DequeueRoundRobinFromOtherNickname(_lastIssuedNickname),
+                _ => throw new OrderQueueException($"Тип категории очереди '{_currentState}' не поддерживается")
             };
 
             _lastIssuedNickname = result.MainNormalizedNickname;

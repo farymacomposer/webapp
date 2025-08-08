@@ -1,6 +1,8 @@
 ﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm;
+using Faryma.Composer.Core.Utils;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
@@ -10,49 +12,37 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 {
     public sealed class OrderQueueService(IDbContextFactory<AppDbContext> contextFactory, IOrderQueueNotificationService notificationService)
     {
+        private readonly SemaphoreLocker _locker = new();
         private OrderQueueManager _queueManager = null!;
 
         public IReadOnlyDictionary<long, OrderPosition> GetOrderQueue() => _queueManager.OrderPositionsById;
 
         public async Task AddOrder(ReviewOrder order)
         {
-            _queueManager.AddOrder(order);
-
-            await notificationService.NotifyNewOrderAdded(_queueManager.OrderPositionsById[order.Id]);
+            await _locker.Lock(async () =>
+            {
+                _queueManager.AddOrder(order);
+                await notificationService.NotifyNewOrderAdded(_queueManager.OrderPositionsById[order.Id]);
+            });
         }
 
-        public async Task UpdateOrder(ReviewOrder order)
+        public async Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
         {
-            _queueManager.UpdateOrder(order);
-
-            await notificationService.NotifyOrderPositionChanged(_queueManager.OrderPositionsById[order!.Id]);
+            await _locker.Lock(async () =>
+            {
+                _queueManager.UpdateOrder(order, updateType);
+                await notificationService.NotifyOrderPositionChanged(_queueManager.OrderPositionsById[order.Id], updateType);
+            });
         }
 
         public async Task RemoveOrder(ReviewOrder order)
         {
-            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
-            //TODO Вернуть удаление когда появится функционал в очереди
-            //_queueManager.RemoveOrder(order);
-
-            await notificationService.NotifyOrderRemoved(position);
-        }
-
-        public async Task StartReview(ReviewOrder order)
-        {
-            _queueManager.UpdateOrder(order);
-
-            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
-
-            await notificationService.NotifyOrderPositionChanged(position);
-        }
-
-        public async Task CompleteReview(ReviewOrder order)
-        {
-            _queueManager.UpdateOrder(order);
-
-            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
-
-            await notificationService.NotifyOrderPositionChanged(position);
+            await _locker.Lock(async () =>
+            {
+                OrderPosition position = _queueManager.OrderPositionsById[order.Id];
+                _queueManager.RemoveOrder(order);
+                await notificationService.NotifyOrderRemoved(position);
+            });
         }
 
         public async Task Initialize()
@@ -100,6 +90,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             {
                 CurrentStreamDate = currentStreamDate,
                 OrderPositionsById = orderPositionsById,
+                LastOutOfQueueCategoryNickname = lastOutOfQueueCategoryNickname,
                 LastNicknameByStreamDate = lastNicknameByStreamDate,
                 LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,
             };

@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
@@ -26,22 +27,78 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// </summary>
         public required Dictionary<DateOnly, string> LastNicknameByStreamDate { get; init; }
 
+        public required string? LastOutOfQueueCategoryNickname { get; set; }
+
         /// <summary>
         /// Добавляет заказ
         /// </summary>
         public void AddOrder(ReviewOrder order)
         {
             OrderPositionsById.Add(order.Id, new OrderPosition { Order = order });
-            UpdateOrderPositions();
+
+            SwapOrderPositions();
+            UpdateActive();
+            UpdateScheduled();
         }
 
         /// <summary>
         /// Обновляет заказ
         /// </summary>
-        public void UpdateOrder(ReviewOrder order)
+        public void UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
         {
-            OrderPositionsById[order.Id].Order = order;
-            UpdateOrderPositions();
+            OrderPosition position = OrderPositionsById[order.Id];
+            position.Order = order;
+
+            switch (updateType)
+            {
+                case OrderQueueUpdateType.AddTrackUrl:
+
+                    return;
+
+                case OrderQueueUpdateType.Up or OrderQueueUpdateType.Freeze or OrderQueueUpdateType.Unfreeze:
+
+                    SwapOrderPositions();
+                    UpdateActive();
+                    UpdateScheduled();
+                    UpdateFrozen();
+
+                    break;
+
+                case OrderQueueUpdateType.TakeInProgress:
+
+                    SetManagerState(position);
+                    SetLastNickname(order);
+
+                    SwapOrderPositions();
+                    UpdateActive();
+                    UpdateInProgress();
+
+                    break;
+
+                case OrderQueueUpdateType.Complete:
+
+                    SwapOrderPositions();
+                    UpdateCompleted();
+
+                    break;
+
+                default:
+                    throw new OrderQueueException($"Тип обновления очереди '{updateType}' не поддерживается");
+            }
+        }
+
+        /// <summary>
+        /// Удаляет заказ
+        /// </summary>
+        public void RemoveOrder(ReviewOrder order)
+        {
+            OrderPositionsById.Remove(order.Id);
+
+            SwapOrderPositions();
+            UpdateActive();
+            UpdateInProgress();
+            UpdateScheduled();
+            UpdateFrozen();
         }
 
         /// <summary>
@@ -50,9 +107,37 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public void UpdateOrderPositions()
         {
             SwapOrderPositions();
-            UpdateScheduledOrdersPositions();
-            UpdateActiveOrdersPositions();
-            UpdateFrozenOrdersPositions();
+            UpdateActive();
+            UpdateInProgress();
+            UpdateCompleted();
+            UpdateScheduled();
+            UpdateFrozen();
+        }
+
+        private void SetManagerState(OrderPosition position)
+        {
+            OrderCategoryType categoryType = position.PositionHistory.Current.Category.Type;
+
+            LastOrderPriorityManagerState = categoryType switch
+            {
+                OrderCategoryType.OutOfQueue => OrderPriorityManager.State.OutOfQueueCategory,
+                OrderCategoryType.Donation => OrderPriorityManager.State.DonationCategory,
+                OrderCategoryType.Debt => OrderPriorityManager.State.DebtCategories,
+                _ => throw new OrderQueueException($"Тип категории заказа '{categoryType}' не поддерживается")
+            };
+        }
+
+        private void SetLastNickname(ReviewOrder order)
+        {
+            if (order.Type == ReviewOrderType.OutOfQueue)
+            {
+                LastOutOfQueueCategoryNickname = order.MainNickname;
+            }
+            else
+            {
+                DateOnly streamDate = order.CreationStream.EventDate;
+                LastNicknameByStreamDate[streamDate] = order.MainNickname;
+            }
         }
 
         private void SwapOrderPositions()
@@ -63,27 +148,10 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             }
         }
 
-        private void UpdateScheduledOrdersPositions()
-        {
-            ReviewOrder[] orders = OrderPositionsById
-                .Select(x => x.Value.Order)
-                .Where(x => !x.IsFrozen && x.CreationStream.EventDate > CurrentStreamDate)
-                .Order(new OrderPriorityComparer())
-                .ToArray();
-
-            int index = 0;
-            foreach (ReviewOrder order in orders)
-            {
-                OrderPositionsById[order.Id].SetCurrentPosition(index, OrderActivityStatus.Scheduled);
-                index++;
-            }
-        }
-
-        private void UpdateActiveOrdersPositions()
+        private void UpdateActive()
         {
             int index = 0;
             OrderPriorityManager manager = new(this);
-            manager.UpdateOrdersCategories();
 
             while (true)
             {
@@ -99,18 +167,56 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             }
         }
 
-        private void UpdateFrozenOrdersPositions()
+        private void UpdateInProgress()
+        {
+            KeyValuePair<long, OrderPosition> kvp = OrderPositionsById
+                .FirstOrDefault(x => x.Value.Order.Status == ReviewOrderStatus.InProgress);
+
+            if (kvp.Value is not null)
+            {
+                OrderPositionsById[kvp.Value.Order.Id].SetCurrentPosition(0, OrderActivityStatus.InProgress);
+            }
+        }
+
+        private void UpdateCompleted()
+        {
+            ReviewOrder[] orders = OrderPositionsById
+                .Select(x => x.Value.Order)
+                .Where(x => x.Status == ReviewOrderStatus.Completed)
+                .OrderBy(x => x.CompletedAt)
+                .ToArray();
+
+            UpdatePositions(orders, OrderActivityStatus.Completed);
+        }
+
+        private void UpdateScheduled()
+        {
+            ReviewOrder[] orders = OrderPositionsById
+                .Select(x => x.Value.Order)
+                .Where(x => !x.IsFrozen && x.CreationStream.EventDate > CurrentStreamDate)
+                .Order(OrderPriorityComparer.Default)
+                .ToArray();
+
+            UpdatePositions(orders, OrderActivityStatus.Scheduled);
+        }
+
+        private void UpdateFrozen()
         {
             ReviewOrder[] orders = OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => x.IsFrozen)
-                .Order(new OrderPriorityComparer())
+                .Order(OrderPriorityComparer.Default)
                 .ToArray();
 
+            UpdatePositions(orders, OrderActivityStatus.Frozen);
+        }
+
+        private void UpdatePositions(ReviewOrder[] orders, OrderActivityStatus activityStatus)
+        {
             int index = 0;
             foreach (ReviewOrder order in orders)
             {
-                OrderPositionsById[order.Id].SetCurrentPosition(index, OrderActivityStatus.Frozen);
+                OrderPositionsById[order.Id].SetCurrentPosition(index, activityStatus);
                 index++;
             }
         }

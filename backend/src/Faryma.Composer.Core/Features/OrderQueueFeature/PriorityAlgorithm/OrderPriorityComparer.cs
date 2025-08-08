@@ -8,6 +8,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
     /// </summary>
     public sealed class OrderPriorityComparer : IComparer<ReviewOrder>
     {
+        public static OrderPriorityComparer Default { get; } = new();
+
         public int Compare(ReviewOrder x, ReviewOrder y)
         {
             decimal xAmount = x.GetTotalAmount();

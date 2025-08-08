@@ -6,7 +6,7 @@
     public sealed record CreateReviewOrderResponse
     {
         /// <summary>
-        /// Id заказа на разбора трека
+        /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; init; }
     }

@@ -15,7 +15,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         /// <summary>
         ///
         /// </summary>
-        [HttpPost(nameof(GetOrderQueue))]
+        [HttpGet(nameof(GetOrderQueue))]
         [AuthorizeComposer]
         public async Task<ActionResult<GetOrderQueueResponse>> GetOrderQueue()
         {

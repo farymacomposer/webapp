@@ -8,6 +8,7 @@ using Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Up;
 using Faryma.Composer.Core.Features.ReviewOrderFeature;
+using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 using Faryma.Composer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -26,30 +27,42 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// <summary>
         /// Создает заказ
         /// </summary>
-        /// <param name="idempotencyKey">Ключ идемпотентности</param>
+        ///// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос создания заказа</param>
         [HttpPost(nameof(CreateReviewOrder))]
         [AuthorizeAdmins]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
-            [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
+            //[FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
             [FromBody] CreateReviewOrderRequest request)
         {
-            if (idempotencyKey == Guid.Empty)
+            //if (idempotencyKey == Guid.Empty)
+            //{
+            //    return BadRequest("Требуется заголовок Idempotency-Key");
+            //}
+
+            //string key = $"CreateReviewOrder:{idempotencyKey}";
+            //if (cache.TryGetValue(key, out CreateReviewOrderResponse? response))
+            //{
+            //    return Ok(response);
+            //}
+
+            ReviewOrder order = await reviewOrderService.Create(new CreateCommand
             {
-                return BadRequest("Требуется заголовок Idempotency-Key");
-            }
+                Nickname = request.Nickname.Trim(),
+                OrderType = request.OrderType,
+                PaymentAmount = request.PaymentAmount,
+                TrackUrl = request.TrackUrl,
+                UserComment = request.UserComment?.Trim(),
+            });
 
-            string key = $"{nameof(CreateReviewOrder)}:{idempotencyKey}";
-            if (cache.TryGetValue(key, out long id))
+            CreateReviewOrderResponse response = new()
             {
-                return Ok(new CreateReviewOrderResponse { ReviewOrderId = id });
-            }
+                ReviewOrderId = order.Id
+            };
 
-            ReviewOrder order = await reviewOrderService.Create(request.Map());
+            //cache.Set(key, response, _idempotencyKeyExpiration);
 
-            cache.Set(key, order.Id, _idempotencyKeyExpiration);
-
-            return Ok(new CreateReviewOrderResponse { ReviewOrderId = order.Id });
+            return Ok(response);
         }
 
         /// <summary>
@@ -68,17 +81,28 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 return BadRequest("Требуется заголовок Idempotency-Key");
             }
 
-            string key = $"{nameof(UpReviewOrder)}:{idempotencyKey}";
-            if (cache.TryGetValue(key, out long id))
+            string key = $"UpReviewOrder:{idempotencyKey}";
+            if (cache.TryGetValue(key, out UpReviewOrderResponse? response))
             {
-                return Ok(new UpReviewOrderResponse { PaymentTransactionId = id });
+                return Ok(response);
             }
 
-            Transaction transaction = await reviewOrderService.Up(request.Map());
+            Transaction transaction = await reviewOrderService.Up(new UpCommand
+            {
+                ReviewOrderId = request.ReviewOrderId,
+                Nickname = request.Nickname.Trim(),
+                PaymentAmount = request.PaymentAmount,
+            });
 
-            cache.Set(key, transaction.Id, _idempotencyKeyExpiration);
+            response = new UpReviewOrderResponse
+            {
+                ReviewOrderId = transaction.ReviewOrderId!.Value,
+                PaymentTransactionId = transaction.Id
+            };
 
-            return Ok(new UpReviewOrderResponse { PaymentTransactionId = transaction.Id });
+            cache.Set(key, response, _idempotencyKeyExpiration);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -86,11 +110,19 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// </summary>
         [HttpPost(nameof(AddTrackUrl))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl([FromBody] AddTrackUrlRequest request)
+        public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl(AddTrackUrlRequest request)
         {
-            string trackUrl = await reviewOrderService.AddTrackUrl(request.Map());
+            ReviewOrder order = await reviewOrderService.AddTrackUrl(new AddTrackUrlCommand
+            {
+                ReviewOrderId = request.ReviewOrderId,
+                TrackUrl = request.TrackUrl,
+            });
 
-            return Ok(new AddTrackUrlResponse { ReviewOrderId = request.ReviewOrderId, TrackUrl = trackUrl });
+            return Ok(new AddTrackUrlResponse
+            {
+                ReviewOrderId = order.Id,
+                TrackUrl = order.TrackUrl!
+            });
         }
 
         /// <summary>
@@ -98,11 +130,17 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// </summary>
         [HttpPost(nameof(TakeOrderInProgress))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress([FromBody] TakeOrderInProgressRequest request)
+        public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request)
         {
-            await reviewOrderService.TakeInProgress(request.Map());
+            ReviewOrder order = await reviewOrderService.TakeInProgress(new TakeInProgressCommand
+            {
+                ReviewOrderId = request.ReviewOrderId,
+            });
 
-            return Ok(new TakeOrderInProgressResponse { ReviewOrderId = request.ReviewOrderId });
+            return Ok(new TakeOrderInProgressResponse
+            {
+                ReviewOrderId = order.Id
+            });
         }
 
         /// <summary>
@@ -110,11 +148,20 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// </summary>
         [HttpPost(nameof(CompleteReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder([FromBody] CompleteReviewOrderRequest request)
+        public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder(CompleteReviewOrderRequest request)
         {
-            await reviewOrderService.Complete(request.Map());
+            ReviewOrder order = await reviewOrderService.Complete(new CompleteCommand
+            {
+                ReviewOrderId = request.ReviewOrderId,
+                Rating = request.Rating,
+                Comment = request.Comment.Trim(),
+            });
 
-            return Ok(new TakeOrderInProgressResponse { ReviewOrderId = request.ReviewOrderId });
+            return Ok(new CompleteReviewOrderResponse
+            {
+                ReviewOrderId = order.Id,
+                ReviewId = order.Review!.Id,
+            });
         }
 
         /// <summary>
@@ -122,11 +169,17 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// </summary>
         [HttpPost(nameof(FreezeReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder([FromBody] FreezeReviewOrderRequest request)
+        public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(FreezeReviewOrderRequest request)
         {
-            await reviewOrderService.Freeze(request.Map());
+            ReviewOrder order = await reviewOrderService.Freeze(new FreezeCommand
+            {
+                ReviewOrderId = request.ReviewOrderId
+            });
 
-            return Ok(new FreezeReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
+            return Ok(new FreezeReviewOrderResponse
+            {
+                ReviewOrderId = order.Id
+            });
         }
 
         /// <summary>
@@ -134,11 +187,17 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// </summary>
         [HttpPost(nameof(UnfreezeReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder([FromBody] UnfreezeReviewOrderRequest request)
+        public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(UnfreezeReviewOrderRequest request)
         {
-            await reviewOrderService.Unfreeze(request.Map());
+            ReviewOrder order = await reviewOrderService.Unfreeze(new UnfreezeCommand
+            {
+                ReviewOrderId = request.ReviewOrderId
+            });
 
-            return Ok(new UnfreezeReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
+            return Ok(new UnfreezeReviewOrderResponse
+            {
+                ReviewOrderId = order.Id
+            });
         }
 
         /// <summary>
@@ -146,11 +205,17 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// </summary>
         [HttpPost(nameof(CancelReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder([FromBody] CancelReviewOrderRequest request)
+        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request)
         {
-            await reviewOrderService.Cancel(request.Map());
+            ReviewOrder order = await reviewOrderService.Cancel(new CancelCommand
+            {
+                ReviewOrderId = request.ReviewOrderId
+            });
 
-            return Ok(new CancelReviewOrderResponse { ReviewOrderId = request.ReviewOrderId });
+            return Ok(new CancelReviewOrderResponse
+            {
+                ReviewOrderId = order.Id
+            });
         }
     }
 }

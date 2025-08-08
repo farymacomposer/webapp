@@ -1,7 +1,7 @@
 ﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
 {
     /// <summary>
-    /// Команда начала разбора трека
+    /// Команда взятия заказа в работу
     /// </summary>
     public sealed record TakeInProgressCommand
     {

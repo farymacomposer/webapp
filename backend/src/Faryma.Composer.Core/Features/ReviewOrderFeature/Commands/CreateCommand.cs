@@ -3,7 +3,7 @@
 namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
 {
     /// <summary>
-    /// Запрос создания заказа разбора трека
+    /// Команда создания заказа
     /// </summary>
     public sealed record CreateCommand
     {
