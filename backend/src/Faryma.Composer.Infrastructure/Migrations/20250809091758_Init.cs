@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace Faryma.Composer.Infrastructure.Migrations
 {
@@ -394,6 +396,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     InProgressAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Type = table.Column<int>(type: "integer", nullable: false),
+                    CategoryType = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
