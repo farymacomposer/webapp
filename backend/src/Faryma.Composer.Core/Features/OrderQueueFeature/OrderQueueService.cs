@@ -55,22 +55,16 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 .Select(x => x.EventDate)
                 .FirstOrDefaultAsync();
 
-            ReviewOrder[] orders = await context.ReviewOrders
-                .AsNoTracking()
-                .Include(x => x.CreationStream)
-                .Include(x => x.UserNicknames)
-                .Include(x => x.Payments)
-                .Where(x => x.Status == ReviewOrderStatus.Preorder
-                    || x.Status == ReviewOrderStatus.Pending
-                    || x.Status == ReviewOrderStatus.InProgress
-                    || (x.ProcessingStream != null && x.ProcessingStream.Status == ComposerStreamStatus.Live))
-                .ToArrayAsync();
+            string? lastIssuedNickname = await context.ReviewOrders
+                .Where(x => x.Status == ReviewOrderStatus.InProgress || x.Status == ReviewOrderStatus.Completed)
+                .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
+                .Select(x => x.MainNormalizedNickname)
+                .LastOrDefaultAsync();
 
-            Dictionary<long, OrderPosition> orderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v });
-
-            string? lastOutOfQueueCategoryNickname = await context.ReviewOrders
-                .Where(x => x.Type == ReviewOrderType.OutOfQueue)
-                .OrderBy(x => x.CompletedAt)
+            string? lastOutOfQueueNickname = await context.ReviewOrders
+                .Where(x => x.Type == ReviewOrderType.OutOfQueue
+                    && (x.Status == ReviewOrderStatus.InProgress || x.Status == ReviewOrderStatus.Completed))
+                .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
                 .Select(x => x.MainNormalizedNickname)
                 .LastOrDefaultAsync();
 
@@ -81,22 +75,32 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 {
                     x.EventDate,
                     x.ProcessedReviewOrders.Where(x => x.Type != ReviewOrderType.OutOfQueue)
-                        .OrderBy(x => x.CompletedAt)
+                        .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
                         .Last().MainNormalizedNickname
                 })
                 .ToDictionaryAsync(k => k.EventDate, v => v.MainNormalizedNickname);
 
+            ReviewOrder[] orders = await context.ReviewOrders
+                .AsNoTracking()
+                .Include(x => x.CreationStream)
+                .Include(x => x.Payments)
+                .Where(x => x.Status == ReviewOrderStatus.Preorder
+                    || x.Status == ReviewOrderStatus.Pending
+                    || x.Status == ReviewOrderStatus.InProgress
+                    || (x.ProcessingStream != null && x.ProcessingStream.Status == ComposerStreamStatus.Live))
+                .ToArrayAsync();
+
             _queueManager = new OrderQueueManager
             {
                 NearestStreamDate = nearestStreamDate,
-                LastPriorityManagerState = CategoryState.Initial,
-                LastIssuedNickname = null,
-                LastOutOfQueueNickname = lastOutOfQueueCategoryNickname,
+                LastPriorityManagerState = default,
+                LastIssuedNickname = lastIssuedNickname,
+                LastOutOfQueueNickname = lastOutOfQueueNickname,
                 LastNicknameByStreamDate = lastNicknameByStreamDate,
-                OrderPositionsById = orderPositionsById,
+                OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
             };
 
-            if (orderPositionsById.Count > 0)
+            if (orders.Length > 0)
             {
                 _queueManager.UpdateAllPositions();
             }
