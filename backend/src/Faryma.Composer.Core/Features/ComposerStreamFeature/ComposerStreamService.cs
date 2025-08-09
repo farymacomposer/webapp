@@ -35,6 +35,13 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             return stream;
         }
 
+        public async Task<ComposerStream> Cancel(CancelCommand command)
+        {
+            ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
+
+            return stream;
+        }
+
         public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname, ReviewOrderType orderType)
         {
             if (orderType == ReviewOrderType.Charity)

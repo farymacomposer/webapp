@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Api.Auth;
+using Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Create;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Find;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled;
@@ -77,6 +78,24 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
             });
 
             return Ok(new StartStreamResponse
+            {
+                ComposerStream = ComposerStreamDto.Map(item)
+            });
+        }
+
+        /// <summary>
+        /// Отменяет стрим
+        /// </summary>
+        [HttpPost(nameof(CancelStream))]
+        [AuthorizeComposer]
+        public async Task<ActionResult<CancelStreamResponse>> CancelStream(CancelStreamRequest request)
+        {
+            ComposerStream item = await composerStreamService.Cancel(new CancelCommand
+            {
+                ComposerStreamId = request.ComposerStreamId
+            });
+
+            return Ok(new CancelStreamResponse
             {
                 ComposerStream = ComposerStreamDto.Map(item)
             });

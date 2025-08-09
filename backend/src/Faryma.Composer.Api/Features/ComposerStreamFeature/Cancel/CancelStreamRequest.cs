@@ -1,9 +1,9 @@
-﻿namespace Faryma.Composer.Core.Features.ComposerStreamFeature.Commands
+﻿namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel
 {
     /// <summary>
-    /// Команда отмены стрима
+    /// Запрос отмены стрима
     /// </summary>
-    public sealed record CancelCommand
+    public sealed record CancelStreamRequest
     {
         /// <summary>
         /// Id стрима
