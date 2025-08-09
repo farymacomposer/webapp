@@ -2,6 +2,7 @@
 using Faryma.Composer.Core.Features.ComposerStreamFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 using Faryma.Composer.Core.Features.UserNicknameFeature;
 using Faryma.Composer.Infrastructure;
@@ -138,6 +139,9 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             ComposerStream liveStream = await ofw.ComposerStreamRepository.FindLiveStream()
                 ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима");
 
+            OrderQueuePosition position = await orderQueueService.GetCurrentQueuePosition(order);
+
+            order.CategoryType = position.Category.Type;
             order.ProcessingStream = liveStream;
             order.Status = ReviewOrderStatus.InProgress;
             order.InProgressAt = DateTime.UtcNow;

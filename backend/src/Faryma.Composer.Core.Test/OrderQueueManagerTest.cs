@@ -795,6 +795,7 @@ namespace Faryma.Composer.Core.Test
                 IsFrozen = isFrozen,
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.Donation,
+                CategoryType = OrderCategoryType.Unspecified,
                 NominalAmount = amount,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
@@ -816,6 +817,7 @@ namespace Faryma.Composer.Core.Test
                 IsFrozen = false,
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.OutOfQueue,
+                CategoryType = OrderCategoryType.Unspecified,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreationStream = new ComposerStream

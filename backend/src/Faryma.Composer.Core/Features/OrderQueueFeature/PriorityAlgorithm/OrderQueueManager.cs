@@ -41,6 +41,20 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public required Dictionary<long, OrderPosition> OrderPositionsById { get; init; }
 
         /// <summary>
+        ///
+        /// </summary>
+        public static CategoryState MapCategoryState(OrderCategoryType categoryType)
+        {
+            return categoryType switch
+            {
+                OrderCategoryType.OutOfQueue => CategoryState.OutOfQueue,
+                OrderCategoryType.Donation => CategoryState.Donation,
+                OrderCategoryType.Debt => CategoryState.Debt,
+                _ => throw new OrderQueueException($"Тип категории заказа '{categoryType}' не поддерживается")
+            };
+        }
+
+        /// <summary>
         /// Добавляет заказ
         /// </summary>
         public void AddOrder(ReviewOrder order)
@@ -77,7 +91,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
                 case OrderQueueUpdateType.TakeInProgress:
 
-                    SetManagerState(position);
+                    LastPriorityManagerState = MapCategoryState(position.PositionHistory.Current.Category.Type);
                     SetLastNickname(order);
 
                     SaveCurrentPositionsToPrevious();
@@ -123,22 +137,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdateCompleted();
             UpdateScheduled();
             UpdateFrozen();
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        private void SetManagerState(OrderPosition position)
-        {
-            OrderCategoryType categoryType = position.PositionHistory.Current.Category.Type;
-
-            LastPriorityManagerState = categoryType switch
-            {
-                OrderCategoryType.OutOfQueue => CategoryState.OutOfQueue,
-                OrderCategoryType.Donation => CategoryState.Donation,
-                OrderCategoryType.Debt => CategoryState.Debt,
-                _ => throw new OrderQueueException($"Тип категории заказа '{categoryType}' не поддерживается")
-            };
         }
 
         /// <summary>
