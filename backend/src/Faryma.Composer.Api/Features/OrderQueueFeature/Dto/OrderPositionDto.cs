@@ -2,7 +2,10 @@
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.Dto
 {
-    public sealed class OrderQueueItemDto
+    /// <summary>
+    /// Представляет позицию заказа в очереди, включая сам заказ и историю перемещений
+    /// </summary>
+    public sealed record OrderPositionDto
     {
         /// <summary>
         /// Заказ разбора трека
@@ -19,7 +22,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Dto
         /// </summary>
         public required OrderQueuePositionDto PreviousPosition { get; init; }
 
-        public static OrderQueueItemDto Map(OrderPosition orderPosition)
+        public static OrderPositionDto Map(OrderPosition orderPosition)
         {
             return new()
             {
