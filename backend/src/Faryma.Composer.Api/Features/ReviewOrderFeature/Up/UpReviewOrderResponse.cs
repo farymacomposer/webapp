@@ -6,6 +6,11 @@
     public sealed record UpReviewOrderResponse
     {
         /// <summary>
+        /// Id заказа разбора трека
+        /// </summary>
+        public required long ReviewOrderId { get; init; }
+
+        /// <summary>
         /// Id платежа
         /// </summary>
         public required long PaymentTransactionId { get; init; }

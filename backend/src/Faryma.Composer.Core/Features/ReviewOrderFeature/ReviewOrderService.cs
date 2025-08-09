@@ -1,6 +1,8 @@
 ﻿using Faryma.Composer.Core.Features.AppSettings;
 using Faryma.Composer.Core.Features.ComposerStreamFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 using Faryma.Composer.Core.Features.UserNicknameFeature;
 using Faryma.Composer.Infrastructure;
@@ -21,7 +23,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
             ComposerStream stream = await composerStreamService.GetOrCreateForOrder(userNickname, command.OrderType);
 
-            ReviewOrder? result = null;
+            ReviewOrder? order = null;
             switch (command.OrderType)
             {
                 case ReviewOrderType.Donation:
@@ -29,17 +31,16 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     Transaction deposit = ofw.TransactionRepository.CreateDeposit(userNickname.Account, command.PaymentAmount!.Value);
                     Transaction payment = ofw.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount!.Value);
 
-                    result = ofw.ReviewOrderRepository.CreateDonation(
+                    order = ofw.ReviewOrderRepository.CreateDonation(
                         stream,
                         payment,
-                        command.OrderType,
                         command.TrackUrl,
                         command.UserComment);
 
                     break;
                 case ReviewOrderType.OutOfQueue or ReviewOrderType.Charity:
 
-                    result = ofw.ReviewOrderRepository.CreateFree(
+                    order = ofw.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
                         nominalAmount: 0,
@@ -50,10 +51,10 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
                 case ReviewOrderType.Free:
 
-                    result = ofw.ReviewOrderRepository.CreateFree(
+                    order = ofw.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
-                        appSettingsService.Settings.ReviewOrderNominalAmount,
+                        nominalAmount: appSettingsService.Settings.ReviewOrderNominalAmount,
                         command.OrderType,
                         command.TrackUrl,
                         command.UserComment);
@@ -61,21 +62,21 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
 
                 default:
-                    throw new ReviewOrderException($"Типа заказа '{command.OrderType}' не поддерживается");
+                    throw new ReviewOrderException($"Тип заказа '{command.OrderType}' не поддерживается");
             }
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.AddOrder(result);
+            await orderQueueService.AddOrder(order);
 
-            return result;
+            return order;
         }
 
         public async Task<Transaction> Up(UpCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
                 throw new ReviewOrderException($"Невозможно поднять заказ в статусе '{order.Status}'");
             }
@@ -87,37 +88,41 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Up);
 
             return payment;
         }
 
-        public async Task<string> AddTrackUrl(AddTrackUrlCommand command)
+        public async Task<ReviewOrder> AddTrackUrl(AddTrackUrlCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder or ReviewOrderStatus.InProgress))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
                 throw new ReviewOrderException($"Невозможно добавить ссылку на трек в статусе '{order.Status}'");
             }
 
             order.TrackUrl = command.TrackUrl;
 
-            if (order.Status is ReviewOrderStatus.Preorder)
+            if (order.Status == ReviewOrderStatus.Preorder)
             {
                 order.Status = ReviewOrderStatus.Pending;
             }
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.AddTrackUrl);
 
-            return order.TrackUrl;
+            return order;
         }
 
-        public async Task TakeInProgress(TakeInProgressCommand command)
+        public async Task<ReviewOrder> TakeInProgress(TakeInProgressCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (order.Status == ReviewOrderStatus.InProgress)
+            {
+                return order;
+            }
 
             if (order.IsFrozen)
             {
@@ -135,21 +140,30 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 throw new ReviewOrderException($"Невозможно взять в работу заказ Id: {command.ReviewOrderId}, пока заказ Id: {inProgress.Id} находится в работе");
             }
 
-            ComposerStream liveStream = await ofw.ComposerStreamRepository.FindLiveStream()
+            ComposerStream liveStream = await ofw.ComposerStreamRepository.FindLive()
                 ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима");
 
+            OrderQueuePosition position = await orderQueueService.GetCurrentQueuePosition(order);
+
+            order.CategoryType = position.Category.Type;
             order.ProcessingStream = liveStream;
             order.Status = ReviewOrderStatus.InProgress;
             order.InProgressAt = DateTime.UtcNow;
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.StartReview(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.TakeInProgress);
+
+            return order;
         }
 
-        public async Task<Review> Complete(CompleteCommand command)
+        public async Task<ReviewOrder> Complete(CompleteCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (order.Status == ReviewOrderStatus.Completed)
+            {
+                return order;
+            }
 
             if (order.Status != ReviewOrderStatus.InProgress)
             {
@@ -164,16 +178,20 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.CompleteReview(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Complete);
 
-            return order.Review;
+            return order;
         }
 
-        public async Task Freeze(FreezeCommand command)
+        public async Task<ReviewOrder> Freeze(FreezeCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (order.IsFrozen)
+            {
+                return order;
+            }
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
                 throw new ReviewOrderException($"Невозможно заморозить заказ в статусе '{order.Status}'");
             }
@@ -182,14 +200,20 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Freeze);
+
+            return order;
         }
 
-        public async Task Unfreeze(UnfreezeCommand command)
+        public async Task<ReviewOrder> Unfreeze(UnfreezeCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (!order.IsFrozen)
+            {
+                return order;
+            }
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
                 throw new ReviewOrderException($"Невозможно разморозить заказ в статусе '{order.Status}'");
             }
@@ -198,14 +222,20 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await ofw.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Unfreeze);
+
+            return order;
         }
 
-        public async Task Cancel(CancelCommand command)
+        public async Task<ReviewOrder> Cancel(CancelCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (order.Status == ReviewOrderStatus.Canceled)
+            {
+                return order;
+            }
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder or ReviewOrderStatus.InProgress))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
                 throw new ReviewOrderException($"Невозможно отменить заказ в статусе '{order.Status}'");
             }
@@ -215,6 +245,8 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             await ofw.SaveChangesAsync();
 
             await orderQueueService.RemoveOrder(order);
+
+            return order;
         }
     }
 }

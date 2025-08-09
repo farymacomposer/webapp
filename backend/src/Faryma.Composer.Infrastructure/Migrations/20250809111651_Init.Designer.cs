@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250806133632_Init")]
+    [Migration("20250809111651_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -111,6 +111,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateOnly>("EventDate")
                         .HasColumnType("date");
 
@@ -119,6 +122,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("WentLiveAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -193,6 +199,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("CategoryType")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");

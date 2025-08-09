@@ -1,7 +1,7 @@
 ﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
 {
     /// <summary>
-    /// Команда отмены заказа разбора трека
+    /// Команда отмены заказа
     /// </summary>
     public sealed record CancelCommand
     {

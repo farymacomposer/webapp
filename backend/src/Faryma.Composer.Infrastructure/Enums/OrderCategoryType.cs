@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Core.Features.OrderQueueFeature.Enums
+﻿namespace Faryma.Composer.Infrastructure.Enums
 {
     /// <summary>
     /// Тип категории заказа

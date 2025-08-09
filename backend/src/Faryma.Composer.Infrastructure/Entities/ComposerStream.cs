@@ -25,6 +25,16 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// </summary>
         public required ComposerStreamType Type { get; set; }
 
+        /// <summary>
+        /// Дата и время начала стрима
+        /// </summary>
+        public DateTime? WentLiveAt { get; set; }
+
+        /// <summary>
+        /// Дата и время завершения стрима
+        /// </summary>
+        public DateTime? CompletedAt { get; set; }
+
         // Навигационные свойства
 
         /// <summary>

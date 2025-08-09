@@ -4,12 +4,12 @@
     {
         private readonly SemaphoreSlim _semaphore = new(1, 1);
 
-        public async Task<T> Lock<T>(Func<Task<T>> action)
+        public async Task<T> Lock<T>(Func<T> action)
         {
             await _semaphore.WaitAsync();
             try
             {
-                return await action();
+                return action();
             }
             finally
             {
@@ -17,12 +17,12 @@
             }
         }
 
-        public async Task Lock(Action action)
+        public async Task Lock(Func<Task> action)
         {
             await _semaphore.WaitAsync();
             try
             {
-                action();
+                await action();
             }
             finally
             {

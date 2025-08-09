@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
@@ -68,18 +67,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
             {
                 yield return new ValidationResult("Для бесплатных, внеочередных и благотворительных заказов сумма платежа должна быть равна нулю");
             }
-        }
-
-        public CreateCommand Map()
-        {
-            return new()
-            {
-                Nickname = Nickname.Trim(),
-                OrderType = OrderType,
-                PaymentAmount = PaymentAmount,
-                TrackUrl = TrackUrl,
-                UserComment = UserComment?.Trim(),
-            };
         }
     }
 }

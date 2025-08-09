@@ -19,13 +19,18 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public Task<ReviewOrder?> FindAnotherOrderInProgress(long reviewOrderId) =>
             context.ReviewOrders.FirstOrDefaultAsync(x => x.Id != reviewOrderId && x.Status == ReviewOrderStatus.InProgress);
 
-        public ReviewOrder CreateDonation(ComposerStream stream, Transaction transaction, ReviewOrderType type, string? trackUrl, string? userComment)
+        public ReviewOrder CreateDonation(
+            ComposerStream stream,
+            Transaction transaction,
+            string? trackUrl,
+            string? userComment)
         {
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,
                 IsFrozen = false,
-                Type = type,
+                Type = ReviewOrderType.Donation,
+                CategoryType = OrderCategoryType.Unspecified,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
                 MainNickname = transaction.Account.UserNickname.Nickname,
                 MainNormalizedNickname = transaction.Account.UserNickname.NormalizedNickname,
@@ -37,13 +42,20 @@ namespace Faryma.Composer.Infrastructure.Repositories
             }).Entity;
         }
 
-        public ReviewOrder CreateFree(ComposerStream stream, UserNickname userNickname, decimal nominalAmount, ReviewOrderType type, string? trackUrl, string? userComment)
+        public ReviewOrder CreateFree(
+            ComposerStream stream,
+            UserNickname userNickname,
+            decimal nominalAmount,
+            ReviewOrderType type,
+            string? trackUrl,
+            string? userComment)
         {
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,
                 IsFrozen = false,
                 Type = type,
+                CategoryType = OrderCategoryType.Unspecified,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
                 MainNickname = userNickname.Nickname,
                 MainNormalizedNickname = userNickname.NormalizedNickname,
