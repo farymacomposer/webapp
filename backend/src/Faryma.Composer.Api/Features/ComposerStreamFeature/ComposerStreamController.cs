@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Create;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Find;
+using Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled;
 using Faryma.Composer.Core.Features.ComposerStreamFeature;
 using Faryma.Composer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -15,26 +16,46 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
     public sealed class ComposerStreamController(ComposerStreamService composerStreamService) : ControllerBase
     {
         /// <summary>
-        /// Создает стрим
+        /// Возвращает текущий и запланированные стримы
         /// </summary>
-        [HttpPost(nameof(CreateComposerStream))]
-        [AuthorizeComposer]
-        public async Task<ActionResult<CreateComposerStreamResponse>> CreateComposerStream(CreateComposerStreamRequest request)
+        [HttpGet(nameof(FindCurrentAndScheduledStreams))]
+        public async Task<ActionResult<FindCurrentAndScheduledStreamsResponse>> FindCurrentAndScheduledStreams()
         {
-            ComposerStream item = await composerStreamService.Create(request.EventDate, request.Type);
+            IReadOnlyCollection<ComposerStream> items = await composerStreamService.FindCurrentAndScheduled();
 
-            return Ok(new CreateComposerStreamResponse { ComposerStream = ComposerStreamDto.Map(item) });
+            return Ok(new FindCurrentAndScheduledStreamsResponse
+            {
+                Items = items.Select(ComposerStreamDto.Map)
+            });
         }
 
         /// <summary>
         /// Возвращает список стримов
         /// </summary>
-        [HttpGet(nameof(FindComposerStream))]
-        public async Task<ActionResult<FindComposerStreamResponse>> FindComposerStream([FromQuery] FindComposerStreamRequest request)
+        [HttpGet(nameof(FindStreams))]
+        public async Task<ActionResult<FindComposerStreamResponse>> FindStreams([FromQuery] FindComposerStreamRequest request)
         {
             IReadOnlyCollection<ComposerStream> items = await composerStreamService.Find(request.DateFrom, request.DateTo);
 
-            return Ok(new FindComposerStreamResponse { Items = items.Select(ComposerStreamDto.Map) });
+            return Ok(new FindComposerStreamResponse
+            {
+                Items = items.Select(ComposerStreamDto.Map)
+            });
+        }
+
+        /// <summary>
+        /// Создает стрим
+        /// </summary>
+        [HttpPost(nameof(CreateStream))]
+        [AuthorizeComposer]
+        public async Task<ActionResult<CreateComposerStreamResponse>> CreateStream(CreateComposerStreamRequest request)
+        {
+            ComposerStream item = await composerStreamService.Create(request.EventDate, request.Type);
+
+            return Ok(new CreateComposerStreamResponse
+            {
+                ComposerStream = ComposerStreamDto.Map(item)
+            });
         }
     }
 }

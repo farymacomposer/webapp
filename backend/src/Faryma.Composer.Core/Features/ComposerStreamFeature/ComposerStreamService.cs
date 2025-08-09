@@ -10,6 +10,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
     public sealed class ComposerStreamService(UnitOfWork ofw)
     {
         public Task<IReadOnlyCollection<ComposerStream>> Find(DateOnly dateFrom, DateOnly dateTo) => ofw.ComposerStreamRepository.Find(dateFrom, dateTo);
+        public Task<IReadOnlyCollection<ComposerStream>> FindCurrentAndScheduled() => ofw.ComposerStreamRepository.FindCurrentAndScheduled();
 
         public async Task<ComposerStream> Create(DateOnly eventDate, ComposerStreamType type)
         {
@@ -30,7 +31,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
         {
             if (orderType == ReviewOrderType.Charity)
             {
-                ComposerStream? live = await ofw.ComposerStreamRepository.FindLiveStream();
+                ComposerStream? live = await ofw.ComposerStreamRepository.FindLive();
                 if (live is null || live.Type == ComposerStreamType.Charity)
                 {
                     throw new ComposerStreamException("Благотворительный заказ можно создать только на благотворительном стриме");
