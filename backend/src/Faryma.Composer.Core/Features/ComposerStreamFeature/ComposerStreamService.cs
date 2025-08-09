@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Core.Utils;
+﻿using Faryma.Composer.Core.Features.ComposerStreamFeature.Commands;
+using Faryma.Composer.Core.Utils;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
@@ -12,19 +13,26 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
         public Task<IReadOnlyCollection<ComposerStream>> Find(DateOnly dateFrom, DateOnly dateTo) => ofw.ComposerStreamRepository.Find(dateFrom, dateTo);
         public Task<IReadOnlyCollection<ComposerStream>> FindCurrentAndScheduled() => ofw.ComposerStreamRepository.FindCurrentAndScheduled();
 
-        public async Task<ComposerStream> Create(DateOnly eventDate, ComposerStreamType type)
+        public async Task<ComposerStream> Create(CreateCommand command)
         {
             try
             {
-                ComposerStream result = ofw.ComposerStreamRepository.Create(eventDate, type);
+                ComposerStream stream = ofw.ComposerStreamRepository.Create(command.EventDate, command.Type);
                 await ofw.SaveChangesAsync();
 
-                return result;
+                return stream;
             }
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
             {
-                throw new ComposerStreamException($"Стрим на дату {eventDate}, уже существует");
+                throw new ComposerStreamException($"Стрим на дату {command.EventDate}, уже существует");
             }
+        }
+
+        public async Task<ComposerStream> Start(StartCommand command)
+        {
+            ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
+
+            return stream;
         }
 
         public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname, ReviewOrderType orderType)

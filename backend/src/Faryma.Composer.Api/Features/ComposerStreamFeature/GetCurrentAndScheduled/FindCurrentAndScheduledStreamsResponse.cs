@@ -2,7 +2,10 @@
 
 namespace Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled
 {
-    public sealed class FindCurrentAndScheduledStreamsResponse
+    /// <summary>
+    /// Ответ на запрос текущего и запланированных стримов
+    /// </summary>
+    public sealed record FindCurrentAndScheduledStreamsResponse
     {
         /// <summary>
         /// Список стримов

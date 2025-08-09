@@ -3,7 +3,7 @@
 namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Find
 {
     /// <summary>
-    /// Ответ на запрос поиска стримов композитора
+    /// Ответ на запрос поиска стримов
     /// </summary>
     public sealed record FindComposerStreamResponse
     {

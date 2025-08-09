@@ -2,7 +2,9 @@
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Create;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Find;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled;
+using Faryma.Composer.Api.Features.ComposerStreamFeature.Start;
 using Faryma.Composer.Core.Features.ComposerStreamFeature;
+using Faryma.Composer.Core.Features.ComposerStreamFeature.Commands;
 using Faryma.Composer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,20 +17,6 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
     [ApiController]
     public sealed class ComposerStreamController(ComposerStreamService composerStreamService) : ControllerBase
     {
-        /// <summary>
-        /// Возвращает текущий и запланированные стримы
-        /// </summary>
-        [HttpGet(nameof(FindCurrentAndScheduledStreams))]
-        public async Task<ActionResult<FindCurrentAndScheduledStreamsResponse>> FindCurrentAndScheduledStreams()
-        {
-            IReadOnlyCollection<ComposerStream> items = await composerStreamService.FindCurrentAndScheduled();
-
-            return Ok(new FindCurrentAndScheduledStreamsResponse
-            {
-                Items = items.Select(ComposerStreamDto.Map)
-            });
-        }
-
         /// <summary>
         /// Возвращает список стримов
         /// </summary>
@@ -44,15 +32,51 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         }
 
         /// <summary>
+        /// Возвращает текущий и запланированные стримы
+        /// </summary>
+        [HttpGet(nameof(FindCurrentAndScheduledStreams))]
+        public async Task<ActionResult<FindCurrentAndScheduledStreamsResponse>> FindCurrentAndScheduledStreams()
+        {
+            IReadOnlyCollection<ComposerStream> items = await composerStreamService.FindCurrentAndScheduled();
+
+            return Ok(new FindCurrentAndScheduledStreamsResponse
+            {
+                Items = items.Select(ComposerStreamDto.Map)
+            });
+        }
+
+        /// <summary>
         /// Создает стрим
         /// </summary>
         [HttpPost(nameof(CreateStream))]
         [AuthorizeComposer]
         public async Task<ActionResult<CreateComposerStreamResponse>> CreateStream(CreateComposerStreamRequest request)
         {
-            ComposerStream item = await composerStreamService.Create(request.EventDate, request.Type);
+            ComposerStream item = await composerStreamService.Create(new CreateCommand
+            {
+                EventDate = request.EventDate,
+                Type = request.Type
+            });
 
             return Ok(new CreateComposerStreamResponse
+            {
+                ComposerStream = ComposerStreamDto.Map(item)
+            });
+        }
+
+        /// <summary>
+        /// Запускает стрим
+        /// </summary>
+        [HttpPost(nameof(StartStream))]
+        [AuthorizeComposer]
+        public async Task<ActionResult<StartStreamResponse>> StartStream(StartStreamRequest request)
+        {
+            ComposerStream item = await composerStreamService.Start(new StartCommand
+            {
+                ComposerStreamId = request.ComposerStreamId
+            });
+
+            return Ok(new StartStreamResponse
             {
                 ComposerStream = ComposerStreamDto.Map(item)
             });

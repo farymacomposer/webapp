@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Faryma.Composer.Core\Faryma.Composer.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\ComposerStreamFeature\Cancel\" />
+  </ItemGroup>
+
 </Project>

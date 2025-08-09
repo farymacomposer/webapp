@@ -1,5 +1,6 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Repositories
@@ -9,6 +10,9 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public Task<ComposerStream> Get(DateOnly eventDate) => context.ComposerStreams.FirstAsync(x => x.EventDate == eventDate);
         public Task<ComposerStream?> Find(DateOnly eventDate) => context.ComposerStreams.FirstOrDefaultAsync(x => x.EventDate == eventDate);
         public Task<ComposerStream?> FindLive() => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
+
+        public async Task<ComposerStream> Get(long composerStreamId) => await context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == composerStreamId)
+            ?? throw new NotFoundException($"Стрим Id: {composerStreamId}, не существует");
 
         public ComposerStream Create(DateOnly eventDate, ComposerStreamType type)
         {
@@ -33,7 +37,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
 
             return context.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live
-                    || (x.Status != ComposerStreamStatus.Canceled && x.EventDate >= dateFrom && x.EventDate <= dateTo))
+                    || (x.EventDate >= dateFrom && x.EventDate <= dateTo))
                 .OrderBy(x => x.EventDate)
                 .FirstOrDefaultAsync();
         }
