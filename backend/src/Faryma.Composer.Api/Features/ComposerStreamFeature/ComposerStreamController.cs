@@ -1,5 +1,6 @@
 ﻿using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel;
+using Faryma.Composer.Api.Features.ComposerStreamFeature.Complete;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Create;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Find;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled;
@@ -78,6 +79,24 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
             });
 
             return Ok(new StartStreamResponse
+            {
+                ComposerStream = ComposerStreamDto.Map(item)
+            });
+        }
+
+        /// <summary>
+        /// Завершает стрим
+        /// </summary>
+        [HttpPost(nameof(CompleteStream))]
+        [AuthorizeComposer]
+        public async Task<ActionResult<CompleteStreamResponse>> CompleteStream(CompleteStreamRequest request)
+        {
+            ComposerStream item = await composerStreamService.Complete(new CompleteCommand
+            {
+                ComposerStreamId = request.ComposerStreamId
+            });
+
+            return Ok(new CompleteStreamResponse
             {
                 ComposerStream = ComposerStreamDto.Map(item)
             });

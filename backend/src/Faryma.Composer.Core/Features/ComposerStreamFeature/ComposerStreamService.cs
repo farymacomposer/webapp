@@ -31,6 +31,41 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
         public async Task<ComposerStream> Start(StartCommand command)
         {
             ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
+            if (stream.Status == ComposerStreamStatus.Live)
+            {
+                return stream;
+            }
+
+            if (stream.Status != ComposerStreamStatus.Planned)
+            {
+                throw new ComposerStreamException($"Невозможно начать стрим в статусе '{stream.Status}'");
+            }
+
+            stream.Status = ComposerStreamStatus.Live;
+            stream.WentLiveAt = DateTime.UtcNow;
+
+            await ofw.SaveChangesAsync();
+
+            return stream;
+        }
+
+        public async Task<ComposerStream> Complete(CompleteCommand command)
+        {
+            ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
+            if (stream.Status == ComposerStreamStatus.Completed)
+            {
+                return stream;
+            }
+
+            if (stream.Status != ComposerStreamStatus.Live)
+            {
+                throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{stream.Status}'");
+            }
+
+            stream.Status = ComposerStreamStatus.Completed;
+            stream.CompletedAt = DateTime.UtcNow;
+
+            await ofw.SaveChangesAsync();
 
             return stream;
         }
@@ -38,6 +73,19 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
         public async Task<ComposerStream> Cancel(CancelCommand command)
         {
             ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
+            if (stream.Status == ComposerStreamStatus.Canceled)
+            {
+                return stream;
+            }
+
+            if (stream.Status != ComposerStreamStatus.Planned)
+            {
+                throw new ComposerStreamException($"Невозможно отменить стрим в статусе '{stream.Status}'");
+            }
+
+            stream.Status = ComposerStreamStatus.Canceled;
+
+            await ofw.SaveChangesAsync();
 
             return stream;
         }
