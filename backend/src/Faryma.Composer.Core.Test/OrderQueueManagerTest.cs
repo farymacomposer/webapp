@@ -831,7 +831,7 @@ namespace Faryma.Composer.Core.Test
         {
             return new()
             {
-                CurrentStreamDate = DateOnly.Parse(currentStreamDate, CultureInfo.GetCultureInfo("ru-RU")),
+                NearestStreamDate = DateOnly.Parse(currentStreamDate, CultureInfo.GetCultureInfo("ru-RU")),
                 LastPriorityManagerState = CategoryState.Initial,
                 LastIssuedNickname = null,
                 LastOutOfQueueNickname = null,

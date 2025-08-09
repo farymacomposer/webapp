@@ -11,9 +11,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
     public sealed class OrderQueueManager
     {
         /// <summary>
-        /// Дата текущего стрима
+        /// Дата ближайшего стрима
         /// </summary>
-        public required DateOnly CurrentStreamDate { get; set; }
+        public required DateOnly NearestStreamDate { get; set; }
 
         /// <summary>
         /// Последнее состояние менеджера приоритетов
@@ -227,7 +227,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             ReviewOrder[] orders = OrderPositionsById
                 .Select(x => x.Value.Order)
-                .Where(x => !x.IsFrozen && x.CreationStream.EventDate > CurrentStreamDate)
+                .Where(x => !x.IsFrozen && x.CreationStream.EventDate > NearestStreamDate)
                 .Order(OrderPriorityComparer.Default)
                 .ToArray();
 

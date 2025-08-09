@@ -55,7 +55,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 .Where(x => !x.IsFrozen
                     && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
                     && x.Status is ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending
-                    && x.CreationStream.EventDate <= queueManager.CurrentStreamDate)
+                    && x.CreationStream.EventDate <= queueManager.NearestStreamDate)
                 .GroupBy(x => x.CreationStream.EventDate)
                 .Select(x => (x.Key, new OrderCategory(x.Order(OrderPriorityComparer.Default).ToList())))
                 .OrderBy(x => x.Key)
@@ -72,7 +72,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 }
 
                 (DateOnly StreamDate, OrderCategory Category) item = categories.Last();
-                if (item.StreamDate == queueManager.CurrentStreamDate)
+                if (item.StreamDate == queueManager.NearestStreamDate)
                 {
                     categories.Remove(item);
                     _donationCategory = item.Category;

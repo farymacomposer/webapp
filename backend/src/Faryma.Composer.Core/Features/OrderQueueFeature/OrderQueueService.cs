@@ -49,8 +49,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
 
-            DateOnly currentStreamDate = await context.ComposerStreams
-                .Where(x => x.Status == ComposerStreamStatus.Planned || x.Status == ComposerStreamStatus.Live)
+            DateOnly nearestStreamDate = await context.ComposerStreams
+                .Where(x => x.Status == ComposerStreamStatus.Live || x.Status == ComposerStreamStatus.Planned)
                 .OrderBy(x => x.EventDate)
                 .Select(x => x.EventDate)
                 .FirstOrDefaultAsync();
@@ -88,7 +88,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
             _queueManager = new OrderQueueManager
             {
-                CurrentStreamDate = currentStreamDate,
+                NearestStreamDate = nearestStreamDate,
                 LastPriorityManagerState = CategoryState.Initial,
                 LastIssuedNickname = null,
                 LastOutOfQueueNickname = lastOutOfQueueCategoryNickname,

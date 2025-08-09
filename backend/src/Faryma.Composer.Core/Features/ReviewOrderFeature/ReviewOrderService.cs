@@ -75,7 +75,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
                 throw new ReviewOrderException($"Невозможно поднять заказ в статусе '{order.Status}'");
             }
@@ -96,14 +96,14 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder or ReviewOrderStatus.InProgress))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
                 throw new ReviewOrderException($"Невозможно добавить ссылку на трек в статусе '{order.Status}'");
             }
 
             order.TrackUrl = command.TrackUrl;
 
-            if (order.Status is ReviewOrderStatus.Preorder)
+            if (order.Status == ReviewOrderStatus.Preorder)
             {
                 order.Status = ReviewOrderStatus.Pending;
             }
@@ -175,7 +175,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
                 throw new ReviewOrderException($"Невозможно заморозить заказ в статусе '{order.Status}'");
             }
@@ -193,7 +193,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
                 throw new ReviewOrderException($"Невозможно разморозить заказ в статусе '{order.Status}'");
             }
@@ -211,7 +211,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
 
-            if (order.Status is not (ReviewOrderStatus.Pending or ReviewOrderStatus.Preorder or ReviewOrderStatus.InProgress))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
                 throw new ReviewOrderException($"Невозможно отменить заказ в статусе '{order.Status}'");
             }
