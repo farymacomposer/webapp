@@ -119,6 +119,10 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         public async Task<ReviewOrder> TakeInProgress(TakeInProgressCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (order.Status == ReviewOrderStatus.InProgress)
+            {
+                return order;
+            }
 
             if (order.IsFrozen)
             {
@@ -156,6 +160,10 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         public async Task<ReviewOrder> Complete(CompleteCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (order.Status == ReviewOrderStatus.Completed)
+            {
+                return order;
+            }
 
             if (order.Status != ReviewOrderStatus.InProgress)
             {
@@ -178,6 +186,10 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         public async Task<ReviewOrder> Freeze(FreezeCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (order.IsFrozen)
+            {
+                return order;
+            }
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
@@ -196,6 +208,10 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         public async Task<ReviewOrder> Unfreeze(UnfreezeCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (!order.IsFrozen)
+            {
+                return order;
+            }
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
@@ -214,6 +230,10 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         public async Task<ReviewOrder> Cancel(CancelCommand command)
         {
             ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            if (order.Status == ReviewOrderStatus.Canceled)
+            {
+                return order;
+            }
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
