@@ -68,9 +68,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         }
 
         /// <summary>
-        /// Обновляет категорию заказов
+        /// Обновляет категории заказов (X3-X2-X1)
         /// </summary>
-        public void UpdateOrdersCategory(OrderQueueManager queueManager)
+        public void UpdateOrderCategories(OrderQueueManager queueManager)
         {
             int debtNumber = 1;
             foreach ((DateOnly streamDate, OrderCategory category) in debtCategoriesByStreamDate.AsEnumerable().Reverse())

@@ -5,7 +5,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
     /// <summary>
     /// Категория заказов
-    /// <para>в одной категории может быть только один тип заказов</para>
     /// </summary>
     public sealed class OrderCategory(List<ReviewOrder> orders)
     {
@@ -20,7 +19,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public bool HasOrders => orders.Count > 0;
 
         /// <summary>
-        ///
+        /// Устанавливает последний выданный никнейм
         /// </summary>
         public void SetLastIssuedNickname(string? nickname) => _lastIssuedNickname = nickname;
 
@@ -47,7 +46,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
             // bestMatch - когда в категории есть никнейм, который не совпадает с последним прослушанным `nicknameToSkip` и с последним из данной категории `_lastIssuedNickname`
             // fallback - когда в категории есть никнейм, который не совпадает с последним прослушанным `nicknameToSkip`
-            // first - если в категории остались заказы, совпадающие с `nicknameToSkip`
+            // first - если в категории остались только заказы, совпадающие с `nicknameToSkip`
             foreach (ReviewOrder order in orders)
             {
                 if (order.MainNormalizedNickname != nicknameToSkip)
@@ -77,7 +76,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             foreach (ReviewOrder item in orders)
             {
-                queueManager.OrderPositionsById[item.Id].SetCurrentCategory(type, debtNumber);
+                queueManager.OrderPositionsById[item.Id].UpdateCurrentCategory(type, debtNumber);
             }
         }
     }

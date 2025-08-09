@@ -5,6 +5,9 @@ using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
+    /// <summary>
+    /// Управляет очередью заказов
+    /// </summary>
     public sealed class OrderQueueManager
     {
         /// <summary>
@@ -13,21 +16,29 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public required DateOnly CurrentStreamDate { get; set; }
 
         /// <summary>
-        ///
+        /// Последнее состояние менеджера приоритетов
         /// </summary>
-        public required OrderPriorityManager.State LastOrderPriorityManagerState { get; set; }
+        public required CategoryState LastPriorityManagerState { get; set; }
 
         /// <summary>
-        ///
+        /// Последний обработанный никнейм
         /// </summary>
-        public required Dictionary<long, OrderPosition> OrderPositionsById { get; init; }
+        public required string? LastIssuedNickname { get; set; }
 
         /// <summary>
-        /// Последний никнейм в категории (по дате стрима)
+        /// Последний никнейм в категории - вне очереди
+        /// </summary>
+        public required string? LastOutOfQueueNickname { get; set; }
+
+        /// <summary>
+        /// Последний никнейм в донатной и долговых категориях (по дате стрима)
         /// </summary>
         public required Dictionary<DateOnly, string> LastNicknameByStreamDate { get; init; }
 
-        public required string? LastOutOfQueueCategoryNickname { get; set; }
+        /// <summary>
+        /// Заказы и их позиции в очереди
+        /// </summary>
+        public required Dictionary<long, OrderPosition> OrderPositionsById { get; init; }
 
         /// <summary>
         /// Добавляет заказ
@@ -36,7 +47,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             OrderPositionsById.Add(order.Id, new OrderPosition { Order = order });
 
-            SwapOrderPositions();
+            SaveCurrentPositionsToPrevious();
             UpdateActive();
             UpdateScheduled();
         }
@@ -57,7 +68,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
                 case OrderQueueUpdateType.Up or OrderQueueUpdateType.Freeze or OrderQueueUpdateType.Unfreeze:
 
-                    SwapOrderPositions();
+                    SaveCurrentPositionsToPrevious();
                     UpdateActive();
                     UpdateScheduled();
                     UpdateFrozen();
@@ -69,7 +80,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                     SetManagerState(position);
                     SetLastNickname(order);
 
-                    SwapOrderPositions();
+                    SaveCurrentPositionsToPrevious();
                     UpdateActive();
                     UpdateInProgress();
 
@@ -77,7 +88,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
                 case OrderQueueUpdateType.Complete:
 
-                    SwapOrderPositions();
+                    SaveCurrentPositionsToPrevious();
                     UpdateCompleted();
 
                     break;
@@ -94,7 +105,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             OrderPositionsById.Remove(order.Id);
 
-            SwapOrderPositions();
+            SaveCurrentPositionsToPrevious();
             UpdateActive();
             UpdateInProgress();
             UpdateScheduled();
@@ -104,9 +115,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// <summary>
         /// Обновляет позиции заказов
         /// </summary>
-        public void UpdateOrderPositions()
+        public void UpdateAllPositions()
         {
-            SwapOrderPositions();
+            SaveCurrentPositionsToPrevious();
             UpdateActive();
             UpdateInProgress();
             UpdateCompleted();
@@ -114,24 +125,32 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdateFrozen();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void SetManagerState(OrderPosition position)
         {
             OrderCategoryType categoryType = position.PositionHistory.Current.Category.Type;
 
-            LastOrderPriorityManagerState = categoryType switch
+            LastPriorityManagerState = categoryType switch
             {
-                OrderCategoryType.OutOfQueue => OrderPriorityManager.State.OutOfQueueCategory,
-                OrderCategoryType.Donation => OrderPriorityManager.State.DonationCategory,
-                OrderCategoryType.Debt => OrderPriorityManager.State.DebtCategories,
+                OrderCategoryType.OutOfQueue => CategoryState.OutOfQueue,
+                OrderCategoryType.Donation => CategoryState.Donation,
+                OrderCategoryType.Debt => CategoryState.Debt,
                 _ => throw new OrderQueueException($"Тип категории заказа '{categoryType}' не поддерживается")
             };
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void SetLastNickname(ReviewOrder order)
         {
+            LastIssuedNickname = order.MainNickname;
+
             if (order.Type == ReviewOrderType.OutOfQueue)
             {
-                LastOutOfQueueCategoryNickname = order.MainNickname;
+                LastOutOfQueueNickname = order.MainNickname;
             }
             else
             {
@@ -140,14 +159,20 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             }
         }
 
-        private void SwapOrderPositions()
+        /// <summary>
+        /// Сохраняет текущие позиции заказов в предыдущее состояние (для отслеживания изменений)
+        /// </summary>
+        private void SaveCurrentPositionsToPrevious()
         {
-            foreach (KeyValuePair<long, OrderPosition> item in OrderPositionsById)
+            foreach (KeyValuePair<long, OrderPosition> kvp in OrderPositionsById)
             {
-                item.Value.Swap();
+                kvp.Value.SaveCurrentPositionToPrevious();
             }
         }
 
+        /// <summary>
+        /// Обновляет позиции активных заказов
+        /// </summary>
         private void UpdateActive()
         {
             int index = 0;
@@ -155,18 +180,21 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
             while (true)
             {
-                (OrderPriorityManager.State state, bool isOnlyNicknameLeft) = manager.DetermineNextState();
-                if (state == OrderPriorityManager.State.Completed)
+                (CategoryState state, bool isOnlyNicknameLeft) = manager.DetermineNextState();
+                if (state == CategoryState.Completed)
                 {
                     break;
                 }
 
                 ReviewOrder order = manager.TakeNextOrder(isOnlyNicknameLeft);
-                OrderPositionsById[order.Id].SetCurrentPosition(index, OrderActivityStatus.Active);
+                OrderPositionsById[order.Id].UpdateCurrentPosition(index, OrderActivityStatus.Active);
                 index++;
             }
         }
 
+        /// <summary>
+        /// Обновляет позицию заказа в работе
+        /// </summary>
         private void UpdateInProgress()
         {
             KeyValuePair<long, OrderPosition> kvp = OrderPositionsById
@@ -174,10 +202,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
             if (kvp.Value is not null)
             {
-                OrderPositionsById[kvp.Value.Order.Id].SetCurrentPosition(0, OrderActivityStatus.InProgress);
+                OrderPositionsById[kvp.Value.Order.Id].UpdateCurrentPosition(0, OrderActivityStatus.InProgress);
             }
         }
 
+        /// <summary>
+        /// Обновляет позиции выполненных заказов
+        /// </summary>
         private void UpdateCompleted()
         {
             ReviewOrder[] orders = OrderPositionsById
@@ -189,6 +220,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdatePositions(orders, OrderActivityStatus.Completed);
         }
 
+        /// <summary>
+        /// Обновляет позиции запланированных заказов
+        /// </summary>
         private void UpdateScheduled()
         {
             ReviewOrder[] orders = OrderPositionsById
@@ -200,6 +234,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdatePositions(orders, OrderActivityStatus.Scheduled);
         }
 
+        /// <summary>
+        /// Обновляет позиции замороженных заказов
+        /// </summary>
         private void UpdateFrozen()
         {
             ReviewOrder[] orders = OrderPositionsById
@@ -211,12 +248,15 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdatePositions(orders, OrderActivityStatus.Frozen);
         }
 
+        /// <summary>
+        /// Обновляет позиции заказов
+        /// </summary>
         private void UpdatePositions(ReviewOrder[] orders, OrderActivityStatus activityStatus)
         {
             int index = 0;
             foreach (ReviewOrder order in orders)
             {
-                OrderPositionsById[order.Id].SetCurrentPosition(index, activityStatus);
+                OrderPositionsById[order.Id].UpdateCurrentPosition(index, activityStatus);
                 index++;
             }
         }

@@ -89,15 +89,16 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             _queueManager = new OrderQueueManager
             {
                 CurrentStreamDate = currentStreamDate,
-                OrderPositionsById = orderPositionsById,
-                LastOutOfQueueCategoryNickname = lastOutOfQueueCategoryNickname,
+                LastPriorityManagerState = CategoryState.Initial,
+                LastIssuedNickname = null,
+                LastOutOfQueueNickname = lastOutOfQueueCategoryNickname,
                 LastNicknameByStreamDate = lastNicknameByStreamDate,
-                LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,
+                OrderPositionsById = orderPositionsById,
             };
 
             if (orderPositionsById.Count > 0)
             {
-                _queueManager.UpdateOrderPositions();
+                _queueManager.UpdateAllPositions();
             }
         }
     }

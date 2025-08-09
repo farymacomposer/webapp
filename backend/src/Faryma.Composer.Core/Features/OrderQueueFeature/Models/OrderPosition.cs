@@ -18,10 +18,20 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// </summary>
         public OrderPositionHistory PositionHistory { get; } = new();
 
-        public void Swap() => PositionHistory.Previous.Swap(PositionHistory.Current);
-        public void SetCurrentPosition(int index, OrderActivityStatus status) => PositionHistory.Current.Set(index, status);
+        /// <summary>
+        /// Записывает текущее состояние в предыдущее
+        /// </summary>
+        public void SaveCurrentPositionToPrevious() => PositionHistory.Previous.CopyFrom(PositionHistory.Current);
 
-        public void SetCurrentCategory(OrderCategoryType type, int debtNumber)
+        /// <summary>
+        /// Обновляет текущую позицию заказа в очереди
+        /// </summary>
+        public void UpdateCurrentPosition(int index, OrderActivityStatus status) => PositionHistory.Current.UpdatePosition(index, status);
+
+        /// <summary>
+        /// Обновляет текущую категорию заказа
+        /// </summary>
+        public void UpdateCurrentCategory(OrderCategoryType type, int debtNumber)
         {
             PositionHistory.Current.Category = new OrderCategoryInfo
             {

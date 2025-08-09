@@ -23,7 +23,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"),
@@ -43,7 +43,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"),
@@ -67,7 +67,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"),
@@ -94,7 +94,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"),
@@ -121,7 +121,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick2"),
@@ -148,7 +148,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"),
@@ -179,7 +179,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"),
@@ -213,7 +213,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"),
@@ -247,7 +247,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick2"),
@@ -284,7 +284,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1,  "Nick1"),
@@ -328,7 +328,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1,  "Nick1"),
@@ -375,7 +375,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1,  "Nick10"),
@@ -411,7 +411,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (7, "Nick7"), // долг x2
@@ -442,7 +442,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (7, "Nick7"), // долг x3
@@ -480,7 +480,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (10, "Nick7"), // долг x4
@@ -521,7 +521,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (10, "Nick1"), // долг x4
@@ -552,7 +552,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"), // ВНЕ ОЧЕРЕДИ
@@ -576,7 +576,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"), // ВНЕ ОЧЕРЕДИ
@@ -603,7 +603,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1, "Nick1"), // ВНЕ ОЧЕРЕДИ
@@ -641,7 +641,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "20.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1,  "Nick1"),
@@ -689,7 +689,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "20.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (1,  "Nick10"),
@@ -737,7 +737,7 @@ namespace Faryma.Composer.Core.Test
             ];
 
             OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateOrderPositions();
+            queueManager.UpdateAllPositions();
 
             Check([
                 (0, 4, OrderActivityStatus.Scheduled,    "Nick1"),
@@ -832,10 +832,11 @@ namespace Faryma.Composer.Core.Test
             return new()
             {
                 CurrentStreamDate = DateOnly.Parse(currentStreamDate, CultureInfo.GetCultureInfo("ru-RU")),
-                OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
-                LastOutOfQueueCategoryNickname = null,
+                LastPriorityManagerState = CategoryState.Initial,
+                LastIssuedNickname = null,
+                LastOutOfQueueNickname = null,
                 LastNicknameByStreamDate = new Dictionary<DateOnly, string>(),
-                LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,
+                OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
             };
         }
     }
