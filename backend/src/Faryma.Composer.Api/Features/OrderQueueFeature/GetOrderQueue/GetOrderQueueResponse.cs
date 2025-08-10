@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
@@ -11,6 +12,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
         /// <summary>
         /// Активные заказы
         /// </summary>
+        [Required]
         public ICollection<OrderPositionDto> ActiveOrders { get; } = [];
 
         /// <summary>
@@ -21,44 +23,49 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
         /// <summary>
         /// Выполненные заказы
         /// </summary>
+        [Required]
         public ICollection<OrderPositionDto> CompletedOrders { get; } = [];
 
         /// <summary>
         /// Запланированные заказы
         /// </summary>
+        [Required]
         public ICollection<OrderPositionDto> ScheduledOrders { get; } = [];
 
         /// <summary>
         /// Замороженные заказы
         /// </summary>
+        [Required]
         public ICollection<OrderPositionDto> FrozenOrders { get; } = [];
 
-        public static GetOrderQueueResponse Map(Dictionary<long, OrderPosition> orders)
+        public static GetOrderQueueResponse Map(IEnumerable<OrderPosition> orders)
         {
             GetOrderQueueResponse result = new();
 
-            foreach (KeyValuePair<long, OrderPosition> kvp in orders.OrderBy(x => x.Value.PositionHistory.Current.QueueIndex))
+            foreach (OrderPosition order in orders.OrderBy(x => x.PositionHistory.Current.QueueIndex))
             {
-                switch (kvp.Value.PositionHistory.Current.ActivityStatus)
+                OrderPositionDto dto = OrderPositionDto.Map(order);
+
+                switch (order.PositionHistory.Current.ActivityStatus)
                 {
                     case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.Active:
-                        result.ActiveOrders.Add(OrderPositionDto.Map(kvp.Value));
+                        result.ActiveOrders.Add(dto);
                         break;
 
                     case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.InProgress:
-                        result.InProgressOrder = OrderPositionDto.Map(kvp.Value);
+                        result.InProgressOrder = dto;
                         break;
 
                     case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.Completed:
-                        result.CompletedOrders.Add(OrderPositionDto.Map(kvp.Value));
+                        result.CompletedOrders.Add(dto);
                         break;
 
                     case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.Scheduled:
-                        result.ScheduledOrders.Add(OrderPositionDto.Map(kvp.Value));
+                        result.ScheduledOrders.Add(dto);
                         break;
 
                     case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.Frozen:
-                        result.FrozenOrders.Add(OrderPositionDto.Map(kvp.Value));
+                        result.FrozenOrders.Add(dto);
                         break;
                 }
             }

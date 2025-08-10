@@ -7,17 +7,24 @@ namespace Faryma.Composer.Infrastructure.Repositories
 {
     public sealed class ReviewOrderRepository(AppDbContext context)
     {
-        public async Task<ReviewOrder> Get(long reviewOrderId) => await Find(reviewOrderId)
-            ?? throw new NotFoundException($"Заказ разбора трека Id: {reviewOrderId}, не существует");
+        public async Task<ReviewOrder> Get(long id) => await Find(id)
+            ?? throw new NotFoundException($"Заказ разбора трека Id: {id}, не существует");
 
         public Task<ReviewOrder?> Find(long id) => context.ReviewOrders
             .Include(x => x.CreationStream)
-            .Include(x => x.UserNicknames)
             .Include(x => x.Payments)
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        public Task<ReviewOrder?> FindAnotherOrderInProgress(long reviewOrderId) =>
-            context.ReviewOrders.FirstOrDefaultAsync(x => x.Id != reviewOrderId && x.Status == ReviewOrderStatus.InProgress);
+        public Task<ReviewOrder[]> GetOrdersForStream(long creationStreamId) => context.ReviewOrders
+            .AsNoTracking()
+            .Include(x => x.CreationStream)
+            .Include(x => x.Payments)
+            .Where(x => x.CreationStreamId == creationStreamId)
+            .ToArrayAsync();
+
+        public Task<ReviewOrder?> FindAnotherOrderInProgress(long id) => context.ReviewOrders
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id != id && x.Status == ReviewOrderStatus.InProgress);
 
         public ReviewOrder CreateDonation(
             ComposerStream stream,
