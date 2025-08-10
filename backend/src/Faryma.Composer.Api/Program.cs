@@ -3,6 +3,7 @@ using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
+using Faryma.Composer.Api.Features.TrackFeature;
 using Faryma.Composer.Core.DependencyInjection;
 using Faryma.Composer.Core.Features.AppSettings;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
@@ -33,7 +34,12 @@ namespace Faryma.Composer.Api
                         .AddPersistenceAndIdentity(context.Configuration)
                         .AddAuthentication(context.Configuration)
                         .AddAuthorization()
-                        .AddCoreServices();
+                        .AddCoreServices()
+                        .AddGraphQLServer()
+                        .AddQueryType<TrackQuery>()
+                        .AddProjections()
+                        .AddFiltering()
+                        .AddSorting();
 
                     if (builder.Environment.IsDevelopment())
                     {
@@ -57,6 +63,8 @@ namespace Faryma.Composer.Api
             app.MapControllers();
 
             app.MapHub<OrderQueueNotificationHub>(OrderQueueNotificationHub.RoutePattern);
+
+            app.MapGraphQL();
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();
