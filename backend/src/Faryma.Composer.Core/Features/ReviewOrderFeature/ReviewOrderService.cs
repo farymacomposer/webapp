@@ -172,7 +172,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             DateTime now = DateTime.UtcNow;
 
-            order.Review = ofw.ReviewRepository.Create(order, command.Rating, command.Comment, now);
+            order.Review = ofw.ReviewRepository.Create(order, command.Rating, now);
             order.CompletedAt = now;
             order.Status = ReviewOrderStatus.Completed;
 

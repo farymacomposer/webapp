@@ -25,6 +25,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             string? trackUrl,
             string? userComment)
         {
+            // TODO: Сохранять ReviewOrderNominalAmount
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,

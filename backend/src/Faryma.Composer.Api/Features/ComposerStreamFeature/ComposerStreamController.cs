@@ -25,11 +25,11 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [HttpGet(nameof(FindStreams))]
         public async Task<ActionResult<FindComposerStreamResponse>> FindStreams([FromQuery] FindComposerStreamRequest request)
         {
-            IReadOnlyCollection<ComposerStream> items = await composerStreamService.Find(request.DateFrom, request.DateTo);
+            IReadOnlyCollection<ComposerStream> streams = await composerStreamService.Find(request.DateFrom, request.DateTo);
 
             return Ok(new FindComposerStreamResponse
             {
-                Items = items.Select(ComposerStreamDto.Map)
+                Streams = streams.Select(ComposerStreamDto.Map)
             });
         }
 
@@ -39,11 +39,11 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [HttpGet(nameof(FindCurrentAndScheduledStreams))]
         public async Task<ActionResult<FindCurrentAndScheduledStreamsResponse>> FindCurrentAndScheduledStreams()
         {
-            IReadOnlyCollection<ComposerStream> items = await composerStreamService.FindCurrentAndScheduled();
+            IReadOnlyCollection<ComposerStream> streams = await composerStreamService.FindCurrentAndScheduled();
 
             return Ok(new FindCurrentAndScheduledStreamsResponse
             {
-                Items = items.Select(ComposerStreamDto.Map)
+                Streams = streams.Select(ComposerStreamDto.Map)
             });
         }
 
@@ -54,7 +54,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [AuthorizeComposer]
         public async Task<ActionResult<CreateComposerStreamResponse>> CreateStream(CreateComposerStreamRequest request)
         {
-            ComposerStream item = await composerStreamService.Create(new CreateCommand
+            ComposerStream stream = await composerStreamService.Create(new CreateCommand
             {
                 EventDate = request.EventDate,
                 Type = request.Type
@@ -62,7 +62,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
 
             return Ok(new CreateComposerStreamResponse
             {
-                ComposerStream = ComposerStreamDto.Map(item)
+                ComposerStream = ComposerStreamDto.Map(stream)
             });
         }
 
@@ -73,14 +73,14 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [AuthorizeComposer]
         public async Task<ActionResult<StartStreamResponse>> StartStream(StartStreamRequest request)
         {
-            ComposerStream item = await composerStreamService.Start(new StartCommand
+            ComposerStream stream = await composerStreamService.Start(new StartCommand
             {
                 ComposerStreamId = request.ComposerStreamId
             });
 
             return Ok(new StartStreamResponse
             {
-                ComposerStream = ComposerStreamDto.Map(item)
+                ComposerStream = ComposerStreamDto.Map(stream)
             });
         }
 
@@ -91,14 +91,14 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [AuthorizeComposer]
         public async Task<ActionResult<CompleteStreamResponse>> CompleteStream(CompleteStreamRequest request)
         {
-            ComposerStream item = await composerStreamService.Complete(new CompleteCommand
+            ComposerStream stream = await composerStreamService.Complete(new CompleteCommand
             {
                 ComposerStreamId = request.ComposerStreamId
             });
 
             return Ok(new CompleteStreamResponse
             {
-                ComposerStream = ComposerStreamDto.Map(item)
+                ComposerStream = ComposerStreamDto.Map(stream)
             });
         }
 
@@ -109,14 +109,14 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [AuthorizeComposer]
         public async Task<ActionResult<CancelStreamResponse>> CancelStream(CancelStreamRequest request)
         {
-            ComposerStream item = await composerStreamService.Cancel(new CancelCommand
+            ComposerStream stream = await composerStreamService.Cancel(new CancelCommand
             {
                 ComposerStreamId = request.ComposerStreamId
             });
 
             return Ok(new CancelStreamResponse
             {
-                ComposerStream = ComposerStreamDto.Map(item)
+                ComposerStream = ComposerStreamDto.Map(stream)
             });
         }
     }

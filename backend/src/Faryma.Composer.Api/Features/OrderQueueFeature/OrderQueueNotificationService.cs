@@ -12,6 +12,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         public const string RoutePattern = "/api/OrderQueueNotificationHub";
     }
 
+    // TODO: отправлять предыдущий хэш очереди
     [AsyncApi]
     public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub> context, ILogger<OrderQueueNotificationService> logger) : IOrderQueueNotificationService
     {

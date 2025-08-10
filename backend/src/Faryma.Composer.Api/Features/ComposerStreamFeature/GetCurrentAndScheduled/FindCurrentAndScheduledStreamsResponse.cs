@@ -11,6 +11,6 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndSchedu
         /// Список стримов
         /// </summary>
         [Required]
-        public required IEnumerable<ComposerStreamDto> Items { get; init; }
+        public required IEnumerable<ComposerStreamDto> Streams { get; init; }
     }
 }

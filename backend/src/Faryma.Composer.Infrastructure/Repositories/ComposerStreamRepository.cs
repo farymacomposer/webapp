@@ -33,11 +33,9 @@ namespace Faryma.Composer.Infrastructure.Repositories
 
         public Task<ComposerStream?> FindNearestInWeekRange(DateOnly dateFrom)
         {
-            DateOnly dateTo = dateFrom.AddDays(6);
-
             return context.ComposerStreams
-                .Where(x => x.Status == ComposerStreamStatus.Live
-                    || (x.EventDate >= dateFrom && x.EventDate <= dateTo))
+                .Where(x => x.Status != ComposerStreamStatus.Canceled
+                    && (x.Status == ComposerStreamStatus.Live || x.EventDate >= dateFrom))
                 .OrderBy(x => x.EventDate)
                 .FirstOrDefaultAsync();
         }

@@ -49,6 +49,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             });
         }
 
+        // TODO: обновить стрим по заказам
+        public void StartStream(ComposerStream stream) => _queueManager.UpdateAllPositions();
+
         public async Task Initialize()
         {
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();

@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
-using Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue;
+﻿using Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -21,10 +20,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         {
             Dictionary<long, OrderPosition> orders = await orderQueueService.GetOrderQueue();
 
-            return Ok(new GetOrderQueueResponse
-            {
-                Items = orders.Select(x => OrderPositionDto.Map(x.Value))
-            });
+            return Ok(GetOrderQueueResponse.Map(orders));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Core.Features.ComposerStreamFeature.Commands;
+using Faryma.Composer.Core.Features.OrderQueueFeature;
 using Faryma.Composer.Core.Utils;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Entities;
@@ -8,7 +9,7 @@ using Npgsql;
 
 namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 {
-    public sealed class ComposerStreamService(UnitOfWork ofw)
+    public sealed class ComposerStreamService(UnitOfWork ofw, OrderQueueService orderQueueService)
     {
         public Task<IReadOnlyCollection<ComposerStream>> Find(DateOnly dateFrom, DateOnly dateTo) => ofw.ComposerStreamRepository.Find(dateFrom, dateTo);
         public Task<IReadOnlyCollection<ComposerStream>> FindCurrentAndScheduled() => ofw.ComposerStreamRepository.FindCurrentAndScheduled();
@@ -30,6 +31,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
         public async Task<ComposerStream> Start(StartCommand command)
         {
+            // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
             ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
             if (stream.Status == ComposerStreamStatus.Live)
             {
@@ -45,6 +47,8 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             stream.WentLiveAt = DateTime.UtcNow;
 
             await ofw.SaveChangesAsync();
+
+            orderQueueService.StartStream(stream);
 
             return stream;
         }
@@ -138,8 +142,9 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
         private async Task<ComposerStream> GetOrCreateStream((DateOnly EventDate, ComposerStreamType Type) streamInfo)
         {
+            // TODO: проверка на отмененный стрим на целевую дату и поиск на следующую неделю
             ComposerStream? stream = await ofw.ComposerStreamRepository.Find(streamInfo.EventDate);
-            if (stream is not null)
+            if (stream is not null && stream.Status != ComposerStreamStatus.Canceled)
             {
                 return stream;
             }
@@ -157,6 +162,18 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
                 ofw.Remove(stream);
 
                 return await ofw.ComposerStreamRepository.Get(streamInfo.EventDate);
+            }
+        }
+
+        private async Task<ComposerStream> FindPlanned(DateOnly eventDate)
+        {
+            while (true)
+            {
+                ComposerStream? stream = await ofw.ComposerStreamRepository.Find(eventDate);
+                if (stream is not null)
+                {
+                    return stream;
+                }
             }
         }
     }

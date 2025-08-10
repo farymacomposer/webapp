@@ -154,7 +154,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Rating = request.Rating,
-                Comment = request.Comment.Trim(),
             });
 
             return Ok(new CompleteReviewOrderResponse

@@ -14,11 +14,6 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required int Rating { get; set; }
 
         /// <summary>
-        /// Комментарий
-        /// </summary>
-        public required string Comment { get; set; }
-
-        /// <summary>
         /// Дата и время последнего обновления
         /// </summary>
         public required DateTime UpdatedAt { get; set; }

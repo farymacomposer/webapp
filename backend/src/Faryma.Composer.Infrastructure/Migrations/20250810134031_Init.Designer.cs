@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250809111651_Init")]
+    [Migration("20250810134031_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -165,10 +165,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
