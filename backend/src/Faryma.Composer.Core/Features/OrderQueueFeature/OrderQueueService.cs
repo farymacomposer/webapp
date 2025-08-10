@@ -14,19 +14,23 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
     {
         private readonly SemaphoreLocker _locker = new();
         private OrderQueueManager _queueManager = null!;
+        private int _positionsHashCode;
 
-        public Task<Dictionary<long, OrderPosition>> GetOrderQueue() =>
-            _locker.Lock(() => _queueManager.OrderPositionsById);
+        public Task<OrderPosition[]> GetOrderQueue() =>
+            _locker.Lock(() => _queueManager.OrderPositionsById.Select(x => x.Value.Clone()).ToArray());
 
         public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrder order) =>
-            _locker.Lock(() => _queueManager.OrderPositionsById[order.Id].PositionHistory.Current);
+            _locker.Lock(() => _queueManager.OrderPositionsById[order.Id].PositionHistory.Current.Clone());
 
         public async Task AddOrder(ReviewOrder order)
         {
             await _locker.Lock(async () =>
             {
-                _queueManager.AddOrder(order);
-                await notificationService.NotifyNewOrderAdded(_queueManager.OrderPositionsById[order.Id]);
+                int positionsHashCode = _positionsHashCode;
+                OrderPosition position = _queueManager.AddOrder(order);
+                _positionsHashCode = _queueManager.GetPositionsHashCode();
+
+                await notificationService.NotifyNewOrderAdded(positionsHashCode, position);
             });
         }
 
@@ -34,8 +38,23 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await _locker.Lock(async () =>
             {
-                _queueManager.UpdateOrder(order, updateType);
-                await notificationService.NotifyOrderPositionChanged(_queueManager.OrderPositionsById[order.Id], updateType);
+                int positionsHashCode = _positionsHashCode;
+                OrderPosition position = _queueManager.UpdateOrder(order, updateType);
+                _positionsHashCode = _queueManager.GetPositionsHashCode();
+
+                await notificationService.NotifyOrderPositionChanged(positionsHashCode, position, updateType);
+            });
+        }
+
+        public async Task UpdateOrders(IEnumerable<ReviewOrder> orders)
+        {
+            await _locker.Lock(async () =>
+            {
+                int positionsHashCode = _positionsHashCode;
+                IEnumerable<OrderPosition> positions = _queueManager.UpdateOrders(orders);
+                _positionsHashCode = _queueManager.GetPositionsHashCode();
+
+                await notificationService.NotifyOrderPositionsChanged(positionsHashCode, positions);
             });
         }
 
@@ -43,14 +62,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await _locker.Lock(async () =>
             {
-                OrderPosition position = _queueManager.OrderPositionsById[order.Id];
-                _queueManager.RemoveOrder(order);
-                await notificationService.NotifyOrderRemoved(position);
+                int positionsHashCode = _positionsHashCode;
+                OrderPosition position = _queueManager.RemoveOrder(order);
+                _positionsHashCode = _queueManager.GetPositionsHashCode();
+
+                await notificationService.NotifyOrderRemoved(positionsHashCode, position);
             });
         }
-
-        // TODO: обновить стрим по заказам
-        public void StartStream(ComposerStream stream) => _queueManager.UpdateAllPositions();
 
         public async Task Initialize()
         {

@@ -9,6 +9,11 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
     public sealed record NewOrderAddedEvent
     {
         /// <summary>
+        /// Хэш-код позиций заказов
+        /// </summary>
+        public required int PositionsHashCode { get; init; }
+
+        /// <summary>
         /// Заказ разбора трека
         /// </summary>
         public required ReviewOrderDto Order { get; init; }
@@ -18,10 +23,11 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// </summary>
         public required OrderQueuePositionDto CurrentPosition { get; init; }
 
-        public static NewOrderAddedEvent Map(OrderPosition orderPosition)
+        public static NewOrderAddedEvent Map(int positionsHashCode, OrderPosition orderPosition)
         {
             return new()
             {
+                PositionsHashCode = positionsHashCode,
                 Order = ReviewOrderDto.Map(orderPosition.Order),
                 CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current)
             };

@@ -7,7 +7,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
     /// <summary>
     /// Представляет позицию заказа в очереди, включая сам заказ и историю перемещений
     /// </summary>
-    public sealed record OrderPosition
+    public sealed class OrderPosition
     {
         /// <summary>
         /// Заказ разбора трека
@@ -17,7 +17,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// <summary>
         /// История изменений позиции заказа в очереди
         /// </summary>
-        public OrderPositionHistory PositionHistory { get; } = new();
+        public OrderPositionHistory PositionHistory { get; init; } = new();
 
         /// <summary>
         /// Записывает текущее состояние в предыдущее
@@ -40,5 +40,16 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
                 DebtNumber = debtNumber
             };
         }
+
+        public OrderPosition Clone()
+        {
+            return new()
+            {
+                Order = Order,
+                PositionHistory = PositionHistory.Clone(),
+            };
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Order, PositionHistory);
     }
 }

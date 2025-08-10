@@ -55,21 +55,38 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         }
 
         /// <summary>
+        /// Возвращает комбинированный хэш-код на основе всех позиций заказов
+        /// </summary>
+        public int GetPositionsHashCode()
+        {
+            HashCode hash = new();
+            foreach (KeyValuePair<long, OrderPosition> kvp in OrderPositionsById)
+            {
+                hash.Add(kvp.Value);
+            }
+
+            return hash.ToHashCode();
+        }
+
+        /// <summary>
         /// Добавляет заказ
         /// </summary>
-        public void AddOrder(ReviewOrder order)
+        public OrderPosition AddOrder(ReviewOrder order)
         {
-            OrderPositionsById.Add(order.Id, new OrderPosition { Order = order });
+            OrderPosition position = new() { Order = order };
+            OrderPositionsById.Add(order.Id, position);
 
             SaveCurrentPositionsToPrevious();
             UpdateActive();
             UpdateScheduled();
+
+            return position;
         }
 
         /// <summary>
         /// Обновляет заказ
         /// </summary>
-        public void UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
+        public OrderPosition UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
         {
             OrderPosition position = OrderPositionsById[order.Id];
             position.Order = order;
@@ -78,7 +95,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             {
                 case OrderQueueUpdateType.AddTrackUrl:
 
-                    return;
+                    return position;
 
                 case OrderQueueUpdateType.Up or OrderQueueUpdateType.Freeze or OrderQueueUpdateType.Unfreeze:
 
@@ -110,13 +127,34 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 default:
                     throw new OrderQueueException($"Тип обновления очереди '{updateType}' не поддерживается");
             }
+
+            return position;
+        }
+
+        /// <summary>
+        /// Обновляет заказы
+        /// </summary>
+        public IEnumerable<OrderPosition> UpdateOrders(IEnumerable<ReviewOrder> orders)
+        {
+            List<OrderPosition> positions = [];
+            foreach (ReviewOrder order in orders)
+            {
+                OrderPosition position = OrderPositionsById[order.Id];
+                position.Order = order;
+                positions.Add(position);
+            }
+
+            UpdateAllPositions();
+
+            return positions;
         }
 
         /// <summary>
         /// Удаляет заказ
         /// </summary>
-        public void RemoveOrder(ReviewOrder order)
+        public OrderPosition RemoveOrder(ReviewOrder order)
         {
+            OrderPosition position = OrderPositionsById[order.Id];
             OrderPositionsById.Remove(order.Id);
 
             SaveCurrentPositionsToPrevious();
@@ -124,6 +162,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdateInProgress();
             UpdateScheduled();
             UpdateFrozen();
+
+            return position;
         }
 
         /// <summary>

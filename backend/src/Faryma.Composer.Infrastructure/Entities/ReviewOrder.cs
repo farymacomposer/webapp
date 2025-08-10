@@ -110,5 +110,14 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Возвращает общую стоимость заказа
         /// </summary>
         public decimal GetTotalAmount() => NominalAmount + Payments.Sum(x => x.Amount);
+
+        public override int GetHashCode() => HashCode.Combine(
+            Id,
+            CategoryType,
+            Status,
+            IsFrozen,
+            TrackUrl,
+            CreationStream.Status,
+            GetTotalAmount());
     }
 }
