@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl
 {
     /// <summary>
-    /// Запрос добавления ссылки на трек
+    /// Запрос добавления в заказ ссылки на трек
     /// </summary>
     public sealed record AddTrackUrlRequest
     {
@@ -19,14 +18,5 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl
         [Required]
         [Url(ErrorMessage = "Некорректная ссылка на трек")]
         public required string TrackUrl { get; set; }
-
-        public AddTrackUrlCommand Map()
-        {
-            return new()
-            {
-                ReviewOrderId = ReviewOrderId,
-                TrackUrl = TrackUrl,
-            };
-        }
     }
 }

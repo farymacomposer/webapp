@@ -3,12 +3,12 @@
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl
 {
     /// <summary>
-    /// Ответ на запрос добавления ссылки на трек
+    /// Ответ на запрос добавления в заказ ссылки на трек
     /// </summary>
     public sealed record AddTrackUrlResponse
     {
         /// <summary>
-        /// Id заказа на разбор трека
+        /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; init; }
 

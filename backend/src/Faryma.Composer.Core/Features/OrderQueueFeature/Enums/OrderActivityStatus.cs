@@ -11,18 +11,28 @@
         Unspecified = 0,
 
         /// <summary>
-        /// Заказ запланирован на будущий стрим
+        /// Активен
         /// </summary>
-        Scheduled = 1,
+        Active = 1,
 
         /// <summary>
-        /// Заказ активен
+        /// В работе
         /// </summary>
-        Active = 2,
+        InProgress = 2,
 
         /// <summary>
-        /// Заказ заморожен и не будет обрабатываться
+        /// Выполнен
         /// </summary>
-        Frozen = 3
+        Completed = 3,
+
+        /// <summary>
+        /// Запланирован на будущий стрим
+        /// </summary>
+        Scheduled = 4,
+
+        /// <summary>
+        /// Заморожен и не будет обрабатываться
+        /// </summary>
+        Frozen = 5
     }
 }

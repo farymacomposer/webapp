@@ -1,7 +1,7 @@
 ﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
 {
     /// <summary>
-    /// Команда завершения разбора трека
+    /// Команда выполнения заказа
     /// </summary>
     public sealed record CompleteCommand
     {

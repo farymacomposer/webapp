@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
@@ -8,6 +9,11 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
     /// </summary>
     public sealed record OrderPositionChangedEvent
     {
+        /// <summary>
+        /// Тип обновления очереди
+        /// </summary>
+        public required OrderQueueUpdateType OrderQueueUpdateType { get; init; }
+
         /// <summary>
         /// Заказ разбора трека
         /// </summary>
@@ -23,10 +29,11 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// </summary>
         public required OrderQueuePositionDto PreviousPosition { get; init; }
 
-        public static OrderPositionChangedEvent Map(OrderPosition orderPosition)
+        public static OrderPositionChangedEvent Map(OrderPosition orderPosition, OrderQueueUpdateType updateType)
         {
             return new()
             {
+                OrderQueueUpdateType = updateType,
                 Order = ReviewOrderDto.Map(orderPosition.Order),
                 CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
                 PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous)

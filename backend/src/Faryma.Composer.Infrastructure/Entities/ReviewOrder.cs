@@ -32,6 +32,11 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required ReviewOrderType Type { get; set; }
 
         /// <summary>
+        /// Тип категории заказа
+        /// </summary>
+        public required OrderCategoryType CategoryType { get; set; }
+
+        /// <summary>
         /// Статус заказа
         /// </summary>
         public required ReviewOrderStatus Status { get; set; }
