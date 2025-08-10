@@ -15,6 +15,21 @@ namespace Faryma.Composer.Core.Features.TrackFeature
 
             return result;
         }
+
+        public IQueryable<Track> GetAll()
+        {
+            IQueryable<Track> tracks = ofw.TrackRepository.GetAll();
+
+            return tracks;
+        }
+
+        public Track Find(int id)
+        {
+            Track? track = ofw.TrackRepository.Find(id).Result
+                ?? throw new InvalidOperationException($"Трек ID {id} не найден.");
+
+            return track;
+        }
     }
 
     public sealed record CreateTrackCommand
