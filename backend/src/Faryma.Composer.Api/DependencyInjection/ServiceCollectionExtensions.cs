@@ -91,7 +91,7 @@ namespace Faryma.Composer.Api.DependencyInjection
 
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                string xmlPath = Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
+                string xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
                 if (File.Exists(xmlPath))
                 {
                     options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
