@@ -50,7 +50,5 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
                 Category = Category,
             };
         }
-
-        public override int GetHashCode() => HashCode.Combine(QueueIndex, ActivityStatus, Category);
     }
 }

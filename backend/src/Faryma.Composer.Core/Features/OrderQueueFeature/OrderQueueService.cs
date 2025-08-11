@@ -14,7 +14,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
     {
         private readonly SemaphoreLocker _locker = new();
         private OrderQueueManager _queueManager = null!;
-        private int _positionsHashCode;
+        private TimeSpan _positionsHashCode;
 
         public Task<OrderPosition[]> GetOrderQueue() =>
             _locker.Lock(() => _queueManager.OrderPositionsById.Select(x => x.Value.Clone()).ToArray());
@@ -26,9 +26,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await _locker.Lock(async () =>
             {
-                int positionsHashCode = _positionsHashCode;
+                TimeSpan positionsHashCode = _positionsHashCode;
                 OrderPosition position = _queueManager.AddOrder(order);
-                _positionsHashCode = _queueManager.GetPositionsHashCode();
+                _positionsHashCode = DateTime.UtcNow.TimeOfDay;
 
                 await notificationService.NotifyNewOrderAdded(positionsHashCode, position);
             });
@@ -38,21 +38,21 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await _locker.Lock(async () =>
             {
-                int positionsHashCode = _positionsHashCode;
+                TimeSpan positionsHashCode = _positionsHashCode;
                 OrderPosition position = _queueManager.UpdateOrder(order, updateType);
-                _positionsHashCode = _queueManager.GetPositionsHashCode();
+                _positionsHashCode = DateTime.UtcNow.TimeOfDay;
 
                 await notificationService.NotifyOrderPositionChanged(positionsHashCode, position, updateType);
             });
         }
 
-        public async Task UpdateOrders(IEnumerable<ReviewOrder> orders)
+        public async Task UpdateOrders(ReviewOrder[] orders)
         {
             await _locker.Lock(async () =>
             {
-                int positionsHashCode = _positionsHashCode;
+                TimeSpan positionsHashCode = _positionsHashCode;
                 IEnumerable<OrderPosition> positions = _queueManager.UpdateOrders(orders);
-                _positionsHashCode = _queueManager.GetPositionsHashCode();
+                _positionsHashCode = DateTime.UtcNow.TimeOfDay;
 
                 await notificationService.NotifyOrderPositionsChanged(positionsHashCode, positions);
             });
@@ -62,9 +62,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await _locker.Lock(async () =>
             {
-                int positionsHashCode = _positionsHashCode;
+                TimeSpan positionsHashCode = _positionsHashCode;
                 OrderPosition position = _queueManager.RemoveOrder(order);
-                _positionsHashCode = _queueManager.GetPositionsHashCode();
+                _positionsHashCode = DateTime.UtcNow.TimeOfDay;
 
                 await notificationService.NotifyOrderRemoved(positionsHashCode, position);
             });

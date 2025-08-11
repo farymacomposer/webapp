@@ -23,7 +23,5 @@
                 Current = Current.Clone(),
             };
         }
-
-        public override int GetHashCode() => HashCode.Combine(Previous, Current);
     }
 }

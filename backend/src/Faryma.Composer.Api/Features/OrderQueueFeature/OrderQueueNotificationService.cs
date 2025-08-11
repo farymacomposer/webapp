@@ -22,7 +22,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         /// </summary>
         [Channel("NewOrderAdded", Servers = new[] { HubServerName })]
         [PublishOperation(typeof(NewOrderAddedEvent))]
-        public async Task NotifyNewOrderAdded(int positionsHashCode, OrderPosition position)
+        public async Task NotifyNewOrderAdded(TimeSpan positionsHashCode, OrderPosition position)
         {
             NewOrderAddedEvent item = NewOrderAddedEvent.Map(positionsHashCode, position);
             logger.LogInformation("NotifyNewOrderAdded {@item}", item);
@@ -35,7 +35,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         /// </summary>
         [Channel("OrderPositionChanged", Servers = new[] { HubServerName })]
         [PublishOperation(typeof(OrderPositionChangedEvent))]
-        public async Task NotifyOrderPositionChanged(int positionsHashCode, OrderPosition position, OrderQueueUpdateType updateType)
+        public async Task NotifyOrderPositionChanged(TimeSpan positionsHashCode, OrderPosition position, OrderQueueUpdateType updateType)
         {
             OrderPositionChangedEvent item = OrderPositionChangedEvent.Map(positionsHashCode, position, updateType);
             logger.LogInformation("NotifyOrderPositionChanged {@item}", item);
@@ -48,7 +48,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         /// </summary>
         [Channel("OrderPositionsChanged", Servers = new[] { HubServerName })]
         [PublishOperation(typeof(OrderPositionsChangedEvent))]
-        public async Task NotifyOrderPositionsChanged(int positionsHashCode, IEnumerable<OrderPosition> positions)
+        public async Task NotifyOrderPositionsChanged(TimeSpan positionsHashCode, IEnumerable<OrderPosition> positions)
         {
             OrderPositionsChangedEvent item = OrderPositionsChangedEvent.Map(positionsHashCode, positions);
             logger.LogInformation("NotifyOrderPositionsChanged {@item}", item);
@@ -61,7 +61,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         /// </summary>
         [Channel("OrderRemoved", Servers = new[] { HubServerName })]
         [PublishOperation(typeof(OrderRemovedEvent))]
-        public async Task NotifyOrderRemoved(int positionsHashCode, OrderPosition position)
+        public async Task NotifyOrderRemoved(TimeSpan positionsHashCode, OrderPosition position)
         {
             OrderRemovedEvent item = OrderRemovedEvent.Map(positionsHashCode, position);
             logger.LogInformation("NotifyOrderRemoved {@item}", item);

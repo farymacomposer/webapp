@@ -55,20 +55,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         }
 
         /// <summary>
-        /// Возвращает комбинированный хэш-код на основе всех позиций заказов
-        /// </summary>
-        public int GetPositionsHashCode()
-        {
-            HashCode hash = new();
-            foreach (KeyValuePair<long, OrderPosition> kvp in OrderPositionsById)
-            {
-                hash.Add(kvp.Value);
-            }
-
-            return hash.ToHashCode();
-        }
-
-        /// <summary>
         /// Добавляет заказ
         /// </summary>
         public OrderPosition AddOrder(ReviewOrder order)
@@ -134,7 +120,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// <summary>
         /// Обновляет заказы
         /// </summary>
-        public IEnumerable<OrderPosition> UpdateOrders(IEnumerable<ReviewOrder> orders)
+        public IEnumerable<OrderPosition> UpdateOrders(ReviewOrder[] orders)
         {
             List<OrderPosition> positions = [];
             foreach (ReviewOrder order in orders)

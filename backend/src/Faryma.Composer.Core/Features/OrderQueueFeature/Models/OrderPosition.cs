@@ -49,7 +49,5 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
                 PositionHistory = PositionHistory.Clone(),
             };
         }
-
-        public override int GetHashCode() => HashCode.Combine(Order, PositionHistory);
     }
 }

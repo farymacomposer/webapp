@@ -13,7 +13,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// <summary>
         /// Хэш-код позиций заказов
         /// </summary>
-        public required int PositionsHashCode { get; init; }
+        public required TimeSpan PositionsHashCode { get; init; }
 
         /// <summary>
         /// Тип обновления очереди
@@ -35,7 +35,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// </summary>
         public required OrderQueuePositionDto CurrentPosition { get; init; }
 
-        public static OrderPositionChangedEvent Map(int positionsHashCode, OrderPosition orderPosition, OrderQueueUpdateType updateType)
+        public static OrderPositionChangedEvent Map(TimeSpan positionsHashCode, OrderPosition orderPosition, OrderQueueUpdateType updateType)
         {
             return new()
             {
