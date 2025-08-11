@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250810134031_Init")]
+    [Migration("20250811030254_Init")]
     partial class Init
     {
         /// <inheritdoc />
