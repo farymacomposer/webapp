@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Api.Features.CommonDto;
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.CommonDto;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel
 {
@@ -10,6 +11,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel
         /// <summary>
         /// Заказ разбора трека
         /// </summary>
+        [Required]
         public required ReviewOrderDto ReviewOrder { get; init; }
     }
 }
