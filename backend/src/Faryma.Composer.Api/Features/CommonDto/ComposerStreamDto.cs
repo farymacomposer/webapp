@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Api.Features.ComposerStreamFeature
+namespace Faryma.Composer.Api.Features.CommonDto
 {
     /// <summary>
     /// Стрим композитора

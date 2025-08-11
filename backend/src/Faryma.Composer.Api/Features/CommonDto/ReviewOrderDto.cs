@@ -71,6 +71,12 @@ namespace Faryma.Composer.Api.Features.CommonDto
         /// </summary>
         public required decimal TotalAmount { get; init; }
 
+        /// <summary>
+        /// Связанный cтрим композитора, где создан заказ
+        /// </summary>
+        [Required]
+        public required ComposerStreamDto CreationStream { get; init; }
+
         public static ReviewOrderDto Map(ReviewOrder item)
         {
             return new()
@@ -87,6 +93,7 @@ namespace Faryma.Composer.Api.Features.CommonDto
                 UserComment = item.UserComment,
                 MainNickname = item.MainNickname,
                 TotalAmount = item.GetTotalAmount(),
+                CreationStream = ComposerStreamDto.Map(item.CreationStream),
             };
         }
     }
