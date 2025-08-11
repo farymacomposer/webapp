@@ -1,4 +1,6 @@
-﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel
+﻿using Faryma.Composer.Api.Features.CommonDto;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel
 {
     /// <summary>
     /// Ответ на запрос отмены заказа
@@ -6,8 +8,8 @@
     public sealed record CancelReviewOrderResponse
     {
         /// <summary>
-        /// Id отмененного заказа
+        /// Заказ разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; init; }
+        public required ReviewOrderDto ReviewOrder { get; init; }
     }
 }

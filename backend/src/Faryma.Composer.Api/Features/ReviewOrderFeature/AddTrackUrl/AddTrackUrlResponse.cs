@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Faryma.Composer.Api.Features.CommonDto;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl
 {
@@ -8,15 +8,8 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl
     public sealed record AddTrackUrlResponse
     {
         /// <summary>
-        /// Id заказа разбора трека
+        /// Заказ разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; init; }
-
-        /// <summary>
-        /// Ссылка на трек
-        /// </summary>
-        [Required]
-        [Url]
-        public required string TrackUrl { get; init; }
+        public required ReviewOrderDto ReviewOrder { get; init; }
     }
 }

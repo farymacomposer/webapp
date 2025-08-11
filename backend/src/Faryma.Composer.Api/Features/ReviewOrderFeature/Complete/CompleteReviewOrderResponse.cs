@@ -1,4 +1,6 @@
-﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Complete
+﻿using Faryma.Composer.Api.Features.CommonDto;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Complete
 {
     /// <summary>
     /// Ответ на запрос выполнения заказа
@@ -6,9 +8,9 @@
     public sealed record CompleteReviewOrderResponse
     {
         /// <summary>
-        /// Id выполненного заказа
+        /// Заказ разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; init; }
+        public required ReviewOrderDto ReviewOrder { get; init; }
 
         /// <summary>
         /// Id созданного разбора

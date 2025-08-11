@@ -1,4 +1,6 @@
-﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Up
+﻿using Faryma.Composer.Api.Features.CommonDto;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Up
 {
     /// <summary>
     /// Ответ на запрос поднятия заказа в очереди
@@ -6,9 +8,9 @@
     public sealed record UpReviewOrderResponse
     {
         /// <summary>
-        /// Id заказа разбора трека
+        /// Заказ разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; init; }
+        public required ReviewOrderDto ReviewOrder { get; init; }
 
         /// <summary>
         /// Id платежа
