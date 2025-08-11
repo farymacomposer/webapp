@@ -11,14 +11,14 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// <summary>
         /// Хэш-код позиций заказов
         /// </summary>
-        public required TimeSpan PositionsHashCode { get; init; }
+        public required int PositionsHashCode { get; init; }
 
         /// <summary>
         /// Позиции заказов
         /// </summary>
         public required IEnumerable<OrderPositionDto> OrderPositions { get; init; }
 
-        public static OrderPositionsChangedEvent Map(TimeSpan positionsHashCode, IEnumerable<OrderPosition> positions)
+        public static OrderPositionsChangedEvent Map(int positionsHashCode, IEnumerable<OrderPosition> positions)
         {
             return new()
             {

@@ -12,7 +12,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// <summary>
         /// Хэш-код позиций заказов
         /// </summary>
-        public required TimeSpan PositionsHashCode { get; init; }
+        public required int PositionsHashCode { get; init; }
 
         /// <summary>
         /// Заказ разбора трека
@@ -24,7 +24,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// </summary>
         public required OrderQueuePositionDto PreviousPosition { get; init; }
 
-        public static OrderRemovedEvent Map(TimeSpan positionsHashCode, OrderPosition orderPosition)
+        public static OrderRemovedEvent Map(int positionsHashCode, OrderPosition orderPosition)
         {
             return new()
             {
