@@ -11,8 +11,8 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 {
     public sealed class ComposerStreamService(UnitOfWork ofw, OrderQueueService orderQueueService)
     {
-        public Task<IReadOnlyCollection<ComposerStream>> Find(DateOnly dateFrom, DateOnly dateTo) => ofw.ComposerStreamRepository.Find(dateFrom, dateTo);
-        public Task<IReadOnlyCollection<ComposerStream>> FindCurrentAndScheduled() => ofw.ComposerStreamRepository.FindCurrentAndScheduled();
+        public Task<ComposerStream[]> Find(DateOnly dateFrom, DateOnly dateTo) => ofw.ComposerStreamRepository.Find(dateFrom, dateTo);
+        public Task<ComposerStream[]> FindCurrentAndScheduled() => ofw.ComposerStreamRepository.FindLiveAndPlanned();
 
         public async Task<ComposerStream> Create(CreateCommand command)
         {
@@ -117,7 +117,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             (DateOnly EventDate, ComposerStreamType Type) donationStreamInfo = (donationStreamDate, ComposerStreamType.Donation);
             (DateOnly EventDate, ComposerStreamType Type) nearestStreamInfo = (debtStreamDate < donationStreamDate) ? debtStreamInfo : donationStreamInfo;
 
-            ComposerStream? nearestStream = await ofw.ComposerStreamRepository.FindNearestInWeekRange(today);
+            ComposerStream? nearestStream = await ofw.ComposerStreamRepository.FindNearest(today);
 
             switch (orderType)
             {

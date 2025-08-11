@@ -7,13 +7,6 @@ namespace Faryma.Composer.Infrastructure.Repositories
 {
     public sealed class ComposerStreamRepository(AppDbContext context)
     {
-        public Task<ComposerStream> Get(DateOnly eventDate) => context.ComposerStreams.FirstAsync(x => x.EventDate == eventDate);
-        public Task<ComposerStream?> Find(DateOnly eventDate) => context.ComposerStreams.FirstOrDefaultAsync(x => x.EventDate == eventDate);
-        public Task<ComposerStream?> FindLive() => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
-
-        public async Task<ComposerStream> Get(long id) => await context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id)
-            ?? throw new NotFoundException($"Стрим Id: {id}, не существует");
-
         public ComposerStream Create(DateOnly eventDate, ComposerStreamType type)
         {
             return context.Add(new ComposerStream
@@ -24,27 +17,35 @@ namespace Faryma.Composer.Infrastructure.Repositories
             }).Entity;
         }
 
-        public async Task<IReadOnlyCollection<ComposerStream>> Find(DateOnly dateFrom, DateOnly dateTo)
-        {
-            return await context.ComposerStreams
-                .Where(x => x.EventDate >= dateFrom && x.EventDate <= dateTo)
-                .ToArrayAsync();
-        }
+        public Task<ComposerStream> Get(DateOnly eventDate) => context.ComposerStreams.FirstAsync(x => x.EventDate == eventDate);
 
-        public Task<ComposerStream?> FindNearestInWeekRange(DateOnly dateFrom)
+        public async Task<ComposerStream> Get(long id) => await context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id)
+            ?? throw new NotFoundException($"Стрим Id: {id}, не существует");
+
+        public Task<ComposerStream?> Find(DateOnly eventDate) => context.ComposerStreams.FirstOrDefaultAsync(x => x.EventDate == eventDate);
+        public Task<ComposerStream?> FindLive() => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
+
+        public Task<ComposerStream?> FindNearest(DateOnly today)
         {
             return context.ComposerStreams
-                .Where(x => x.Status != ComposerStreamStatus.Canceled
-                    && (x.Status == ComposerStreamStatus.Live || x.EventDate >= dateFrom))
+                .Where(x => x.Status == ComposerStreamStatus.Live
+                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
                 .OrderBy(x => x.EventDate)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IReadOnlyCollection<ComposerStream>> FindCurrentAndScheduled()
+        public Task<ComposerStream[]> Find(DateOnly dateFrom, DateOnly dateTo)
+        {
+            return context.ComposerStreams
+                .Where(x => x.EventDate >= dateFrom && x.EventDate <= dateTo)
+                .ToArrayAsync();
+        }
+
+        public Task<ComposerStream[]> FindLiveAndPlanned()
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
-            return await context.ComposerStreams
+            return context.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
                 .ToArrayAsync();

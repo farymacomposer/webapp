@@ -26,7 +26,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [HttpGet(nameof(FindStreams))]
         public async Task<ActionResult<FindComposerStreamResponse>> FindStreams([FromQuery] FindComposerStreamRequest request)
         {
-            IReadOnlyCollection<ComposerStream> streams = await composerStreamService.Find(request.DateFrom, request.DateTo);
+            ComposerStream[] streams = await composerStreamService.Find(request.DateFrom, request.DateTo);
 
             return Ok(new FindComposerStreamResponse
             {
@@ -40,7 +40,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [HttpGet(nameof(FindCurrentAndScheduledStreams))]
         public async Task<ActionResult<FindCurrentAndScheduledStreamsResponse>> FindCurrentAndScheduledStreams()
         {
-            IReadOnlyCollection<ComposerStream> streams = await composerStreamService.FindCurrentAndScheduled();
+            ComposerStream[] streams = await composerStreamService.FindCurrentAndScheduled();
 
             return Ok(new FindCurrentAndScheduledStreamsResponse
             {
