@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
+using Faryma.Composer.Core.Features.OrderQueueFeature;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
@@ -48,25 +50,28 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
 
                 switch (order.PositionHistory.Current.ActivityStatus)
                 {
-                    case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.Active:
+                    case OrderActivityStatus.Active:
                         result.ActiveOrders.Add(dto);
                         break;
 
-                    case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.InProgress:
+                    case OrderActivityStatus.InProgress:
                         result.InProgressOrder = dto;
                         break;
 
-                    case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.Completed:
+                    case OrderActivityStatus.Completed:
                         result.CompletedOrders.Add(dto);
                         break;
 
-                    case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.Scheduled:
+                    case OrderActivityStatus.Scheduled:
                         result.ScheduledOrders.Add(dto);
                         break;
 
-                    case Core.Features.OrderQueueFeature.Enums.OrderActivityStatus.Frozen:
+                    case OrderActivityStatus.Frozen:
                         result.FrozenOrders.Add(dto);
                         break;
+
+                    default:
+                        throw new OrderQueueException($"Статус активности заказа '{order.PositionHistory.Current.ActivityStatus}' не поддерживается");
                 }
             }
 

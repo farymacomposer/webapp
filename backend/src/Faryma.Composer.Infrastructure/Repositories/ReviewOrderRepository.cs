@@ -29,10 +29,10 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public ReviewOrder CreateDonation(
             ComposerStream stream,
             Transaction transaction,
+            int nominalAmountAtCreation,
             string? trackUrl,
             string? userComment)
         {
-            // TODO: Сохранять ReviewOrderNominalAmount
             return context.Add(new ReviewOrder
             {
                 CreatedAt = DateTime.UtcNow,
@@ -46,6 +46,8 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 UserComment = userComment,
                 CreationStream = stream,
                 UserNicknames = { transaction.Account.UserNickname },
+                NominalAmount = 0,
+                NominalAmountAtCreation = nominalAmountAtCreation,
                 Payments = { transaction },
             }).Entity;
         }
@@ -53,7 +55,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public ReviewOrder CreateFree(
             ComposerStream stream,
             UserNickname userNickname,
-            decimal nominalAmount,
+            int nominalAmount,
             ReviewOrderType type,
             string? trackUrl,
             string? userComment)
@@ -72,6 +74,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 CreationStream = stream,
                 UserNicknames = { userNickname },
                 NominalAmount = nominalAmount,
+                NominalAmountAtCreation = nominalAmount,
             }).Entity;
         }
     }

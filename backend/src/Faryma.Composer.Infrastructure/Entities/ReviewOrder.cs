@@ -54,7 +54,12 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Номинальная стоимость заказа (для бесплатных)
         /// </summary>
-        public decimal NominalAmount { get; set; }
+        public required decimal NominalAmount { get; set; }
+
+        /// <summary>
+        /// Номинальная стоимость заказа на момент создания
+        /// </summary>
+        public required decimal NominalAmountAtCreation { get; set; }
 
         /// <summary>
         /// Комментарий пользователя
