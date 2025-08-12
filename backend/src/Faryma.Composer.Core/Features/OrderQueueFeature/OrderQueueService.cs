@@ -50,10 +50,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             });
         }
 
-        public async Task UpdateOrders(ReviewOrder[] orders)
+        public async Task StartStream(ComposerStream stream, ReviewOrder[] orders)
         {
             await _locker.Lock(async () =>
             {
+                _queueManager.NearestStreamDate = stream.EventDate;
                 OrderQueue orderQueue = new()
                 {
                     PositionsHashCode = _positionsHashCode,

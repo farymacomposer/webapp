@@ -49,7 +49,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             await ofw.SaveChangesAsync();
 
             ReviewOrder[] orders = await ofw.ReviewOrderRepository.GetOrdersForStream(stream.Id);
-            await orderQueueService.UpdateOrders(orders);
+            await orderQueueService.StartStream(stream, orders);
 
             return stream;
         }
