@@ -18,12 +18,12 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// </summary>
         public required IEnumerable<OrderPositionDto> OrderPositions { get; init; }
 
-        public static OrderPositionsChangedEvent Map(int positionsHashCode, IEnumerable<OrderPosition> positions)
+        public static OrderPositionsChangedEvent Map(OrderQueue orderQueue)
         {
             return new()
             {
-                PositionsHashCode = positionsHashCode,
-                OrderPositions = positions.Select(OrderPositionDto.Map),
+                PositionsHashCode = orderQueue.PositionsHashCode,
+                OrderPositions = orderQueue.Positions.Select(OrderPositionDto.Map),
             };
         }
     }

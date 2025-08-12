@@ -12,6 +12,11 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
     public sealed record GetOrderQueueResponse
     {
         /// <summary>
+        /// Хэш-код позиций заказов
+        /// </summary>
+        public required int PositionsHashCode { get; init; }
+
+        /// <summary>
         /// Активные заказы
         /// </summary>
         [Required]
@@ -40,15 +45,18 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
         [Required]
         public ICollection<OrderPositionDto> FrozenOrders { get; } = [];
 
-        public static GetOrderQueueResponse Map(IEnumerable<OrderPosition> orders)
+        public static GetOrderQueueResponse Map(OrderQueue orderQueue)
         {
-            GetOrderQueueResponse result = new();
-
-            foreach (OrderPosition order in orders.OrderBy(x => x.PositionHistory.Current.QueueIndex))
+            GetOrderQueueResponse result = new()
             {
-                OrderPositionDto dto = OrderPositionDto.Map(order);
+                PositionsHashCode = orderQueue.PositionsHashCode,
+            };
 
-                switch (order.PositionHistory.Current.ActivityStatus)
+            foreach (OrderPosition position in orderQueue.Positions.OrderBy(x => x.PositionHistory.Current.QueueIndex))
+            {
+                OrderPositionDto dto = OrderPositionDto.Map(position);
+
+                switch (position.PositionHistory.Current.ActivityStatus)
                 {
                     case OrderActivityStatus.Active:
                         result.ActiveOrders.Add(dto);
@@ -71,7 +79,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
                         break;
 
                     default:
-                        throw new OrderQueueException($"Статус активности заказа '{order.PositionHistory.Current.ActivityStatus}' не поддерживается");
+                        throw new OrderQueueException($"Статус активности заказа '{position.PositionHistory.Current.ActivityStatus}' не поддерживается");
                 }
             }
 

@@ -18,9 +18,9 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         [HttpGet(nameof(GetOrderQueue))]
         public async Task<ActionResult<GetOrderQueueResponse>> GetOrderQueue()
         {
-            OrderPosition[] orders = await orderQueueService.GetOrderQueue();
+            OrderQueue orderQueue = await orderQueueService.GetOrderQueue();
 
-            return Ok(GetOrderQueueResponse.Map(orders));
+            return Ok(GetOrderQueueResponse.Map(orderQueue));
         }
     }
 }

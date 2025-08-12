@@ -48,9 +48,9 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         /// </summary>
         [Channel("OrderPositionsChanged", Servers = new[] { HubServerName })]
         [PublishOperation(typeof(OrderPositionsChangedEvent))]
-        public async Task NotifyOrderPositionsChanged(int positionsHashCode, IEnumerable<OrderPosition> positions)
+        public async Task NotifyOrderPositionsChanged(OrderQueue orderQueue)
         {
-            OrderPositionsChangedEvent item = OrderPositionsChangedEvent.Map(positionsHashCode, positions);
+            OrderPositionsChangedEvent item = OrderPositionsChangedEvent.Map(orderQueue);
             logger.LogInformation("NotifyOrderPositionsChanged {@item}", item);
 
             await context.Clients.All.SendAsync("OrderPositionsChanged", item);

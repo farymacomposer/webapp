@@ -7,7 +7,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Contracts
     {
         Task NotifyNewOrderAdded(int positionsHashCode, OrderPosition position);
         Task NotifyOrderPositionChanged(int positionsHashCode, OrderPosition position, OrderQueueUpdateType updateType);
-        Task NotifyOrderPositionsChanged(int positionsHashCode, IEnumerable<OrderPosition> positions);
+        Task NotifyOrderPositionsChanged(OrderQueue orderQueue);
         Task NotifyOrderRemoved(int positionsHashCode, OrderPosition position);
     }
 }
