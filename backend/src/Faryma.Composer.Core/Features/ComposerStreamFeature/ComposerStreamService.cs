@@ -143,38 +143,34 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
         private async Task<ComposerStream> GetOrCreateStream((DateOnly EventDate, ComposerStreamType Type) streamInfo)
         {
-            // TODO: проверка на отмененный стрим на целевую дату и поиск на следующую неделю
-            ComposerStream? stream = await ofw.ComposerStreamRepository.Find(streamInfo.EventDate);
-            if (stream is not null && stream.Status != ComposerStreamStatus.Canceled)
-            {
-                return stream;
-            }
-
-            stream = ofw.ComposerStreamRepository.Create(streamInfo.EventDate, streamInfo.Type);
-
-            try
-            {
-                await ofw.SaveChangesAsync();
-
-                return stream;
-            }
-            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
-            {
-                ofw.Remove(stream);
-
-                return await ofw.ComposerStreamRepository.Get(streamInfo.EventDate);
-            }
-        }
-
-        private async Task<ComposerStream> FindPlanned(DateOnly eventDate)
-        {
             while (true)
             {
+                DateOnly eventDate = streamInfo.EventDate;
                 ComposerStream? stream = await ofw.ComposerStreamRepository.Find(eventDate);
-                if (stream is not null)
+
+                if (stream is null)
+                {
+                    stream = ofw.ComposerStreamRepository.Create(eventDate, streamInfo.Type);
+
+                    try
+                    {
+                        await ofw.SaveChangesAsync();
+
+                        return stream;
+                    }
+                    catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
+                    {
+                        ofw.Remove(stream);
+
+                        return await ofw.ComposerStreamRepository.Get(eventDate);
+                    }
+                }
+                else if (stream.Status == ComposerStreamStatus.Planned && stream.Type == streamInfo.Type)
                 {
                     return stream;
                 }
+
+                eventDate = eventDate.AddDays(6);
             }
         }
     }

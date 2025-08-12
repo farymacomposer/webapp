@@ -25,6 +25,13 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public Task<ComposerStream?> Find(DateOnly eventDate) => context.ComposerStreams.FirstOrDefaultAsync(x => x.EventDate == eventDate);
         public Task<ComposerStream?> FindLive() => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
 
+        public Task<ComposerStream[]> Find(DateOnly dateFrom, DateOnly dateTo)
+        {
+            return context.ComposerStreams
+                .Where(x => x.EventDate >= dateFrom && x.EventDate <= dateTo)
+                .ToArrayAsync();
+        }
+
         public Task<ComposerStream?> FindNearest(DateOnly today)
         {
             return context.ComposerStreams
@@ -32,13 +39,6 @@ namespace Faryma.Composer.Infrastructure.Repositories
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
                 .OrderBy(x => x.EventDate)
                 .FirstOrDefaultAsync();
-        }
-
-        public Task<ComposerStream[]> Find(DateOnly dateFrom, DateOnly dateTo)
-        {
-            return context.ComposerStreams
-                .Where(x => x.EventDate >= dateFrom && x.EventDate <= dateTo)
-                .ToArrayAsync();
         }
 
         public Task<ComposerStream[]> FindLiveAndPlanned()
