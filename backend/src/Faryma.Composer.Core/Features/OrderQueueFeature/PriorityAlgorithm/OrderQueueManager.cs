@@ -222,7 +222,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         private void UpdateInProgress()
         {
             KeyValuePair<long, OrderPosition> kvp = OrderPositionsById
-                .FirstOrDefault(x => x.Value.Order.Status == ReviewOrderStatus.InProgress);
+                .SingleOrDefault(x => x.Value.Order.Status == ReviewOrderStatus.InProgress);
 
             if (kvp.Value is not null)
             {
