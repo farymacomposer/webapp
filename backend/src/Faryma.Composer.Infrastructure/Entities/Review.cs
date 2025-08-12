@@ -14,11 +14,17 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required int Rating { get; set; }
 
         /// <summary>
+        /// Дата и время создания разбора
+        /// </summary>
+        public required DateTime CreatedAt { get; set; }
+
+        /// <summary>
         /// Дата и время последнего обновления
         /// </summary>
         public required DateTime UpdatedAt { get; set; }
 
-        public long ReviewOrderId { get; set; }
+        public long? ReviewOrderId { get; set; }
+        public long? TrackId { get; set; }
 
         // Навигационные свойства
 
@@ -26,6 +32,12 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Связанный заказ
         /// </summary>
         [ForeignKey(nameof(ReviewOrderId))]
-        public required ReviewOrder ReviewOrder { get; set; }
+        public ReviewOrder? ReviewOrder { get; set; }
+
+        /// <summary>
+        /// Связанный музыкальный трек
+        /// </summary>
+        [ForeignKey(nameof(TrackId))]
+        public Track? Track { get; set; }
     }
 }

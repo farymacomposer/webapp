@@ -163,10 +163,13 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
 
-                    b.Property<long>("ReviewOrderId")
+                    b.Property<long?>("ReviewOrderId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("TrackId")
@@ -685,15 +688,15 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 {
                     b.HasOne("Faryma.Composer.Infrastructure.Entities.ReviewOrder", "ReviewOrder")
                         .WithOne("Review")
-                        .HasForeignKey("Faryma.Composer.Infrastructure.Entities.Review", "ReviewOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Faryma.Composer.Infrastructure.Entities.Review", "ReviewOrderId");
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
                         .WithMany("Reviews")
                         .HasForeignKey("TrackId");
 
                     b.Navigation("ReviewOrder");
+
+                    b.Navigation("Track");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrder", b =>

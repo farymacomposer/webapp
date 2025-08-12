@@ -79,19 +79,19 @@ namespace Faryma.Composer.Infrastructure.Entities
         public Review? Review { get; set; }
 
         /// <summary>
-        /// Трек для разбора
+        /// Связанный музыкальный трек
         /// </summary>
         [ForeignKey(nameof(TrackId))]
         public Track? Track { get; set; }
 
         /// <summary>
-        /// Связанный cтрим композитора, где создан заказ
+        /// Связанный cтрим, где создан заказ
         /// </summary>
         [ForeignKey(nameof(CreationStreamId))]
         public required ComposerStream CreationStream { get; set; }
 
         /// <summary>
-        /// Связанный cтрим композитора, где заказ взят в работу
+        /// Связанный cтрим, где заказ взят в работу
         /// </summary>
         [ForeignKey(nameof(ProcessingStreamId))]
         public ComposerStream? ProcessingStream { get; set; }

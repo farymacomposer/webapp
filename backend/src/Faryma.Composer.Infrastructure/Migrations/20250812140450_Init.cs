@@ -503,8 +503,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Rating = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ReviewOrderId = table.Column<long>(type: "bigint", nullable: false),
+                    ReviewOrderId = table.Column<long>(type: "bigint", nullable: true),
                     TrackId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -515,8 +516,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         column: x => x.ReviewOrderId,
                         principalSchema: "app",
                         principalTable: "ReviewOrders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Reviews_Tracks_TrackId",
                         column: x => x.TrackId,
