@@ -225,6 +225,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     b.Property<decimal>("NominalAmount")
                         .HasColumnType("numeric");
 
+                    b.Property<decimal>("NominalAmountAtCreation")
+                        .HasColumnType("numeric");
+
                     b.Property<long?>("ProcessingStreamId")
                         .HasColumnType("bigint");
 
