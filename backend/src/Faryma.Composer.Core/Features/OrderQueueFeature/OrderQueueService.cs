@@ -36,7 +36,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             {
                 OrderPosition position = _queueManager.AddOrder(order);
                 await notificationService.NotifyNewOrderAdded(_positionsHashCode, position);
-                _positionsHashCode = DateTime.UtcNow.GetHashCode();
+                _positionsHashCode++;
             });
         }
 
@@ -46,7 +46,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             {
                 OrderPosition position = _queueManager.UpdateOrder(order, updateType);
                 await notificationService.NotifyOrderPositionChanged(_positionsHashCode, position, updateType);
-                _positionsHashCode = DateTime.UtcNow.GetHashCode();
+                _positionsHashCode++;
             });
         }
 
@@ -62,7 +62,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 };
 
                 await notificationService.NotifyOrderPositionsChanged(orderQueue);
-                _positionsHashCode = DateTime.UtcNow.GetHashCode();
+                _positionsHashCode++;
             });
         }
 
@@ -72,7 +72,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             {
                 OrderPosition position = _queueManager.RemoveOrder(order);
                 await notificationService.NotifyOrderRemoved(_positionsHashCode, position);
-                _positionsHashCode = DateTime.UtcNow.GetHashCode();
+                _positionsHashCode++;
             });
         }
 
