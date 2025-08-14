@@ -25,27 +25,27 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
     {
         private static readonly TimeSpan _idempotencyKeyExpiration = TimeSpan.FromHours(1);
 
-        ///// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <summary>
         /// Создает заказ
         /// </summary>
+        /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос создания заказа</param>
         [HttpPost(nameof(CreateReviewOrder))]
         [AuthorizeAdmins]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
-            //[FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
+            [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
             [FromBody] CreateReviewOrderRequest request)
         {
-            //if (idempotencyKey == Guid.Empty)
-            //{
-            //    return BadRequest("Требуется заголовок Idempotency-Key");
-            //}
+            if (idempotencyKey == Guid.Empty)
+            {
+                return BadRequest("Требуется заголовок Idempotency-Key");
+            }
 
-            //string key = $"CreateReviewOrder:{idempotencyKey}";
-            //if (cache.TryGetValue(key, out CreateReviewOrderResponse? response))
-            //{
-            //    return Ok(response);
-            //}
+            string key = $"CreateReviewOrder:{idempotencyKey}";
+            if (cache.TryGetValue(key, out CreateReviewOrderResponse? response))
+            {
+                return Ok(response);
+            }
 
             ReviewOrder order = await reviewOrderService.Create(new CreateCommand
             {
@@ -56,37 +56,37 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 UserComment = request.UserComment?.Trim(),
             });
 
-            CreateReviewOrderResponse response = new()
+            response = new CreateReviewOrderResponse
             {
                 ReviewOrder = ReviewOrderDto.Map(order)
             };
 
-            //cache.Set(key, response, _idempotencyKeyExpiration);
+            cache.Set(key, response, _idempotencyKeyExpiration);
 
             return Ok(response);
         }
 
-        ///// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <summary>
         /// Поднимает заказ в очереди
         /// </summary>
+        /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос поднятия заказа в очереди</param>
         [HttpPost(nameof(UpReviewOrder))]
         [AuthorizeAdmins]
         public async Task<ActionResult<UpReviewOrderResponse>> UpReviewOrder(
-            //[FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
+            [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
             [FromBody] UpReviewOrderRequest request)
         {
-            //if (idempotencyKey == Guid.Empty)
-            //{
-            //    return BadRequest("Требуется заголовок Idempotency-Key");
-            //}
+            if (idempotencyKey == Guid.Empty)
+            {
+                return BadRequest("Требуется заголовок Idempotency-Key");
+            }
 
-            //string key = $"UpReviewOrder:{idempotencyKey}";
-            //if (cache.TryGetValue(key, out UpReviewOrderResponse? response))
-            //{
-            //    return Ok(response);
-            //}
+            string key = $"UpReviewOrder:{idempotencyKey}";
+            if (cache.TryGetValue(key, out UpReviewOrderResponse? response))
+            {
+                return Ok(response);
+            }
 
             Transaction transaction = await reviewOrderService.Up(new UpCommand
             {
@@ -95,13 +95,13 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 PaymentAmount = request.PaymentAmount,
             });
 
-            UpReviewOrderResponse response = new()
+            response = new UpReviewOrderResponse
             {
                 ReviewOrder = ReviewOrderDto.Map(transaction.ReviewOrder!),
                 PaymentTransactionId = transaction.Id
             };
 
-            //cache.Set(key, response, _idempotencyKeyExpiration);
+            cache.Set(key, response, _idempotencyKeyExpiration);
 
             return Ok(response);
         }

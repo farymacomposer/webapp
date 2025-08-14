@@ -11,9 +11,9 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
     public sealed record OrderPositionChangedEvent
     {
         /// <summary>
-        /// Хэш-код позиций заказов
+        /// Версия для синхронизации состояния очереди
         /// </summary>
-        public required int PositionsHashCode { get; init; }
+        public required int SyncVersion { get; init; }
 
         /// <summary>
         /// Тип обновления очереди
@@ -35,11 +35,11 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// </summary>
         public required OrderQueuePositionDto CurrentPosition { get; init; }
 
-        public static OrderPositionChangedEvent Map(int positionsHashCode, OrderPosition orderPosition, OrderQueueUpdateType updateType)
+        public static OrderPositionChangedEvent Map(int syncVersion, OrderPosition orderPosition, OrderQueueUpdateType updateType)
         {
             return new()
             {
-                PositionsHashCode = positionsHashCode,
+                SyncVersion = syncVersion,
                 OrderQueueUpdateType = updateType,
                 Order = ReviewOrderDto.Map(orderPosition.Order),
                 PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),

@@ -12,9 +12,9 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
     public sealed record GetOrderQueueResponse
     {
         /// <summary>
-        /// Хэш-код позиций заказов
+        /// Версия для синхронизации состояния очереди
         /// </summary>
-        public required int PositionsHashCode { get; init; }
+        public required int SyncVersion { get; init; }
 
         /// <summary>
         /// Активные заказы
@@ -49,7 +49,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
         {
             GetOrderQueueResponse result = new()
             {
-                PositionsHashCode = orderQueue.PositionsHashCode,
+                SyncVersion = orderQueue.SyncVersion,
             };
 
             foreach (OrderPosition position in orderQueue.Positions.OrderBy(x => x.PositionHistory.Current.QueueIndex))

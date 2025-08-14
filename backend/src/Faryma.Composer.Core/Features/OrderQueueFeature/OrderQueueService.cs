@@ -14,7 +14,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
     {
         private readonly SemaphoreLocker _locker = new();
         private OrderQueueManager _queueManager = null!;
-        private int _positionsHashCode;
+
+        /// <summary>
+        /// Версия для синхронизации состояния очереди
+        /// </summary>
+        private int _syncVersion;
 
         public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrder order) =>
             _locker.Lock(() => _queueManager.OrderPositionsById[order.Id].PositionHistory.Current.Clone());
@@ -23,7 +27,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             return _locker.Lock(() => new OrderQueue
             {
-                PositionsHashCode = _positionsHashCode,
+                SyncVersion = _syncVersion,
                 Positions = _queueManager.OrderPositionsById
                     .Select(x => x.Value.Clone())
                     .ToArray(),
@@ -35,8 +39,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             await _locker.Lock(async () =>
             {
                 OrderPosition position = _queueManager.AddOrder(order);
-                await notificationService.NotifyNewOrderAdded(_positionsHashCode, position);
-                _positionsHashCode++;
+                await notificationService.NotifyNewOrderAdded(_syncVersion, position);
+                _syncVersion++;
             });
         }
 
@@ -45,8 +49,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             await _locker.Lock(async () =>
             {
                 OrderPosition position = _queueManager.UpdateOrder(order, updateType);
-                await notificationService.NotifyOrderPositionChanged(_positionsHashCode, position, updateType);
-                _positionsHashCode++;
+                await notificationService.NotifyOrderPositionChanged(_syncVersion, position, updateType);
+                _syncVersion++;
             });
         }
 
@@ -57,12 +61,12 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 _queueManager.NearestStreamDate = stream.EventDate;
                 OrderQueue orderQueue = new()
                 {
-                    PositionsHashCode = _positionsHashCode,
+                    SyncVersion = _syncVersion,
                     Positions = _queueManager.UpdateOrders(orders),
                 };
 
                 await notificationService.NotifyOrderPositionsChanged(orderQueue);
-                _positionsHashCode++;
+                _syncVersion++;
             });
         }
 
@@ -71,8 +75,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             await _locker.Lock(async () =>
             {
                 OrderPosition position = _queueManager.RemoveOrder(order);
-                await notificationService.NotifyOrderRemoved(_positionsHashCode, position);
-                _positionsHashCode++;
+                await notificationService.NotifyOrderRemoved(_syncVersion, position);
+                _syncVersion++;
             });
         }
 

@@ -6,9 +6,9 @@
     public sealed record OrderQueue
     {
         /// <summary>
-        /// Хэш-код позиций заказов
+        /// Версия для синхронизации состояния очереди
         /// </summary>
-        public required int PositionsHashCode { get; init; }
+        public required int SyncVersion { get; init; }
 
         /// <summary>
         /// Позиции заказов
