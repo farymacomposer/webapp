@@ -1,9 +1,11 @@
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM --platform=linux/arm64 mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
+
 COPY ["src/Faryma.Composer.Api/Faryma.Composer.Api.csproj", "src/Faryma.Composer.Api/"]
 COPY ["src/Faryma.Composer.Infrastructure/Faryma.Composer.Infrastructure.csproj", "src/Faryma.Composer.Infrastructure/"]
 RUN dotnet restore "src/Faryma.Composer.Api/Faryma.Composer.Api.csproj"
+
 COPY . .
 WORKDIR "/src/src/Faryma.Composer.Api"
 RUN dotnet build "Faryma.Composer.Api.csproj" -c Release -o /app/build
@@ -17,10 +19,13 @@ FROM build AS migrations
 WORKDIR "/src/src/Faryma.Composer.Infrastructure"
 RUN dotnet new tool-manifest && \
     dotnet tool install dotnet-ef -v d && \
-    dotnet ef migrations bundle -v --self-contained -r linux-x64 -o /app/migrations-bundle
+    dotnet ef migrations bundle \
+    --self-contained \
+    -r linux-arm64 \
+    --output /app/migrations-bundle
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+FROM --platform=linux/arm64 mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 EXPOSE 8080
 

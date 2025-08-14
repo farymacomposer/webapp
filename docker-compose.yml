@@ -1,8 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
-
   webapi:
+    platform: linux/amd64
     build:
       context: ./backend
       dockerfile: Dockerfile
