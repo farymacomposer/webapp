@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.CommonDto;
 
 namespace Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled
 {
@@ -11,6 +12,6 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndSchedu
         /// Список стримов
         /// </summary>
         [Required]
-        public required IEnumerable<ComposerStreamDto> Items { get; init; }
+        public required IEnumerable<ComposerStreamDto> Streams { get; init; }
     }
 }

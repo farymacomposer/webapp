@@ -22,10 +22,11 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         /// </summary>
         [Channel("NewOrderAdded", Servers = new[] { HubServerName })]
         [PublishOperation(typeof(NewOrderAddedEvent))]
-        public async Task NotifyNewOrderAdded(OrderPosition position)
+        public async Task NotifyNewOrderAdded(int syncVersion, OrderPosition position)
         {
-            NewOrderAddedEvent item = NewOrderAddedEvent.Map(position);
+            NewOrderAddedEvent item = NewOrderAddedEvent.Map(syncVersion, position);
             logger.LogInformation("NotifyNewOrderAdded {@item}", item);
+
             await context.Clients.All.SendAsync("NewOrderAdded", item);
         }
 
@@ -34,11 +35,25 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         /// </summary>
         [Channel("OrderPositionChanged", Servers = new[] { HubServerName })]
         [PublishOperation(typeof(OrderPositionChangedEvent))]
-        public async Task NotifyOrderPositionChanged(OrderPosition position, OrderQueueUpdateType updateType)
+        public async Task NotifyOrderPositionChanged(int syncVersion, OrderPosition position, OrderQueueUpdateType updateType)
         {
-            OrderPositionChangedEvent item = OrderPositionChangedEvent.Map(position, updateType);
+            OrderPositionChangedEvent item = OrderPositionChangedEvent.Map(syncVersion, position, updateType);
             logger.LogInformation("NotifyOrderPositionChanged {@item}", item);
+
             await context.Clients.All.SendAsync("OrderPositionChanged", item);
+        }
+
+        /// <summary>
+        /// Уведомляет об изменении позиций заказов
+        /// </summary>
+        [Channel("OrderPositionsChanged", Servers = new[] { HubServerName })]
+        [PublishOperation(typeof(OrderPositionsChangedEvent))]
+        public async Task NotifyOrderPositionsChanged(OrderQueue orderQueue)
+        {
+            OrderPositionsChangedEvent item = OrderPositionsChangedEvent.Map(orderQueue);
+            logger.LogInformation("NotifyOrderPositionsChanged {@item}", item);
+
+            await context.Clients.All.SendAsync("OrderPositionsChanged", item);
         }
 
         /// <summary>
@@ -46,10 +61,11 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         /// </summary>
         [Channel("OrderRemoved", Servers = new[] { HubServerName })]
         [PublishOperation(typeof(OrderRemovedEvent))]
-        public async Task NotifyOrderRemoved(OrderPosition position)
+        public async Task NotifyOrderRemoved(int syncVersion, OrderPosition position)
         {
-            OrderRemovedEvent item = OrderRemovedEvent.Map(position);
+            OrderRemovedEvent item = OrderRemovedEvent.Map(syncVersion, position);
             logger.LogInformation("NotifyOrderRemoved {@item}", item);
+
             await context.Clients.All.SendAsync("OrderRemoved", item);
         }
     }

@@ -1,4 +1,7 @@
-﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.CommonDto;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress
 {
     /// <summary>
     /// Ответ на запрос взятия заказа в работу
@@ -6,8 +9,9 @@
     public sealed record TakeOrderInProgressResponse
     {
         /// <summary>
-        /// Id заказа разбора трека
+        /// Заказ разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; init; }
+        [Required]
+        public required ReviewOrderDto ReviewOrder { get; init; }
     }
 }

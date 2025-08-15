@@ -17,11 +17,11 @@ namespace Faryma.Composer.Core.Features.AppSettings
             Settings = await context.AppSettings.SingleAsync();
         }
 
-        public async Task Update(AppSettingsModel item)
+        public async Task<AppSettingsEntity> Update(AppSettingsModel item)
         {
             if (Settings.ReviewOrderNominalAmount == item.ReviewOrderNominalAmount)
             {
-                return;
+                return Settings;
             }
 
             AppSettingsEntity entity = Clone(Settings);
@@ -29,6 +29,8 @@ namespace Faryma.Composer.Core.Features.AppSettings
 
             await Save(entity);
             Settings = entity;
+
+            return entity;
         }
 
         private static AppSettingsEntity Clone(AppSettingsEntity item)

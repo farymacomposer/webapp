@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Core.Features.AppSettings;
 using Faryma.Composer.Infrastructure.Entities;
 
 namespace Faryma.Composer.Api.Features.AppSettingsFeature
@@ -10,7 +9,7 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
     public sealed record AppSettingsDto
     {
         /// <summary>
-        /// Номинальная стоимость заказа (для бесплатных разборов)
+        /// Номинальная стоимость заказа (для бесплатных или минималка для платных)
         /// </summary>
         [Range(0, 10_000)]
         public required int ReviewOrderNominalAmount { get; set; }
@@ -20,14 +19,6 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
             return new()
             {
                 ReviewOrderNominalAmount = item.ReviewOrderNominalAmount,
-            };
-        }
-
-        public AppSettingsModel Map()
-        {
-            return new()
-            {
-                ReviewOrderNominalAmount = ReviewOrderNominalAmount,
             };
         }
     }

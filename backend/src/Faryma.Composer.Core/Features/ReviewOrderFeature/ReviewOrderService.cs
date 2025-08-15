@@ -22,6 +22,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         {
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
             ComposerStream stream = await composerStreamService.GetOrCreateForOrder(userNickname, command.OrderType);
+            int nominalAmount = appSettingsService.Settings.ReviewOrderNominalAmount;
 
             ReviewOrder? order = null;
             switch (command.OrderType)
@@ -34,6 +35,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     order = ofw.ReviewOrderRepository.CreateDonation(
                         stream,
                         payment,
+                        nominalAmount,
                         command.TrackUrl,
                         command.UserComment);
 
@@ -54,7 +56,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     order = ofw.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
-                        nominalAmount: appSettingsService.Settings.ReviewOrderNominalAmount,
+                        nominalAmount,
                         command.OrderType,
                         command.TrackUrl,
                         command.UserComment);
@@ -172,7 +174,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             DateTime now = DateTime.UtcNow;
 
-            order.Review = ofw.ReviewRepository.Create(order, command.Rating, command.Comment, now);
+            order.Review = ofw.ReviewRepository.Create(order, command.Rating, now);
             order.CompletedAt = now;
             order.Status = ReviewOrderStatus.Completed;
 

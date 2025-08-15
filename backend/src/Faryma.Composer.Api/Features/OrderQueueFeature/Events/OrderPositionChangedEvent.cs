@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
+﻿using Faryma.Composer.Api.Features.CommonDto;
+using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
@@ -10,6 +11,11 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
     public sealed record OrderPositionChangedEvent
     {
         /// <summary>
+        /// Версия для синхронизации состояния очереди
+        /// </summary>
+        public required int SyncVersion { get; init; }
+
+        /// <summary>
         /// Тип обновления очереди
         /// </summary>
         public required OrderQueueUpdateType OrderQueueUpdateType { get; init; }
@@ -20,23 +26,24 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         public required ReviewOrderDto Order { get; init; }
 
         /// <summary>
-        /// Текущая позиция заказа в очереди
-        /// </summary>
-        public required OrderQueuePositionDto CurrentPosition { get; init; }
-
-        /// <summary>
         /// Предыдущая позиция заказа в очереди
         /// </summary>
         public required OrderQueuePositionDto PreviousPosition { get; init; }
 
-        public static OrderPositionChangedEvent Map(OrderPosition orderPosition, OrderQueueUpdateType updateType)
+        /// <summary>
+        /// Текущая позиция заказа в очереди
+        /// </summary>
+        public required OrderQueuePositionDto CurrentPosition { get; init; }
+
+        public static OrderPositionChangedEvent Map(int syncVersion, OrderPosition orderPosition, OrderQueueUpdateType updateType)
         {
             return new()
             {
+                SyncVersion = syncVersion,
                 OrderQueueUpdateType = updateType,
                 Order = ReviewOrderDto.Map(orderPosition.Order),
-                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
-                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous)
+                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),
+                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current)
             };
         }
     }
