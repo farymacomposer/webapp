@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Api.Auth;
+﻿using Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -6,22 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace Faryma.Composer.Api.Features.OrderQueueFeature
 {
     /// <summary>
-    ///
+    /// Работа с очередью заказов
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public sealed class OrderQueueController(OrderQueueService orderQueueService) : ControllerBase
     {
         /// <summary>
-        ///
+        /// Получает текущее состояние очереди заказов
         /// </summary>
-        [HttpPost(nameof(GetOrderQueue))]
-        [AuthorizeComposer]
+        [HttpGet(nameof(GetOrderQueue))]
         public async Task<ActionResult<GetOrderQueueResponse>> GetOrderQueue()
         {
-            IReadOnlyDictionary<long, OrderPosition> orders = orderQueueService.GetOrderQueue();
+            OrderQueue orderQueue = await orderQueueService.GetOrderQueue();
 
-            return Ok(GetOrderQueueResponse.Map(orders));
+            return Ok(GetOrderQueueResponse.Map(orderQueue));
         }
     }
 }

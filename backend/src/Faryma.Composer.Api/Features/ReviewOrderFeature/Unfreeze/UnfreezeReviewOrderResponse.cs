@@ -1,13 +1,17 @@
-﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.CommonDto;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze
 {
     /// <summary>
-    /// Ответ на запрос разморозки заказа на разбор
+    /// Ответ на запрос разморозки заказа
     /// </summary>
     public sealed record UnfreezeReviewOrderResponse
     {
         /// <summary>
-        /// Id размороженного заказа разбора трека
+        /// Заказ разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; init; }
+        [Required]
+        public required ReviewOrderDto ReviewOrder { get; init; }
     }
 }

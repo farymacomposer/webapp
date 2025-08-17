@@ -1,6 +1,8 @@
 ﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm;
+using Faryma.Composer.Core.Utils;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
@@ -10,77 +12,94 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 {
     public sealed class OrderQueueService(IDbContextFactory<AppDbContext> contextFactory, IOrderQueueNotificationService notificationService)
     {
+        private readonly SemaphoreLocker _locker = new();
         private OrderQueueManager _queueManager = null!;
 
-        public IReadOnlyDictionary<long, OrderPosition> GetOrderQueue() => _queueManager.OrderPositionsById;
+        /// <summary>
+        /// Версия для синхронизации состояния очереди
+        /// </summary>
+        private int _syncVersion;
+
+        public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrder order) =>
+            _locker.Lock(() => _queueManager.OrderPositionsById[order.Id].PositionHistory.Current.Clone());
+
+        public Task<OrderQueue> GetOrderQueue()
+        {
+            return _locker.Lock(() => new OrderQueue
+            {
+                SyncVersion = _syncVersion,
+                Positions = _queueManager.OrderPositionsById
+                    .Select(x => x.Value.Clone())
+                    .ToArray(),
+            });
+        }
 
         public async Task AddOrder(ReviewOrder order)
         {
-            _queueManager.AddOrder(order);
-
-            await notificationService.NotifyNewOrderAdded(_queueManager.OrderPositionsById[order.Id]);
+            await _locker.Lock(async () =>
+            {
+                OrderPosition position = _queueManager.AddOrder(order);
+                await notificationService.NotifyNewOrderAdded(_syncVersion, position);
+                _syncVersion++;
+            });
         }
 
-        public async Task UpdateOrder(ReviewOrder order)
+        public async Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
         {
-            _queueManager.UpdateOrder(order);
+            await _locker.Lock(async () =>
+            {
+                OrderPosition position = _queueManager.UpdateOrder(order, updateType);
+                await notificationService.NotifyOrderPositionChanged(_syncVersion, position, updateType);
+                _syncVersion++;
+            });
+        }
 
-            await notificationService.NotifyOrderPositionChanged(_queueManager.OrderPositionsById[order!.Id]);
+        public async Task StartStream(ComposerStream stream, ReviewOrder[] orders)
+        {
+            await _locker.Lock(async () =>
+            {
+                _queueManager.NearestStreamDate = stream.EventDate;
+                OrderQueue orderQueue = new()
+                {
+                    SyncVersion = _syncVersion,
+                    Positions = _queueManager.UpdateOrders(orders),
+                };
+
+                await notificationService.NotifyOrderPositionsChanged(orderQueue);
+                _syncVersion++;
+            });
         }
 
         public async Task RemoveOrder(ReviewOrder order)
         {
-            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
-            //TODO Вернуть удаление когда появится функционал в очереди
-            //_queueManager.RemoveOrder(order);
-
-            await notificationService.NotifyOrderRemoved(position);
-        }
-
-        public async Task StartReview(ReviewOrder order)
-        {
-            _queueManager.UpdateOrder(order);
-
-            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
-
-            await notificationService.NotifyOrderPositionChanged(position);
-        }
-
-        public async Task CompleteReview(ReviewOrder order)
-        {
-            _queueManager.UpdateOrder(order);
-
-            OrderPosition position = _queueManager.OrderPositionsById[order!.Id];
-
-            await notificationService.NotifyOrderPositionChanged(position);
+            await _locker.Lock(async () =>
+            {
+                OrderPosition position = _queueManager.RemoveOrder(order);
+                await notificationService.NotifyOrderRemoved(_syncVersion, position);
+                _syncVersion++;
+            });
         }
 
         public async Task Initialize()
         {
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
 
-            DateOnly currentStreamDate = await context.ComposerStreams
-                .Where(x => x.Status == ComposerStreamStatus.Planned || x.Status == ComposerStreamStatus.Live)
+            DateOnly nearestStreamDate = await context.ComposerStreams
+                .Where(x => x.Status == ComposerStreamStatus.Live || x.Status == ComposerStreamStatus.Planned)
                 .OrderBy(x => x.EventDate)
                 .Select(x => x.EventDate)
                 .FirstOrDefaultAsync();
 
-            ReviewOrder[] orders = await context.ReviewOrders
+            ReviewOrder? lastOrder = await context.ReviewOrders
                 .AsNoTracking()
-                .Include(x => x.CreationStream)
-                .Include(x => x.UserNicknames)
-                .Include(x => x.Payments)
-                .Where(x => x.Status == ReviewOrderStatus.Preorder
-                    || x.Status == ReviewOrderStatus.Pending
-                    || x.Status == ReviewOrderStatus.InProgress
-                    || (x.ProcessingStream != null && x.ProcessingStream.Status == ComposerStreamStatus.Live))
-                .ToArrayAsync();
+                .Where(x => x.Status == ReviewOrderStatus.InProgress || x.Status == ReviewOrderStatus.Completed)
+                .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
+                .LastOrDefaultAsync();
 
-            Dictionary<long, OrderPosition> orderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v });
-
-            string? lastOutOfQueueCategoryNickname = await context.ReviewOrders
-                .Where(x => x.Type == ReviewOrderType.OutOfQueue)
-                .OrderBy(x => x.CompletedAt)
+            string? lastOutOfQueueNickname = await context.ReviewOrders
+                .Where(x => x.Type == ReviewOrderType.OutOfQueue
+                    && (x.Status == ReviewOrderStatus.InProgress || x.Status == ReviewOrderStatus.Completed))
+                .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
                 .Select(x => x.MainNormalizedNickname)
                 .LastOrDefaultAsync();
 
@@ -91,22 +110,34 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 {
                     x.EventDate,
                     x.ProcessedReviewOrders.Where(x => x.Type != ReviewOrderType.OutOfQueue)
-                        .OrderBy(x => x.CompletedAt)
+                        .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
                         .Last().MainNormalizedNickname
                 })
                 .ToDictionaryAsync(k => k.EventDate, v => v.MainNormalizedNickname);
 
+            ReviewOrder[] orders = await context.ReviewOrders
+                .AsNoTracking()
+                .Include(x => x.CreationStream)
+                .Include(x => x.Payments)
+                .Where(x => x.Status == ReviewOrderStatus.Preorder
+                    || x.Status == ReviewOrderStatus.Pending
+                    || x.Status == ReviewOrderStatus.InProgress
+                    || (x.ProcessingStream != null && x.ProcessingStream.Status == ComposerStreamStatus.Live))
+                .ToArrayAsync();
+
             _queueManager = new OrderQueueManager
             {
-                CurrentStreamDate = currentStreamDate,
-                OrderPositionsById = orderPositionsById,
+                NearestStreamDate = nearestStreamDate,
+                LastPriorityManagerState = (lastOrder is null) ? CategoryState.Initial : OrderQueueManager.MapCategoryState(lastOrder.CategoryType),
+                LastIssuedNickname = lastOrder?.MainNormalizedNickname,
+                LastOutOfQueueNickname = lastOutOfQueueNickname,
                 LastNicknameByStreamDate = lastNicknameByStreamDate,
-                LastOrderPriorityManagerState = OrderPriorityManager.State.Initial,
+                OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
             };
 
-            if (orderPositionsById.Count > 0)
+            if (orders.Length > 0)
             {
-                _queueManager.UpdateOrderPositions();
+                _queueManager.UpdateAllPositions();
             }
         }
     }

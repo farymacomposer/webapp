@@ -1,12 +1,13 @@
 ﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
 {
     /// <summary>
     /// Представляет позицию заказа в очереди, включая сам заказ и историю перемещений
     /// </summary>
-    public sealed record OrderPosition
+    public sealed class OrderPosition
     {
         /// <summary>
         /// Заказ разбора трека
@@ -16,17 +17,36 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// <summary>
         /// История изменений позиции заказа в очереди
         /// </summary>
-        public OrderPositionHistory PositionHistory { get; } = new();
+        public OrderPositionHistory PositionHistory { get; init; } = new();
 
-        public void Swap() => PositionHistory.Previous.Swap(PositionHistory.Current);
-        public void SetCurrentPosition(int index, OrderActivityStatus status) => PositionHistory.Current.Set(index, status);
+        /// <summary>
+        /// Записывает текущее состояние в предыдущее
+        /// </summary>
+        public void SaveCurrentPositionToPrevious() => PositionHistory.Previous.CopyFrom(PositionHistory.Current);
 
-        public void SetCurrentCategory(OrderCategoryType type, int debtNumber)
+        /// <summary>
+        /// Обновляет текущую позицию заказа в очереди
+        /// </summary>
+        public void UpdateCurrentPosition(int index, OrderActivityStatus status) => PositionHistory.Current.UpdatePosition(index, status);
+
+        /// <summary>
+        /// Обновляет текущую категорию заказа
+        /// </summary>
+        public void UpdateCurrentCategory(OrderCategoryType type, int debtNumber)
         {
             PositionHistory.Current.Category = new OrderCategoryInfo
             {
                 Type = type,
                 DebtNumber = debtNumber
+            };
+        }
+
+        public OrderPosition Clone()
+        {
+            return new()
+            {
+                Order = Order,
+                PositionHistory = PositionHistory.Clone(),
             };
         }
     }

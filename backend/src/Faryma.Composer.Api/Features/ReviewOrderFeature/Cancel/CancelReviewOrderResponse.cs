@@ -1,13 +1,17 @@
-﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.CommonDto;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel
 {
     /// <summary>
-    /// Ответ на запрос отмены заказа на разбор
+    /// Ответ на запрос отмены заказа
     /// </summary>
     public sealed record CancelReviewOrderResponse
     {
         /// <summary>
-        /// Id отмененного заказа разбора трека
+        /// Заказ разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; init; }
+        [Required]
+        public required ReviewOrderDto ReviewOrder { get; init; }
     }
 }

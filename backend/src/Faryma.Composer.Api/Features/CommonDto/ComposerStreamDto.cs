@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Api.Features.ComposerStreamFeature
+namespace Faryma.Composer.Api.Features.CommonDto
 {
     /// <summary>
     /// Стрим композитора
@@ -11,22 +11,32 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         /// <summary>
         /// Id стрима
         /// </summary>
-        public required long Id { get; set; }
+        public required long Id { get; init; }
 
         /// <summary>
         /// Дата проведения стрима
         /// </summary>
-        public required DateOnly EventDate { get; set; }
+        public required DateOnly EventDate { get; init; }
 
         /// <summary>
         /// Статус стрима
         /// </summary>
-        public required ComposerStreamStatus Status { get; set; }
+        public required ComposerStreamStatus Status { get; init; }
 
         /// <summary>
         /// Тип стрима
         /// </summary>
-        public required ComposerStreamType Type { get; set; }
+        public required ComposerStreamType Type { get; init; }
+
+        /// <summary>
+        /// Дата и время начала стрима
+        /// </summary>
+        public required DateTime? WentLiveAt { get; init; }
+
+        /// <summary>
+        /// Дата и время завершения стрима
+        /// </summary>
+        public required DateTime? CompletedAt { get; init; }
 
         public static ComposerStreamDto Map(ComposerStream item)
         {
@@ -36,6 +46,8 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
                 EventDate = item.EventDate,
                 Status = item.Status,
                 Type = item.Type,
+                WentLiveAt = item.WentLiveAt,
+                CompletedAt = item.CompletedAt,
             };
         }
     }

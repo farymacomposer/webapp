@@ -1,5 +1,6 @@
 ﻿using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Core.Features.AppSettings;
+using Faryma.Composer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Faryma.Composer.Api.Features.AppSettingsFeature
@@ -23,11 +24,14 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
         /// </summary>
         [HttpPost(nameof(UpdateAppSettings))]
         [AuthorizeComposer]
-        public async Task<IActionResult> UpdateAppSettings(AppSettingsDto dto)
+        public async Task<ActionResult<AppSettingsDto>> UpdateAppSettings(AppSettingsDto dto)
         {
-            await appSettingsService.Update(dto.Map());
+            AppSettingsEntity settings = await appSettingsService.Update(new AppSettingsModel
+            {
+                ReviewOrderNominalAmount = dto.ReviewOrderNominalAmount,
+            });
 
-            return Ok(new { });
+            return Ok(AppSettingsDto.Map(settings));
         }
     }
 }

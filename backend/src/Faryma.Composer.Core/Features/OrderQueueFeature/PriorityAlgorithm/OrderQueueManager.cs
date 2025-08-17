@@ -1,116 +1,286 @@
 ﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 {
+    /// <summary>
+    /// Управляет очередью заказов
+    /// </summary>
     public sealed class OrderQueueManager
     {
         /// <summary>
-        /// Дата текущего стрима
+        /// Дата ближайшего стрима
         /// </summary>
-        public required DateOnly CurrentStreamDate { get; set; }
+        public required DateOnly NearestStreamDate { get; set; }
 
         /// <summary>
-        ///
+        /// Последнее состояние менеджера приоритетов
         /// </summary>
-        public required OrderPriorityManager.State LastOrderPriorityManagerState { get; set; }
+        public required CategoryState LastPriorityManagerState { get; set; }
 
         /// <summary>
-        ///
+        /// Последний обработанный никнейм
         /// </summary>
-        public required Dictionary<long, OrderPosition> OrderPositionsById { get; init; }
+        public required string? LastIssuedNickname { get; set; }
 
         /// <summary>
-        /// Последний никнейм в категории (по дате стрима)
+        /// Последний никнейм в категории - вне очереди
+        /// </summary>
+        public required string? LastOutOfQueueNickname { get; set; }
+
+        /// <summary>
+        /// Последний никнейм в донатной и долговых категориях (по дате стрима)
         /// </summary>
         public required Dictionary<DateOnly, string> LastNicknameByStreamDate { get; init; }
 
         /// <summary>
+        /// Заказы и их позиции в очереди
+        /// </summary>
+        public required Dictionary<long, OrderPosition> OrderPositionsById { get; init; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public static CategoryState MapCategoryState(OrderCategoryType categoryType)
+        {
+            return categoryType switch
+            {
+                OrderCategoryType.OutOfQueue => CategoryState.OutOfQueue,
+                OrderCategoryType.Donation => CategoryState.Donation,
+                OrderCategoryType.Debt => CategoryState.Debt,
+                _ => throw new OrderQueueException($"Тип категории заказа '{categoryType}' не поддерживается")
+            };
+        }
+
+        /// <summary>
         /// Добавляет заказ
         /// </summary>
-        public void AddOrder(ReviewOrder order)
+        public OrderPosition AddOrder(ReviewOrder order)
         {
-            OrderPositionsById.Add(order.Id, new OrderPosition { Order = order });
-            UpdateOrderPositions();
+            OrderPosition position = new() { Order = order };
+            OrderPositionsById.Add(order.Id, position);
+
+            SaveCurrentPositionsToPrevious();
+            UpdateActive();
+            UpdateScheduled();
+
+            return position;
         }
 
         /// <summary>
         /// Обновляет заказ
         /// </summary>
-        public void UpdateOrder(ReviewOrder order)
+        public OrderPosition UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
         {
-            OrderPositionsById[order.Id].Order = order;
-            UpdateOrderPositions();
+            OrderPosition position = OrderPositionsById[order.Id];
+            position.Order = order;
+
+            switch (updateType)
+            {
+                case OrderQueueUpdateType.AddTrackUrl:
+
+                    return position;
+
+                case OrderQueueUpdateType.Up or OrderQueueUpdateType.Freeze or OrderQueueUpdateType.Unfreeze:
+
+                    SaveCurrentPositionsToPrevious();
+                    UpdateActive();
+                    UpdateScheduled();
+                    UpdateFrozen();
+
+                    break;
+
+                case OrderQueueUpdateType.TakeInProgress:
+
+                    LastPriorityManagerState = MapCategoryState(position.PositionHistory.Current.Category.Type);
+                    SetLastNickname(order);
+
+                    SaveCurrentPositionsToPrevious();
+                    UpdateActive();
+                    UpdateInProgress();
+
+                    break;
+
+                case OrderQueueUpdateType.Complete:
+
+                    SaveCurrentPositionsToPrevious();
+                    UpdateCompleted();
+
+                    break;
+
+                default:
+                    throw new OrderQueueException($"Тип обновления очереди '{updateType}' не поддерживается");
+            }
+
+            return position;
+        }
+
+        /// <summary>
+        /// Обновляет заказы
+        /// </summary>
+        public IEnumerable<OrderPosition> UpdateOrders(ReviewOrder[] orders)
+        {
+            List<OrderPosition> positions = [];
+            foreach (ReviewOrder order in orders)
+            {
+                OrderPosition position = OrderPositionsById[order.Id];
+                position.Order = order;
+                positions.Add(position);
+            }
+
+            UpdateAllPositions();
+
+            return positions;
+        }
+
+        /// <summary>
+        /// Удаляет заказ
+        /// </summary>
+        public OrderPosition RemoveOrder(ReviewOrder order)
+        {
+            OrderPosition position = OrderPositionsById[order.Id];
+            OrderPositionsById.Remove(order.Id);
+
+            SaveCurrentPositionsToPrevious();
+            UpdateActive();
+            UpdateInProgress();
+            UpdateScheduled();
+            UpdateFrozen();
+
+            return position;
         }
 
         /// <summary>
         /// Обновляет позиции заказов
         /// </summary>
-        public void UpdateOrderPositions()
+        public void UpdateAllPositions()
         {
-            SwapOrderPositions();
-            UpdateScheduledOrdersPositions();
-            UpdateActiveOrdersPositions();
-            UpdateFrozenOrdersPositions();
+            SaveCurrentPositionsToPrevious();
+            UpdateActive();
+            UpdateInProgress();
+            UpdateCompleted();
+            UpdateScheduled();
+            UpdateFrozen();
         }
 
-        private void SwapOrderPositions()
+        /// <summary>
+        ///
+        /// </summary>
+        private void SetLastNickname(ReviewOrder order)
         {
-            foreach (KeyValuePair<long, OrderPosition> item in OrderPositionsById)
+            LastIssuedNickname = order.MainNickname;
+
+            if (order.Type == ReviewOrderType.OutOfQueue)
             {
-                item.Value.Swap();
+                LastOutOfQueueNickname = order.MainNickname;
+            }
+            else
+            {
+                DateOnly streamDate = order.CreationStream.EventDate;
+                LastNicknameByStreamDate[streamDate] = order.MainNickname;
             }
         }
 
-        private void UpdateScheduledOrdersPositions()
+        /// <summary>
+        /// Сохраняет текущие позиции заказов в предыдущее состояние (для отслеживания изменений)
+        /// </summary>
+        private void SaveCurrentPositionsToPrevious()
         {
-            ReviewOrder[] orders = OrderPositionsById
-                .Select(x => x.Value.Order)
-                .Where(x => !x.IsFrozen && x.CreationStream.EventDate > CurrentStreamDate)
-                .Order(new OrderPriorityComparer())
-                .ToArray();
-
-            int index = 0;
-            foreach (ReviewOrder order in orders)
+            foreach (KeyValuePair<long, OrderPosition> kvp in OrderPositionsById)
             {
-                OrderPositionsById[order.Id].SetCurrentPosition(index, OrderActivityStatus.Scheduled);
-                index++;
+                kvp.Value.SaveCurrentPositionToPrevious();
             }
         }
 
-        private void UpdateActiveOrdersPositions()
+        /// <summary>
+        /// Обновляет позиции активных заказов
+        /// </summary>
+        private void UpdateActive()
         {
             int index = 0;
             OrderPriorityManager manager = new(this);
-            manager.UpdateOrdersCategories();
 
             while (true)
             {
-                (OrderPriorityManager.State state, bool isOnlyNicknameLeft) = manager.DetermineNextState();
-                if (state == OrderPriorityManager.State.Completed)
+                (CategoryState state, bool isOnlyNicknameLeft) = manager.DetermineNextState();
+                if (state == CategoryState.Completed)
                 {
                     break;
                 }
 
                 ReviewOrder order = manager.TakeNextOrder(isOnlyNicknameLeft);
-                OrderPositionsById[order.Id].SetCurrentPosition(index, OrderActivityStatus.Active);
+                OrderPositionsById[order.Id].UpdateCurrentPosition(index, OrderActivityStatus.Active);
                 index++;
             }
         }
 
-        private void UpdateFrozenOrdersPositions()
+        /// <summary>
+        /// Обновляет позицию заказа в работе
+        /// </summary>
+        private void UpdateInProgress()
+        {
+            KeyValuePair<long, OrderPosition> kvp = OrderPositionsById
+                .SingleOrDefault(x => x.Value.Order.Status == ReviewOrderStatus.InProgress);
+
+            if (kvp.Value is not null)
+            {
+                OrderPositionsById[kvp.Value.Order.Id].UpdateCurrentPosition(0, OrderActivityStatus.InProgress);
+            }
+        }
+
+        /// <summary>
+        /// Обновляет позиции выполненных заказов
+        /// </summary>
+        private void UpdateCompleted()
+        {
+            ReviewOrder[] orders = OrderPositionsById
+                .Select(x => x.Value.Order)
+                .Where(x => x.Status == ReviewOrderStatus.Completed)
+                .OrderBy(x => x.CompletedAt)
+                .ToArray();
+
+            UpdatePositions(orders, OrderActivityStatus.Completed);
+        }
+
+        /// <summary>
+        /// Обновляет позиции запланированных заказов
+        /// </summary>
+        private void UpdateScheduled()
+        {
+            ReviewOrder[] orders = OrderPositionsById
+                .Select(x => x.Value.Order)
+                .Where(x => !x.IsFrozen && x.CreationStream.EventDate > NearestStreamDate)
+                .Order(OrderPriorityComparer.Default)
+                .ToArray();
+
+            UpdatePositions(orders, OrderActivityStatus.Scheduled);
+        }
+
+        /// <summary>
+        /// Обновляет позиции замороженных заказов
+        /// </summary>
+        private void UpdateFrozen()
         {
             ReviewOrder[] orders = OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => x.IsFrozen)
-                .Order(new OrderPriorityComparer())
+                .Order(OrderPriorityComparer.Default)
                 .ToArray();
 
+            UpdatePositions(orders, OrderActivityStatus.Frozen);
+        }
+
+        /// <summary>
+        /// Обновляет позиции заказов
+        /// </summary>
+        private void UpdatePositions(ReviewOrder[] orders, OrderActivityStatus activityStatus)
+        {
             int index = 0;
             foreach (ReviewOrder order in orders)
             {
-                OrderPositionsById[order.Id].SetCurrentPosition(index, OrderActivityStatus.Frozen);
+                OrderPositionsById[order.Id].UpdateCurrentPosition(index, activityStatus);
                 index++;
             }
         }

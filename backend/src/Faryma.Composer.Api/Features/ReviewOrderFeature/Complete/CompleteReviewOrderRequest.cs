@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Complete
 {
@@ -18,22 +17,5 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Complete
         /// </summary>
         [Range(0, 26, ErrorMessage = "Оценка должна быть от 0 до 26")]
         public required int Rating { get; set; }
-
-        /// <summary>
-        /// Комментарий к разбору
-        /// </summary>
-        [Required]
-        [StringLength(300, MinimumLength = 1, ErrorMessage = "Обязательно наличие комментария, но не более 300 символов")]
-        public required string Comment { get; set; }
-
-        public CompleteCommand Map()
-        {
-            return new()
-            {
-                ReviewOrderId = ReviewOrderId,
-                Rating = Rating,
-                Comment = Comment.Trim(),
-            };
-        }
     }
 }

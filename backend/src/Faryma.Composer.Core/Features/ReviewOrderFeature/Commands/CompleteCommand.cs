@@ -1,7 +1,7 @@
 ﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
 {
     /// <summary>
-    /// Команда завершения разбора трека
+    /// Команда выполнения заказа
     /// </summary>
     public sealed record CompleteCommand
     {
@@ -14,10 +14,5 @@
         /// Оценка трека (0-26)
         /// </summary>
         public required int Rating { get; init; }
-
-        /// <summary>
-        /// Комментарий к разбору
-        /// </summary>
-        public required string Comment { get; init; }
     }
 }

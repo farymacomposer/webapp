@@ -1,4 +1,7 @@
-﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.CommonDto;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
 {
     /// <summary>
     /// Ответ на запрос создания заказа на разбор
@@ -6,8 +9,9 @@
     public sealed record CreateReviewOrderResponse
     {
         /// <summary>
-        /// Id заказа на разбора трека
+        /// Заказ разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; init; }
+        [Required]
+        public required ReviewOrderDto ReviewOrder { get; init; }
     }
 }

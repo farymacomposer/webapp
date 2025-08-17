@@ -1,7 +1,7 @@
 ﻿namespace Faryma.Composer.Core.Features.ReviewOrderFeature.Commands
 {
     /// <summary>
-    /// Команда разморозки заказа разбора трека
+    /// Команда разморозки заказа
     /// </summary>
     public sealed record UnfreezeCommand
     {

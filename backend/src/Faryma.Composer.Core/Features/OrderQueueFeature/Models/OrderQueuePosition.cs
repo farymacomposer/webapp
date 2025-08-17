@@ -22,17 +22,33 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// </summary>
         public OrderCategoryInfo Category { get; set; } = new();
 
-        public void Swap(OrderQueuePosition current)
+        /// <summary>
+        /// Копирует состояние из другой позиции в текущую
+        /// </summary>
+        public void CopyFrom(OrderQueuePosition current)
         {
             QueueIndex = current.QueueIndex;
             ActivityStatus = current.ActivityStatus;
             Category = current.Category;
         }
 
-        public void Set(int index, OrderActivityStatus status)
+        /// <summary>
+        /// Обновляет позицию заказа в очереди и статус активности
+        /// </summary>
+        public void UpdatePosition(int index, OrderActivityStatus status)
         {
             QueueIndex = index;
             ActivityStatus = status;
+        }
+
+        public OrderQueuePosition Clone()
+        {
+            return new()
+            {
+                QueueIndex = QueueIndex,
+                ActivityStatus = ActivityStatus,
+                Category = Category,
+            };
         }
     }
 }

@@ -108,6 +108,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateOnly>("EventDate")
                         .HasColumnType("date");
 
@@ -116,6 +119,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("WentLiveAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -157,14 +163,13 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Comment")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
 
-                    b.Property<long>("ReviewOrderId")
+                    b.Property<long?>("ReviewOrderId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("TrackId")
@@ -191,6 +196,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<int>("CategoryType")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -215,6 +223,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("NominalAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("NominalAmountAtCreation")
                         .HasColumnType("numeric");
 
                     b.Property<long?>("ProcessingStreamId")
@@ -680,15 +691,15 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 {
                     b.HasOne("Faryma.Composer.Infrastructure.Entities.ReviewOrder", "ReviewOrder")
                         .WithOne("Review")
-                        .HasForeignKey("Faryma.Composer.Infrastructure.Entities.Review", "ReviewOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Faryma.Composer.Infrastructure.Entities.Review", "ReviewOrderId");
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
                         .WithMany("Reviews")
                         .HasForeignKey("TrackId");
 
                     b.Navigation("ReviewOrder");
+
+                    b.Navigation("Track");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrder", b =>

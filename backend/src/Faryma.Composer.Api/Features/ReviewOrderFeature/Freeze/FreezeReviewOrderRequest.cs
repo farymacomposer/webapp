@@ -1,9 +1,7 @@
-﻿using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
-
-namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze
+﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze
 {
     /// <summary>
-    /// Запрос заморозки заказа на разбор
+    /// Запрос заморозки заказа
     /// </summary>
     public sealed record FreezeReviewOrderRequest
     {
@@ -11,13 +9,5 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze
         /// Id заказа разбора трека
         /// </summary>
         public required long ReviewOrderId { get; set; }
-
-        public FreezeCommand Map()
-        {
-            return new()
-            {
-                ReviewOrderId = ReviewOrderId,
-            };
-        }
     }
 }
