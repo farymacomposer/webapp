@@ -1,20 +1,16 @@
 ﻿using Faryma.Composer.Infrastructure.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Entities
 {
     /// <summary>
-    /// Музыкальный жанр
+    /// Музыкальный жанр трека
     /// </summary>
-    [Index(nameof(NormalizedName), IsUnique = true)]
-    public sealed class Genre : BaseEntity
+    public sealed class TrackGenre : BaseEntity
     {
         /// <summary>
         /// Название жанра
         /// </summary>
         public required string Name { get; set; }
-
-        public required string NormalizedName { get; set; }
 
         // Навигационные свойства
 

@@ -3,7 +3,6 @@ using System.Text;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
-using Faryma.Composer.Api.Features.TrackFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
@@ -87,7 +86,7 @@ namespace Faryma.Composer.Api.DependencyInjection
         {
             services
                 .AddGraphQLServer()
-                .AddQueryType<TrackQuery>()
+                //.AddQueryType<TrackQuery>()
                 .AddProjections()
                 .AddFiltering()
                 .AddSorting();

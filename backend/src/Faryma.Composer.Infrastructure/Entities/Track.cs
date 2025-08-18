@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Infrastructure.Abstractions;
-using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Infrastructure.Models;
 
 namespace Faryma.Composer.Infrastructure.Entities
 {
@@ -10,19 +10,14 @@ namespace Faryma.Composer.Infrastructure.Entities
     public sealed class Track : BaseEntity
     {
         /// <summary>
+        /// Дата и время добавления трека
+        /// </summary>
+        public required DateTime AddedAt { get; set; }
+
+        /// <summary>
         /// Название трека
         /// </summary>
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// Год выпуска трека
-        /// </summary>
-        public int? Year { get; set; }
-
-        /// <summary>
-        /// Дата и время загрузки трека
-        /// </summary>
-        public required DateTime UploadedAt { get; set; }
+        public required string Title { get; set; }
 
         /// <summary>
         /// Ссылка на трек
@@ -30,29 +25,51 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required string Url { get; set; }
 
         /// <summary>
-        /// Происхождение трека
+        /// Дата выпуска трека
         /// </summary>
-        public TrackOrigin? Origin { get; set; }
+        public DateTime? ReleaseDate { get; set; }
 
-        public Guid UploadedByUserNicknameId { get; set; }
+        /// <summary>
+        /// Ссылка на обложку
+        /// </summary>
+        public string? CoverUrl { get; set; }
+
+        /// <summary>
+        /// Расширенные жанры
+        /// </summary>
+        public List<string> ExtendedGenres { get; set; } = [];
+
+        /// <summary>
+        /// Тэги
+        /// </summary>
+        public List<TrackTag> Tags { get; set; } = [];
+
+        public Guid AddedByUserNicknameId { get; set; }
+        public long? CountryId { get; set; }
 
         // Навигационные свойства
 
         /// <summary>
         /// Пользователь, загрузивший трек
         /// </summary>
-        [ForeignKey(nameof(UploadedByUserNicknameId))]
-        public required UserNickname UploadedBy { get; set; }
+        [ForeignKey(nameof(AddedByUserNicknameId))]
+        public required UserNickname AddedBy { get; set; }
+
+        /// <summary>
+        /// Страна производства
+        /// </summary>
+        [ForeignKey(nameof(CountryId))]
+        public TrackCountry? Country { get; set; }
 
         /// <summary>
         /// Связь с исполнителями
         /// </summary>
-        public ICollection<Artist> Artists { get; set; } = [];
+        public ICollection<TrackArtist> Artists { get; set; } = [];
 
         /// <summary>
         /// Связь с жанрами
         /// </summary>
-        public ICollection<Genre> Genres { get; set; } = [];
+        public ICollection<TrackGenre> Genres { get; set; } = [];
 
         /// <summary>
         /// Заказы разборов трека

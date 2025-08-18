@@ -14,9 +14,8 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
 
             services
                 .AddScoped<UnitOfWork>()
-                .AddScoped<ArtistRepository>()
+                .AddScoped<TrackArtistRepository>()
                 .AddScoped<ComposerStreamRepository>()
-                .AddScoped<GenreRepository>()
                 .AddScoped<ReviewOrderRepository>()
                 .AddScoped<ReviewRepository>()
                 .AddScoped<TrackRepository>()

@@ -8,19 +8,14 @@ namespace Faryma.Composer.Infrastructure
     public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options)
     {
         /// <summary>
-        /// Исполнители музыкальных треков
+        /// Настройки приложения
         /// </summary>
-        public DbSet<Artist> Artists { get; set; }
+        public DbSet<AppSettingsEntity> AppSettings { get; set; }
 
         /// <summary>
         /// Стримы композитора
         /// </summary>
         public DbSet<ComposerStream> ComposerStreams { get; set; }
-
-        /// <summary>
-        /// Музыкальные жанры
-        /// </summary>
-        public DbSet<Genre> Genres { get; set; }
 
         /// <summary>
         /// Результаты разборов треков
@@ -36,6 +31,21 @@ namespace Faryma.Composer.Infrastructure
         /// Музыкальные треки
         /// </summary>
         public DbSet<Track> Tracks { get; set; }
+
+        /// <summary>
+        /// Исполнители музыкальных треков
+        /// </summary>
+        public DbSet<TrackArtist> TrackArtists { get; set; }
+
+        /// <summary>
+        /// Страны производства треков
+        /// </summary>
+        public DbSet<TrackCountry> TrackCountries { get; set; }
+
+        /// <summary>
+        /// Музыкальные жанры
+        /// </summary>
+        public DbSet<TrackGenre> TrackGenres { get; set; }
 
         /// <summary>
         /// Операции по счетам
@@ -62,11 +72,6 @@ namespace Faryma.Composer.Infrastructure
         /// </summary>
         public DbSet<UserTrackRating> UserTrackRatings { get; set; }
 
-        /// <summary>
-        /// Настройки приложения
-        /// </summary>
-        public DbSet<AppSettingsEntity> AppSettings { get; set; }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.HasDefaultSchema("app");
@@ -83,6 +88,9 @@ namespace Faryma.Composer.Infrastructure
                 .WithOne(ro => ro.ProcessingStream)
                 .HasForeignKey(ro => ro.ProcessingStreamId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Track>()
+                .OwnsMany(x => x.Tags, x => x.ToJson());
 
             builder.Entity<IdentityRole<Guid>>().HasData(
                 new IdentityRole<Guid>
@@ -114,6 +122,27 @@ namespace Faryma.Composer.Infrastructure
                     Id = 1,
                     ReviewOrderNominalAmount = 750,
                 }
+            );
+
+            builder.Entity<TrackGenre>().HasData(
+                new TrackGenre { Id = 1, Name = "электронное" },
+                new TrackGenre { Id = 2, Name = "фолк" },
+                new TrackGenre { Id = 3, Name = "рок" },
+                new TrackGenre { Id = 4, Name = "разное" },
+                new TrackGenre { Id = 5, Name = "джаз" },
+                new TrackGenre { Id = 6, Name = "метал" },
+                new TrackGenre { Id = 7, Name = "рэп" },
+                new TrackGenre { Id = 8, Name = "поп" },
+                new TrackGenre { Id = 9, Name = "оркестровый" },
+                new TrackGenre { Id = 10, Name = "фанк" },
+                new TrackGenre { Id = 11, Name = "мюзикл/опера" },
+                new TrackGenre { Id = 12, Name = "инди" },
+                new TrackGenre { Id = 13, Name = "поп-рок" },
+                new TrackGenre { Id = 14, Name = "шансон" },
+                new TrackGenre { Id = 15, Name = "специфическое" },
+                new TrackGenre { Id = 16, Name = "баллада" },
+                new TrackGenre { Id = 17, Name = "фортепиано" },
+                new TrackGenre { Id = 18, Name = "инструментал" }
             );
         }
     }

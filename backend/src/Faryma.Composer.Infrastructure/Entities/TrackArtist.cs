@@ -7,7 +7,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// Исполнитель музыкального трека
     /// </summary>
     [Index(nameof(NormalizedName), IsUnique = true)]
-    public sealed class Artist : BaseEntity
+    public sealed class TrackArtist : BaseEntity
     {
         /// <summary>
         /// Имя исполнителя
