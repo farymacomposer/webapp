@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Api.Auth;
+using Faryma.Composer.Api.Features.CommonDto;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Complete;
@@ -27,24 +28,24 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// <summary>
         /// Создает заказ
         /// </summary>
-        ///// <param name="idempotencyKey">Ключ идемпотентности</param>
+        /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос создания заказа</param>
         [HttpPost(nameof(CreateReviewOrder))]
         [AuthorizeAdmins]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
-            //[FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
+            [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
             [FromBody] CreateReviewOrderRequest request)
         {
-            //if (idempotencyKey == Guid.Empty)
-            //{
-            //    return BadRequest("Требуется заголовок Idempotency-Key");
-            //}
+            if (idempotencyKey == Guid.Empty)
+            {
+                return BadRequest("Требуется заголовок Idempotency-Key");
+            }
 
-            //string key = $"CreateReviewOrder:{idempotencyKey}";
-            //if (cache.TryGetValue(key, out CreateReviewOrderResponse? response))
-            //{
-            //    return Ok(response);
-            //}
+            string key = $"CreateReviewOrder:{idempotencyKey}";
+            if (cache.TryGetValue(key, out CreateReviewOrderResponse? response))
+            {
+                return Ok(response);
+            }
 
             ReviewOrder order = await reviewOrderService.Create(new CreateCommand
             {
@@ -55,12 +56,12 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 UserComment = request.UserComment?.Trim(),
             });
 
-            CreateReviewOrderResponse response = new()
+            response = new CreateReviewOrderResponse
             {
-                ReviewOrderId = order.Id
+                ReviewOrder = ReviewOrderDto.Map(order)
             };
 
-            //cache.Set(key, response, _idempotencyKeyExpiration);
+            cache.Set(key, response, _idempotencyKeyExpiration);
 
             return Ok(response);
         }
@@ -96,7 +97,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
 
             response = new UpReviewOrderResponse
             {
-                ReviewOrderId = transaction.ReviewOrderId!.Value,
+                ReviewOrder = ReviewOrderDto.Map(transaction.ReviewOrder!),
                 PaymentTransactionId = transaction.Id
             };
 
@@ -120,8 +121,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
 
             return Ok(new AddTrackUrlResponse
             {
-                ReviewOrderId = order.Id,
-                TrackUrl = order.TrackUrl!
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
@@ -139,7 +139,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
 
             return Ok(new TakeOrderInProgressResponse
             {
-                ReviewOrderId = order.Id
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
@@ -154,12 +154,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Rating = request.Rating,
-                Comment = request.Comment.Trim(),
             });
 
             return Ok(new CompleteReviewOrderResponse
             {
-                ReviewOrderId = order.Id,
+                ReviewOrder = ReviewOrderDto.Map(order),
                 ReviewId = order.Review!.Id,
             });
         }
@@ -178,7 +177,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
 
             return Ok(new FreezeReviewOrderResponse
             {
-                ReviewOrderId = order.Id
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
@@ -196,7 +195,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
 
             return Ok(new UnfreezeReviewOrderResponse
             {
-                ReviewOrderId = order.Id
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
@@ -214,7 +213,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
 
             return Ok(new CancelReviewOrderResponse
             {
-                ReviewOrderId = order.Id
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
     }

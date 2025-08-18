@@ -40,5 +40,15 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
             QueueIndex = index;
             ActivityStatus = status;
         }
+
+        public OrderQueuePosition Clone()
+        {
+            return new()
+            {
+                QueueIndex = QueueIndex,
+                ActivityStatus = ActivityStatus,
+                Category = Category,
+            };
+        }
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.CommonDto;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze
 {
     /// <summary>
     /// Ответ на запрос заморозки заказа
@@ -6,8 +9,9 @@
     public sealed record FreezeReviewOrderResponse
     {
         /// <summary>
-        /// Id замороженного заказа
+        /// Заказ разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; init; }
+        [Required]
+        public required ReviewOrderDto ReviewOrder { get; init; }
     }
 }

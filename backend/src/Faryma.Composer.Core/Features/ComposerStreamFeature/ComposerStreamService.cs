@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Core.Features.ComposerStreamFeature.Commands;
+using Faryma.Composer.Core.Features.OrderQueueFeature;
 using Faryma.Composer.Core.Utils;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Entities;
@@ -8,10 +9,10 @@ using Npgsql;
 
 namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 {
-    public sealed class ComposerStreamService(UnitOfWork ofw)
+    public sealed class ComposerStreamService(UnitOfWork ofw, OrderQueueService orderQueueService)
     {
-        public Task<IReadOnlyCollection<ComposerStream>> Find(DateOnly dateFrom, DateOnly dateTo) => ofw.ComposerStreamRepository.Find(dateFrom, dateTo);
-        public Task<IReadOnlyCollection<ComposerStream>> FindCurrentAndScheduled() => ofw.ComposerStreamRepository.FindCurrentAndScheduled();
+        public Task<ComposerStream[]> Find(DateOnly dateFrom, DateOnly dateTo) => ofw.ComposerStreamRepository.Find(dateFrom, dateTo);
+        public Task<ComposerStream[]> FindCurrentAndScheduled() => ofw.ComposerStreamRepository.FindLiveAndPlanned();
 
         public async Task<ComposerStream> Create(CreateCommand command)
         {
@@ -30,6 +31,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
         public async Task<ComposerStream> Start(StartCommand command)
         {
+            // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
             ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
             if (stream.Status == ComposerStreamStatus.Live)
             {
@@ -45,6 +47,9 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             stream.WentLiveAt = DateTime.UtcNow;
 
             await ofw.SaveChangesAsync();
+
+            ReviewOrder[] orders = await ofw.ReviewOrderRepository.GetOrdersForStream(stream.Id);
+            await orderQueueService.StartStream(stream, orders);
 
             return stream;
         }
@@ -112,7 +117,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             (DateOnly EventDate, ComposerStreamType Type) donationStreamInfo = (donationStreamDate, ComposerStreamType.Donation);
             (DateOnly EventDate, ComposerStreamType Type) nearestStreamInfo = (debtStreamDate < donationStreamDate) ? debtStreamInfo : donationStreamInfo;
 
-            ComposerStream? nearestStream = await ofw.ComposerStreamRepository.FindNearestInWeekRange(today);
+            ComposerStream? nearestStream = await ofw.ComposerStreamRepository.FindNearest(today);
 
             switch (orderType)
             {
@@ -138,25 +143,34 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
         private async Task<ComposerStream> GetOrCreateStream((DateOnly EventDate, ComposerStreamType Type) streamInfo)
         {
-            ComposerStream? stream = await ofw.ComposerStreamRepository.Find(streamInfo.EventDate);
-            if (stream is not null)
+            while (true)
             {
-                return stream;
-            }
+                DateOnly eventDate = streamInfo.EventDate;
+                ComposerStream? stream = await ofw.ComposerStreamRepository.Find(eventDate);
 
-            stream = ofw.ComposerStreamRepository.Create(streamInfo.EventDate, streamInfo.Type);
+                if (stream is null)
+                {
+                    stream = ofw.ComposerStreamRepository.Create(eventDate, streamInfo.Type);
 
-            try
-            {
-                await ofw.SaveChangesAsync();
+                    try
+                    {
+                        await ofw.SaveChangesAsync();
 
-                return stream;
-            }
-            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
-            {
-                ofw.Remove(stream);
+                        return stream;
+                    }
+                    catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
+                    {
+                        ofw.Remove(stream);
 
-                return await ofw.ComposerStreamRepository.Get(streamInfo.EventDate);
+                        return await ofw.ComposerStreamRepository.Get(eventDate);
+                    }
+                }
+                else if (stream.Status == ComposerStreamStatus.Planned && stream.Type == streamInfo.Type)
+                {
+                    return stream;
+                }
+
+                eventDate = eventDate.AddDays(6);
             }
         }
     }

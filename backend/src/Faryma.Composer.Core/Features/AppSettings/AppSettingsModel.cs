@@ -6,7 +6,7 @@
     public sealed record AppSettingsModel
     {
         /// <summary>
-        /// Номинальная стоимость заказа (для бесплатных)
+        /// Номинальная стоимость заказа (для бесплатных или минималка для платных)
         /// </summary>
         public required int ReviewOrderNominalAmount { get; init; }
     }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.CommonDto;
 
 namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Start
 {
