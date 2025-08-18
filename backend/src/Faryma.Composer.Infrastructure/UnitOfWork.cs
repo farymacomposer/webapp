@@ -16,7 +16,7 @@ namespace Faryma.Composer.Infrastructure
         UserRepository userRepository,
         UserTrackRatingRepository userTrackRatingRepository)
     {
-        public TrackArtistRepository ArtistRepository { get; } = artistRepository;
+        public TrackArtistRepository TrackArtistRepository { get; } = artistRepository;
         public ComposerStreamRepository ComposerStreamRepository { get; } = composerStreamRepository;
         public ReviewOrderRepository ReviewOrderRepository { get; } = reviewOrderRepository;
         public ReviewRepository ReviewRepository { get; } = reviewRepository;

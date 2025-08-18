@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Infrastructure.Repositories;
+﻿using Faryma.Composer.Infrastructure.QueryServices;
+using Faryma.Composer.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,9 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
                 .AddScoped<UserNicknameRepository>()
                 .AddScoped<UserRepository>()
                 .AddScoped<UserTrackRatingRepository>();
+
+            services
+                .AddScoped<TrackQueryService>();
 
             return services;
         }

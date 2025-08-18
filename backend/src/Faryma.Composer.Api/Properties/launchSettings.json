@@ -30,6 +30,16 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7166;http://localhost:5190"
+    },
+    "graphql": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "graphql",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7166;http://localhost:5190"
     }
   }
 }
