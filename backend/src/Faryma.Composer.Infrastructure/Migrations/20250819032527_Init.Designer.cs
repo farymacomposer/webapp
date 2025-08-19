@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250818161530_Init")]
+    [Migration("20250819032527_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -92,7 +92,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Rating")
+                    b.Property<int>("RatingValue")
                         .HasColumnType("integer");
 
                     b.Property<long?>("ReviewOrderId")
@@ -207,8 +207,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text[]");
 
-                    b.Property<DateTime?>("ReleaseDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("ReleaseDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("Title")
                         .IsRequired()

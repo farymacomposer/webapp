@@ -27,7 +27,7 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Дата выпуска трека
         /// </summary>
-        public DateTime? ReleaseDate { get; set; }
+        public DateOnly? ReleaseDate { get; set; }
 
         /// <summary>
         /// Ссылка на обложку

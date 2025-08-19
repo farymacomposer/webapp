@@ -13,14 +13,34 @@ namespace Faryma.Composer.Infrastructure.QueryModels
         public required string Title { get; init; }
 
         /// <summary>
-        /// Дата выпуска трека
+        /// Год выпуска трека
         /// </summary>
-        public required DateTime? ReleaseDate { get; init; }
+        public required int? ReleaseYear { get; init; }
+
+        /// <summary>
+        /// Id страны производства
+        /// </summary>
+        public required long? CountryId { get; init; }
 
         /// <summary>
         /// Ссылка на обложку
         /// </summary>
         public required string? CoverUrl { get; init; }
+
+        /// <summary>
+        /// Есть разнос
+        /// </summary>
+        public required bool HasReview { get; init; }
+
+        /// <summary>
+        /// Оценка последнего разноса
+        /// </summary>
+        public required int? LastReviewRating { get; init; }
+
+        /// <summary>
+        /// Оценка пользователей
+        /// </summary>
+        public required int? UserRating { get; init; }
 
         /// <summary>
         /// Расширенные жанры
@@ -33,28 +53,13 @@ namespace Faryma.Composer.Infrastructure.QueryModels
         public required IEnumerable<TrackTag> Tags { get; init; }
 
         /// <summary>
-        /// Страна производства
+        /// Исполнители
         /// </summary>
-        public required TrackCountryQueryModel? Country { get; init; }
+        public required IEnumerable<string> Artists { get; init; }
 
         /// <summary>
-        /// Связь с исполнителями
+        /// Id жанров
         /// </summary>
-        public required IEnumerable<TrackArtistQueryModel> Artists { get; init; }
-
-        /// <summary>
-        /// Связь с жанрами
-        /// </summary>
-        public required IEnumerable<TrackGenreQueryModel> Genres { get; init; }
-
-        /// <summary>
-        /// Результаты разборов трека композитором
-        /// </summary>
-        public required IEnumerable<ReviewQueryModel> Reviews { get; init; }
-
-        /// <summary>
-        /// Оценки пользователей
-        /// </summary>
-        public required IEnumerable<UserTrackRatingQueryModel> UserRatings { get; init; }
+        public required IEnumerable<long> GenreIds { get; init; }
     }
 }

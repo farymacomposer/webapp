@@ -310,7 +310,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     AddedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Url = table.Column<string>(type: "text", nullable: false),
-                    ReleaseDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ReleaseDate = table.Column<DateOnly>(type: "date", nullable: true),
                     CoverUrl = table.Column<string>(type: "text", nullable: true),
                     ExtendedGenres = table.Column<List<string>>(type: "text[]", nullable: false),
                     AddedByUserNicknameId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -526,7 +526,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Rating = table.Column<int>(type: "integer", nullable: false),
+                    RatingValue = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: true),

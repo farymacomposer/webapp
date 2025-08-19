@@ -12,7 +12,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             return context.Reviews.Add(new Review
             {
                 ReviewOrder = inProgressOrder,
-                Rating = rating,
+                RatingValue = rating,
                 CreatedAt = createdAt,
                 UpdatedAt = createdAt,
             }).Entity;

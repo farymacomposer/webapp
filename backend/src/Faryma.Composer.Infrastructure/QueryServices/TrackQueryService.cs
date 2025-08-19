@@ -9,35 +9,19 @@ namespace Faryma.Composer.Infrastructure.QueryServices
 
         public IQueryable<TrackQueryModel> GetTracks() => _context.Tracks
             .AsNoTracking()
-            .Include(x => x.Country)
-            .Include(x => x.Artists)
-            .Include(x => x.Genres)
-            .Include(x => x.Reviews)
-            .Include(x => x.UserRatings)
             .Select(x => new TrackQueryModel
             {
                 Title = x.Title,
-                ReleaseDate = x.ReleaseDate,
+                ReleaseYear = (x.ReleaseDate != null) ? x.ReleaseDate.Value.Year : null,
+                CountryId = x.CountryId,
                 CoverUrl = x.CoverUrl,
+                HasReview = x.Reviews.Count > 0,
+                LastReviewRating = (x.Reviews.Count > 0) ? x.Reviews.OrderBy(x => x.CreatedAt).Last().RatingValue : null,
+                UserRating = (x.UserRatings.Count > 0) ? x.UserRatings.Sum(x => x.RatingValue) : null,
                 ExtendedGenres = x.ExtendedGenres,
                 Tags = x.Tags,
-                Country = x.CountryId == null ? null : new TrackCountryQueryModel { Name = x.Country!.Name },
-                Artists = x.Artists.Select(a => new TrackArtistQueryModel
-                {
-                    Name = a.Name,
-                }),
-                Genres = x.Genres.Select(a => new TrackGenreQueryModel
-                {
-                    Name = a.Name,
-                }),
-                Reviews = x.Reviews.Select(a => new ReviewQueryModel
-                {
-                    Rating = a.Rating,
-                }),
-                UserRatings = x.UserRatings.Select(a => new UserTrackRatingQueryModel
-                {
-                    RatingValue = a.RatingValue,
-                }),
+                Artists = x.Artists.Select(x => x.Name),
+                GenreIds = x.Genres.Select(x => x.Id),
             });
 
         public ValueTask DisposeAsync() => _context.DisposeAsync();

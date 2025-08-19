@@ -11,7 +11,7 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Оценка
         /// </summary>
-        public required int Rating { get; set; }
+        public required int RatingValue { get; set; }
 
         /// <summary>
         /// Дата и время создания разбора
