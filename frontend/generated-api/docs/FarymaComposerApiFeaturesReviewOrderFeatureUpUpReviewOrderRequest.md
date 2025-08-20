@@ -7,7 +7,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **nickname** | **string** | Псевдоним пользователя | [default to undefined]
-**reviewOrderId** | **number** | Id заказа на разбора трека | [default to undefined]
+**reviewOrderId** | **number** | Id заказа разбора трека | [default to undefined]
 **paymentAmount** | **number** | Сумма платежа | [default to undefined]
 
 ## Example

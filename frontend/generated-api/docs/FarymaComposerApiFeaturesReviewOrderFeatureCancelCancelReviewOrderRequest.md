@@ -1,6 +1,6 @@
 # FarymaComposerApiFeaturesReviewOrderFeatureCancelCancelReviewOrderRequest
 
-Запрос отмены заказа на разбор
+Запрос отмены заказа
 
 ## Properties
 

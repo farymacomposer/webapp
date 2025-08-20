@@ -6,7 +6,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**reviewOrderId** | **number** | Id заказа на разбора трека | [default to undefined]
+**reviewOrder** | [**FarymaComposerApiFeaturesCommonDtoReviewOrderDto**](FarymaComposerApiFeaturesCommonDtoReviewOrderDto.md) | Заказ разбора трека | [default to undefined]
 
 ## Example
 
@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 import { FarymaComposerApiFeaturesReviewOrderFeatureCreateCreateReviewOrderResponse } from './api';
 
 const instance: FarymaComposerApiFeaturesReviewOrderFeatureCreateCreateReviewOrderResponse = {
-    reviewOrderId,
+    reviewOrder,
 };
 ```
 

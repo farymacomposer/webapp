@@ -8,7 +8,6 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **reviewOrderId** | **number** | Id заказа разбора трека | [default to undefined]
 **rating** | **number** | Оценка трека (0-26) | [default to undefined]
-**comment** | **string** | Комментарий к разбору | [default to undefined]
 
 ## Example
 
@@ -18,7 +17,6 @@ import { FarymaComposerApiFeaturesReviewOrderFeatureCompleteCompleteReviewOrderR
 const instance: FarymaComposerApiFeaturesReviewOrderFeatureCompleteCompleteReviewOrderRequest = {
     reviewOrderId,
     rating,
-    comment,
 };
 ```
 

@@ -77,7 +77,24 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.AppSettingsFeature.AppSettingsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.AppSettingsFeature.AppSettingsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.AppSettingsFeature.AppSettingsDto"
+                }
+              }
+            }
           }
         }
       }
@@ -193,7 +210,89 @@
         }
       }
     },
-    "/api/ComposerStream/CreateComposerStream": {
+    "/api/ComposerStream/FindStreams": {
+      "get": {
+        "tags": [
+          "ComposerStream"
+        ],
+        "summary": "Возвращает список стримов",
+        "parameters": [
+          {
+            "name": "DateFrom",
+            "in": "query",
+            "description": "Начальная дата периода поиска",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "DateTo",
+            "in": "query",
+            "description": "Конечная дата периода поиска",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Find.FindComposerStreamResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Find.FindComposerStreamResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Find.FindComposerStreamResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ComposerStream/FindCurrentAndScheduledStreams": {
+      "get": {
+        "tags": [
+          "ComposerStream"
+        ],
+        "summary": "Возвращает текущий и запланированные стримы",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled.FindCurrentAndScheduledStreamsResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled.FindCurrentAndScheduledStreamsResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled.FindCurrentAndScheduledStreamsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ComposerStream/CreateStream": {
       "post": {
         "tags": [
           "ComposerStream"
@@ -257,51 +356,191 @@
         }
       }
     },
-    "/api/ComposerStream/FindComposerStream": {
-      "get": {
+    "/api/ComposerStream/StartStream": {
+      "post": {
         "tags": [
           "ComposerStream"
         ],
-        "summary": "Возвращает список стримов",
-        "parameters": [
-          {
-            "name": "DateFrom",
-            "in": "query",
-            "description": "Начальная дата периода поиска",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          },
-          {
-            "name": "DateTo",
-            "in": "query",
-            "description": "Конечная дата периода поиска",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
+        "summary": "Запускает стрим",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Start.StartStreamRequest"
+                  }
+                ],
+                "description": "Запрос запуска стрима"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Start.StartStreamRequest"
+                  }
+                ],
+                "description": "Запрос запуска стрима"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Start.StartStreamRequest"
+                  }
+                ],
+                "description": "Запрос запуска стрима"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Find.FindComposerStreamResponse"
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Start.StartStreamResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Find.FindComposerStreamResponse"
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Start.StartStreamResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Find.FindComposerStreamResponse"
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Start.StartStreamResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ComposerStream/CompleteStream": {
+      "post": {
+        "tags": [
+          "ComposerStream"
+        ],
+        "summary": "Завершает стрим",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Complete.CompleteStreamRequest"
+                  }
+                ],
+                "description": "Запрос завершения стрима"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Complete.CompleteStreamRequest"
+                  }
+                ],
+                "description": "Запрос завершения стрима"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Complete.CompleteStreamRequest"
+                  }
+                ],
+                "description": "Запрос завершения стрима"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Complete.CompleteStreamResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Complete.CompleteStreamResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Complete.CompleteStreamResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ComposerStream/CancelStream": {
+      "post": {
+        "tags": [
+          "ComposerStream"
+        ],
+        "summary": "Отменяет стрим",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel.CancelStreamRequest"
+                  }
+                ],
+                "description": "Запрос отмены стрима"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel.CancelStreamRequest"
+                  }
+                ],
+                "description": "Запрос отмены стрима"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel.CancelStreamRequest"
+                  }
+                ],
+                "description": "Запрос отмены стрима"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel.CancelStreamResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel.CancelStreamResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel.CancelStreamResponse"
                 }
               }
             }
@@ -310,28 +549,28 @@
       }
     },
     "/api/OrderQueue/GetOrderQueue": {
-      "post": {
+      "get": {
         "tags": [
           "OrderQueue"
         ],
-        "summary": "",
+        "summary": "Получает текущее состояние очереди заказов",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueueResponse"
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue.GetOrderQueueResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueueResponse"
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue.GetOrderQueueResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueueResponse"
+                  "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue.GetOrderQueueResponse"
                 }
               }
             }
@@ -506,7 +745,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl.AddTrackUrlRequest"
                   }
                 ],
-                "description": "Запрос добавления ссылки на трек"
+                "description": "Запрос добавления в заказ ссылки на трек"
               }
             },
             "text/json": {
@@ -516,7 +755,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl.AddTrackUrlRequest"
                   }
                 ],
-                "description": "Запрос добавления ссылки на трек"
+                "description": "Запрос добавления в заказ ссылки на трек"
               }
             },
             "application/*+json": {
@@ -526,7 +765,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl.AddTrackUrlRequest"
                   }
                 ],
-                "description": "Запрос добавления ссылки на трек"
+                "description": "Запрос добавления в заказ ссылки на трек"
               }
             }
           }
@@ -698,7 +937,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze.FreezeReviewOrderRequest"
                   }
                 ],
-                "description": "Запрос заморозки заказа на разбор"
+                "description": "Запрос заморозки заказа"
               }
             },
             "text/json": {
@@ -708,7 +947,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze.FreezeReviewOrderRequest"
                   }
                 ],
-                "description": "Запрос заморозки заказа на разбор"
+                "description": "Запрос заморозки заказа"
               }
             },
             "application/*+json": {
@@ -718,7 +957,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze.FreezeReviewOrderRequest"
                   }
                 ],
-                "description": "Запрос заморозки заказа на разбор"
+                "description": "Запрос заморозки заказа"
               }
             }
           }
@@ -762,7 +1001,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze.UnfreezeReviewOrderRequest"
                   }
                 ],
-                "description": "Запрос разморозки заказа на разбор"
+                "description": "Запрос разморозки заказа"
               }
             },
             "text/json": {
@@ -772,7 +1011,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze.UnfreezeReviewOrderRequest"
                   }
                 ],
-                "description": "Запрос разморозки заказа на разбор"
+                "description": "Запрос разморозки заказа"
               }
             },
             "application/*+json": {
@@ -782,7 +1021,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze.UnfreezeReviewOrderRequest"
                   }
                 ],
-                "description": "Запрос разморозки заказа на разбор"
+                "description": "Запрос разморозки заказа"
               }
             }
           }
@@ -826,7 +1065,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel.CancelReviewOrderRequest"
                   }
                 ],
-                "description": "Запрос отмены заказа на разбор"
+                "description": "Запрос отмены заказа"
               }
             },
             "text/json": {
@@ -836,7 +1075,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel.CancelReviewOrderRequest"
                   }
                 ],
-                "description": "Запрос отмены заказа на разбор"
+                "description": "Запрос отмены заказа"
               }
             },
             "application/*+json": {
@@ -846,7 +1085,7 @@
                     "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel.CancelReviewOrderRequest"
                   }
                 ],
-                "description": "Запрос отмены заказа на разбор"
+                "description": "Запрос отмены заказа"
               }
             }
           }
@@ -949,19 +1188,21 @@
             "maximum": 10000,
             "minimum": 0,
             "type": "integer",
-            "description": "Номинальная стоимость заказа (для бесплатных разборов)",
+            "description": "Номинальная стоимость заказа (для бесплатных или минималка для платных)",
             "format": "int32"
           }
         },
         "additionalProperties": false,
         "description": "Настройки приложения"
       },
-      "Faryma.Composer.Api.Features.ComposerStreamFeature.ComposerStreamDto": {
+      "Faryma.Composer.Api.Features.CommonDto.ComposerStreamDto": {
         "required": [
+          "completedAt",
           "eventDate",
           "id",
           "status",
-          "type"
+          "type",
+          "wentLiveAt"
         ],
         "type": "object",
         "properties": {
@@ -990,10 +1231,189 @@
               }
             ],
             "description": "Тип стрима"
+          },
+          "wentLiveAt": {
+            "type": "string",
+            "description": "Дата и время начала стрима",
+            "format": "date-time",
+            "nullable": true
+          },
+          "completedAt": {
+            "type": "string",
+            "description": "Дата и время завершения стрима",
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false,
         "description": "Стрим композитора"
+      },
+      "Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto": {
+        "required": [
+          "categoryType",
+          "completedAt",
+          "createdAt",
+          "creationStream",
+          "id",
+          "inProgressAt",
+          "isFrozen",
+          "mainNickname",
+          "status",
+          "totalAmount",
+          "trackUrl",
+          "type",
+          "userComment"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id заказа",
+            "format": "int64"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Дата и время создания заказа",
+            "format": "date-time"
+          },
+          "inProgressAt": {
+            "type": "string",
+            "description": "Дата и время взятия заказа в работу",
+            "format": "date-time",
+            "nullable": true
+          },
+          "completedAt": {
+            "type": "string",
+            "description": "Дата и время выполнения заказа",
+            "format": "date-time",
+            "nullable": true
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Infrastructure.Enums.ReviewOrderType"
+              }
+            ],
+            "description": "Тип заказа разбора трека"
+          },
+          "categoryType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Infrastructure.Enums.OrderCategoryType"
+              }
+            ],
+            "description": "Тип категории заказа"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Infrastructure.Enums.ReviewOrderStatus"
+              }
+            ],
+            "description": "Статус заказа разбора трека"
+          },
+          "isFrozen": {
+            "type": "boolean",
+            "description": "Заказ заморожен"
+          },
+          "trackUrl": {
+            "type": "string",
+            "description": "Ссылка на трек",
+            "format": "uri",
+            "nullable": true
+          },
+          "userComment": {
+            "type": "string",
+            "description": "Комментарий пользователя",
+            "nullable": true
+          },
+          "mainNickname": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа"
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "Общая стоимость заказа (номинал + платежи)",
+            "format": "double"
+          },
+          "creationStream": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ComposerStreamDto"
+              }
+            ],
+            "description": "Связанный cтрим композитора, где создан заказ"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Заказ разбора трека"
+      },
+      "Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel.CancelStreamRequest": {
+        "required": [
+          "composerStreamId"
+        ],
+        "type": "object",
+        "properties": {
+          "composerStreamId": {
+            "type": "integer",
+            "description": "Id стрима",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Запрос отмены стрима"
+      },
+      "Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel.CancelStreamResponse": {
+        "required": [
+          "composerStream"
+        ],
+        "type": "object",
+        "properties": {
+          "composerStream": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ComposerStreamDto"
+              }
+            ],
+            "description": "Стрим композитора"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Ответ на запрос отмены стрима"
+      },
+      "Faryma.Composer.Api.Features.ComposerStreamFeature.Complete.CompleteStreamRequest": {
+        "required": [
+          "composerStreamId"
+        ],
+        "type": "object",
+        "properties": {
+          "composerStreamId": {
+            "type": "integer",
+            "description": "Id стрима",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Запрос завершения стрима"
+      },
+      "Faryma.Composer.Api.Features.ComposerStreamFeature.Complete.CompleteStreamResponse": {
+        "required": [
+          "composerStream"
+        ],
+        "type": "object",
+        "properties": {
+          "composerStream": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ComposerStreamDto"
+              }
+            ],
+            "description": "Стрим композитора"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Ответ на запрос завершения стрима"
       },
       "Faryma.Composer.Api.Features.ComposerStreamFeature.Create.CreateComposerStreamRequest": {
         "required": [
@@ -1028,7 +1448,7 @@
           "composerStream": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.ComposerStreamDto"
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ComposerStreamDto"
               }
             ],
             "description": "Стрим композитора"
@@ -1039,24 +1459,208 @@
       },
       "Faryma.Composer.Api.Features.ComposerStreamFeature.Find.FindComposerStreamResponse": {
         "required": [
-          "items"
+          "streams"
         ],
         "type": "object",
         "properties": {
-          "items": {
+          "streams": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Faryma.Composer.Api.Features.ComposerStreamFeature.ComposerStreamDto"
+              "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ComposerStreamDto"
             },
             "description": "Список стримов"
           }
         },
         "additionalProperties": false,
-        "description": "Ответ на запрос поиска стримов композитора"
+        "description": "Ответ на запрос поиска стримов"
       },
-      "Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueueResponse": {
+      "Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled.FindCurrentAndScheduledStreamsResponse": {
+        "required": [
+          "streams"
+        ],
         "type": "object",
-        "additionalProperties": false
+        "properties": {
+          "streams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ComposerStreamDto"
+            },
+            "description": "Список стримов"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Ответ на запрос текущего и запланированных стримов"
+      },
+      "Faryma.Composer.Api.Features.ComposerStreamFeature.Start.StartStreamRequest": {
+        "required": [
+          "composerStreamId"
+        ],
+        "type": "object",
+        "properties": {
+          "composerStreamId": {
+            "type": "integer",
+            "description": "Id стрима",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Запрос запуска стрима"
+      },
+      "Faryma.Composer.Api.Features.ComposerStreamFeature.Start.StartStreamResponse": {
+        "required": [
+          "composerStream"
+        ],
+        "type": "object",
+        "properties": {
+          "composerStream": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ComposerStreamDto"
+              }
+            ],
+            "description": "Стрим композитора"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Ответ на запрос запуска стрима"
+      },
+      "Faryma.Composer.Api.Features.OrderQueueFeature.Dto.OrderPositionDto": {
+        "required": [
+          "currentPosition",
+          "order",
+          "previousPosition"
+        ],
+        "type": "object",
+        "properties": {
+          "order": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto"
+              }
+            ],
+            "description": "Заказ разбора трека",
+            "nullable": true
+          },
+          "previousPosition": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.Dto.OrderQueuePositionDto"
+              }
+            ],
+            "description": "Предыдущая позиция заказа в очереди",
+            "nullable": true
+          },
+          "currentPosition": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.Dto.OrderQueuePositionDto"
+              }
+            ],
+            "description": "Текущая позиция заказа в очереди",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Представляет позицию заказа в очереди, включая сам заказ и историю перемещений"
+      },
+      "Faryma.Composer.Api.Features.OrderQueueFeature.Dto.OrderQueuePositionDto": {
+        "required": [
+          "activityStatus",
+          "categoryDebtNumber",
+          "categoryType",
+          "queueIndex"
+        ],
+        "type": "object",
+        "properties": {
+          "queueIndex": {
+            "type": "integer",
+            "description": "Позиция заказа в очереди",
+            "format": "int32"
+          },
+          "activityStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Core.Features.OrderQueueFeature.Enums.OrderActivityStatus"
+              }
+            ],
+            "description": "Статус активности заказа"
+          },
+          "categoryType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Infrastructure.Enums.OrderCategoryType"
+              }
+            ],
+            "description": "Тип категории заказа"
+          },
+          "categoryDebtNumber": {
+            "type": "integer",
+            "description": "Номер категории, если заказ относится к долговой категории",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Позиция заказа в очереди, включая его индекс, статус активности и категорию"
+      },
+      "Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue.GetOrderQueueResponse": {
+        "required": [
+          "activeOrders",
+          "completedOrders",
+          "frozenOrders",
+          "scheduledOrders",
+          "syncVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "syncVersion": {
+            "type": "integer",
+            "description": "Версия для синхронизации состояния очереди",
+            "format": "int32"
+          },
+          "activeOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.Dto.OrderPositionDto"
+            },
+            "description": "Активные заказы",
+            "readOnly": true
+          },
+          "inProgressOrder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.Dto.OrderPositionDto"
+              }
+            ],
+            "description": "Заказ в работе",
+            "nullable": true
+          },
+          "completedOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.Dto.OrderPositionDto"
+            },
+            "description": "Выполненные заказы",
+            "readOnly": true
+          },
+          "scheduledOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.Dto.OrderPositionDto"
+            },
+            "description": "Запланированные заказы",
+            "readOnly": true
+          },
+          "frozenOrders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Faryma.Composer.Api.Features.OrderQueueFeature.Dto.OrderPositionDto"
+            },
+            "description": "Замороженные заказы",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Ответ на запрос получения очереди заказов"
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl.AddTrackUrlRequest": {
         "required": [
@@ -1078,29 +1682,25 @@
           }
         },
         "additionalProperties": false,
-        "description": "Запрос добавления ссылки на трек"
+        "description": "Запрос добавления в заказ ссылки на трек"
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl.AddTrackUrlResponse": {
         "required": [
-          "reviewOrderId",
-          "trackUrl"
+          "reviewOrder"
         ],
         "type": "object",
         "properties": {
-          "reviewOrderId": {
-            "type": "integer",
-            "description": "Id заказа на разбор трека",
-            "format": "int64"
-          },
-          "trackUrl": {
-            "minLength": 1,
-            "type": "string",
-            "description": "Ссылка на трек",
-            "format": "uri"
+          "reviewOrder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto"
+              }
+            ],
+            "description": "Заказ разбора трека"
           }
         },
         "additionalProperties": false,
-        "description": "Ответ на запрос добавления ссылки на трек"
+        "description": "Ответ на запрос добавления в заказ ссылки на трек"
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel.CancelReviewOrderRequest": {
         "required": [
@@ -1115,26 +1715,28 @@
           }
         },
         "additionalProperties": false,
-        "description": "Запрос отмены заказа на разбор"
+        "description": "Запрос отмены заказа"
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel.CancelReviewOrderResponse": {
         "required": [
-          "reviewOrderId"
+          "reviewOrder"
         ],
         "type": "object",
         "properties": {
-          "reviewOrderId": {
-            "type": "integer",
-            "description": "Id отмененного заказа разбора трека",
-            "format": "int64"
+          "reviewOrder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto"
+              }
+            ],
+            "description": "Заказ разбора трека"
           }
         },
         "additionalProperties": false,
-        "description": "Ответ на запрос отмены заказа на разбор"
+        "description": "Ответ на запрос отмены заказа"
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.Complete.CompleteReviewOrderRequest": {
         "required": [
-          "comment",
           "rating",
           "reviewOrderId"
         ],
@@ -1151,12 +1753,6 @@
             "type": "integer",
             "description": "Оценка трека (0-26)",
             "format": "int32"
-          },
-          "comment": {
-            "maxLength": 300,
-            "minLength": 1,
-            "type": "string",
-            "description": "Комментарий к разбору"
           }
         },
         "additionalProperties": false,
@@ -1165,14 +1761,17 @@
       "Faryma.Composer.Api.Features.ReviewOrderFeature.Complete.CompleteReviewOrderResponse": {
         "required": [
           "reviewId",
-          "reviewOrderId"
+          "reviewOrder"
         ],
         "type": "object",
         "properties": {
-          "reviewOrderId": {
-            "type": "integer",
-            "description": "Id выполненного заказа разбора трека",
-            "format": "int64"
+          "reviewOrder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto"
+              }
+            ],
+            "description": "Заказ разбора трека"
           },
           "reviewId": {
             "type": "integer",
@@ -1228,14 +1827,17 @@
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.Create.CreateReviewOrderResponse": {
         "required": [
-          "reviewOrderId"
+          "reviewOrder"
         ],
         "type": "object",
         "properties": {
-          "reviewOrderId": {
-            "type": "integer",
-            "description": "Id заказа на разбора трека",
-            "format": "int64"
+          "reviewOrder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto"
+              }
+            ],
+            "description": "Заказ разбора трека"
           }
         },
         "additionalProperties": false,
@@ -1254,22 +1856,25 @@
           }
         },
         "additionalProperties": false,
-        "description": "Запрос заморозки заказа на разбор"
+        "description": "Запрос заморозки заказа"
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze.FreezeReviewOrderResponse": {
         "required": [
-          "reviewOrderId"
+          "reviewOrder"
         ],
         "type": "object",
         "properties": {
-          "reviewOrderId": {
-            "type": "integer",
-            "description": "Id замороженного заказа разбора трека",
-            "format": "int64"
+          "reviewOrder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto"
+              }
+            ],
+            "description": "Заказ разбора трека"
           }
         },
         "additionalProperties": false,
-        "description": "Ответ на запрос заморозки заказа на разбор"
+        "description": "Ответ на запрос заморозки заказа"
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress.TakeOrderInProgressRequest": {
         "required": [
@@ -1288,14 +1893,17 @@
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress.TakeOrderInProgressResponse": {
         "required": [
-          "reviewOrderId"
+          "reviewOrder"
         ],
         "type": "object",
         "properties": {
-          "reviewOrderId": {
-            "type": "integer",
-            "description": "Id заказа разбора трека",
-            "format": "int64"
+          "reviewOrder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto"
+              }
+            ],
+            "description": "Заказ разбора трека"
           }
         },
         "additionalProperties": false,
@@ -1314,22 +1922,25 @@
           }
         },
         "additionalProperties": false,
-        "description": "Запрос разморозки заказа на разбор"
+        "description": "Запрос разморозки заказа"
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze.UnfreezeReviewOrderResponse": {
         "required": [
-          "reviewOrderId"
+          "reviewOrder"
         ],
         "type": "object",
         "properties": {
-          "reviewOrderId": {
-            "type": "integer",
-            "description": "Id размороженного заказа разбора трека",
-            "format": "int64"
+          "reviewOrder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto"
+              }
+            ],
+            "description": "Заказ разбора трека"
           }
         },
         "additionalProperties": false,
-        "description": "Ответ на запрос разморозки заказа на разбор"
+        "description": "Ответ на запрос разморозки заказа"
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.Up.UpReviewOrderRequest": {
         "required": [
@@ -1347,7 +1958,7 @@
           },
           "reviewOrderId": {
             "type": "integer",
-            "description": "Id заказа на разбора трека",
+            "description": "Id заказа разбора трека",
             "format": "int64"
           },
           "paymentAmount": {
@@ -1361,10 +1972,19 @@
       },
       "Faryma.Composer.Api.Features.ReviewOrderFeature.Up.UpReviewOrderResponse": {
         "required": [
-          "paymentTransactionId"
+          "paymentTransactionId",
+          "reviewOrder"
         ],
         "type": "object",
         "properties": {
+          "reviewOrder": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Faryma.Composer.Api.Features.CommonDto.ReviewOrderDto"
+              }
+            ],
+            "description": "Заказ разбора трека"
+          },
           "paymentTransactionId": {
             "type": "integer",
             "description": "Id платежа",
@@ -1373,6 +1993,17 @@
         },
         "additionalProperties": false,
         "description": "Ответ на запрос поднятия заказа в очереди"
+      },
+      "Faryma.Composer.Core.Features.OrderQueueFeature.Enums.OrderActivityStatus": {
+        "enum": [
+          "Unspecified",
+          "Active",
+          "InProgress",
+          "Completed",
+          "Scheduled",
+          "Frozen"
+        ],
+        "type": "string"
       },
       "Faryma.Composer.Infrastructure.Enums.ComposerStreamStatus": {
         "enum": [
@@ -1394,6 +2025,28 @@
         ],
         "type": "string",
         "description": "Тип стрима"
+      },
+      "Faryma.Composer.Infrastructure.Enums.OrderCategoryType": {
+        "enum": [
+          "Unspecified",
+          "OutOfQueue",
+          "Donation",
+          "Debt"
+        ],
+        "type": "string",
+        "description": "Тип категории заказа"
+      },
+      "Faryma.Composer.Infrastructure.Enums.ReviewOrderStatus": {
+        "enum": [
+          "Unspecified",
+          "Preorder",
+          "Pending",
+          "InProgress",
+          "Completed",
+          "Canceled"
+        ],
+        "type": "string",
+        "description": "Статус заказа разбора трека"
       },
       "Faryma.Composer.Infrastructure.Enums.ReviewOrderType": {
         "enum": [
@@ -1426,7 +2079,7 @@
     },
     {
       "name": "OrderQueue",
-      "description": ""
+      "description": "Работа с очередью заказов"
     },
     {
       "name": "ComposerStream",

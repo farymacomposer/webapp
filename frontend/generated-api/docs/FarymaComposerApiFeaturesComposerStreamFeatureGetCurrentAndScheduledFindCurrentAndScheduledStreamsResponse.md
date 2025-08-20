@@ -1,6 +1,6 @@
-# FarymaComposerApiFeaturesComposerStreamFeatureFindFindComposerStreamResponse
+# FarymaComposerApiFeaturesComposerStreamFeatureGetCurrentAndScheduledFindCurrentAndScheduledStreamsResponse
 
-Ответ на запрос поиска стримов
+Ответ на запрос текущего и запланированных стримов
 
 ## Properties
 
@@ -11,9 +11,9 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { FarymaComposerApiFeaturesComposerStreamFeatureFindFindComposerStreamResponse } from './api';
+import { FarymaComposerApiFeaturesComposerStreamFeatureGetCurrentAndScheduledFindCurrentAndScheduledStreamsResponse } from './api';
 
-const instance: FarymaComposerApiFeaturesComposerStreamFeatureFindFindComposerStreamResponse = {
+const instance: FarymaComposerApiFeaturesComposerStreamFeatureGetCurrentAndScheduledFindCurrentAndScheduledStreamsResponse = {
     streams,
 };
 ```

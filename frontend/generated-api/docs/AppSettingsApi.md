@@ -51,7 +51,7 @@ This endpoint does not have any parameters.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **apiAppSettingsUpdateAppSettingsPost**
-> apiAppSettingsUpdateAppSettingsPost()
+> FarymaComposerApiFeaturesAppSettingsFeatureAppSettingsDto apiAppSettingsUpdateAppSettingsPost()
 
 
 ### Example
@@ -82,7 +82,7 @@ const { status, data } = await apiInstance.apiAppSettingsUpdateAppSettingsPost(
 
 ### Return type
 
-void (empty response body)
+**FarymaComposerApiFeaturesAppSettingsFeatureAppSettingsDto**
 
 ### Authorization
 
@@ -91,7 +91,7 @@ void (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: application/json, text/json, application/*+json
- - **Accept**: Not defined
+ - **Accept**: text/plain, application/json, text/json
 
 
 ### HTTP response details

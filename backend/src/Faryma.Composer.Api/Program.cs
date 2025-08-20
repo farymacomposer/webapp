@@ -47,9 +47,20 @@ namespace Faryma.Composer.Api
                     services.AddInfrastructure(builder.Environment);
                 });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
             WebApplication app = builder.Build();
 
             app.UseRouting();
+            app.UseCors("AllowAll");
             app.UseApiDocumentation();
             app.UseHttpsRedirection();
             app.UseAuthentication();

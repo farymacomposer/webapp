@@ -1,6 +1,6 @@
 # FarymaComposerApiFeaturesReviewOrderFeatureAddTrackUrlAddTrackUrlRequest
 
-Запрос добавления ссылки на трек
+Запрос добавления в заказ ссылки на трек
 
 ## Properties
 

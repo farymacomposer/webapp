@@ -26,8 +26,8 @@ export const Header: React.FC<Props> = ({ className }) => {
         </Button>
         <nav className="flex-1 flex justify-center gap-15 ml-30">
           <NavItem href="#">Главная</NavItem>
-          <NavItem href="#">Стрим-space</NavItem>
-          <NavItem href="#">База треков</NavItem>
+          <NavItem href="/stream">Стрим-space</NavItem>
+          <NavItem href="/catalog">База треков</NavItem>
           <NavItem href="#">Помощь</NavItem>
         </nav>
       </div>

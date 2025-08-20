@@ -14,12 +14,10 @@ const config = new Configuration({
   basePath,
 });
 
-export const api = {
+export const Api = {
   reviewOrder: new ReviewOrderApi(config),
   orderQueue: new OrderQueueApi(config),
   composerStream: new ComposerStreamApi(config),
   appSettings: new AppSettingsApi(config),
   auth: new AuthApi(config),
 };
-
-api.orderQueue.apiOrderQueueGetOrderQueuePost();

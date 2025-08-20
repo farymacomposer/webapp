@@ -1,12 +1,12 @@
 # FarymaComposerApiFeaturesReviewOrderFeatureUnfreezeUnfreezeReviewOrderResponse
 
-Ответ на запрос разморозки заказа на разбор
+Ответ на запрос разморозки заказа
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**reviewOrderId** | **number** | Id размороженного заказа разбора трека | [default to undefined]
+**reviewOrder** | [**FarymaComposerApiFeaturesCommonDtoReviewOrderDto**](FarymaComposerApiFeaturesCommonDtoReviewOrderDto.md) | Заказ разбора трека | [default to undefined]
 
 ## Example
 
@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 import { FarymaComposerApiFeaturesReviewOrderFeatureUnfreezeUnfreezeReviewOrderResponse } from './api';
 
 const instance: FarymaComposerApiFeaturesReviewOrderFeatureUnfreezeUnfreezeReviewOrderResponse = {
-    reviewOrderId,
+    reviewOrder,
 };
 ```
 

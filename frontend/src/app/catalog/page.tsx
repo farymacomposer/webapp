@@ -1,5 +1,5 @@
 import { SidebarFilters } from "@/components/shared";
-import TrackList from "@/components/shared/track-list";
+import TrackList from "@/components/shared/trackList";
 
 export default function CatalogPage() {
   const tracks = [
@@ -31,7 +31,7 @@ export default function CatalogPage() {
         <aside className="w-72 p-4 border-r border-gray-700">
           <SidebarFilters />
         </aside>
-        <main className="flex-1 p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <main className="flex-1 p-6">
           <TrackList tracks={tracks} />
         </main>
       </div>

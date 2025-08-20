@@ -1,6 +1,6 @@
 # FarymaComposerApiFeaturesReviewOrderFeatureUnfreezeUnfreezeReviewOrderRequest
 
-Запрос разморозки заказа на разбор
+Запрос разморозки заказа
 
 ## Properties
 

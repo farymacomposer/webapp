@@ -6,6 +6,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**reviewOrder** | [**FarymaComposerApiFeaturesCommonDtoReviewOrderDto**](FarymaComposerApiFeaturesCommonDtoReviewOrderDto.md) | Заказ разбора трека | [default to undefined]
 **paymentTransactionId** | **number** | Id платежа | [default to undefined]
 
 ## Example
@@ -14,6 +15,7 @@ Name | Type | Description | Notes
 import { FarymaComposerApiFeaturesReviewOrderFeatureUpUpReviewOrderResponse } from './api';
 
 const instance: FarymaComposerApiFeaturesReviewOrderFeatureUpUpReviewOrderResponse = {
+    reviewOrder,
     paymentTransactionId,
 };
 ```

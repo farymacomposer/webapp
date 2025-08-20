@@ -1,13 +1,12 @@
 # FarymaComposerApiFeaturesReviewOrderFeatureAddTrackUrlAddTrackUrlResponse
 
-Ответ на запрос добавления ссылки на трек
+Ответ на запрос добавления в заказ ссылки на трек
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**reviewOrderId** | **number** | Id заказа на разбор трека | [default to undefined]
-**trackUrl** | **string** | Ссылка на трек | [default to undefined]
+**reviewOrder** | [**FarymaComposerApiFeaturesCommonDtoReviewOrderDto**](FarymaComposerApiFeaturesCommonDtoReviewOrderDto.md) | Заказ разбора трека | [default to undefined]
 
 ## Example
 
@@ -15,8 +14,7 @@ Name | Type | Description | Notes
 import { FarymaComposerApiFeaturesReviewOrderFeatureAddTrackUrlAddTrackUrlResponse } from './api';
 
 const instance: FarymaComposerApiFeaturesReviewOrderFeatureAddTrackUrlAddTrackUrlResponse = {
-    reviewOrderId,
-    trackUrl,
+    reviewOrder,
 };
 ```
 

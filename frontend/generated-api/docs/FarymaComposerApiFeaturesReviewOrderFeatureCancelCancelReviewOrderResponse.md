@@ -1,12 +1,12 @@
 # FarymaComposerApiFeaturesReviewOrderFeatureCancelCancelReviewOrderResponse
 
-Ответ на запрос отмены заказа на разбор
+Ответ на запрос отмены заказа
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**reviewOrderId** | **number** | Id отмененного заказа разбора трека | [default to undefined]
+**reviewOrder** | [**FarymaComposerApiFeaturesCommonDtoReviewOrderDto**](FarymaComposerApiFeaturesCommonDtoReviewOrderDto.md) | Заказ разбора трека | [default to undefined]
 
 ## Example
 
@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 import { FarymaComposerApiFeaturesReviewOrderFeatureCancelCancelReviewOrderResponse } from './api';
 
 const instance: FarymaComposerApiFeaturesReviewOrderFeatureCancelCancelReviewOrderResponse = {
-    reviewOrderId,
+    reviewOrder,
 };
 ```
 

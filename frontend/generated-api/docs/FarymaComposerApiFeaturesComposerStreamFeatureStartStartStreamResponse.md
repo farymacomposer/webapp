@@ -1,6 +1,6 @@
-# FarymaComposerApiFeaturesComposerStreamFeatureCreateCreateComposerStreamResponse
+# FarymaComposerApiFeaturesComposerStreamFeatureStartStartStreamResponse
 
-Ответ на запрос создания стрима
+Ответ на запрос запуска стрима
 
 ## Properties
 
@@ -11,9 +11,9 @@ Name | Type | Description | Notes
 ## Example
 
 ```typescript
-import { FarymaComposerApiFeaturesComposerStreamFeatureCreateCreateComposerStreamResponse } from './api';
+import { FarymaComposerApiFeaturesComposerStreamFeatureStartStartStreamResponse } from './api';
 
-const instance: FarymaComposerApiFeaturesComposerStreamFeatureCreateCreateComposerStreamResponse = {
+const instance: FarymaComposerApiFeaturesComposerStreamFeatureStartStartStreamResponse = {
     composerStream,
 };
 ```

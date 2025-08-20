@@ -4,10 +4,10 @@ All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**apiOrderQueueGetOrderQueuePost**](#apiorderqueuegetorderqueuepost) | **POST** /api/OrderQueue/GetOrderQueue | |
+|[**apiOrderQueueGetOrderQueueGet**](#apiorderqueuegetorderqueueget) | **GET** /api/OrderQueue/GetOrderQueue | Получает текущее состояние очереди заказов|
 
-# **apiOrderQueueGetOrderQueuePost**
-> object apiOrderQueueGetOrderQueuePost()
+# **apiOrderQueueGetOrderQueueGet**
+> FarymaComposerApiFeaturesOrderQueueFeatureGetOrderQueueGetOrderQueueResponse apiOrderQueueGetOrderQueueGet()
 
 
 ### Example
@@ -21,7 +21,7 @@ import {
 const configuration = new Configuration();
 const apiInstance = new OrderQueueApi(configuration);
 
-const { status, data } = await apiInstance.apiOrderQueueGetOrderQueuePost();
+const { status, data } = await apiInstance.apiOrderQueueGetOrderQueueGet();
 ```
 
 ### Parameters
@@ -30,7 +30,7 @@ This endpoint does not have any parameters.
 
 ### Return type
 
-**object**
+**FarymaComposerApiFeaturesOrderQueueFeatureGetOrderQueueGetOrderQueueResponse**
 
 ### Authorization
 

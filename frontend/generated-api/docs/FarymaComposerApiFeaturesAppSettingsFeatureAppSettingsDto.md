@@ -6,7 +6,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**reviewOrderNominalAmount** | **number** | Номинальная стоимость заказа (для бесплатных разборов) | [default to undefined]
+**reviewOrderNominalAmount** | **number** | Номинальная стоимость заказа (для бесплатных или минималка для платных) | [default to undefined]
 
 ## Example
 

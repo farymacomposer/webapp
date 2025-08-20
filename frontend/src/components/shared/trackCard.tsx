@@ -1,4 +1,4 @@
-import { Track } from "@/lib/models";
+import { Track } from "@/types";
 import Image from "next/image";
 
 interface TrackCardProps {
