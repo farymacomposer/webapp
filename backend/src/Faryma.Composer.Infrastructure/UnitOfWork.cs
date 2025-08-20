@@ -5,9 +5,8 @@ namespace Faryma.Composer.Infrastructure
 {
     public sealed class UnitOfWork(
         AppDbContext context,
-        ArtistRepository artistRepository,
+        TrackArtistRepository artistRepository,
         ComposerStreamRepository composerStreamRepository,
-        GenreRepository genreRepository,
         ReviewOrderRepository reviewOrderRepository,
         ReviewRepository reviewRepository,
         TrackRepository trackRepository,
@@ -17,9 +16,8 @@ namespace Faryma.Composer.Infrastructure
         UserRepository userRepository,
         UserTrackRatingRepository userTrackRatingRepository)
     {
-        public ArtistRepository ArtistRepository { get; } = artistRepository;
+        public TrackArtistRepository TrackArtistRepository { get; } = artistRepository;
         public ComposerStreamRepository ComposerStreamRepository { get; } = composerStreamRepository;
-        public GenreRepository GenreRepository { get; } = genreRepository;
         public ReviewOrderRepository ReviewOrderRepository { get; } = reviewOrderRepository;
         public ReviewRepository ReviewRepository { get; } = reviewRepository;
         public TrackRepository TrackRepository { get; } = trackRepository;

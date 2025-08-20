@@ -33,7 +33,8 @@ namespace Faryma.Composer.Api
                         .AddPersistenceAndIdentity(context.Configuration)
                         .AddAuthentication(context.Configuration)
                         .AddAuthorization()
-                        .AddCoreServices();
+                        .AddCoreServices()
+                        .AddGraphQL();
 
                     if (builder.Environment.IsDevelopment())
                     {
@@ -54,8 +55,9 @@ namespace Faryma.Composer.Api
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.MapControllers();
 
+            app.MapControllers();
+            app.MapGraphQL();
             app.MapHub<OrderQueueNotificationHub>(OrderQueueNotificationHub.RoutePattern);
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();

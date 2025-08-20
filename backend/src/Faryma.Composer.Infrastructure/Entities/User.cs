@@ -27,7 +27,7 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Связь с исполнителями
         /// </summary>
-        public ICollection<Artist> AssociatedArtists { get; set; } = [];
+        public ICollection<TrackArtist> AssociatedArtists { get; set; } = [];
 
         /// <summary>
         /// Оценки треков

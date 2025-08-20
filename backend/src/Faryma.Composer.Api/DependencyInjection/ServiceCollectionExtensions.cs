@@ -3,6 +3,7 @@ using System.Text;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
+using Faryma.Composer.Api.Features.TrackFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
@@ -82,6 +83,17 @@ namespace Faryma.Composer.Api.DependencyInjection
             return services;
         }
 
+        public static IServiceCollection AddGraphQL(this IServiceCollection services)
+        {
+            services
+                .AddGraphQLServer()
+                .AddQueryType<TrackQuery>()
+                .AddFiltering()
+                .AddSorting();
+
+            return services;
+        }
+
         private static IServiceCollection ConfigureSwagger(this IServiceCollection services, IWebHostEnvironment environment)
         {
             return services.AddSwaggerGen(options =>
@@ -94,7 +106,7 @@ namespace Faryma.Composer.Api.DependencyInjection
 
                 foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    string xmlPath = Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
+                    string xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
                     if (File.Exists(xmlPath))
                     {
                         options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);

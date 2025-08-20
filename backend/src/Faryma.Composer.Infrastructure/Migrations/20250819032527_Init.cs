@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -29,21 +30,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AppSettings", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Artists",
-                schema: "app",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    NormalizedName = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Artists", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,7 +93,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Genres",
+                name: "TrackArtists",
                 schema: "app",
                 columns: table => new
                 {
@@ -118,7 +104,35 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Genres", x => x.Id);
+                    table.PrimaryKey("PK_TrackArtists", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrackCountries",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrackCountries", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrackGenres",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrackGenres", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -140,33 +154,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         column: x => x.RoleId,
                         principalSchema: "app",
                         principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ArtistUser",
-                schema: "app",
-                columns: table => new
-                {
-                    AssociatedArtistsId = table.Column<long>(type: "bigint", nullable: false),
-                    UsersId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ArtistUser", x => new { x.AssociatedArtistsId, x.UsersId });
-                    table.ForeignKey(
-                        name: "FK_ArtistUser_Artists_AssociatedArtistsId",
-                        column: x => x.AssociatedArtistsId,
-                        principalSchema: "app",
-                        principalTable: "Artists",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ArtistUser_AspNetUsers_UsersId",
-                        column: x => x.UsersId,
-                        principalSchema: "app",
-                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -287,25 +274,61 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TrackArtistUser",
+                schema: "app",
+                columns: table => new
+                {
+                    AssociatedArtistsId = table.Column<long>(type: "bigint", nullable: false),
+                    UsersId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrackArtistUser", x => new { x.AssociatedArtistsId, x.UsersId });
+                    table.ForeignKey(
+                        name: "FK_TrackArtistUser_AspNetUsers_UsersId",
+                        column: x => x.UsersId,
+                        principalSchema: "app",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TrackArtistUser_TrackArtists_AssociatedArtistsId",
+                        column: x => x.AssociatedArtistsId,
+                        principalSchema: "app",
+                        principalTable: "TrackArtists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tracks",
                 schema: "app",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: true),
-                    Year = table.Column<int>(type: "integer", nullable: true),
-                    UploadedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AddedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
                     Url = table.Column<string>(type: "text", nullable: false),
-                    Origin = table.Column<int>(type: "integer", nullable: true),
-                    UploadedByUserNicknameId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ReleaseDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    CoverUrl = table.Column<string>(type: "text", nullable: true),
+                    ExtendedGenres = table.Column<List<string>>(type: "text[]", nullable: false),
+                    AddedByUserNicknameId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CountryId = table.Column<long>(type: "bigint", nullable: true),
+                    Tags = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tracks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tracks_UserNicknames_UploadedByUserNicknameId",
-                        column: x => x.UploadedByUserNicknameId,
+                        name: "FK_Tracks_TrackCountries_CountryId",
+                        column: x => x.CountryId,
+                        principalSchema: "app",
+                        principalTable: "TrackCountries",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Tracks_UserNicknames_AddedByUserNicknameId",
+                        column: x => x.AddedByUserNicknameId,
                         principalSchema: "app",
                         principalTable: "UserNicknames",
                         principalColumn: "Id",
@@ -329,60 +352,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         column: x => x.UserNicknameId,
                         principalSchema: "app",
                         principalTable: "UserNicknames",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ArtistTrack",
-                schema: "app",
-                columns: table => new
-                {
-                    ArtistsId = table.Column<long>(type: "bigint", nullable: false),
-                    TracksId = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ArtistTrack", x => new { x.ArtistsId, x.TracksId });
-                    table.ForeignKey(
-                        name: "FK_ArtistTrack_Artists_ArtistsId",
-                        column: x => x.ArtistsId,
-                        principalSchema: "app",
-                        principalTable: "Artists",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ArtistTrack_Tracks_TracksId",
-                        column: x => x.TracksId,
-                        principalSchema: "app",
-                        principalTable: "Tracks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GenreTrack",
-                schema: "app",
-                columns: table => new
-                {
-                    GenresId = table.Column<long>(type: "bigint", nullable: false),
-                    TracksId = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GenreTrack", x => new { x.GenresId, x.TracksId });
-                    table.ForeignKey(
-                        name: "FK_GenreTrack_Genres_GenresId",
-                        column: x => x.GenresId,
-                        principalSchema: "app",
-                        principalTable: "Genres",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_GenreTrack_Tracks_TracksId",
-                        column: x => x.TracksId,
-                        principalSchema: "app",
-                        principalTable: "Tracks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -434,6 +403,60 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         principalSchema: "app",
                         principalTable: "Tracks",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrackTrackArtist",
+                schema: "app",
+                columns: table => new
+                {
+                    ArtistsId = table.Column<long>(type: "bigint", nullable: false),
+                    TracksId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrackTrackArtist", x => new { x.ArtistsId, x.TracksId });
+                    table.ForeignKey(
+                        name: "FK_TrackTrackArtist_TrackArtists_ArtistsId",
+                        column: x => x.ArtistsId,
+                        principalSchema: "app",
+                        principalTable: "TrackArtists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TrackTrackArtist_Tracks_TracksId",
+                        column: x => x.TracksId,
+                        principalSchema: "app",
+                        principalTable: "Tracks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrackTrackGenre",
+                schema: "app",
+                columns: table => new
+                {
+                    GenresId = table.Column<long>(type: "bigint", nullable: false),
+                    TracksId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrackTrackGenre", x => new { x.GenresId, x.TracksId });
+                    table.ForeignKey(
+                        name: "FK_TrackTrackGenre_TrackGenres_GenresId",
+                        column: x => x.GenresId,
+                        principalSchema: "app",
+                        principalTable: "TrackGenres",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TrackTrackGenre_Tracks_TracksId",
+                        column: x => x.TracksId,
+                        principalSchema: "app",
+                        principalTable: "Tracks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -503,7 +526,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Rating = table.Column<int>(type: "integer", nullable: false),
+                    RatingValue = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: true),
@@ -574,24 +597,31 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     { new Guid("ac0b9e85-a06f-4655-822b-9c125d8d7bb4"), "AC0B9E85-A06F-4655-822B-9C125D8D7BB4", "Moderator", "MODERATOR" }
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Artists_NormalizedName",
+            migrationBuilder.InsertData(
                 schema: "app",
-                table: "Artists",
-                column: "NormalizedName",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ArtistTrack_TracksId",
-                schema: "app",
-                table: "ArtistTrack",
-                column: "TracksId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ArtistUser_UsersId",
-                schema: "app",
-                table: "ArtistUser",
-                column: "UsersId");
+                table: "TrackGenres",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1L, "электронное" },
+                    { 2L, "фолк" },
+                    { 3L, "рок" },
+                    { 4L, "разное" },
+                    { 5L, "джаз" },
+                    { 6L, "метал" },
+                    { 7L, "рэп" },
+                    { 8L, "поп" },
+                    { 9L, "оркестровый" },
+                    { 10L, "фанк" },
+                    { 11L, "мюзикл/опера" },
+                    { 12L, "инди" },
+                    { 13L, "поп-рок" },
+                    { 14L, "шансон" },
+                    { 15L, "специфическое" },
+                    { 16L, "баллада" },
+                    { 17L, "фортепиано" },
+                    { 18L, "инструментал" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -645,19 +675,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Genres_NormalizedName",
-                schema: "app",
-                table: "Genres",
-                column: "NormalizedName",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GenreTrack_TracksId",
-                schema: "app",
-                table: "GenreTrack",
-                column: "TracksId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ReviewOrders_CreationStreamId",
                 schema: "app",
                 table: "ReviewOrders",
@@ -695,10 +712,41 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 column: "TrackId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tracks_UploadedByUserNicknameId",
+                name: "IX_TrackArtists_NormalizedName",
+                schema: "app",
+                table: "TrackArtists",
+                column: "NormalizedName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrackArtistUser_UsersId",
+                schema: "app",
+                table: "TrackArtistUser",
+                column: "UsersId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tracks_AddedByUserNicknameId",
                 schema: "app",
                 table: "Tracks",
-                column: "UploadedByUserNicknameId");
+                column: "AddedByUserNicknameId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tracks_CountryId",
+                schema: "app",
+                table: "Tracks",
+                column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrackTrackArtist_TracksId",
+                schema: "app",
+                table: "TrackTrackArtist",
+                column: "TracksId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrackTrackGenre_TracksId",
+                schema: "app",
+                table: "TrackTrackGenre",
+                column: "TracksId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_ReviewOrderId",
@@ -753,14 +801,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 schema: "app");
 
             migrationBuilder.DropTable(
-                name: "ArtistTrack",
-                schema: "app");
-
-            migrationBuilder.DropTable(
-                name: "ArtistUser",
-                schema: "app");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims",
                 schema: "app");
 
@@ -781,15 +821,23 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 schema: "app");
 
             migrationBuilder.DropTable(
-                name: "GenreTrack",
-                schema: "app");
-
-            migrationBuilder.DropTable(
                 name: "ReviewOrderUserNickname",
                 schema: "app");
 
             migrationBuilder.DropTable(
                 name: "Reviews",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "TrackArtistUser",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "TrackTrackArtist",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "TrackTrackGenre",
                 schema: "app");
 
             migrationBuilder.DropTable(
@@ -801,15 +849,15 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 schema: "app");
 
             migrationBuilder.DropTable(
-                name: "Artists",
-                schema: "app");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles",
                 schema: "app");
 
             migrationBuilder.DropTable(
-                name: "Genres",
+                name: "TrackArtists",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "TrackGenres",
                 schema: "app");
 
             migrationBuilder.DropTable(
@@ -826,6 +874,10 @@ namespace Faryma.Composer.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tracks",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "TrackCountries",
                 schema: "app");
 
             migrationBuilder.DropTable(
