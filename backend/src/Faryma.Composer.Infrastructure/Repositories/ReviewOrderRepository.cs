@@ -8,7 +8,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
     public sealed class ReviewOrderRepository(AppDbContext context)
     {
         public async Task<ReviewOrder> Get(long id) => await Find(id)
-            ?? throw new NotFoundException($"Заказ разбора трека Id: {id}, не существует");
+            ?? throw new NotFoundException("Заказ разбора трека не существует", id);
 
         public Task<ReviewOrder?> Find(long id) => context.ReviewOrders
             .Include(x => x.CreationStream)

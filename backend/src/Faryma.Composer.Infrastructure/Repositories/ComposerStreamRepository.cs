@@ -20,7 +20,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public Task<ComposerStream> Get(DateOnly eventDate) => context.ComposerStreams.FirstAsync(x => x.EventDate == eventDate);
 
         public async Task<ComposerStream> Get(long id) => await context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id)
-            ?? throw new NotFoundException($"Стрим Id: {id}, не существует");
+            ?? throw new NotFoundException("Стрим не существует", id);
 
         public Task<ComposerStream?> Find(DateOnly eventDate) => context.ComposerStreams.FirstOrDefaultAsync(x => x.EventDate == eventDate);
         public Task<ComposerStream?> FindLive() => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
