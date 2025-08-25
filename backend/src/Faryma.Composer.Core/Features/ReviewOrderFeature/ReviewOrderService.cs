@@ -12,7 +12,7 @@ using Faryma.Composer.Infrastructure.Enums;
 namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 {
     public sealed class ReviewOrderService(
-        UnitOfWork ofw,
+        UnitOfWork uow,
         UserNicknameService userNicknameService,
         AppSettingsService appSettingsService,
         ComposerStreamService composerStreamService,
@@ -29,10 +29,10 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             {
                 case ReviewOrderType.Donation:
 
-                    Transaction deposit = ofw.TransactionRepository.CreateDeposit(userNickname.Account, command.PaymentAmount!.Value);
-                    Transaction payment = ofw.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount!.Value);
+                    Transaction deposit = uow.TransactionRepository.CreateDeposit(userNickname.Account, command.PaymentAmount!.Value);
+                    Transaction payment = uow.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount!.Value);
 
-                    order = ofw.ReviewOrderRepository.CreateDonation(
+                    order = uow.ReviewOrderRepository.CreateDonation(
                         stream,
                         payment,
                         nominalAmount,
@@ -42,7 +42,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
                 case ReviewOrderType.OutOfQueue or ReviewOrderType.Charity:
 
-                    order = ofw.ReviewOrderRepository.CreateFree(
+                    order = uow.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
                         nominalAmount: 0,
@@ -53,7 +53,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     break;
                 case ReviewOrderType.Free:
 
-                    order = ofw.ReviewOrderRepository.CreateFree(
+                    order = uow.ReviewOrderRepository.CreateFree(
                         stream,
                         userNickname,
                         nominalAmount,
@@ -67,7 +67,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                     throw new ReviewOrderException($"Тип заказа '{command.OrderType}' не поддерживается");
             }
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             await orderQueueService.AddOrder(order);
 
@@ -76,7 +76,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
         public async Task<Transaction> Up(UpCommand command)
         {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            ReviewOrder order = await uow.ReviewOrderRepository.Get(command.ReviewOrderId);
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
@@ -84,11 +84,11 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             }
 
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
-            Transaction deposit = ofw.TransactionRepository.CreateDeposit(userNickname.Account, command.PaymentAmount);
-            Transaction payment = ofw.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount);
+            Transaction deposit = uow.TransactionRepository.CreateDeposit(userNickname.Account, command.PaymentAmount);
+            Transaction payment = uow.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount);
             order.Payments.Add(payment);
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Up);
 
@@ -97,7 +97,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
         public async Task<ReviewOrder> AddTrackUrl(AddTrackUrlCommand command)
         {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            ReviewOrder order = await uow.ReviewOrderRepository.Get(command.ReviewOrderId);
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
@@ -111,7 +111,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 order.Status = ReviewOrderStatus.Pending;
             }
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.AddTrackUrl);
 
@@ -120,7 +120,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
         public async Task<ReviewOrder> TakeInProgress(TakeInProgressCommand command)
         {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            ReviewOrder order = await uow.ReviewOrderRepository.Get(command.ReviewOrderId);
             if (order.Status == ReviewOrderStatus.InProgress)
             {
                 return order;
@@ -136,13 +136,13 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 throw new ReviewOrderException($"Невозможно взять в работу заказ в статусе '{order.Status}'");
             }
 
-            ReviewOrder? inProgress = await ofw.ReviewOrderRepository.FindAnotherOrderInProgress(command.ReviewOrderId);
+            ReviewOrder? inProgress = await uow.ReviewOrderRepository.FindAnotherOrderInProgress(command.ReviewOrderId);
             if (inProgress is not null)
             {
                 throw new ReviewOrderException($"Невозможно взять в работу заказ Id: {command.ReviewOrderId}, пока заказ Id: {inProgress.Id} находится в работе");
             }
 
-            ComposerStream liveStream = await ofw.ComposerStreamRepository.FindLive()
+            ComposerStream liveStream = await uow.ComposerStreamRepository.FindLive()
                 ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима");
 
             OrderQueuePosition position = await orderQueueService.GetCurrentQueuePosition(order);
@@ -152,7 +152,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             order.Status = ReviewOrderStatus.InProgress;
             order.InProgressAt = DateTime.UtcNow;
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.TakeInProgress);
 
@@ -161,7 +161,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
         public async Task<ReviewOrder> Complete(CompleteCommand command)
         {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            ReviewOrder order = await uow.ReviewOrderRepository.Get(command.ReviewOrderId);
             if (order.Status == ReviewOrderStatus.Completed)
             {
                 return order;
@@ -174,11 +174,11 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             DateTime now = DateTime.UtcNow;
 
-            order.Review = ofw.ReviewRepository.Create(order, command.Rating, now);
+            order.Review = uow.ReviewRepository.Create(order, command.Rating, now);
             order.CompletedAt = now;
             order.Status = ReviewOrderStatus.Completed;
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Complete);
 
@@ -187,7 +187,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
         public async Task<ReviewOrder> Freeze(FreezeCommand command)
         {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            ReviewOrder order = await uow.ReviewOrderRepository.Get(command.ReviewOrderId);
             if (order.IsFrozen)
             {
                 return order;
@@ -200,7 +200,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             order.IsFrozen = true;
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Freeze);
 
@@ -209,7 +209,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
         public async Task<ReviewOrder> Unfreeze(UnfreezeCommand command)
         {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            ReviewOrder order = await uow.ReviewOrderRepository.Get(command.ReviewOrderId);
             if (!order.IsFrozen)
             {
                 return order;
@@ -222,7 +222,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             order.IsFrozen = false;
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Unfreeze);
 
@@ -231,7 +231,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
         public async Task<ReviewOrder> Cancel(CancelCommand command)
         {
-            ReviewOrder order = await ofw.ReviewOrderRepository.Get(command.ReviewOrderId);
+            ReviewOrder order = await uow.ReviewOrderRepository.Get(command.ReviewOrderId);
             if (order.Status == ReviewOrderStatus.Canceled)
             {
                 return order;
@@ -244,7 +244,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             order.Status = ReviewOrderStatus.Canceled;
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             await orderQueueService.RemoveOrder(order);
 

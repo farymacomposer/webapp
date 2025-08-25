@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Faryma.Composer.Api.Auth;
+﻿using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
@@ -42,8 +41,7 @@ namespace Faryma.Composer.Api
                     }
 
                     services
-                        .AddControllers()
-                        .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+                        .AddControllers();
 
                     services.AddInfrastructure(builder.Environment);
                 });
@@ -52,6 +50,12 @@ namespace Faryma.Composer.Api
 
             app.UseRouting();
             app.UseApiDocumentation();
+
+            app.UseCors(config => config
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();

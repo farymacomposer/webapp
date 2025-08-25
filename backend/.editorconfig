@@ -1415,7 +1415,7 @@ dotnet_diagnostic.IDE0059.severity = suggestion
 dotnet_diagnostic.IDE0060.severity = suggestion
 
 # IDE0079: Удалить ненужное подавление
-dotnet_diagnostic.IDE0079.severity = warning
+dotnet_diagnostic.IDE0079.severity = none
 
 # IDE0130: Пространство имен не соответствует структуре папок
 dotnet_diagnostic.IDE0130.severity = suggestion

@@ -38,9 +38,10 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await _locker.Lock(async () =>
             {
-                OrderPosition position = _queueManager.AddOrder(order);
-                await notificationService.NotifyNewOrderAdded(_syncVersion, position);
                 _syncVersion++;
+                OrderPosition position = _queueManager.AddOrder(order);
+
+                await notificationService.NotifyNewOrderAdded(_syncVersion, position);
             });
         }
 
@@ -48,9 +49,10 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await _locker.Lock(async () =>
             {
-                OrderPosition position = _queueManager.UpdateOrder(order, updateType);
-                await notificationService.NotifyOrderPositionChanged(_syncVersion, position, updateType);
                 _syncVersion++;
+                OrderPosition position = _queueManager.UpdateOrder(order, updateType);
+
+                await notificationService.NotifyOrderPositionChanged(_syncVersion, position, updateType);
             });
         }
 
@@ -58,6 +60,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await _locker.Lock(async () =>
             {
+                _syncVersion++;
                 _queueManager.NearestStreamDate = stream.EventDate;
                 OrderQueue orderQueue = new()
                 {
@@ -66,7 +69,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 };
 
                 await notificationService.NotifyOrderPositionsChanged(orderQueue);
-                _syncVersion++;
             });
         }
 
@@ -74,9 +76,10 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             await _locker.Lock(async () =>
             {
-                OrderPosition position = _queueManager.RemoveOrder(order);
-                await notificationService.NotifyOrderRemoved(_syncVersion, position);
                 _syncVersion++;
+                OrderPosition position = _queueManager.RemoveOrder(order);
+
+                await notificationService.NotifyOrderRemoved(_syncVersion, position);
             });
         }
 
