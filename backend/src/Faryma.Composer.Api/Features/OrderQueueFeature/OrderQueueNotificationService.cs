@@ -13,7 +13,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
     }
 
     [AsyncApi]
-    public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub> context, ILogger<OrderQueueNotificationService> logger) : IOrderQueueNotificationService
+    public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub> context) : IOrderQueueNotificationService
     {
         public const string HubServerName = "OrderQueueNotificationHub";
 
@@ -25,8 +25,6 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         public async Task NotifyNewOrderAdded(int syncVersion, OrderPosition position)
         {
             NewOrderAddedEvent item = NewOrderAddedEvent.Map(syncVersion, position);
-            logger.LogInformation("NotifyNewOrderAdded {@item}", item);
-
             await context.Clients.All.SendAsync("NewOrderAdded", item);
         }
 
@@ -38,8 +36,6 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         public async Task NotifyOrderPositionChanged(int syncVersion, OrderPosition position, OrderQueueUpdateType updateType)
         {
             OrderPositionChangedEvent item = OrderPositionChangedEvent.Map(syncVersion, position, updateType);
-            logger.LogInformation("NotifyOrderPositionChanged {@item}", item);
-
             await context.Clients.All.SendAsync("OrderPositionChanged", item);
         }
 
@@ -51,8 +47,6 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         public async Task NotifyOrderPositionsChanged(OrderQueue orderQueue)
         {
             OrderPositionsChangedEvent item = OrderPositionsChangedEvent.Map(orderQueue);
-            logger.LogInformation("NotifyOrderPositionsChanged {@item}", item);
-
             await context.Clients.All.SendAsync("OrderPositionsChanged", item);
         }
 
@@ -64,8 +58,6 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         public async Task NotifyOrderRemoved(int syncVersion, OrderPosition position)
         {
             OrderRemovedEvent item = OrderRemovedEvent.Map(syncVersion, position);
-            logger.LogInformation("NotifyOrderRemoved {@item}", item);
-
             await context.Clients.All.SendAsync("OrderRemoved", item);
         }
     }

@@ -29,10 +29,10 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             }
         }
 
-        public async Task<ComposerStream> Start(StartCommand command)
+        public async Task<ComposerStream> Start(long composerStreamId)
         {
             // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
-            ComposerStream stream = await uow.ComposerStreamRepository.Get(command.ComposerStreamId);
+            ComposerStream stream = await uow.ComposerStreamRepository.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Live)
             {
                 return stream;
@@ -54,9 +54,9 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             return stream;
         }
 
-        public async Task<ComposerStream> Complete(CompleteCommand command)
+        public async Task<ComposerStream> Complete(long composerStreamId)
         {
-            ComposerStream stream = await uow.ComposerStreamRepository.Get(command.ComposerStreamId);
+            ComposerStream stream = await uow.ComposerStreamRepository.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Completed)
             {
                 return stream;
@@ -75,9 +75,9 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             return stream;
         }
 
-        public async Task<ComposerStream> Cancel(CancelCommand command)
+        public async Task<ComposerStream> Cancel(long composerStreamId)
         {
-            ComposerStream stream = await uow.ComposerStreamRepository.Get(command.ComposerStreamId);
+            ComposerStream stream = await uow.ComposerStreamRepository.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Canceled)
             {
                 return stream;

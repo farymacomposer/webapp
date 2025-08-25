@@ -1,5 +1,4 @@
 ﻿using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Api.Features.CommonDto;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Complete;
@@ -8,6 +7,7 @@ using Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Up;
+using Faryma.Composer.Api.Shared.Dto;
 using Faryma.Composer.Core.Features.ReviewOrderFeature;
 using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 using Faryma.Composer.Infrastructure.Entities;
