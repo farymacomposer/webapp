@@ -41,6 +41,7 @@ namespace Faryma.Composer.Api
                     }
 
                     services
+                        .AddSingleton<GlobalExceptionFilter>()
                         .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>());
 
                     services.AddInfrastructure(builder.Environment);

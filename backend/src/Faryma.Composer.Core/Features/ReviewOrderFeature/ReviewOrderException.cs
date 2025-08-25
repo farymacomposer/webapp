@@ -3,29 +3,16 @@ using Faryma.Composer.Infrastructure.Exceptions;
 
 namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 {
-    public sealed class ReviewOrderException(string message, ReviewOrder? order = null) : AppException(message)
+    public sealed class ReviewOrderException : AppException
     {
-        public ReviewOrder? Order { get; } = order;
-
-        public object GetResultObject()
+        public ReviewOrderException(string message, ReviewOrder? order = null) : base(message)
         {
-            if (Order is null)
+            if (order is not null)
             {
-                return new
-                {
-                    ExceptionType = nameof(ReviewOrderException),
-                    Message = Message,
-                };
+                Data.Add("OrderId", order.Id);
+                Data.Add("Status", order.Status.ToString());
+                Data.Add("IsFrozen", order.IsFrozen);
             }
-
-            return new
-            {
-                ExceptionType = nameof(ReviewOrderException),
-                Message = Message,
-                OrderId = Order.Id,
-                Status = Order.Status,
-                IsFrozen = Order.IsFrozen,
-            };
         }
     }
 }

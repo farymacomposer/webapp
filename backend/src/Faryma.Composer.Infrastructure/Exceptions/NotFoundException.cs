@@ -1,17 +1,6 @@
 ﻿namespace Faryma.Composer.Infrastructure.Exceptions
 {
-    public sealed class NotFoundException : AppException
+    public sealed class NotFoundException(string? message) : AppException(message)
     {
-        public NotFoundException() : base()
-        {
-        }
-
-        public NotFoundException(string? message) : base(message)
-        {
-        }
-
-        public NotFoundException(string? message, Exception? innerException) : base(message, innerException)
-        {
-        }
     }
 }

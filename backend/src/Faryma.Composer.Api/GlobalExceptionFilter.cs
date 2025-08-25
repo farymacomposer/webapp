@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Core.Features.ReviewOrderFeature;
+﻿using Faryma.Composer.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -8,14 +8,9 @@ namespace Faryma.Composer.Api
     {
         public override void OnException(ExceptionContext context)
         {
-            object? resultObject = context.Exception switch
+            if (context.Exception is AppException appException)
             {
-                ReviewOrderException ex => ex.GetResultObject(),
-                _ => null
-            };
-
-            if (resultObject is not null)
-            {
+                ResultObject resultObject = appException.GetResultObject();
                 context.Result = new JsonResult(resultObject)
                 {
                     StatusCode = 600
