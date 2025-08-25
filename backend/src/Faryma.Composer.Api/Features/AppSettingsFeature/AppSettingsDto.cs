@@ -9,7 +9,7 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
     public sealed record AppSettingsDto
     {
         /// <summary>
-        /// Номинальная стоимость заказа (для бесплатных или минималка для платных)
+        /// Номинальная стоимость заказа
         /// </summary>
         [Range(0, 10_000)]
         public required int ReviewOrderNominalAmount { get; set; }

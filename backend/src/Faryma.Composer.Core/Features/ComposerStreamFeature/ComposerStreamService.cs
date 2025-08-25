@@ -95,50 +95,46 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             return stream;
         }
 
-        public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname, ReviewOrderType orderType)
+        public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname)
         {
-            if (orderType == ReviewOrderType.Charity)
-            {
-                ComposerStream? live = await uow.ComposerStreamRepository.FindLive();
-                if (live is null || live.Type == ComposerStreamType.Charity)
-                {
-                    throw new ComposerStreamException("Благотворительный заказ можно создать только на благотворительном стриме");
-                }
-            }
-
-            const DayOfWeek debtStreamDay = DayOfWeek.Tuesday;
-            const DayOfWeek donationStreamDay = DayOfWeek.Saturday;
-
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-            DateOnly debtStreamDate = today.GetNextDateForDay(debtStreamDay);
-            DateOnly donationStreamDate = today.GetNextDateForDay(donationStreamDay);
-
-            (DateOnly EventDate, ComposerStreamType Type) debtStreamInfo = (debtStreamDate, ComposerStreamType.Debt);
-            (DateOnly EventDate, ComposerStreamType Type) donationStreamInfo = (donationStreamDate, ComposerStreamType.Donation);
-            (DateOnly EventDate, ComposerStreamType Type) nearestStreamInfo = (debtStreamDate < donationStreamDate) ? debtStreamInfo : donationStreamInfo;
 
             ComposerStream? nearestStream = await uow.ComposerStreamRepository.FindNearest(today);
 
-            switch (orderType)
+            if (await uow.UserNicknameRepository.HasOrders(userNickname))
             {
-                case ReviewOrderType.OutOfQueue:
-
-                    return nearestStream ?? await GetOrCreateStream(nearestStreamInfo);
-
-                case ReviewOrderType.Donation or ReviewOrderType.Free:
-
-                    if (await uow.UserNicknameRepository.HasOrders(userNickname))
-                    {
-                        return await GetOrCreateStream(donationStreamInfo);
-                    }
-                    else
-                    {
-                        return nearestStream ?? await GetOrCreateStream(nearestStreamInfo);
-                    }
-
-                default:
-                    throw new ComposerStreamException($"Тип заказа '{orderType}' не поддерживается");
+                return await GetOrCreateStream(GetDonationStreamInfo(today));
             }
+            else
+            {
+                return nearestStream ?? await GetOrCreateStream(GetNearestStreamInfo(today));
+            }
+        }
+
+        public async Task<ComposerStream> GetOrCreateForOutOfQueueOrder()
+        {
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            ComposerStream? nearestStream = await uow.ComposerStreamRepository.FindNearest(today);
+
+            return nearestStream ?? await GetOrCreateStream(GetNearestStreamInfo(today));
+        }
+
+        private (DateOnly EventDate, ComposerStreamType Type) GetDonationStreamInfo(DateOnly today)
+        {
+            DateOnly donationStreamDate = today.GetNextDateForDay(DayOfWeek.Saturday);
+
+            return (donationStreamDate, ComposerStreamType.Donation);
+        }
+
+        private (DateOnly EventDate, ComposerStreamType Type) GetNearestStreamInfo(DateOnly today)
+        {
+            DateOnly debtStreamDate = today.GetNextDateForDay(DayOfWeek.Tuesday);
+
+            (DateOnly EventDate, ComposerStreamType Type) debtStreamInfo = (debtStreamDate, ComposerStreamType.Debt);
+            (DateOnly EventDate, ComposerStreamType Type) donationStreamInfo = GetDonationStreamInfo(today);
+
+            return (debtStreamInfo.EventDate < donationStreamInfo.EventDate) ? debtStreamInfo : donationStreamInfo;
         }
 
         private async Task<ComposerStream> GetOrCreateStream((DateOnly EventDate, ComposerStreamType Type) streamInfo)

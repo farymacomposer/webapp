@@ -11,6 +11,7 @@ using Faryma.Composer.Api.Features.ReviewOrderFeature.Up;
 using Faryma.Composer.Core.Features.ReviewOrderFeature;
 using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
 using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -23,7 +24,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
     [ApiController]
     public sealed class ReviewOrderController(ReviewOrderService reviewOrderService, IMemoryCache cache) : ControllerBase
     {
-        private static readonly TimeSpan _idempotencyKeyExpiration = TimeSpan.FromHours(1);
+        private static readonly TimeSpan _idempotencyKeyExpiration = TimeSpan.FromMinutes(10);
 
         /// <summary>
         /// Создает заказ
@@ -47,14 +48,35 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 return Ok(response);
             }
 
-            ReviewOrder order = await reviewOrderService.Create(new CreateCommand
+            ReviewOrder order = request.OrderType switch
             {
-                Nickname = request.Nickname.Trim(),
-                OrderType = request.OrderType,
-                PaymentAmount = request.PaymentAmount,
-                TrackUrl = request.TrackUrl,
-                UserComment = request.UserComment?.Trim(),
-            });
+                ReviewOrderType.OutOfQueue => await reviewOrderService.CreateOutOfQueue(new CreateOutOfQueueOrderCommand
+                {
+                    Nickname = request.Nickname,
+                    TrackUrl = request.TrackUrl,
+                    UserComment = request.UserComment,
+                }),
+                ReviewOrderType.Donation => await reviewOrderService.CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = request.Nickname,
+                    TrackUrl = request.TrackUrl,
+                    UserComment = request.UserComment,
+                    PaymentAmount = request.PaymentAmount!.Value,
+                }),
+                ReviewOrderType.Free => await reviewOrderService.CreateFree(new CreateFreeOrderCommand
+                {
+                    Nickname = request.Nickname,
+                    TrackUrl = request.TrackUrl,
+                    UserComment = request.UserComment,
+                }),
+                ReviewOrderType.Charity => await reviewOrderService.CreateCharity(new CreateCharityOrderCommand
+                {
+                    Nickname = request.Nickname,
+                    TrackUrl = request.TrackUrl,
+                    UserComment = request.UserComment,
+                }),
+                _ => throw new InvalidOperationException(),
+            };
 
             response = new CreateReviewOrderResponse
             {
@@ -132,10 +154,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request)
         {
-            ReviewOrder order = await reviewOrderService.TakeInProgress(new TakeInProgressCommand
-            {
-                ReviewOrderId = request.ReviewOrderId,
-            });
+            ReviewOrder order = await reviewOrderService.TakeInProgress(request.ReviewOrderId);
 
             return Ok(new TakeOrderInProgressResponse
             {
@@ -170,10 +189,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(FreezeReviewOrderRequest request)
         {
-            ReviewOrder order = await reviewOrderService.Freeze(new FreezeCommand
-            {
-                ReviewOrderId = request.ReviewOrderId
-            });
+            ReviewOrder order = await reviewOrderService.Freeze(request.ReviewOrderId);
 
             return Ok(new FreezeReviewOrderResponse
             {
@@ -188,10 +204,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(UnfreezeReviewOrderRequest request)
         {
-            ReviewOrder order = await reviewOrderService.Unfreeze(new UnfreezeCommand
-            {
-                ReviewOrderId = request.ReviewOrderId
-            });
+            ReviewOrder order = await reviewOrderService.Unfreeze(request.ReviewOrderId);
 
             return Ok(new UnfreezeReviewOrderResponse
             {
@@ -206,10 +219,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request)
         {
-            ReviewOrder order = await reviewOrderService.Cancel(new CancelCommand
-            {
-                ReviewOrderId = request.ReviewOrderId
-            });
+            ReviewOrder order = await reviewOrderService.Cancel(request.ReviewOrderId);
 
             return Ok(new CancelReviewOrderResponse
             {

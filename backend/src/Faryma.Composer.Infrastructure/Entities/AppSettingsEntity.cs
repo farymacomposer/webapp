@@ -8,7 +8,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     public sealed class AppSettingsEntity : BaseEntity
     {
         /// <summary>
-        /// Номинальная стоимость заказа (для бесплатных или минималка для платных)
+        /// Номинальная стоимость заказа
         /// </summary>
         public required int ReviewOrderNominalAmount { get; set; }
     }
