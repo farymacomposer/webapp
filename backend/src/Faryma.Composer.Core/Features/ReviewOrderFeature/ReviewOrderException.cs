@@ -10,7 +10,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         {
             if (order is not null)
             {
-                Data.Add("OrderId", order.Id);
+                Data.Add("Id", order.Id);
                 Data.Add("Status", order.Status.ToString());
                 Data.Add("IsFrozen", order.IsFrozen);
             }

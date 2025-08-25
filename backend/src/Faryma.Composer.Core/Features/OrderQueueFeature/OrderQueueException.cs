@@ -3,10 +3,7 @@ using Faryma.Composer.Infrastructure.Exceptions;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature
 {
-    public sealed class OrderQueueException : AppException
+    public sealed class OrderQueueException(string? message, [CallerMemberName] string callerMemberName = null!) : AppException(message, callerMemberName)
     {
-        public OrderQueueException(string? message, [CallerMemberName] string callerMemberName = null!) : base(message, callerMemberName)
-        {
-        }
     }
 }

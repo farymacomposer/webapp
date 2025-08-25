@@ -40,7 +40,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             if (stream.Status != ComposerStreamStatus.Planned)
             {
-                throw new ComposerStreamException($"Невозможно начать стрим в статусе '{stream.Status}'");
+                throw new ComposerStreamException("Невозможно начать стрим", stream);
             }
 
             stream.Status = ComposerStreamStatus.Live;
@@ -64,7 +64,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             if (stream.Status != ComposerStreamStatus.Live)
             {
-                throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{stream.Status}'");
+                throw new ComposerStreamException("Невозможно завершить стрим", stream);
             }
 
             stream.Status = ComposerStreamStatus.Completed;
@@ -85,7 +85,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             if (stream.Status != ComposerStreamStatus.Planned)
             {
-                throw new ComposerStreamException($"Невозможно отменить стрим в статусе '{stream.Status}'");
+                throw new ComposerStreamException("Невозможно отменить стрим", stream);
             }
 
             stream.Status = ComposerStreamStatus.Canceled;
