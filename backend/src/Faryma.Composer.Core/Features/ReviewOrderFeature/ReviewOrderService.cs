@@ -132,7 +132,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
-                throw new ReviewOrderException("Невозможно добавить ссылку на трек", order);
+                throw new ReviewOrderException("Невозможно добавить/изменить ссылку на трек", order);
             }
 
             order.TrackUrl = command.TrackUrl;
