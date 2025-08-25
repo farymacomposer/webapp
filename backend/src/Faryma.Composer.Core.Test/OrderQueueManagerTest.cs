@@ -797,7 +797,6 @@ namespace Faryma.Composer.Core.Test
                 Type = ReviewOrderType.Donation,
                 CategoryType = OrderCategoryType.Unspecified,
                 NominalAmount = amount,
-                NominalAmountAtCreation = 750,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreationStream = new ComposerStream
@@ -820,7 +819,6 @@ namespace Faryma.Composer.Core.Test
                 Type = ReviewOrderType.OutOfQueue,
                 CategoryType = OrderCategoryType.Unspecified,
                 NominalAmount = 0,
-                NominalAmountAtCreation = 750,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreationStream = new ComposerStream

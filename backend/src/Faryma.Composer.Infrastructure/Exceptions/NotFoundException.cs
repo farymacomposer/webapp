@@ -1,17 +1,12 @@
-﻿namespace Faryma.Composer.Infrastructure.Exceptions
+﻿using System.Runtime.CompilerServices;
+
+namespace Faryma.Composer.Infrastructure.Exceptions
 {
     public sealed class NotFoundException : AppException
     {
-        public NotFoundException() : base()
+        public NotFoundException(string? message, long id, [CallerMemberName] string callerMemberName = null!) : base(message, callerMemberName)
         {
-        }
-
-        public NotFoundException(string? message) : base(message)
-        {
-        }
-
-        public NotFoundException(string? message, Exception? innerException) : base(message, innerException)
-        {
+            Data.Add("Id", id);
         }
     }
 }

@@ -372,7 +372,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
                     NominalAmount = table.Column<decimal>(type: "numeric", nullable: false),
-                    NominalAmountAtCreation = table.Column<decimal>(type: "numeric", nullable: false),
                     UserComment = table.Column<string>(type: "text", nullable: true),
                     MainNickname = table.Column<string>(type: "text", nullable: false),
                     MainNormalizedNickname = table.Column<string>(type: "text", nullable: false),

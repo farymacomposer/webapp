@@ -9,17 +9,17 @@ using Npgsql;
 
 namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 {
-    public sealed class ComposerStreamService(UnitOfWork ofw, OrderQueueService orderQueueService)
+    public sealed class ComposerStreamService(UnitOfWork uow, OrderQueueService orderQueueService)
     {
-        public Task<ComposerStream[]> Find(DateOnly dateFrom, DateOnly dateTo) => ofw.ComposerStreamRepository.Find(dateFrom, dateTo);
-        public Task<ComposerStream[]> FindCurrentAndScheduled() => ofw.ComposerStreamRepository.FindLiveAndPlanned();
+        public Task<ComposerStream[]> Find(DateOnly dateFrom, DateOnly dateTo) => uow.ComposerStreamRepository.Find(dateFrom, dateTo);
+        public Task<ComposerStream[]> FindCurrentAndScheduled() => uow.ComposerStreamRepository.FindLiveAndPlanned();
 
         public async Task<ComposerStream> Create(CreateCommand command)
         {
             try
             {
-                ComposerStream stream = ofw.ComposerStreamRepository.Create(command.EventDate, command.Type);
-                await ofw.SaveChangesAsync();
+                ComposerStream stream = uow.ComposerStreamRepository.Create(command.EventDate, command.Type);
+                await uow.SaveChangesAsync();
 
                 return stream;
             }
@@ -29,10 +29,10 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             }
         }
 
-        public async Task<ComposerStream> Start(StartCommand command)
+        public async Task<ComposerStream> Start(long composerStreamId)
         {
             // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
-            ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
+            ComposerStream stream = await uow.ComposerStreamRepository.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Live)
             {
                 return stream;
@@ -40,23 +40,23 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             if (stream.Status != ComposerStreamStatus.Planned)
             {
-                throw new ComposerStreamException($"Невозможно начать стрим в статусе '{stream.Status}'");
+                throw new ComposerStreamException("Невозможно начать стрим", stream);
             }
 
             stream.Status = ComposerStreamStatus.Live;
             stream.WentLiveAt = DateTime.UtcNow;
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
-            ReviewOrder[] orders = await ofw.ReviewOrderRepository.GetOrdersForStream(stream.Id);
+            ReviewOrder[] orders = await uow.ReviewOrderRepository.GetOrdersForStream(stream.Id);
             await orderQueueService.StartStream(stream, orders);
 
             return stream;
         }
 
-        public async Task<ComposerStream> Complete(CompleteCommand command)
+        public async Task<ComposerStream> Complete(long composerStreamId)
         {
-            ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
+            ComposerStream stream = await uow.ComposerStreamRepository.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Completed)
             {
                 return stream;
@@ -64,20 +64,20 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             if (stream.Status != ComposerStreamStatus.Live)
             {
-                throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{stream.Status}'");
+                throw new ComposerStreamException("Невозможно завершить стрим", stream);
             }
 
             stream.Status = ComposerStreamStatus.Completed;
             stream.CompletedAt = DateTime.UtcNow;
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             return stream;
         }
 
-        public async Task<ComposerStream> Cancel(CancelCommand command)
+        public async Task<ComposerStream> Cancel(long composerStreamId)
         {
-            ComposerStream stream = await ofw.ComposerStreamRepository.Get(command.ComposerStreamId);
+            ComposerStream stream = await uow.ComposerStreamRepository.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Canceled)
             {
                 return stream;
@@ -85,60 +85,56 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             if (stream.Status != ComposerStreamStatus.Planned)
             {
-                throw new ComposerStreamException($"Невозможно отменить стрим в статусе '{stream.Status}'");
+                throw new ComposerStreamException("Невозможно отменить стрим", stream);
             }
 
             stream.Status = ComposerStreamStatus.Canceled;
 
-            await ofw.SaveChangesAsync();
+            await uow.SaveChangesAsync();
 
             return stream;
         }
 
-        public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname, ReviewOrderType orderType)
+        public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname)
         {
-            if (orderType == ReviewOrderType.Charity)
-            {
-                ComposerStream? live = await ofw.ComposerStreamRepository.FindLive();
-                if (live is null || live.Type == ComposerStreamType.Charity)
-                {
-                    throw new ComposerStreamException("Благотворительный заказ можно создать только на благотворительном стриме");
-                }
-            }
-
-            const DayOfWeek debtStreamDay = DayOfWeek.Tuesday;
-            const DayOfWeek donationStreamDay = DayOfWeek.Saturday;
-
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-            DateOnly debtStreamDate = today.GetNextDateForDay(debtStreamDay);
-            DateOnly donationStreamDate = today.GetNextDateForDay(donationStreamDay);
+
+            ComposerStream? nearestStream = await uow.ComposerStreamRepository.FindNearest(today);
+
+            if (await uow.UserNicknameRepository.HasOrders(userNickname))
+            {
+                return await GetOrCreateStream(GetDonationStreamInfo(today));
+            }
+            else
+            {
+                return nearestStream ?? await GetOrCreateStream(GetNearestStreamInfo(today));
+            }
+        }
+
+        public async Task<ComposerStream> GetOrCreateForOutOfQueueOrder()
+        {
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            ComposerStream? nearestStream = await uow.ComposerStreamRepository.FindNearest(today);
+
+            return nearestStream ?? await GetOrCreateStream(GetNearestStreamInfo(today));
+        }
+
+        private (DateOnly EventDate, ComposerStreamType Type) GetDonationStreamInfo(DateOnly today)
+        {
+            DateOnly donationStreamDate = today.GetNextDateForDay(DayOfWeek.Saturday);
+
+            return (donationStreamDate, ComposerStreamType.Donation);
+        }
+
+        private (DateOnly EventDate, ComposerStreamType Type) GetNearestStreamInfo(DateOnly today)
+        {
+            DateOnly debtStreamDate = today.GetNextDateForDay(DayOfWeek.Tuesday);
 
             (DateOnly EventDate, ComposerStreamType Type) debtStreamInfo = (debtStreamDate, ComposerStreamType.Debt);
-            (DateOnly EventDate, ComposerStreamType Type) donationStreamInfo = (donationStreamDate, ComposerStreamType.Donation);
-            (DateOnly EventDate, ComposerStreamType Type) nearestStreamInfo = (debtStreamDate < donationStreamDate) ? debtStreamInfo : donationStreamInfo;
+            (DateOnly EventDate, ComposerStreamType Type) donationStreamInfo = GetDonationStreamInfo(today);
 
-            ComposerStream? nearestStream = await ofw.ComposerStreamRepository.FindNearest(today);
-
-            switch (orderType)
-            {
-                case ReviewOrderType.OutOfQueue:
-
-                    return nearestStream ?? await GetOrCreateStream(nearestStreamInfo);
-
-                case ReviewOrderType.Donation or ReviewOrderType.Free:
-
-                    if (await ofw.UserNicknameRepository.HasOrders(userNickname))
-                    {
-                        return await GetOrCreateStream(donationStreamInfo);
-                    }
-                    else
-                    {
-                        return nearestStream ?? await GetOrCreateStream(nearestStreamInfo);
-                    }
-
-                default:
-                    throw new ComposerStreamException($"Тип заказа '{orderType}' не поддерживается");
-            }
+            return (debtStreamInfo.EventDate < donationStreamInfo.EventDate) ? debtStreamInfo : donationStreamInfo;
         }
 
         private async Task<ComposerStream> GetOrCreateStream((DateOnly EventDate, ComposerStreamType Type) streamInfo)
@@ -146,23 +142,23 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             while (true)
             {
                 DateOnly eventDate = streamInfo.EventDate;
-                ComposerStream? stream = await ofw.ComposerStreamRepository.Find(eventDate);
+                ComposerStream? stream = await uow.ComposerStreamRepository.Find(eventDate);
 
                 if (stream is null)
                 {
-                    stream = ofw.ComposerStreamRepository.Create(eventDate, streamInfo.Type);
+                    stream = uow.ComposerStreamRepository.Create(eventDate, streamInfo.Type);
 
                     try
                     {
-                        await ofw.SaveChangesAsync();
+                        await uow.SaveChangesAsync();
 
                         return stream;
                     }
                     catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
                     {
-                        ofw.Remove(stream);
+                        uow.Remove(stream);
 
-                        return await ofw.ComposerStreamRepository.Get(eventDate);
+                        return await uow.ComposerStreamRepository.Get(eventDate);
                     }
                 }
                 else if (stream.Status == ComposerStreamStatus.Planned && stream.Type == streamInfo.Type)

@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250819032527_Init")]
+    [Migration("20250825064641_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -149,9 +149,6 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal>("NominalAmount")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("NominalAmountAtCreation")
                         .HasColumnType("numeric");
 
                     b.Property<long?>("ProcessingStreamId")

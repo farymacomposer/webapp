@@ -8,7 +8,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
     public sealed class ReviewOrderRepository(AppDbContext context)
     {
         public async Task<ReviewOrder> Get(long id) => await Find(id)
-            ?? throw new NotFoundException($"Заказ разбора трека Id: {id}, не существует");
+            ?? throw new NotFoundException("Заказ разбора трека не существует", id);
 
         public Task<ReviewOrder?> Find(long id) => context.ReviewOrders
             .Include(x => x.CreationStream)
@@ -29,7 +29,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public ReviewOrder CreateDonation(
             ComposerStream stream,
             Transaction transaction,
-            int nominalAmountAtCreation,
+            int nominalAmount,
             string? trackUrl,
             string? userComment)
         {
@@ -46,8 +46,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 UserComment = userComment,
                 CreationStream = stream,
                 UserNicknames = { transaction.Account.UserNickname },
-                NominalAmount = 0,
-                NominalAmountAtCreation = nominalAmountAtCreation,
+                NominalAmount = nominalAmount,
                 Payments = { transaction },
             }).Entity;
         }
@@ -56,9 +55,9 @@ namespace Faryma.Composer.Infrastructure.Repositories
             ComposerStream stream,
             UserNickname userNickname,
             int nominalAmount,
-            ReviewOrderType type,
             string? trackUrl,
-            string? userComment)
+            string? userComment,
+            ReviewOrderType type)
         {
             return context.Add(new ReviewOrder
             {
@@ -74,7 +73,6 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 CreationStream = stream,
                 UserNicknames = { userNickname },
                 NominalAmount = nominalAmount,
-                NominalAmountAtCreation = nominalAmount,
             }).Entity;
         }
     }

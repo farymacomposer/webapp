@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Features.CommonDto;
+using Faryma.Composer.Api.Shared.Dto;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress
 {

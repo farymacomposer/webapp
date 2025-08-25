@@ -459,6 +459,9 @@ dotnet_diagnostic.rcs1181.severity = none
 # Add or remove region name
 dotnet_diagnostic.rcs1189.severity = none
 
+# Implement exception constructors
+dotnet_diagnostic.rcs1194.severity = none
+
 # Reduce 'if' nesting
 dotnet_diagnostic.rcs1208.severity = none
 
@@ -1017,9 +1020,6 @@ dotnet_diagnostic.rcs1192.severity = error
 # Overriding member should not change 'params' modifier
 dotnet_diagnostic.rcs1193.severity = error
 
-# Implement exception constructors
-dotnet_diagnostic.rcs1194.severity = error
-
 # Use ^ operator
 dotnet_diagnostic.rcs1195.severity = error
 
@@ -1415,7 +1415,7 @@ dotnet_diagnostic.IDE0059.severity = suggestion
 dotnet_diagnostic.IDE0060.severity = suggestion
 
 # IDE0079: Удалить ненужное подавление
-dotnet_diagnostic.IDE0079.severity = warning
+dotnet_diagnostic.IDE0079.severity = none
 
 # IDE0130: Пространство имен не соответствует структуре папок
 dotnet_diagnostic.IDE0130.severity = suggestion

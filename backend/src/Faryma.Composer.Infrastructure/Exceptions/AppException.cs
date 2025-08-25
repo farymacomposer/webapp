@@ -1,17 +1,16 @@
 ﻿namespace Faryma.Composer.Infrastructure.Exceptions
 {
-    public abstract class AppException : Exception
+    public abstract class AppException(string? message, string callerMemberName) : Exception(message)
     {
-        protected AppException() : base()
+        public ResultObject GetResultObject()
         {
-        }
-
-        protected AppException(string? message) : base(message)
-        {
-        }
-
-        protected AppException(string? message, Exception? innerException) : base(message, innerException)
-        {
+            return new()
+            {
+                ExceptionType = GetType().FullName!,
+                Method = callerMemberName,
+                Message = Message,
+                Data = Data
+            };
         }
     }
 }

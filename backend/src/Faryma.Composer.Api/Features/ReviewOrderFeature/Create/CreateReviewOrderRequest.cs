@@ -39,9 +39,13 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (OrderType == ReviewOrderType.Unspecified)
+            if (OrderType is not (
+                ReviewOrderType.Donation
+                or ReviewOrderType.OutOfQueue
+                or ReviewOrderType.Free
+                or ReviewOrderType.Charity))
             {
-                yield return new ValidationResult("Недопустимый тип заказа");
+                yield return new ValidationResult($"Тип заказа не поддерживается `{OrderType}`");
             }
 
             if (TrackUrl is not null && !Uri.TryCreate(TrackUrl, UriKind.Absolute, out _))

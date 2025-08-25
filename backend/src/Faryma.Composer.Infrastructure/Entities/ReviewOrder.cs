@@ -52,14 +52,9 @@ namespace Faryma.Composer.Infrastructure.Entities
         public string? TrackUrl { get; set; }
 
         /// <summary>
-        /// Номинальная стоимость заказа (для бесплатных)
+        /// Номинальная стоимость заказа
         /// </summary>
         public required decimal NominalAmount { get; set; }
-
-        /// <summary>
-        /// Номинальная стоимость заказа на момент создания
-        /// </summary>
-        public required decimal NominalAmountAtCreation { get; set; }
 
         /// <summary>
         /// Комментарий пользователя
@@ -114,6 +109,16 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Возвращает общую стоимость заказа
         /// </summary>
-        public decimal GetTotalAmount() => NominalAmount + Payments.Sum(x => x.Amount);
+        public decimal GetTotalAmount()
+        {
+            return Type switch
+            {
+                ReviewOrderType.OutOfQueue => 0,
+                ReviewOrderType.Donation => Payments.Sum(x => x.Amount),
+                ReviewOrderType.Free => NominalAmount + Payments.Sum(x => x.Amount),
+                ReviewOrderType.Charity => 0,
+                _ => throw new InvalidOperationException(),
+            };
+        }
     }
 }

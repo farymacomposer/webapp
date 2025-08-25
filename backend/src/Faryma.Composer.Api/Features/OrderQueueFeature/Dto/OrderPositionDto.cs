@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Api.Features.CommonDto;
+﻿using Faryma.Composer.Api.Shared.Dto;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.Dto
