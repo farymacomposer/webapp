@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Core.Test",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLoader", "src\DataLoader\DataLoader.csproj", "{524E8682-AE45-4716-ADF0-FECFBDCB9FD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Release|Any CPU.Build.0 = Release|Any CPU
+		{524E8682-AE45-4716-ADF0-FECFBDCB9FD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{524E8682-AE45-4716-ADF0-FECFBDCB9FD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{524E8682-AE45-4716-ADF0-FECFBDCB9FD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{524E8682-AE45-4716-ADF0-FECFBDCB9FD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Faryma.Composer.Infrastructure.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
@@ -13,8 +14,11 @@ namespace Faryma.Composer.Infrastructure
                 .AddEnvironmentVariables()
                 .Build();
 
+            PostgreOptions? options = configuration.GetSection("POSTGRES").Get<PostgreOptions>();
+            string? connectionString = options?.GetConnectionString();
+
             DbContextOptionsBuilder<AppDbContext> optionsBuilder = new();
-            optionsBuilder.UseNpgsql(ConnectionStringHelper.Get(configuration), x => x.MigrationsHistoryTable("__EFMigrationsHistory", "app"));
+            optionsBuilder.UseNpgsql(connectionString, x => x.MigrationsHistoryTable("__EFMigrationsHistory", "app"));
 
             return new AppDbContext(optionsBuilder.Options);
         }

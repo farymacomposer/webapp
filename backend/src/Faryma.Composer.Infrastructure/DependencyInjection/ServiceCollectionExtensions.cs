@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Infrastructure.QueryServices;
+﻿using Faryma.Composer.Infrastructure.Options;
+using Faryma.Composer.Infrastructure.QueryServices;
 using Faryma.Composer.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +11,9 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
         {
-            string? connectionString = ConnectionStringHelper.Get(configuration);
+            PostgreOptions? options = configuration.GetSection("POSTGRES").Get<PostgreOptions>();
+            string? connectionString = options?.GetConnectionString();
+
             services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(connectionString));
 
             services

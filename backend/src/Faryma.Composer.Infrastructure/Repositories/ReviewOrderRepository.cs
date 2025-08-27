@@ -15,7 +15,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             .Include(x => x.Payments)
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        public Task<ReviewOrder[]> GetOrdersForStream(long creationStreamId) => context.ReviewOrders
+        public Task<ReviewOrder[]> GetOrdersByStream(long creationStreamId) => context.ReviewOrders
             .AsNoTracking()
             .Include(x => x.CreationStream)
             .Include(x => x.Payments)

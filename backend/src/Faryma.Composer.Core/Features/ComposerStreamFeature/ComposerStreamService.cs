@@ -19,7 +19,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             try
             {
                 ComposerStream stream = uow.ComposerStreamRepository.Create(command.EventDate, command.Type);
-                await uow.SaveChangesAsync();
+                await uow.SaveChanges();
 
                 return stream;
             }
@@ -46,9 +46,9 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             stream.Status = ComposerStreamStatus.Live;
             stream.WentLiveAt = DateTime.UtcNow;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
-            ReviewOrder[] orders = await uow.ReviewOrderRepository.GetOrdersForStream(stream.Id);
+            ReviewOrder[] orders = await uow.ReviewOrderRepository.GetOrdersByStream(stream.Id);
             await orderQueueService.StartStream(stream, orders);
 
             return stream;
@@ -70,7 +70,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             stream.Status = ComposerStreamStatus.Completed;
             stream.CompletedAt = DateTime.UtcNow;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             return stream;
         }
@@ -90,7 +90,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             stream.Status = ComposerStreamStatus.Canceled;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             return stream;
         }
@@ -120,14 +120,14 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             return nearestStream ?? await GetOrCreateStream(GetNearestStreamInfo(today));
         }
 
-        private (DateOnly EventDate, ComposerStreamType Type) GetDonationStreamInfo(DateOnly today)
+        private static (DateOnly EventDate, ComposerStreamType Type) GetDonationStreamInfo(DateOnly today)
         {
             DateOnly donationStreamDate = today.GetNextDateForDay(DayOfWeek.Saturday);
 
             return (donationStreamDate, ComposerStreamType.Donation);
         }
 
-        private (DateOnly EventDate, ComposerStreamType Type) GetNearestStreamInfo(DateOnly today)
+        private static (DateOnly EventDate, ComposerStreamType Type) GetNearestStreamInfo(DateOnly today)
         {
             DateOnly debtStreamDate = today.GetNextDateForDay(DayOfWeek.Tuesday);
 
@@ -150,7 +150,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
                     try
                     {
-                        await uow.SaveChangesAsync();
+                        await uow.SaveChanges();
 
                         return stream;
                     }

@@ -31,7 +31,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 command.UserComment,
                 ReviewOrderType.OutOfQueue);
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.AddOrder(order);
 
@@ -53,7 +53,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 command.TrackUrl,
                 command.UserComment);
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.AddOrder(order);
 
@@ -73,7 +73,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 command.UserComment,
                 ReviewOrderType.Free);
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.AddOrder(order);
 
@@ -98,7 +98,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 command.UserComment,
                 ReviewOrderType.Charity);
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.AddOrder(order);
 
@@ -119,7 +119,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             Transaction payment = uow.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount);
             order.Payments.Add(payment);
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Up);
 
@@ -142,7 +142,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 order.Status = ReviewOrderStatus.Pending;
             }
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.AddTrackUrl);
 
@@ -178,7 +178,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             order.Status = ReviewOrderStatus.InProgress;
             order.InProgressAt = DateTime.UtcNow;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.TakeInProgress);
 
@@ -204,7 +204,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             order.CompletedAt = now;
             order.Status = ReviewOrderStatus.Completed;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Complete);
 
@@ -226,7 +226,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             order.IsFrozen = true;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Freeze);
 
@@ -248,7 +248,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             order.IsFrozen = false;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Unfreeze);
 
@@ -270,7 +270,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             order.Status = ReviewOrderStatus.Canceled;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.RemoveOrder(order);
 

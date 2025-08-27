@@ -16,19 +16,19 @@ namespace Faryma.Composer.Infrastructure
         UserRepository userRepository,
         UserTrackRatingRepository userTrackRatingRepository)
     {
-        public TrackArtistRepository TrackArtistRepository { get; } = artistRepository;
         public ComposerStreamRepository ComposerStreamRepository { get; } = composerStreamRepository;
-        public ReviewOrderRepository ReviewOrderRepository { get; } = reviewOrderRepository;
         public ReviewRepository ReviewRepository { get; } = reviewRepository;
+        public ReviewOrderRepository ReviewOrderRepository { get; } = reviewOrderRepository;
         public TrackRepository TrackRepository { get; } = trackRepository;
+        public TrackArtistRepository TrackArtistRepository { get; } = artistRepository;
         public TransactionRepository TransactionRepository { get; } = transactionRepository;
+        public UserRepository UserRepository { get; } = userRepository;
         public UserAccountRepository UserAccountRepository { get; } = userAccountRepository;
         public UserNicknameRepository UserNicknameRepository { get; } = userNicknameRepository;
-        public UserRepository UserRepository { get; } = userRepository;
         public UserTrackRatingRepository UserTrackRatingRepository { get; } = userTrackRatingRepository;
 
-        public Task<IDbContextTransaction> BeginTransaction() => context.Database.BeginTransactionAsync();
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) => context.SaveChangesAsync(cancellationToken);
+        public Task<IDbContextTransaction> BeginTransaction(CancellationToken cancellationToken = default) => context.Database.BeginTransactionAsync(cancellationToken);
+        public Task<int> SaveChanges(CancellationToken cancellationToken = default) => context.SaveChangesAsync(cancellationToken);
         public void Remove<TEntity>(TEntity entity) where TEntity : class => context.Remove(entity);
     }
 }

@@ -13,7 +13,7 @@ namespace Faryma.Composer.Core.Features.UserNicknameFeature
             {
                 result = uow.UserNicknameRepository.Create(nickname);
                 uow.UserAccountRepository.Create(result);
-                await uow.SaveChangesAsync();
+                await uow.SaveChanges();
             }
 
             return result;
