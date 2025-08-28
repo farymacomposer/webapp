@@ -56,7 +56,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             _signalrClient.On<OrderRemovedEvent>("OrderRemoved", OnOrderRemoved);
         }
 
-        public void OnNewOrderAdded(NewOrderAddedEvent message)
+        private void OnNewOrderAdded(NewOrderAddedEvent message)
         {
             if (message.CurrentPosition.ActivityStatus is not (OrderActivityStatus.Scheduled or OrderActivityStatus.Active))
             {
@@ -66,14 +66,14 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             InsertOrder(message.Order, message.CurrentPosition);
         }
 
-        public void OnOrderPositionChanged(OrderPositionChangedEvent message)
+        private void OnOrderPositionChanged(OrderPositionChangedEvent message)
         {
             switch (message.OrderQueueUpdateType)
             {
                 case OrderQueueUpdateType.AddTrackUrl:
 
                     ObservableCollection<ReviewOrderVM> list = GetOrdersList(message.CurrentPosition.ActivityStatus);
-                    list[message.CurrentPosition.QueueIndex].Update(message.Order);
+                    list[message.CurrentPosition.QueueIndex].UpdateTrackUrl(message.Order);
 
                     break;
 
@@ -93,7 +93,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
         }
 
-        public void OnOrderRemoved(OrderRemovedEvent message)
+        private void OnOrderRemoved(OrderRemovedEvent message)
         {
             if (message.Order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {

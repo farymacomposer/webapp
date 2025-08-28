@@ -6,7 +6,68 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Faryma.Composer.Desktop.UI.OrderQueueFeature"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sharedVM="using:Faryma.Composer.Desktop.Shared.ViewModels"
     mc:Ignorable="d">
 
-    <Grid />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <local:ReviewOrderControl DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <ListView
+                ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
+                ItemsSource="{x:Bind ViewModel.OrderQueueService.CompletedOrders}"
+                SelectionMode="None">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
+                        <local:ReviewOrderControl />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <ListView
+                ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
+                ItemsSource="{x:Bind ViewModel.OrderQueueService.ActiveOrders}"
+                SelectionMode="None">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
+                        <local:ReviewOrderControl />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <ListView
+                ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
+                ItemsSource="{x:Bind ViewModel.OrderQueueService.ScheduledOrders}"
+                SelectionMode="None">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
+                        <local:ReviewOrderControl />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <ListView
+                ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
+                ItemsSource="{x:Bind ViewModel.OrderQueueService.FrozenOrders}"
+                SelectionMode="None">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
+                        <local:ReviewOrderControl />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </Grid>
 </Page>
