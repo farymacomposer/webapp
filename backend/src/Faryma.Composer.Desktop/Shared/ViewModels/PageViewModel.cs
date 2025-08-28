@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Faryma.Composer.Desktop.ViewModels
+namespace Faryma.Composer.Desktop.Shared.ViewModels
 {
     public sealed partial class PageViewModel : ObservableObject
     {

@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Faryma.Composer.Desktop"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:Faryma.Composer.Desktop.ViewModels"
+    xmlns:vm="using:Faryma.Composer.Desktop.Shared.ViewModels"
     Title="Faryma.Composer.Desktop"
     mc:Ignorable="d">
 

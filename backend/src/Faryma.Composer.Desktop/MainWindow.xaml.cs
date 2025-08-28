@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using Faryma.Composer.Desktop.UI.OrderQueue;
-using Faryma.Composer.Desktop.ViewModels;
+using Faryma.Composer.Desktop.Shared.ViewModels;
+using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;

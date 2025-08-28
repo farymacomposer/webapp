@@ -1,16 +1,25 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Faryma.Composer.Desktop.Services.OrderQueueFeature;
+using Faryma.Composer.Desktop.UI.OrderQueueFeature;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 
 namespace Faryma.Composer.Desktop
 {
     public partial class App : Application
     {
-        private static readonly IServiceProvider _services;
+        private static readonly ServiceProvider _services;
 
         static App()
         {
-            _services = new ServiceCollection()
-                .BuildServiceProvider();
+            ServiceCollection services = new();
+
+            services.AddHttpClient("Faryma.Composer.Api", client => client.BaseAddress = new Uri("https://api.example.com"));
+
+            services.AddSingleton<OrderQueueService>();
+
+            services.AddSingleton<OrderQueuePageVM>();
+
+            _services = services.BuildServiceProvider();
         }
 
         public App()
