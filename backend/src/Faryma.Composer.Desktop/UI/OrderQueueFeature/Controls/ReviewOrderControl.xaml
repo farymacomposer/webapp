@@ -63,29 +63,60 @@
             </StackPanel>
         </Grid>
 
-        <Button
-            x:Name="EditButton"
-            Margin="16,12"
-            VerticalAlignment="Top"
-            Style="{StaticResource EditButtonStyle}">
-            <Button.Flyout>
-                <Flyout>
-                    <local:ReviewOrderCommandsControl />
-                </Flyout>
-            </Button.Flyout>
-        </Button>
+        <StackPanel
+            x:Name="Buttons"
+            Margin="4"
+            VerticalAlignment="Bottom"
+            Orientation="Horizontal"
+            Spacing="8">
+
+            <Button
+                AccessKey="&#xE74A;"
+                Style="{StaticResource EditButtonStyle}"
+                ToolTipService.ToolTip="Апнуть" />
+
+            <Button
+                AccessKey="&#xE71B;"
+                Style="{StaticResource EditButtonStyle}"
+                ToolTipService.ToolTip="Ссылка на трек" />
+
+            <Button
+                AccessKey="&#xE768;"
+                Style="{StaticResource EditButtonStyle}"
+                ToolTipService.ToolTip="Взять в работу" />
+
+            <Button
+                AccessKey="&#xE930;"
+                Style="{StaticResource EditButtonStyle}"
+                ToolTipService.ToolTip="Выполнить" />
+
+            <Button
+                AccessKey="&#xE74F;"
+                Style="{StaticResource EditButtonStyle}"
+                ToolTipService.ToolTip="Заморозить" />
+
+            <Button
+                AccessKey="&#xE767;"
+                Style="{StaticResource EditButtonStyle}"
+                ToolTipService.ToolTip="Разморозить" />
+
+            <Button
+                AccessKey="&#xE711;"
+                Style="{StaticResource EditButtonStyle}"
+                ToolTipService.ToolTip="Отменить" />
+        </StackPanel>
 
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="PointerStates">
                 <VisualState x:Name="Exited">
                     <Storyboard>
-                        <FadeOutThemeAnimation Storyboard.TargetName="EditButton" />
+                        <FadeOutThemeAnimation Storyboard.TargetName="Buttons" />
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="Entered">
                     <Storyboard>
-                        <FadeInThemeAnimation Storyboard.TargetName="EditButton" />
+                        <FadeInThemeAnimation Storyboard.TargetName="Buttons" />
                     </Storyboard>
                 </VisualState>
             </VisualStateGroup>

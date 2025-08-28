@@ -19,7 +19,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="UI\OrderQueueFeature\Controls\ReviewOrderCommandsControl.xaml" />
     <None Remove="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml" />
     <None Remove="UI\OrderQueueFeature\OrderQueuePage.xaml" />
   </ItemGroup>
@@ -78,12 +77,6 @@
   <ItemGroup>
     <Folder Include="Services\OrderQueueFeature\Enums\" />
     <Folder Include="Shared\Enums\" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Page Update="UI\OrderQueueFeature\Controls\ReviewOrderCommandsControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   
   <ItemGroup>

@@ -18,7 +18,7 @@
                         <FontIcon
                             x:Name="Icon"
                             FontFamily="Segoe MDL2 Assets"
-                            Glyph="&#xE70F;" />
+                            Glyph="{TemplateBinding AccessKey}" />
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="CommonStates">
                                 <VisualState x:Name="Normal">
