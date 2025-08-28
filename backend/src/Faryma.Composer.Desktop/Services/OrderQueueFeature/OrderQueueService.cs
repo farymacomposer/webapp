@@ -46,7 +46,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             _httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
 
             _signalrClient = new HubConnectionBuilder()
-                .WithUrl("address/monitoring-hub")
+                .WithUrl($"{App.BaseAddress}/api/OrderQueueNotificationHub")
                 .WithAutomaticReconnect()
                 .Build();
 
@@ -55,6 +55,8 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             //_signalrClient.On<OrderPositionsChangedEvent>("OrderPositionsChanged", OnOrderPositionsChanged);
             _signalrClient.On<OrderRemovedEvent>("OrderRemoved", OnOrderRemoved);
         }
+
+        public async Task Start() => await _signalrClient.StartAsync();
 
         private void OnNewOrderAdded(NewOrderAddedEvent message)
         {

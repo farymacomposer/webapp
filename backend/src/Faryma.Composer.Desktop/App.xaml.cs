@@ -7,13 +7,15 @@ namespace Faryma.Composer.Desktop
 {
     public partial class App : Application
     {
+        public const string BaseAddress = "http://localhost:8080";
+
         private static readonly ServiceProvider _services;
 
         static App()
         {
             ServiceCollection services = new();
 
-            services.AddHttpClient("Faryma.Composer.Api", client => client.BaseAddress = new Uri("https://api.example.com"));
+            services.AddHttpClient("Faryma.Composer.Api", client => client.BaseAddress = new Uri(BaseAddress));
 
             services.AddSingleton<OrderQueueService>();
 
@@ -29,8 +31,10 @@ namespace Faryma.Composer.Desktop
 
         public static T GetService<T>() where T : notnull => _services.GetRequiredService<T>();
 
-        protected override void OnLaunched(LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
+            await GetService<OrderQueueService>().Start();
+
             MainWindow window = new();
             window.Activate();
         }
