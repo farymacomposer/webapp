@@ -140,7 +140,7 @@ namespace DataLoader
         /// <summary>
         /// Дата и время совершения операции
         /// </summary>
-        public required DateTime Transaction_CreatedAt { get; set; }
+        public DateTime Transaction_CreatedAt => CreationStream_WentLiveAt;
 
         /// <summary>
         /// Дата и время создания заказа
