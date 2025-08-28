@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Net.Http.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.WinUI;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature.Events;
@@ -8,11 +9,13 @@ using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.UI.Dispatching;
 
 namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 {
     public sealed partial class OrderQueueService : ObservableObject
     {
+        private readonly DispatcherQueue _dispatcherQueue;
         private readonly HttpClient _httpClient;
         private readonly HubConnection _signalrClient;
 
@@ -55,6 +58,8 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             _signalrClient.On<OrderPositionChangedEvent>("OrderPositionChanged", OnOrderPositionChanged);
             //_signalrClient.On<OrderPositionsChangedEvent>("OrderPositionsChanged", OnOrderPositionsChanged);
             _signalrClient.On<OrderRemovedEvent>("OrderRemoved", OnOrderRemoved);
+
+            _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         }
 
         public async Task Initialize()
@@ -88,7 +93,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
         }
 
-        private void OnNewOrderAdded(NewOrderAddedEvent message)
+        private Task OnNewOrderAdded(NewOrderAddedEvent message) => _dispatcherQueue.EnqueueAsync(() =>
         {
             if (message.CurrentPosition.ActivityStatus is not (OrderActivityStatus.Scheduled or OrderActivityStatus.Active))
             {
@@ -96,9 +101,9 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
 
             InsertOrder(message.Order, message.CurrentPosition);
-        }
+        });
 
-        private void OnOrderPositionChanged(OrderPositionChangedEvent message)
+        private Task OnOrderPositionChanged(OrderPositionChangedEvent message) => _dispatcherQueue.EnqueueAsync(() =>
         {
             switch (message.OrderQueueUpdateType)
             {
@@ -123,9 +128,9 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 default:
                     throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
             }
-        }
+        });
 
-        private void OnOrderRemoved(OrderRemovedEvent message)
+        private Task OnOrderRemoved(OrderRemovedEvent message) => _dispatcherQueue.EnqueueAsync(() =>
         {
             if (message.Order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
@@ -133,7 +138,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
 
             RemoveOrder(message.PreviousPosition);
-        }
+        });
 
         private void InsertOrder(ReviewOrderDto order, OrderQueuePositionDto position)
         {
