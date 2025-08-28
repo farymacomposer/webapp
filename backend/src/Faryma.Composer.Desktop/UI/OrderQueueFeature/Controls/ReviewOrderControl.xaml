@@ -11,37 +11,55 @@
     mc:Ignorable="d">
 
     <Grid
-        Background="Transparent"
+        Background="#E4FFFFFF"
         BorderBrush="{ThemeResource SystemControlForegroundChromeMediumBrush}"
         BorderThickness="0,1,0,0">
-        <Grid>
+        <Grid Margin="6,4">
             <StackPanel>
-
-                <TextBlock
-                    Margin="16,12"
-                    FontSize="16"
-                    Text="{Binding Title, Mode=OneTime}" />
-
-                <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding TrackUrl, Mode=OneWay}" />
+                <TextBlock FontSize="16" Text="{Binding Title}" />
+                <TextBlock FontSize="16" Text="{Binding Id}" />
             </StackPanel>
 
             <StackPanel
-                Margin="24,12"
                 HorizontalAlignment="Right"
-                Orientation="Horizontal">
+                Orientation="Horizontal"
+                Spacing="4">
 
                 <StackPanel>
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding InProgressAt, Mode=OneTime}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CompletedAt, Mode=OneTime}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding InProgressAt}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CompletedAt}" />
                 </StackPanel>
 
                 <StackPanel>
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding Type, Mode=OneTime}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CategoryType, Mode=OneTime}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding Status, Mode=OneTime}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding Type}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CategoryType}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding Status}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="IsFrozen: " />
+                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding IsFrozen}" />
+                    </StackPanel>
                 </StackPanel>
 
-                <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding IsFrozen, Mode=OneTime}" />
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="QueueIndex: " />
+                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding QueueIndex}" />
+                    </StackPanel>
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding ActivityStatus}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CurrentCategoryType}" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="DebtNumber: " />
+                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CategoryDebtNumber}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamEventDate}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamStatus}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamType}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamWentLiveAt}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamCompletedAt}" />
+                </StackPanel>
             </StackPanel>
         </Grid>
 

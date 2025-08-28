@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
+using Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto;
 using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Infrastructure.Enums;
 
@@ -6,7 +8,7 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
 {
     public sealed partial class ReviewOrderVM : ObservableObject
     {
-        public string Title => $"{Id} {CreatedAt:s} {MainNickname} {TotalAmount}";
+        public string Title => $"{MainNickname} {TotalAmount} {CreatedAt:T}";
 
         /// <summary>
         /// Id заказа
@@ -68,17 +70,65 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
         /// </summary>
         public decimal TotalAmount => Dto.TotalAmount;
 
-        public ReviewOrderDto Dto { get; private set; }
+        /// <summary>
+        /// Позиция заказа в очереди
+        /// </summary>
+        public int QueueIndex => CurrentPosition.QueueIndex;
 
-        public ReviewOrderVM(ReviewOrderDto dto)
+        /// <summary>
+        /// Статус активности заказа
+        /// </summary>
+        public OrderActivityStatus ActivityStatus => CurrentPosition.ActivityStatus;
+
+        /// <summary>
+        /// Тип категории заказа
+        /// </summary>
+        public OrderCategoryType CurrentCategoryType => CurrentPosition.CategoryType;
+
+        /// <summary>
+        /// Номер категории, если заказ относится к долговой категории
+        /// </summary>
+        public int CategoryDebtNumber => CurrentPosition.CategoryDebtNumber;
+
+        /// <summary>
+        /// Дата проведения стрима
+        /// </summary>
+        public DateOnly StreamEventDate => Dto.CreationStream.EventDate;
+
+        /// <summary>
+        /// Статус стрима
+        /// </summary>
+        public ComposerStreamStatus StreamStatus => Dto.CreationStream.Status;
+
+        /// <summary>
+        /// Тип стрима
+        /// </summary>
+        public ComposerStreamType StreamType => Dto.CreationStream.Type;
+
+        /// <summary>
+        /// Дата и время начала стрима
+        /// </summary>
+        public DateTime? StreamWentLiveAt => Dto.CreationStream.WentLiveAt;
+
+        /// <summary>
+        /// Дата и время завершения стрима
+        /// </summary>
+        public DateTime? StreamCompletedAt => Dto.CreationStream.CompletedAt;
+
+        public ReviewOrderDto Dto { get; private set; }
+        public OrderQueuePositionDto CurrentPosition { get; private set; }
+
+        public ReviewOrderVM(ReviewOrderDto dto, OrderQueuePositionDto currentPosition)
         {
             Dto = dto;
+            CurrentPosition = currentPosition;
         }
 
-        public void UpdateTrackUrl(ReviewOrderDto dto)
+        public void Update(ReviewOrderDto dto, OrderQueuePositionDto currentPosition)
         {
             Dto = dto;
-            OnPropertyChanged(nameof(TrackUrl));
+            CurrentPosition = currentPosition;
+            OnPropertyChanged();
         }
     }
 }

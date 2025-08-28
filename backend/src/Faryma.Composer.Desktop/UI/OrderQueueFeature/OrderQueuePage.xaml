@@ -25,49 +25,89 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <ListView
-                ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
-                ItemsSource="{x:Bind ViewModel.OrderQueueService.CompletedOrders}"
-                SelectionMode="None">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
-                        <local:ReviewOrderControl />
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            <Grid Background="#FDFF90">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-            <ListView
-                ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
-                ItemsSource="{x:Bind ViewModel.OrderQueueService.ActiveOrders}"
-                SelectionMode="None">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
-                        <local:ReviewOrderControl />
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                <TextBlock HorizontalAlignment="Center" Text="CompletedOrders" />
 
-            <ListView
-                ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
-                ItemsSource="{x:Bind ViewModel.OrderQueueService.ScheduledOrders}"
-                SelectionMode="None">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
-                        <local:ReviewOrderControl />
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                <ListView
+                    Grid.Row="1"
+                    ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
+                    ItemsSource="{x:Bind ViewModel.OrderQueueService.CompletedOrders}"
+                    SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
+                            <local:ReviewOrderControl />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
 
-            <ListView
-                ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
-                ItemsSource="{x:Bind ViewModel.OrderQueueService.FrozenOrders}"
-                SelectionMode="None">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
-                        <local:ReviewOrderControl />
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            <Grid Grid.Column="1" Background="#75FF7B">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock HorizontalAlignment="Center" Text="ActiveOrders" />
+
+                <ListView
+                    Grid.Row="1"
+                    ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
+                    ItemsSource="{x:Bind ViewModel.OrderQueueService.ActiveOrders}"
+                    SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
+                            <local:ReviewOrderControl />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+
+            <Grid Grid.Column="2" Background="Silver">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock HorizontalAlignment="Center" Text="ScheduledOrders" />
+
+                <ListView
+                    Grid.Row="1"
+                    ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
+                    ItemsSource="{x:Bind ViewModel.OrderQueueService.ScheduledOrders}"
+                    SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
+                            <local:ReviewOrderControl />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+
+            <Grid Grid.Column="3" Background="#64C4FF">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock HorizontalAlignment="Center" Text="FrozenOrders" />
+
+                <ListView
+                    Grid.Row="1"
+                    ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
+                    ItemsSource="{x:Bind ViewModel.OrderQueueService.FrozenOrders}"
+                    SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="sharedVM:ReviewOrderVM">
+                            <local:ReviewOrderControl />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Net.Http.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto;
@@ -56,7 +57,36 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             _signalrClient.On<OrderRemovedEvent>("OrderRemoved", OnOrderRemoved);
         }
 
-        public async Task Start() => await _signalrClient.StartAsync();
+        public async Task Initialize()
+        {
+            await _signalrClient.StartAsync();
+
+            GetOrderQueueResponse? response = await _httpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue");
+            UpdateOrderQueue(response!);
+        }
+
+        private void UpdateOrderQueue(GetOrderQueueResponse response)
+        {
+            if (response.InProgressOrder is not null)
+            {
+                InProgressOrder = new ReviewOrderVM(response.InProgressOrder.Order, response.InProgressOrder.CurrentPosition);
+            }
+
+            Update(response.ActiveOrders, ActiveOrders);
+            Update(response.CompletedOrders, CompletedOrders);
+            Update(response.ScheduledOrders, ScheduledOrders);
+            Update(response.FrozenOrders, FrozenOrders);
+
+            void Update(ICollection<OrderPositionDto> source, ObservableCollection<ReviewOrderVM> target)
+            {
+                target.Clear();
+
+                foreach (OrderPositionDto item in source.OrderBy(x => x.CurrentPosition.QueueIndex))
+                {
+                    target.Add(new ReviewOrderVM(item.Order, item.CurrentPosition));
+                }
+            }
+        }
 
         private void OnNewOrderAdded(NewOrderAddedEvent message)
         {
@@ -75,7 +105,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 case OrderQueueUpdateType.AddTrackUrl:
 
                     ObservableCollection<ReviewOrderVM> list = GetOrdersList(message.CurrentPosition.ActivityStatus);
-                    list[message.CurrentPosition.QueueIndex].UpdateTrackUrl(message.Order);
+                    list[message.CurrentPosition.QueueIndex].Update(message.Order, message.CurrentPosition);
 
                     break;
 
@@ -109,13 +139,13 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         {
             if (position.ActivityStatus == OrderActivityStatus.InProgress)
             {
-                InProgressOrder = new ReviewOrderVM(order);
+                InProgressOrder = new ReviewOrderVM(order, position);
 
                 return;
             }
 
             ObservableCollection<ReviewOrderVM> list = GetOrdersList(position.ActivityStatus);
-            list.Insert(position.QueueIndex, new ReviewOrderVM(order));
+            list.Insert(position.QueueIndex, new ReviewOrderVM(order, position));
         }
 
         private void RemoveOrder(OrderQueuePositionDto position)

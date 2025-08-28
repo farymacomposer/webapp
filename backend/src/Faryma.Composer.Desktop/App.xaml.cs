@@ -33,7 +33,7 @@ namespace Faryma.Composer.Desktop
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
-            await GetService<OrderQueueService>().Start();
+            await GetService<OrderQueueService>().Initialize();
 
             MainWindow window = new();
             window.Activate();
