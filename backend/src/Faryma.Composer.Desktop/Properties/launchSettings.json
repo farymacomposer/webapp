@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Faryma.Composer.Desktop (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Faryma.Composer.Desktop (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
