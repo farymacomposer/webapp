@@ -102,14 +102,22 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             ComposerStream? nearestStream = await uow.ComposerStreamRepository.FindNearest(today);
 
+            if (nearestStream is not null && nearestStream.Type == ComposerStreamType.Donation)
+            {
+                return nearestStream;
+            }
+
             if (await uow.UserNicknameRepository.HasOrders(userNickname))
             {
                 return await GetOrCreateStream(GetDonationStreamInfo(today));
             }
-            else
+
+            if (nearestStream is not null && nearestStream.Type == ComposerStreamType.Debt)
             {
-                return nearestStream ?? await GetOrCreateStream(GetNearestStreamInfo(today));
+                return nearestStream;
             }
+
+            return await GetOrCreateStream(GetNearestStreamInfo(today));
         }
 
         public async Task<ComposerStream> GetOrCreateForOutOfQueueOrder()
