@@ -20,6 +20,12 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         private readonly HubConnection _signalrClient;
 
         /// <summary>
+        /// Версия для синхронизации состояния очереди
+        /// </summary>
+        [ObservableProperty]
+        public partial int SyncVersion { get; private set; }
+
+        /// <summary>
         /// Заказ в работе
         /// </summary>
         [ObservableProperty]
@@ -47,6 +53,8 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
         public OrderQueueService(IHttpClientFactory httpClientFactory)
         {
+            _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
             _httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
 
             _signalrClient = new HubConnectionBuilder()
@@ -58,8 +66,6 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             _signalrClient.On<OrderPositionChangedEvent>("OrderPositionChanged", OnOrderPositionChanged);
             _signalrClient.On<OrderPositionsChangedEvent>("OrderPositionsChanged", OnOrderPositionsChanged);
             _signalrClient.On<OrderRemovedEvent>("OrderRemoved", OnOrderRemoved);
-
-            _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         }
 
         public async Task Initialize()
@@ -71,6 +77,8 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         private async Task UpdateOrderQueue()
         {
             GetOrderQueueResponse response = (await _httpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue"))!;
+
+            SyncVersion = response.SyncVersion;
 
             if (response.InProgressOrder is not null)
             {
@@ -93,66 +101,85 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
         }
 
-        private Task OnNewOrderAdded(NewOrderAddedEvent message) => _dispatcherQueue.EnqueueAsync(() =>
+        private Task OnNewOrderAdded(NewOrderAddedEvent message) => _dispatcherQueue.EnqueueAsync(async () =>
         {
-            if (message.CurrentPosition.ActivityStatus is not (OrderActivityStatus.Scheduled or OrderActivityStatus.Active))
+            if (await CheckSyncVersion(message.SyncVersion))
             {
-                throw new InvalidOperationException(message.CurrentPosition.ActivityStatus.ToString());
-            }
+                if (message.CurrentPosition.ActivityStatus is not (OrderActivityStatus.Scheduled or OrderActivityStatus.Active))
+                {
+                    throw new InvalidOperationException(message.CurrentPosition.ActivityStatus.ToString());
+                }
 
-            InsertOrder(message.Order, message.CurrentPosition);
+                InsertOrder(message.Order, message.CurrentPosition);
+            }
         });
 
-        private Task OnOrderPositionChanged(OrderPositionChangedEvent message) => _dispatcherQueue.EnqueueAsync(() =>
+        private Task OnOrderPositionChanged(OrderPositionChangedEvent message) => _dispatcherQueue.EnqueueAsync(async () =>
         {
-            switch (message.OrderQueueUpdateType)
+            if (await CheckSyncVersion(message.SyncVersion))
             {
-                case OrderQueueUpdateType.AddTrackUrl:
+                switch (message.OrderQueueUpdateType)
+                {
+                    case OrderQueueUpdateType.AddTrackUrl:
 
-                    ObservableCollection<ReviewOrderVM> list = GetOrdersList(message.CurrentPosition.ActivityStatus);
-                    list[message.CurrentPosition.QueueIndex].Update(message.Order, message.CurrentPosition);
+                        ObservableCollection<ReviewOrderVM> list = GetOrdersList(message.CurrentPosition.ActivityStatus);
+                        list[message.CurrentPosition.QueueIndex].Update(message.Order, message.CurrentPosition);
 
-                    break;
+                        break;
 
-                case OrderQueueUpdateType.Up
-                    or OrderQueueUpdateType.TakeInProgress
-                    or OrderQueueUpdateType.Complete
-                    or OrderQueueUpdateType.Freeze
-                    or OrderQueueUpdateType.Unfreeze:
+                    case OrderQueueUpdateType.Up
+                        or OrderQueueUpdateType.TakeInProgress
+                        or OrderQueueUpdateType.Complete
+                        or OrderQueueUpdateType.Freeze
+                        or OrderQueueUpdateType.Unfreeze:
 
-                    RemoveOrder(message.PreviousPosition);
-                    InsertOrder(message.Order, message.CurrentPosition);
+                        RemoveOrder(message.PreviousPosition);
+                        InsertOrder(message.Order, message.CurrentPosition);
 
-                    break;
+                        break;
 
-                default:
+                    default:
+                        throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
+                }
+            }
+        });
+
+        private Task OnOrderPositionsChanged(OrderPositionsChangedEvent message) => _dispatcherQueue.EnqueueAsync(async () =>
+        {
+            if (await CheckSyncVersion(message.SyncVersion))
+            {
+                if (message.OrderQueueUpdateType
+                    is OrderQueueUpdateType.StreamStarted
+                    or OrderQueueUpdateType.StreamCompleted)
+                {
+                    foreach (OrderPositionDto item in message.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
+                    {
+                        RemoveOrder(item.PreviousPosition);
+                    }
+
+                    foreach (OrderPositionDto item in message.OrderPositions.OrderBy(x => x.CurrentPosition.QueueIndex))
+                    {
+                        InsertOrder(item.Order, item.CurrentPosition);
+                    }
+                }
+                else
+                {
                     throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
+                }
             }
         });
 
-        private Task OnOrderPositionsChanged(OrderPositionsChangedEvent message) => _dispatcherQueue.EnqueueAsync(() =>
+        private Task OnOrderRemoved(OrderRemovedEvent message) => _dispatcherQueue.EnqueueAsync(async () =>
         {
-            switch (message.OrderQueueUpdateType)
+            if (await CheckSyncVersion(message.SyncVersion))
             {
-                case OrderQueueUpdateType.StreamStarted:
+                if (message.Order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
+                {
+                    throw new InvalidOperationException(message.Order.Status.ToString());
+                }
 
-                case OrderQueueUpdateType.StreamCompleted:
-
-                    break;
-
-                default:
-                    throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
+                RemoveOrder(message.PreviousPosition);
             }
-        });
-
-        private Task OnOrderRemoved(OrderRemovedEvent message) => _dispatcherQueue.EnqueueAsync(() =>
-        {
-            if (message.Order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
-            {
-                throw new InvalidOperationException(message.Order.Status.ToString());
-            }
-
-            RemoveOrder(message.PreviousPosition);
         });
 
         private void InsertOrder(ReviewOrderDto order, OrderQueuePositionDto position)
@@ -191,6 +218,22 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 OrderActivityStatus.Frozen => FrozenOrders,
                 _ => throw new InvalidOperationException(status.ToString()),
             };
+        }
+
+        private async Task<bool> CheckSyncVersion(int newSyncVersion)
+        {
+            if (newSyncVersion - SyncVersion == 1)
+            {
+                SyncVersion = newSyncVersion;
+
+                return true;
+            }
+            else
+            {
+                await UpdateOrderQueue();
+
+                return false;
+            }
         }
     }
 }
