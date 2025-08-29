@@ -45,7 +45,10 @@
                             <Button Command="{x:Bind ViewModel.GenerateOrderCommand}">
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72C;" />
                             </Button>
-                            <Button Command="{x:Bind ViewModel.CreateReviewOrderCommand}" Content="Создать новый заказ" />
+                            <Button
+                                Command="{x:Bind ViewModel.CreateReviewOrderCommand}"
+                                Content="Создать новый заказ"
+                                Style="{StaticResource AccentButtonStyle}" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Spacing="16">
@@ -74,7 +77,11 @@
 
                 <StackPanel Spacing="8">
 
-                    <controls:TitledContentRow Title="Id выбранного заказа" Content="{x:Bind ViewModel.SelectedOrder.Id, Mode=OneWay, FallbackValue={x:Null}}" />
+                    <controls:TitledContentRow
+                        Title="Id выбранного заказа"
+                        Content="{x:Bind ViewModel.SelectedOrder.Id, Mode=OneWay, FallbackValue={x:Null}}"
+                        FontSize="16"
+                        Foreground="{StaticResource NegativeBrush}" />
 
                     <StackPanel
                         Padding="8"
@@ -85,7 +92,8 @@
                         <Button
                             HorizontalAlignment="Center"
                             Command="{x:Bind ViewModel.UpReviewOrderCommand}"
-                            Content="Апнуть" />
+                            Content="Поднять в очереди"
+                            Style="{StaticResource AccentButtonStyle}" />
 
                         <StackPanel Orientation="Horizontal" Spacing="16">
                             <controls:TitledContentRow
@@ -113,16 +121,36 @@
                         <Button
                             HorizontalAlignment="Center"
                             Command="{x:Bind ViewModel.AddTrackUrlCommand}"
-                            Content="Добавить ссылку на трек" />
+                            Content="Добавить ссылку на трек"
+                            Style="{StaticResource AccentButtonStyle}" />
 
                         <controls:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
                     </StackPanel>
 
-                    <Button Command="{x:Bind ViewModel.TakeOrderInProgressCommand}" Content="Взять в работу" />
-                    <Button Command="{x:Bind ViewModel.CompleteReviewOrderCommand}" Content="Выполнить" />
-                    <Button Command="{x:Bind ViewModel.FreezeReviewOrderCommand}" Content="Заморозить" />
-                    <Button Command="{x:Bind ViewModel.UnfreezeReviewOrderCommand}" Content="Разморозить" />
-                    <Button Command="{x:Bind ViewModel.CancelReviewOrderCommand}" Content="Отменить" />
+                    <Button
+                        Command="{x:Bind ViewModel.TakeOrderInProgressCommand}"
+                        Content="Взять в работу"
+                        Style="{StaticResource AccentButtonStyle}" />
+
+                    <Button
+                        Command="{x:Bind ViewModel.CompleteReviewOrderCommand}"
+                        Content="Выполнить"
+                        Style="{StaticResource AccentButtonStyle}" />
+
+                    <Button
+                        Command="{x:Bind ViewModel.FreezeReviewOrderCommand}"
+                        Content="Заморозить"
+                        Style="{StaticResource AccentButtonStyle}" />
+
+                    <Button
+                        Command="{x:Bind ViewModel.UnfreezeReviewOrderCommand}"
+                        Content="Разморозить"
+                        Style="{StaticResource AccentButtonStyle}" />
+
+                    <Button
+                        Command="{x:Bind ViewModel.CancelReviewOrderCommand}"
+                        Content="Отменить"
+                        Style="{StaticResource AccentButtonStyle}" />
                 </StackPanel>
             </StackPanel>
 
@@ -145,9 +173,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-
                 <TextBlock HorizontalAlignment="Center" Text="FrozenOrders" />
-
                 <ListView
                     Grid.Row="1"
                     ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
@@ -166,9 +192,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-
                 <TextBlock HorizontalAlignment="Center" Text="ScheduledOrders" />
-
                 <ListView
                     Grid.Row="1"
                     ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
@@ -187,9 +211,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-
                 <TextBlock HorizontalAlignment="Center" Text="ActiveOrders" />
-
                 <ListView
                     Grid.Row="1"
                     ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
@@ -208,9 +230,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-
                 <TextBlock HorizontalAlignment="Center" Text="CompletedOrders" />
-
                 <ListView
                     Grid.Row="1"
                     ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"

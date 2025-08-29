@@ -130,7 +130,7 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
         {
             Dto = dto;
             CurrentPosition = currentPosition;
-            OnPropertyChanged();
+            OnPropertyChanged("");
         }
 
         [RelayCommand]

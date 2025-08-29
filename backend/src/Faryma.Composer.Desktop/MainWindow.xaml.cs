@@ -17,23 +17,9 @@ namespace Faryma.Composer.Desktop
             {
                 Index = 0,
                 Title = "Очередь",
-                Icon = "\xE8CB", // Sort
+                Icon = "\xE71D",
                 PageType = typeof(OrderQueuePage),
             },
-            //new()
-            //{
-            //    Index = 1,
-            //    Title = "Транзакции",
-            //    Icon = "\xE71C", // Filter
-            //    PageType = typeof(TransactionsPage),
-            //},
-            //new()
-            //{
-            //    Index = 2,
-            //    Title = "Счета",
-            //    Icon = "\xE8C7", // PaymentCard
-            //    PageType = typeof(AccountsPage),
-            //},
         ];
 
         public MainWindow()

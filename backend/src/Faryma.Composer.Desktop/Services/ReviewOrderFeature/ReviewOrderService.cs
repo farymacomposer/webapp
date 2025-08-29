@@ -13,12 +13,15 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
 {
     public sealed class ReviewOrderService(IHttpClientFactory httpClientFactory, ILogger<ReviewOrderService> logger)
     {
-        private readonly HttpClient _httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
-
         public async Task CreateReviewOrder(Guid idempotencyKey, CreateReviewOrderRequest request)
         {
-            _httpClient.DefaultRequestHeaders.Add("Idempotency-Key", idempotencyKey.ToString("D"));
-            HttpResponseMessage responseMessage = await _httpClient.PostAsJsonAsync("/api/ReviewOrder/CreateReviewOrder", request);
+            HttpClient httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
+
+            HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/ReviewOrder/CreateReviewOrder");
+            requestMessage.Headers.Add("Idempotency-Key", idempotencyKey.ToString("D"));
+            requestMessage.Content = JsonContent.Create(request);
+
+            HttpResponseMessage responseMessage = await httpClient.SendAsync(requestMessage);
 
             try
             {
@@ -30,16 +33,17 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
             {
                 logger.LogError("{content}", await responseMessage.Content.ReadAsStringAsync());
             }
-            finally
-            {
-                _httpClient.DefaultRequestHeaders.Remove("Idempotency-Key");
-            }
         }
 
         public async Task UpReviewOrder(Guid idempotencyKey, UpReviewOrderRequest request)
         {
-            _httpClient.DefaultRequestHeaders.Add("Idempotency-Key", idempotencyKey.ToString("D"));
-            HttpResponseMessage responseMessage = await _httpClient.PostAsJsonAsync("/api/ReviewOrder/UpReviewOrder", request);
+            HttpClient httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
+
+            HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/ReviewOrder/UpReviewOrder");
+            requestMessage.Headers.Add("Idempotency-Key", idempotencyKey.ToString("D"));
+            requestMessage.Content = JsonContent.Create(request);
+
+            HttpResponseMessage responseMessage = await httpClient.SendAsync(requestMessage);
 
             try
             {
@@ -53,13 +57,14 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
             }
             finally
             {
-                _httpClient.DefaultRequestHeaders.Remove("Idempotency-Key");
+                httpClient.DefaultRequestHeaders.Remove("Idempotency-Key");
             }
         }
 
         public async Task AddTrackUrl(AddTrackUrlRequest request)
         {
-            HttpResponseMessage responseMessage = await _httpClient.PostAsJsonAsync("/api/ReviewOrder/AddTrackUrl", request);
+            HttpClient httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
+            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync("/api/ReviewOrder/AddTrackUrl", request);
 
             try
             {
@@ -75,7 +80,8 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
 
         public async Task TakeOrderInProgress(TakeOrderInProgressRequest request)
         {
-            HttpResponseMessage responseMessage = await _httpClient.PostAsJsonAsync("/api/ReviewOrder/TakeOrderInProgress", request);
+            HttpClient httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
+            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync("/api/ReviewOrder/TakeOrderInProgress", request);
 
             try
             {
@@ -91,7 +97,8 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
 
         public async Task CompleteReviewOrder(CompleteReviewOrderRequest request)
         {
-            HttpResponseMessage responseMessage = await _httpClient.PostAsJsonAsync("/api/ReviewOrder/CompleteReviewOrder", request);
+            HttpClient httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
+            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync("/api/ReviewOrder/CompleteReviewOrder", request);
 
             try
             {
@@ -107,7 +114,8 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
 
         public async Task FreezeReviewOrder(FreezeReviewOrderRequest request)
         {
-            HttpResponseMessage responseMessage = await _httpClient.PostAsJsonAsync("/api/ReviewOrder/FreezeReviewOrder", request);
+            HttpClient httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
+            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync("/api/ReviewOrder/FreezeReviewOrder", request);
 
             try
             {
@@ -123,7 +131,8 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
 
         public async Task UnfreezeReviewOrder(UnfreezeReviewOrderRequest request)
         {
-            HttpResponseMessage responseMessage = await _httpClient.PostAsJsonAsync("/api/ReviewOrder/UnfreezeReviewOrder", request);
+            HttpClient httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
+            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync("/api/ReviewOrder/UnfreezeReviewOrder", request);
 
             try
             {
@@ -139,7 +148,8 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
 
         public async Task CancelReviewOrder(CancelReviewOrderRequest request)
         {
-            HttpResponseMessage responseMessage = await _httpClient.PostAsJsonAsync("/api/ReviewOrder/CancelReviewOrder", request);
+            HttpClient httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
+            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync("/api/ReviewOrder/CancelReviewOrder", request);
 
             try
             {

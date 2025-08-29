@@ -18,7 +18,10 @@
 
         <StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Command="{Binding SelectCommand}" Content="{Binding Id}" />
+                <Button
+                    Command="{Binding SelectCommand}"
+                    Content="{Binding Id}"
+                    Style="{StaticResource AccentButtonStyle}" />
                 <TextBlock
                     VerticalAlignment="Center"
                     FontSize="16"
