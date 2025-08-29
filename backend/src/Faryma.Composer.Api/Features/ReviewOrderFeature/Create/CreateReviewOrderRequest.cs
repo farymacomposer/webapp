@@ -24,6 +24,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
         /// <summary>
         /// Ссылка на трек
         /// </summary>
+        [Url(ErrorMessage = "Некорректная ссылка на трек")]
         public string? TrackUrl { get; set; }
 
         /// <summary>
@@ -46,11 +47,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
                 or ReviewOrderType.Charity))
             {
                 yield return new ValidationResult($"Тип заказа не поддерживается `{OrderType}`");
-            }
-
-            if (TrackUrl is not null && !Uri.TryCreate(TrackUrl, UriKind.Absolute, out _))
-            {
-                yield return new ValidationResult("Некорректная ссылка на трек");
             }
 
             if (PaymentAmount < 0)

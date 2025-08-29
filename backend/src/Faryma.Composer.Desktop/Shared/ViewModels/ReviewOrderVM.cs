@@ -1,15 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto;
 using Faryma.Composer.Desktop.Shared.Dto;
+using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Desktop.Shared.ViewModels
 {
     public sealed partial class ReviewOrderVM : ObservableObject
     {
-        public string Title => $"{MainNickname} {TotalAmount} {CreatedAt:T}";
-
         /// <summary>
         /// Id заказа
         /// </summary>
@@ -90,6 +90,8 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
         /// </summary>
         public int CategoryDebtNumber => CurrentPosition.CategoryDebtNumber;
 
+        public long Streamid => Dto.CreationStream.Id;
+
         /// <summary>
         /// Дата проведения стрима
         /// </summary>
@@ -130,5 +132,8 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
             CurrentPosition = currentPosition;
             OnPropertyChanged();
         }
+
+        [RelayCommand]
+        private void Select() => App.GetService<OrderQueuePageVM>().SelectedOrder = this;
     }
 }

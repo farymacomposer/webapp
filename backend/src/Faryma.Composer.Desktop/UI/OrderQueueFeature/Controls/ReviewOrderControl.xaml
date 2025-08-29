@@ -11,115 +11,68 @@
     mc:Ignorable="d">
 
     <Grid
+        Padding="6,4"
         Background="#E4FFFFFF"
         BorderBrush="{ThemeResource SystemControlForegroundChromeMediumBrush}"
         BorderThickness="0,1,0,0">
-        <Grid Margin="6,4">
-            <StackPanel>
-                <TextBlock FontSize="16" Text="{Binding Title}" />
-                <TextBlock FontSize="16" Text="{Binding Id}" />
+
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Command="{Binding SelectCommand}" Content="{Binding Id}" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="16"
+                    Text="{Binding MainNickname}" />
             </StackPanel>
-
-            <StackPanel
-                HorizontalAlignment="Right"
-                Orientation="Horizontal"
-                Spacing="4">
-
-                <StackPanel>
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding InProgressAt}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CompletedAt}" />
-                </StackPanel>
-
-                <StackPanel>
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding Type}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CategoryType}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding Status}" />
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="IsFrozen: " />
-                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding IsFrozen}" />
-                    </StackPanel>
-                </StackPanel>
-
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="QueueIndex: " />
-                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding QueueIndex}" />
-                    </StackPanel>
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding ActivityStatus}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CurrentCategoryType}" />
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="DebtNumber: " />
-                        <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding CategoryDebtNumber}" />
-                    </StackPanel>
-                </StackPanel>
-
-                <StackPanel>
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamEventDate}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamStatus}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamType}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamStartedAt}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamCompletedAt}" />
-                </StackPanel>
-            </StackPanel>
-        </Grid>
+            <TextBlock
+                FontSize="16"
+                Foreground="{StaticResource NegativeBrush}"
+                Text="{Binding TotalAmount}" />
+            <TextBlock FontSize="16" Text="{Binding CreatedAt}" />
+            <TextBlock Text="{Binding TrackUrl}" />
+        </StackPanel>
 
         <StackPanel
-            x:Name="Buttons"
-            Margin="4"
-            VerticalAlignment="Bottom"
+            HorizontalAlignment="Right"
             Orientation="Horizontal"
             Spacing="8">
 
-            <Button
-                AccessKey="&#xE74A;"
-                Style="{StaticResource EditButtonStyle}"
-                ToolTipService.ToolTip="Апнуть" />
+            <StackPanel>
+                <TextBlock Text="{Binding InProgressAt}" />
+                <TextBlock Text="{Binding CompletedAt}" />
+            </StackPanel>
 
-            <Button
-                AccessKey="&#xE71B;"
-                Style="{StaticResource EditButtonStyle}"
-                ToolTipService.ToolTip="Ссылка на трек" />
+            <StackPanel>
+                <TextBlock Text="{Binding Type}" />
+                <TextBlock Text="{Binding CategoryType}" />
+                <TextBlock Text="{Binding Status}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="IsFrozen: " />
+                    <TextBlock Text="{Binding IsFrozen}" />
+                </StackPanel>
+            </StackPanel>
 
-            <Button
-                AccessKey="&#xE768;"
-                Style="{StaticResource EditButtonStyle}"
-                ToolTipService.ToolTip="Взять в работу" />
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="QueueIndex: " />
+                    <TextBlock Text="{Binding QueueIndex}" />
+                </StackPanel>
+                <TextBlock Text="{Binding ActivityStatus}" />
+                <TextBlock Text="{Binding CurrentCategoryType}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="DebtNumber: " />
+                    <TextBlock Text="{Binding CategoryDebtNumber}" />
+                </StackPanel>
+            </StackPanel>
 
-            <Button
-                AccessKey="&#xE930;"
-                Style="{StaticResource EditButtonStyle}"
-                ToolTipService.ToolTip="Выполнить" />
-
-            <Button
-                AccessKey="&#xE74F;"
-                Style="{StaticResource EditButtonStyle}"
-                ToolTipService.ToolTip="Заморозить" />
-
-            <Button
-                AccessKey="&#xE767;"
-                Style="{StaticResource EditButtonStyle}"
-                ToolTipService.ToolTip="Разморозить" />
-
-            <Button
-                AccessKey="&#xE711;"
-                Style="{StaticResource EditButtonStyle}"
-                ToolTipService.ToolTip="Отменить" />
+            <StackPanel>
+                <TextBlock Text="{Binding Streamid}" />
+                <TextBlock Text="{Binding StreamEventDate}" />
+                <TextBlock Text="{Binding StreamStatus}" />
+                <TextBlock Text="{Binding StreamType}" />
+                <TextBlock Text="{Binding StreamStartedAt}" />
+                <TextBlock Text="{Binding StreamCompletedAt}" />
+            </StackPanel>
         </StackPanel>
-
-
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="PointerStates">
-                <VisualState x:Name="Exited">
-                    <Storyboard>
-                        <FadeOutThemeAnimation Storyboard.TargetName="Buttons" />
-                    </Storyboard>
-                </VisualState>
-                <VisualState x:Name="Entered">
-                    <Storyboard>
-                        <FadeInThemeAnimation Storyboard.TargetName="Buttons" />
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
     </Grid>
 </UserControl>

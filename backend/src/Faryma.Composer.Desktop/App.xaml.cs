@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Desktop.Services.OrderQueueFeature;
+using Faryma.Composer.Desktop.Services.ReviewOrderFeature;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -27,6 +28,7 @@ namespace Faryma.Composer.Desktop
             services.AddHttpClient("Faryma.Composer.Api", client => client.BaseAddress = new Uri(BaseAddress));
 
             services.AddSingleton<OrderQueueService>();
+            services.AddSingleton<ReviewOrderService>();
 
             services.AddSingleton<OrderQueuePageVM>();
 

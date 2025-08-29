@@ -12,19 +12,119 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <Grid>
-                <controls:TitledContentRow Title="Плавка" />
-            </Grid>
+            <StackPanel
+                Padding="16"
+                Orientation="Horizontal"
+                Spacing="16">
+
+                <StackPanel Spacing="8">
+
+                    <StackPanel
+                        Width="516"
+                        Padding="8"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="White"
+                        CornerRadius="4"
+                        Spacing="8">
+
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="24">
+                            <Button Command="{x:Bind ViewModel.GenerateOrderCommand}">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72C;" />
+                            </Button>
+                            <Button Command="{x:Bind ViewModel.CreateReviewOrderCommand}" Content="Создать новый заказ" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <controls:TitledContentRow
+                                Title="IdempotencyKey"
+                                Content="{x:Bind ViewModel.IdempotencyKey, Mode=OneWay}"
+                                FontFamily="Consolas" />
+                            <Button Command="{x:Bind ViewModel.GenerateIdempotencyKeyCommand}">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72C;" />
+                            </Button>
+                        </StackPanel>
+
+                        <controls:TitledContentRow Title="Nickname">
+                            <TextBox Text="{x:Bind ViewModel.Nickname, Mode=TwoWay}" />
+                        </controls:TitledContentRow>
+
+                        <controls:TitledContentRow Title="OrderType">
+                            <ComboBox ItemsSource="{x:Bind ViewModel.OrderTypes, Mode=OneTime}" SelectedItem="{x:Bind ViewModel.OrderType, Mode=TwoWay}" />
+                        </controls:TitledContentRow>
+
+                        <controls:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
+                        <controls:TitledContentRow Title="PaymentAmount" Content="{x:Bind ViewModel.PaymentAmount, Mode=OneWay}" />
+                        <controls:TitledContentRow Title="UserComment" Content="{x:Bind ViewModel.UserComment, Mode=OneWay}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Spacing="8">
+
+                    <controls:TitledContentRow Title="Id выбранного заказа" Content="{x:Bind ViewModel.SelectedOrder.Id, Mode=OneWay, FallbackValue={x:Null}}" />
+
+                    <StackPanel
+                        Padding="8"
+                        Background="White"
+                        CornerRadius="4"
+                        Spacing="8">
+
+                        <Button
+                            HorizontalAlignment="Center"
+                            Command="{x:Bind ViewModel.UpReviewOrderCommand}"
+                            Content="Апнуть" />
+
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <controls:TitledContentRow
+                                Title="IdempotencyKey"
+                                Content="{x:Bind ViewModel.IdempotencyKey, Mode=OneWay}"
+                                FontFamily="Consolas" />
+                            <Button Command="{x:Bind ViewModel.GenerateIdempotencyKeyCommand}">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72C;" />
+                            </Button>
+                        </StackPanel>
+
+                        <controls:TitledContentRow Title="Nickname">
+                            <TextBox Text="{x:Bind ViewModel.Nickname, Mode=TwoWay}" />
+                        </controls:TitledContentRow>
+
+                        <controls:TitledContentRow Title="PaymentAmount" Content="{x:Bind ViewModel.PaymentAmount, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <StackPanel
+                        Padding="8"
+                        Background="White"
+                        CornerRadius="4"
+                        Spacing="8">
+
+                        <Button
+                            HorizontalAlignment="Center"
+                            Command="{x:Bind ViewModel.AddTrackUrlCommand}"
+                            Content="Добавить ссылку на трек" />
+
+                        <controls:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <Button Command="{x:Bind ViewModel.TakeOrderInProgressCommand}" Content="Взять в работу" />
+                    <Button Command="{x:Bind ViewModel.CompleteReviewOrderCommand}" Content="Выполнить" />
+                    <Button Command="{x:Bind ViewModel.FreezeReviewOrderCommand}" Content="Заморозить" />
+                    <Button Command="{x:Bind ViewModel.UnfreezeReviewOrderCommand}" Content="Разморозить" />
+                    <Button Command="{x:Bind ViewModel.CancelReviewOrderCommand}" Content="Отменить" />
+                </StackPanel>
+            </StackPanel>
 
             <local:ReviewOrderControl
                 Grid.Column="1"
