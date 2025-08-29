@@ -95,6 +95,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             return stream;
         }
 
+        // TODO: Исправить логику
         public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
