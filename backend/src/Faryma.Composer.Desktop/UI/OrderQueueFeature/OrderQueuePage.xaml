@@ -128,7 +128,7 @@
 
             <local:ReviewOrderControl
                 Grid.Column="1"
-                VerticalAlignment="Center"
+                VerticalAlignment="Bottom"
                 DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
         </Grid>
 
@@ -137,7 +137,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="1.25*" />
             </Grid.ColumnDefinitions>
 
             <Grid Background="#64C4FF">

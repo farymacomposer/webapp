@@ -10,7 +10,7 @@ namespace Faryma.Composer.Desktop
 {
     public partial class App : Application
     {
-        public const string BaseAddress = "http://localhost:8080";
+        public const string BaseAddress = "https://localhost:7166";
 
         private static readonly ServiceProvider _services;
 
