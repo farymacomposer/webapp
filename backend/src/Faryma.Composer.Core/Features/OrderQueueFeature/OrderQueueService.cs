@@ -28,6 +28,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             return _locker.Lock(() => new OrderQueue
             {
                 SyncVersion = _syncVersion,
+                OrderQueueUpdateType = OrderQueueUpdateType.Unspecified,
                 Positions = _queueManager.OrderPositionsById
                     .Select(x => x.Value.Clone())
                     .ToArray(),
@@ -56,6 +57,17 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             });
         }
 
+        public async Task RemoveOrder(ReviewOrder order)
+        {
+            await _locker.Lock(async () =>
+            {
+                _syncVersion++;
+                OrderPosition position = _queueManager.RemoveOrder(order);
+
+                await notificationService.NotifyOrderRemoved(_syncVersion, position);
+            });
+        }
+
         public async Task StartStream(ComposerStream stream, ReviewOrder[] orders)
         {
             await _locker.Lock(async () =>
@@ -65,21 +77,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 OrderQueue orderQueue = new()
                 {
                     SyncVersion = _syncVersion,
+                    OrderQueueUpdateType = OrderQueueUpdateType.StreamStarted,
                     Positions = _queueManager.UpdateOrders(orders),
                 };
 
                 await notificationService.NotifyOrderPositionsChanged(orderQueue);
-            });
-        }
-
-        public async Task RemoveOrder(ReviewOrder order)
-        {
-            await _locker.Lock(async () =>
-            {
-                _syncVersion++;
-                OrderPosition position = _queueManager.RemoveOrder(order);
-
-                await notificationService.NotifyOrderRemoved(_syncVersion, position);
             });
         }
 

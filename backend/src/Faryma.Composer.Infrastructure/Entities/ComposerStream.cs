@@ -28,7 +28,7 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Дата и время начала стрима
         /// </summary>
-        public DateTime? WentLiveAt { get; set; }
+        public DateTime? StartedAt { get; set; }
 
         /// <summary>
         /// Дата и время завершения стрима

@@ -56,7 +56,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
             _signalrClient.On<NewOrderAddedEvent>("NewOrderAdded", OnNewOrderAdded);
             _signalrClient.On<OrderPositionChangedEvent>("OrderPositionChanged", OnOrderPositionChanged);
-            //_signalrClient.On<OrderPositionsChangedEvent>("OrderPositionsChanged", OnOrderPositionsChanged);
+            _signalrClient.On<OrderPositionsChangedEvent>("OrderPositionsChanged", OnOrderPositionsChanged);
             _signalrClient.On<OrderRemovedEvent>("OrderRemoved", OnOrderRemoved);
 
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
@@ -65,13 +65,13 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         public async Task Initialize()
         {
             await _signalrClient.StartAsync();
-
-            GetOrderQueueResponse? response = await _httpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue");
-            UpdateOrderQueue(response!);
+            await UpdateOrderQueue();
         }
 
-        private void UpdateOrderQueue(GetOrderQueueResponse response)
+        private async Task UpdateOrderQueue()
         {
+            GetOrderQueueResponse response = (await _httpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue"))!;
+
             if (response.InProgressOrder is not null)
             {
                 InProgressOrder = new ReviewOrderVM(response.InProgressOrder.Order, response.InProgressOrder.CurrentPosition);
@@ -122,6 +122,21 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
                     RemoveOrder(message.PreviousPosition);
                     InsertOrder(message.Order, message.CurrentPosition);
+
+                    break;
+
+                default:
+                    throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
+            }
+        });
+
+        private Task OnOrderPositionsChanged(OrderPositionsChangedEvent message) => _dispatcherQueue.EnqueueAsync(() =>
+        {
+            switch (message.OrderQueueUpdateType)
+            {
+                case OrderQueueUpdateType.StreamStarted:
+
+                case OrderQueueUpdateType.StreamCompleted:
 
                     break;
 

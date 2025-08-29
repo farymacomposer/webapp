@@ -30,7 +30,7 @@ namespace Faryma.Composer.Desktop.Shared.Dto
         /// <summary>
         /// Дата и время начала стрима
         /// </summary>
-        public required DateTime? WentLiveAt { get; init; }
+        public required DateTime? StartedAt { get; init; }
 
         /// <summary>
         /// Дата и время завершения стрима

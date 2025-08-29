@@ -39,5 +39,15 @@
         /// Разморозка заказа
         /// </summary>
         Unfreeze = 6,
+
+        /// <summary>
+        /// Стрим запущен
+        /// </summary>
+        StreamStarted = 7,
+
+        /// <summary>
+        /// Стрим завершен
+        /// </summary>
+        StreamCompleted = 8,
     }
 }

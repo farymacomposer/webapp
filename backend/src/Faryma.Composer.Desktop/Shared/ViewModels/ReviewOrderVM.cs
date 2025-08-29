@@ -108,7 +108,7 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
         /// <summary>
         /// Дата и время начала стрима
         /// </summary>
-        public DateTime? StreamWentLiveAt => Dto.CreationStream.WentLiveAt;
+        public DateTime? StreamStartedAt => Dto.CreationStream.StartedAt;
 
         /// <summary>
         /// Дата и время завершения стрима

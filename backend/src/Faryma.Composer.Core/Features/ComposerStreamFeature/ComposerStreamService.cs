@@ -44,7 +44,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             }
 
             stream.Status = ComposerStreamStatus.Live;
-            stream.WentLiveAt = DateTime.UtcNow;
+            stream.StartedAt = DateTime.UtcNow;
 
             await uow.SaveChangesAsync();
 

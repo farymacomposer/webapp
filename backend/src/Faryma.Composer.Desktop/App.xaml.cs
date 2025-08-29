@@ -2,6 +2,8 @@
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using Serilog;
+using Serilog.Events;
 
 namespace Faryma.Composer.Desktop
 {
@@ -13,7 +15,14 @@ namespace Faryma.Composer.Desktop
 
         static App()
         {
+            NativeMethods.AllocConsole();
+
             ServiceCollection services = new();
+
+            services.AddLogging(builder => builder.AddSerilog(new LoggerConfiguration()
+                .WriteTo
+                .Console(LogEventLevel.Verbose, applyThemeToRedirectedOutput: true)
+                .CreateLogger()));
 
             services.AddHttpClient("Faryma.Composer.Api", client => client.BaseAddress = new Uri(BaseAddress));
 

@@ -57,7 +57,7 @@
                     <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamEventDate}" />
                     <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamStatus}" />
                     <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamType}" />
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamWentLiveAt}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamStartedAt}" />
                     <TextBlock Foreground="{StaticResource NeutralBrush}" Text="{Binding StreamCompletedAt}" />
                 </StackPanel>
             </StackPanel>
