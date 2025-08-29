@@ -128,23 +128,8 @@
                     </StackPanel>
 
                     <Button
-                        Command="{x:Bind ViewModel.TakeOrderInProgressCommand}"
-                        Content="Взять в работу"
-                        Style="{StaticResource AccentButtonStyle}" />
-
-                    <Button
-                        Command="{x:Bind ViewModel.CompleteReviewOrderCommand}"
-                        Content="Выполнить"
-                        Style="{StaticResource AccentButtonStyle}" />
-
-                    <Button
                         Command="{x:Bind ViewModel.FreezeReviewOrderCommand}"
                         Content="Заморозить"
-                        Style="{StaticResource AccentButtonStyle}" />
-
-                    <Button
-                        Command="{x:Bind ViewModel.UnfreezeReviewOrderCommand}"
-                        Content="Разморозить"
                         Style="{StaticResource AccentButtonStyle}" />
 
                     <Button
@@ -154,10 +139,16 @@
                 </StackPanel>
             </StackPanel>
 
-            <local:ReviewOrderControl
+            <StackPanel
                 Grid.Column="1"
                 VerticalAlignment="Bottom"
-                DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
+                Spacing="16">
+                <Button
+                    Command="{x:Bind ViewModel.CompleteReviewOrderCommand}"
+                    Content="Выполнить"
+                    Style="{StaticResource AccentButtonStyle}" />
+                <local:ReviewOrderControl DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="1">
@@ -173,7 +164,17 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock HorizontalAlignment="Center" Text="FrozenOrders" />
+                <StackPanel
+                    Padding="0,4"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="16">
+                    <Button
+                        Command="{x:Bind ViewModel.UnfreezeReviewOrderCommand}"
+                        Content="Разморозить"
+                        Style="{StaticResource AccentButtonStyle}" />
+                    <TextBlock VerticalAlignment="Center" Text="FrozenOrders" />
+                </StackPanel>
                 <ListView
                     Grid.Row="1"
                     ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
@@ -211,7 +212,17 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock HorizontalAlignment="Center" Text="ActiveOrders" />
+                <StackPanel
+                    Padding="0,4"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="16">
+                    <Button
+                        Command="{x:Bind ViewModel.TakeOrderInProgressCommand}"
+                        Content="Взять в работу"
+                        Style="{StaticResource AccentButtonStyle}" />
+                    <TextBlock VerticalAlignment="Center" Text="ActiveOrders" />
+                </StackPanel>
                 <ListView
                     Grid.Row="1"
                     ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
