@@ -12,7 +12,7 @@ namespace Faryma.Composer.Api.Features.AppSettingsFeature
         /// Номинальная стоимость заказа
         /// </summary>
         [Range(0, 10_000)]
-        public required int ReviewOrderNominalAmount { get; set; }
+        public required int ReviewOrderNominalAmount { get; init; }
 
         public static AppSettingsDto Map(AppSettingsEntity item)
         {

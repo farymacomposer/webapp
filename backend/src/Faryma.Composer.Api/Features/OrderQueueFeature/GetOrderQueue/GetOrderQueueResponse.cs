@@ -25,7 +25,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
         /// <summary>
         /// Заказ в работе
         /// </summary>
-        public OrderPositionDto? InProgressOrder { get; set; }
+        public OrderPositionDto? InProgressOrder { get; private set; }
 
         /// <summary>
         /// Выполненные заказы

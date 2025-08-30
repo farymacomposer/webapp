@@ -10,12 +10,12 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Find
         /// <summary>
         /// Начальная дата периода поиска
         /// </summary>
-        public required DateOnly DateFrom { get; set; }
+        public required DateOnly DateFrom { get; init; }
 
         /// <summary>
         /// Конечная дата периода поиска
         /// </summary>
-        public required DateOnly DateTo { get; set; }
+        public required DateOnly DateTo { get; init; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

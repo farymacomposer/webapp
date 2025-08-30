@@ -13,30 +13,30 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
         /// </summary>
         [Required]
         [StringLength(40, MinimumLength = 1, ErrorMessage = "Длина псевдонима должна быть в пределах от 1 до 40 символов")]
-        public required string Nickname { get; set; }
+        public required string Nickname { get; init; }
 
         /// <summary>
         /// Тип заказа
         /// </summary>
         [EnumDataType(typeof(ReviewOrderType), ErrorMessage = "Недопустимый тип заказа")]
-        public required ReviewOrderType OrderType { get; set; }
+        public required ReviewOrderType OrderType { get; init; }
 
         /// <summary>
         /// Ссылка на трек
         /// </summary>
         [Url(ErrorMessage = "Некорректная ссылка на трек")]
-        public string? TrackUrl { get; set; }
+        public string? TrackUrl { get; init; }
 
         /// <summary>
         /// Сумма платежа
         /// </summary>
-        public decimal? PaymentAmount { get; set; }
+        public decimal? PaymentAmount { get; init; }
 
         /// <summary>
         /// Комментарий пользователя
         /// </summary>
         [StringLength(200, ErrorMessage = "Максимальная длина комментария - 200 символов")]
-        public string? UserComment { get; set; }
+        public string? UserComment { get; init; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

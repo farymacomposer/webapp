@@ -11,13 +11,13 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Create
         /// <summary>
         /// Дата проведения стрима
         /// </summary>
-        public required DateOnly EventDate { get; set; }
+        public required DateOnly EventDate { get; init; }
 
         /// <summary>
         /// Тип стрима
         /// </summary>
         [EnumDataType(typeof(ComposerStreamType), ErrorMessage = "Недопустимый тип стрима")]
-        public required ComposerStreamType Type { get; set; }
+        public required ComposerStreamType Type { get; init; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

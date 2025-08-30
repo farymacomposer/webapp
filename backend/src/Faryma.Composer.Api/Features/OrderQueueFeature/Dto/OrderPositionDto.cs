@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Api.Shared.Dto;
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Shared.Dto;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.Dto
@@ -11,16 +12,19 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Dto
         /// <summary>
         /// Заказ разбора трека
         /// </summary>
+        [Required]
         public required ReviewOrderDto Order { get; init; }
 
         /// <summary>
         /// Предыдущая позиция заказа в очереди
         /// </summary>
+        [Required]
         public required OrderQueuePositionDto PreviousPosition { get; init; }
 
         /// <summary>
         /// Текущая позиция заказа в очереди
         /// </summary>
+        [Required]
         public required OrderQueuePositionDto CurrentPosition { get; init; }
 
         public static OrderPositionDto Map(OrderPosition orderPosition)

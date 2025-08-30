@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
@@ -22,6 +23,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         /// <summary>
         /// Позиции заказов
         /// </summary>
+        [Required]
         public required IEnumerable<OrderPositionDto> OrderPositions { get; init; }
 
         public static OrderPositionsChangedEvent Map(OrderQueue orderQueue)

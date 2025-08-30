@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -17,6 +18,14 @@ namespace Faryma.Composer.Infrastructure.Migrations
         {
             migrationBuilder.EnsureSchema(
                 name: "app");
+
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:composer_stream_status", "canceled,completed,live,planned,unspecified")
+                .Annotation("Npgsql:Enum:composer_stream_type", "charity,debt,donation,unspecified")
+                .Annotation("Npgsql:Enum:order_category_type", "debt,donation,out_of_queue,unspecified")
+                .Annotation("Npgsql:Enum:review_order_status", "canceled,completed,in_progress,pending,preorder,unspecified")
+                .Annotation("Npgsql:Enum:review_order_type", "charity,donation,free,out_of_queue,unspecified")
+                .Annotation("Npgsql:Enum:transaction_type", "deposit,payment,unspecified");
 
             migrationBuilder.CreateTable(
                 name: "AppSettings",
@@ -82,8 +91,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     EventDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<ComposerStreamStatus>(type: "composer_stream_status", nullable: false),
+                    Type = table.Column<ComposerStreamType>(type: "composer_stream_type", nullable: false),
                     StartedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -366,9 +375,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     InProgressAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    CategoryType = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<ReviewOrderType>(type: "review_order_type", nullable: false),
+                    CategoryType = table.Column<OrderCategoryType>(type: "order_category_type", nullable: false),
+                    Status = table.Column<ReviewOrderStatus>(type: "review_order_status", nullable: false),
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
                     NominalAmount = table.Column<decimal>(type: "numeric", nullable: false),
@@ -556,7 +565,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<TransactionType>(type: "transaction_type", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UserAccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: true)
