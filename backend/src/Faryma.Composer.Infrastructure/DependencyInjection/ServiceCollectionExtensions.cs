@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Infrastructure.Enums;
-using Faryma.Composer.Infrastructure.QueryServices;
+﻿using Faryma.Composer.Infrastructure.QueryServices;
 using Faryma.Composer.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -34,17 +33,6 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
             return services;
         }
 
-        public static void NpgsqlOptionsAction(this NpgsqlDbContextOptionsBuilder builder)
-        {
-            builder.MigrationsHistoryTable("__EFMigrationsHistory", "app");
-
-            builder
-                .MapEnum<ComposerStreamStatus>("ComposerStreamStatus")
-                .MapEnum<ComposerStreamType>("ComposerStreamType")
-                .MapEnum<OrderCategoryType>("OrderCategoryType")
-                .MapEnum<ReviewOrderStatus>("ReviewOrderStatus")
-                .MapEnum<ReviewOrderType>("ReviewOrderType")
-                .MapEnum<TransactionType>("TransactionType");
-        }
+        public static void NpgsqlOptionsAction(this NpgsqlDbContextOptionsBuilder builder) => builder.MigrationsHistoryTable("__EFMigrationsHistory", "app");
     }
 }
