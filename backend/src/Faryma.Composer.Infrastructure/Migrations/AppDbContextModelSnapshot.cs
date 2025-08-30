@@ -23,12 +23,12 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "composer_stream_status", new[] { "canceled", "completed", "live", "planned", "unspecified" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "composer_stream_type", new[] { "charity", "debt", "donation", "unspecified" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "order_category_type", new[] { "debt", "donation", "out_of_queue", "unspecified" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "review_order_status", new[] { "canceled", "completed", "in_progress", "pending", "preorder", "unspecified" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "review_order_type", new[] { "charity", "donation", "free", "out_of_queue", "unspecified" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "transaction_type", new[] { "deposit", "payment", "unspecified" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "ComposerStreamStatus", new[] { "canceled", "completed", "live", "planned", "unspecified" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "ComposerStreamType", new[] { "charity", "debt", "donation", "unspecified" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "OrderCategoryType", new[] { "debt", "donation", "out_of_queue", "unspecified" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "ReviewOrderStatus", new[] { "canceled", "completed", "in_progress", "pending", "preorder", "unspecified" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "ReviewOrderType", new[] { "charity", "donation", "free", "out_of_queue", "unspecified" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "TransactionType", new[] { "deposit", "payment", "unspecified" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.AppSettingsEntity", b =>
@@ -72,10 +72,10 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<ComposerStreamStatus>("Status")
-                        .HasColumnType("composer_stream_status");
+                        .HasColumnType("\"ComposerStreamStatus\"");
 
                     b.Property<ComposerStreamType>("Type")
-                        .HasColumnType("composer_stream_type");
+                        .HasColumnType("\"ComposerStreamType\"");
 
                     b.HasKey("Id");
 
@@ -127,7 +127,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<OrderCategoryType>("CategoryType")
-                        .HasColumnType("order_category_type");
+                        .HasColumnType("\"OrderCategoryType\"");
 
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -159,7 +159,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<ReviewOrderStatus>("Status")
-                        .HasColumnType("review_order_status");
+                        .HasColumnType("\"ReviewOrderStatus\"");
 
                     b.Property<long?>("TrackId")
                         .HasColumnType("bigint");
@@ -168,7 +168,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<ReviewOrderType>("Type")
-                        .HasColumnType("review_order_type");
+                        .HasColumnType("\"ReviewOrderType\"");
 
                     b.Property<string>("UserComment")
                         .HasColumnType("text");
@@ -396,7 +396,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<TransactionType>("Type")
-                        .HasColumnType("transaction_type");
+                        .HasColumnType("\"TransactionType\"");
 
                     b.Property<Guid>("UserAccountId")
                         .HasColumnType("uuid");

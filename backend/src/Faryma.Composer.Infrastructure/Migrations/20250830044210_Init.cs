@@ -20,12 +20,12 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 name: "app");
 
             migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:composer_stream_status", "canceled,completed,live,planned,unspecified")
-                .Annotation("Npgsql:Enum:composer_stream_type", "charity,debt,donation,unspecified")
-                .Annotation("Npgsql:Enum:order_category_type", "debt,donation,out_of_queue,unspecified")
-                .Annotation("Npgsql:Enum:review_order_status", "canceled,completed,in_progress,pending,preorder,unspecified")
-                .Annotation("Npgsql:Enum:review_order_type", "charity,donation,free,out_of_queue,unspecified")
-                .Annotation("Npgsql:Enum:transaction_type", "deposit,payment,unspecified");
+                .Annotation("Npgsql:Enum:ComposerStreamStatus", "canceled,completed,live,planned,unspecified")
+                .Annotation("Npgsql:Enum:ComposerStreamType", "charity,debt,donation,unspecified")
+                .Annotation("Npgsql:Enum:OrderCategoryType", "debt,donation,out_of_queue,unspecified")
+                .Annotation("Npgsql:Enum:ReviewOrderStatus", "canceled,completed,in_progress,pending,preorder,unspecified")
+                .Annotation("Npgsql:Enum:ReviewOrderType", "charity,donation,free,out_of_queue,unspecified")
+                .Annotation("Npgsql:Enum:TransactionType", "deposit,payment,unspecified");
 
             migrationBuilder.CreateTable(
                 name: "AppSettings",
@@ -91,8 +91,8 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     EventDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Status = table.Column<ComposerStreamStatus>(type: "composer_stream_status", nullable: false),
-                    Type = table.Column<ComposerStreamType>(type: "composer_stream_type", nullable: false),
+                    Status = table.Column<ComposerStreamStatus>(type: "\"ComposerStreamStatus\"", nullable: false),
+                    Type = table.Column<ComposerStreamType>(type: "\"ComposerStreamType\"", nullable: false),
                     StartedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -375,9 +375,9 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     InProgressAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Type = table.Column<ReviewOrderType>(type: "review_order_type", nullable: false),
-                    CategoryType = table.Column<OrderCategoryType>(type: "order_category_type", nullable: false),
-                    Status = table.Column<ReviewOrderStatus>(type: "review_order_status", nullable: false),
+                    Type = table.Column<ReviewOrderType>(type: "\"ReviewOrderType\"", nullable: false),
+                    CategoryType = table.Column<OrderCategoryType>(type: "\"OrderCategoryType\"", nullable: false),
+                    Status = table.Column<ReviewOrderStatus>(type: "\"ReviewOrderStatus\"", nullable: false),
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
                     NominalAmount = table.Column<decimal>(type: "numeric", nullable: false),
@@ -565,7 +565,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    Type = table.Column<TransactionType>(type: "transaction_type", nullable: false),
+                    Type = table.Column<TransactionType>(type: "\"TransactionType\"", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UserAccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: true)

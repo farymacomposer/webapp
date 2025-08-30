@@ -39,12 +39,12 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
             builder.MigrationsHistoryTable("__EFMigrationsHistory", "app");
 
             builder
-                .MapEnum<ComposerStreamStatus>("composer_stream_status")
-                .MapEnum<ComposerStreamType>("composer_stream_type")
-                .MapEnum<OrderCategoryType>("order_category_type")
-                .MapEnum<ReviewOrderStatus>("review_order_status")
-                .MapEnum<ReviewOrderType>("review_order_type")
-                .MapEnum<TransactionType>("transaction_type");
+                .MapEnum<ComposerStreamStatus>("ComposerStreamStatus")
+                .MapEnum<ComposerStreamType>("ComposerStreamType")
+                .MapEnum<OrderCategoryType>("OrderCategoryType")
+                .MapEnum<ReviewOrderStatus>("ReviewOrderStatus")
+                .MapEnum<ReviewOrderType>("ReviewOrderType")
+                .MapEnum<TransactionType>("TransactionType");
         }
     }
 }
