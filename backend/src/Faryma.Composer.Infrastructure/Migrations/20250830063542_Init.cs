@@ -18,6 +18,14 @@ namespace Faryma.Composer.Infrastructure.Migrations
             migrationBuilder.EnsureSchema(
                 name: "app");
 
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:composer_stream_status", "unspecified,planned,live,completed,canceled")
+                .Annotation("Npgsql:Enum:composer_stream_type", "unspecified,donation,debt,charity")
+                .Annotation("Npgsql:Enum:order_category_type", "unspecified,out_of_queue,donation,debt")
+                .Annotation("Npgsql:Enum:review_order_status", "unspecified,preorder,pending,in_progress,completed,canceled")
+                .Annotation("Npgsql:Enum:review_order_type", "unspecified,out_of_queue,donation,free,charity")
+                .Annotation("Npgsql:Enum:transaction_type", "unspecified,deposit,payment");
+
             migrationBuilder.CreateTable(
                 name: "AppSettings",
                 schema: "app",

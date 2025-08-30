@@ -3,7 +3,6 @@ using Faryma.Composer.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
 namespace Faryma.Composer.Infrastructure.DependencyInjection
 {
@@ -12,7 +11,7 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
         public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
         {
             string? connectionString = ConnectionStringHelper.Get(configuration);
-            services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(connectionString, NpgsqlOptionsAction));
+            services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(connectionString));
 
             services
                 .AddScoped<UnitOfWork>()
@@ -32,7 +31,5 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
 
             return services;
         }
-
-        public static void NpgsqlOptionsAction(this NpgsqlDbContextOptionsBuilder builder) => builder.MigrationsHistoryTable("__EFMigrationsHistory", "app");
     }
 }

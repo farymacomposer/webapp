@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Infrastructure.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
@@ -15,7 +14,7 @@ namespace Faryma.Composer.Infrastructure
                 .Build();
 
             DbContextOptionsBuilder<AppDbContext> optionsBuilder = new();
-            optionsBuilder.UseNpgsql(ConnectionStringHelper.Get(configuration), ServiceCollectionExtensions.NpgsqlOptionsAction);
+            optionsBuilder.UseNpgsql(ConnectionStringHelper.Get(configuration), o => o.MigrationsHistoryTable("__EFMigrationsHistory", "app"));
 
             return new AppDbContext(optionsBuilder.Options);
         }
