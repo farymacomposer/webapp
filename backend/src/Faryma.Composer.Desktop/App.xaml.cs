@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Desktop.Services.OrderQueueFeature;
+﻿using Faryma.Composer.Desktop.Services.ComposerStreamFeature;
+using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,7 @@ namespace Faryma.Composer.Desktop
 
             services.AddSingleton<OrderQueueService>();
             services.AddSingleton<ReviewOrderService>();
+            services.AddSingleton<ComposerStreamService>();
 
             services.AddSingleton<OrderQueuePageVM>();
 

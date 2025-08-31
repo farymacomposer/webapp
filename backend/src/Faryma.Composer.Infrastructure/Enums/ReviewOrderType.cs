@@ -28,6 +28,11 @@
         /// <summary>
         /// Благотворительный
         /// </summary>
-        Charity = 4
+        Charity = 4,
+
+        /// <summary>
+        /// Заказной (индивидуальный заказ)
+        /// </summary>
+        Custom = 5
     }
 }

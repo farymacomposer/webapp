@@ -17,7 +17,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
     public sealed partial class OrderQueueService : ObservableObject
     {
         private readonly DispatcherQueue _dispatcherQueue;
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly HubConnection _signalrClient;
         private readonly ILogger<OrderQueueService> _logger;
 
@@ -53,12 +53,13 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         /// </summary>
         public ObservableCollection<ReviewOrderVM> FrozenOrders { get; } = [];
 
+        private HttpClient HttpClient => _httpClientFactory.CreateClient("Faryma.Composer.Api");
+
         public OrderQueueService(IHttpClientFactory httpClientFactory, ILogger<OrderQueueService> logger)
         {
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            _httpClientFactory = httpClientFactory;
             _logger = logger;
-
-            _httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
 
             _signalrClient = new HubConnectionBuilder()
                 .WithUrl($"{App.BaseAddress}/api/OrderQueueNotificationHub")
@@ -80,7 +81,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
         public async Task UpdateOrderQueue()
         {
-            GetOrderQueueResponse response = (await _httpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue"))!;
+            GetOrderQueueResponse response = (await HttpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue"))!;
 
             _logger.LogInformation("{@response}", response);
 

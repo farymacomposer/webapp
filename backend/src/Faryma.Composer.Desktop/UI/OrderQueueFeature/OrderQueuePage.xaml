@@ -170,16 +170,51 @@
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel
-                Grid.Column="1"
-                VerticalAlignment="Bottom"
-                Spacing="16">
-                <Button
-                    Command="{x:Bind ViewModel.CompleteReviewOrderCommand}"
-                    Content="Выполнить"
-                    Style="{StaticResource AccentButtonStyle}" />
-                <local:ReviewOrderControl DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
-            </StackPanel>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Сегодня" />
+                        <Button>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76B;" />
+                        </Button>
+                        <Button>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76C;" />
+                        </Button>
+                        <TextBlock />
+                    </StackPanel>
+
+                    <ListView Grid.Row="1">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsStackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                    </ListView>
+                </Grid>
+
+                <StackPanel Grid.Row="1" Spacing="16">
+                    <Button
+                        Command="{x:Bind ViewModel.CompleteReviewOrderCommand}"
+                        Content="Выполнить"
+                        Style="{StaticResource AccentButtonStyle}" />
+                    <local:ReviewOrderControl DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
+                </StackPanel>
+            </Grid>
         </Grid>
 
         <Grid Grid.Row="1">

@@ -124,13 +124,11 @@ namespace Faryma.Composer.Infrastructure
                 }
             );
 
-            builder.Entity<AppSettingsEntity>().HasData(
-                new AppSettingsEntity
-                {
-                    Id = 1,
-                    ReviewOrderNominalAmount = 750,
-                }
-            );
+            builder.Entity<AppSettingsEntity>().HasData(new AppSettingsEntity
+            {
+                Id = 1,
+                ReviewOrderNominalAmount = 750,
+            });
 
             builder.Entity<TrackGenre>().HasData(
                 new TrackGenre { Id = 1, Name = "электронное" },
