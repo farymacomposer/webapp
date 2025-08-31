@@ -54,10 +54,57 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             };
         }
 
+        public IEnumerable<OrderPosition> UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
+        {
+            OrderPosition position = updateType switch
+            {
+                OrderQueueUpdateType.Add => AddOrder(order),
+                OrderQueueUpdateType.Cancel => RemoveOrder(order),
+                _ => UpdateOrderInternal(order, updateType),
+            };
+
+            return OrderPositionsById
+                .Select(x => x.Value)
+                .Where(x => x.PositionHistory.IsPositionJumped)
+                .Append(position)
+                .ToHashSet();
+        }
+
+        /// <summary>
+        /// Обновляет заказы
+        /// </summary>
+        public IEnumerable<OrderPosition> UpdateOrders(ReviewOrder[] orders)
+        {
+            List<OrderPosition> positions = [];
+            foreach (ReviewOrder order in orders)
+            {
+                OrderPosition position = OrderPositionsById[order.Id];
+                position.Order = order;
+                positions.Add(position);
+            }
+
+            UpdateAllPositions();
+
+            return positions;
+        }
+
+        /// <summary>
+        /// Обновляет позиции заказов
+        /// </summary>
+        public void UpdateAllPositions()
+        {
+            SaveCurrentPositionsToPrevious();
+            UpdateActive();
+            UpdateInProgress();
+            UpdateCompleted();
+            UpdateScheduled();
+            UpdateFrozen();
+        }
+
         /// <summary>
         /// Добавляет заказ
         /// </summary>
-        public OrderPosition AddOrder(ReviewOrder order)
+        private OrderPosition AddOrder(ReviewOrder order)
         {
             OrderPosition position = new() { Order = order };
             OrderPositionsById.Add(order.Id, position);
@@ -72,7 +119,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// <summary>
         /// Обновляет заказ
         /// </summary>
-        public OrderPosition UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
+        private OrderPosition UpdateOrderInternal(ReviewOrder order, OrderQueueUpdateType updateType)
         {
             OrderPosition position = OrderPositionsById[order.Id];
             position.Order = order;
@@ -118,27 +165,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         }
 
         /// <summary>
-        /// Обновляет заказы
-        /// </summary>
-        public IEnumerable<OrderPosition> UpdateOrders(ReviewOrder[] orders)
-        {
-            List<OrderPosition> positions = [];
-            foreach (ReviewOrder order in orders)
-            {
-                OrderPosition position = OrderPositionsById[order.Id];
-                position.Order = order;
-                positions.Add(position);
-            }
-
-            UpdateAllPositions();
-
-            return positions;
-        }
-
-        /// <summary>
         /// Удаляет заказ
         /// </summary>
-        public OrderPosition RemoveOrder(ReviewOrder order)
+        private OrderPosition RemoveOrder(ReviewOrder order)
         {
             OrderPosition position = OrderPositionsById[order.Id];
             OrderPositionsById.Remove(order.Id);
@@ -150,19 +179,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdateFrozen();
 
             return position;
-        }
-
-        /// <summary>
-        /// Обновляет позиции заказов
-        /// </summary>
-        public void UpdateAllPositions()
-        {
-            SaveCurrentPositionsToPrevious();
-            UpdateActive();
-            UpdateInProgress();
-            UpdateCompleted();
-            UpdateScheduled();
-            UpdateFrozen();
         }
 
         /// <summary>

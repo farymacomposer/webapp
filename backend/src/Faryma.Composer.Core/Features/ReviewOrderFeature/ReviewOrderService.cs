@@ -33,7 +33,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.AddOrder(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Add);
 
             return order;
         }
@@ -55,7 +55,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.AddOrder(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Add);
 
             return order;
         }
@@ -75,7 +75,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.AddOrder(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Add);
 
             return order;
         }
@@ -100,7 +100,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.AddOrder(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Add);
 
             return order;
         }
@@ -272,7 +272,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.RemoveOrder(order);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Cancel);
 
             return order;
         }

@@ -11,43 +11,53 @@
         Unspecified = 0,
 
         /// <summary>
+        /// Добавление заказа
+        /// </summary>
+        Add = 1,
+
+        /// <summary>
         /// Поднятие заказа в очереди
         /// </summary>
-        Up = 1,
+        Up = 2,
 
         /// <summary>
         /// Добавление/изменение ссылки на трек в заказе
         /// </summary>
-        AddTrackUrl = 2,
+        AddTrackUrl = 3,
 
         /// <summary>
         /// Взятие заказа в работу
         /// </summary>
-        TakeInProgress = 3,
+        TakeInProgress = 4,
 
         /// <summary>
         /// Выполнение заказа
         /// </summary>
-        Complete = 4,
+        Complete = 5,
 
         /// <summary>
         /// Заморозка заказа
         /// </summary>
-        Freeze = 5,
+        Freeze = 6,
 
         /// <summary>
         /// Разморозка заказа
         /// </summary>
-        Unfreeze = 6,
+        Unfreeze = 7,
+
+        /// <summary>
+        /// Отмена заказа
+        /// </summary>
+        Cancel = 8,
 
         /// <summary>
         /// Стрим запущен
         /// </summary>
-        StreamStarted = 7,
+        StreamStarted = 9,
 
         /// <summary>
         /// Стрим завершен
         /// </summary>
-        StreamCompleted = 8,
+        StreamCompleted = 10,
     }
 }

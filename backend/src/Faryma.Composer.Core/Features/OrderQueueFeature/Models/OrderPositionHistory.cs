@@ -15,6 +15,11 @@
         /// </summary>
         public OrderQueuePosition Current { get; init; } = new();
 
+        /// <summary>
+        /// Позиция заказа в очереди была изменена более чем на один шаг
+        /// </summary>
+        public bool IsPositionJumped => Math.Abs(Previous.QueueIndex - Current.QueueIndex) > 1;
+
         public OrderPositionHistory Clone()
         {
             return new()

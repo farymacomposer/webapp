@@ -7,7 +7,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
     /// <summary>
     /// Представляет позицию заказа в очереди, включая сам заказ и историю перемещений
     /// </summary>
-    public sealed class OrderPosition
+    public sealed class OrderPosition : IEquatable<OrderPosition>
     {
         /// <summary>
         /// Заказ разбора трека
@@ -49,5 +49,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
                 PositionHistory = PositionHistory.Clone(),
             };
         }
+
+        public bool Equals(OrderPosition? other) => other?.Order.Id == Order.Id;
     }
 }

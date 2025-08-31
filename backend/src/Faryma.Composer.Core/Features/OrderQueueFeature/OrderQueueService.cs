@@ -23,67 +23,41 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrder order) =>
             _locker.Lock(() => _queueManager.OrderPositionsById[order.Id].PositionHistory.Current.Clone());
 
-        public Task<OrderQueue> GetOrderQueue()
+        public Task<OrderQueue> GetOrderQueue() => _locker.Lock(() => new OrderQueue
         {
-            return _locker.Lock(() => new OrderQueue
+            SyncVersion = _syncVersion,
+            OrderQueueUpdateType = OrderQueueUpdateType.Unspecified,
+            Positions = _queueManager.OrderPositionsById
+                .Select(x => x.Value.Clone())
+                .ToArray(),
+        });
+
+        public Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType) => _locker.Lock(async () =>
+        {
+            _syncVersion++;
+            OrderQueue orderQueue = new()
             {
                 SyncVersion = _syncVersion,
-                OrderQueueUpdateType = OrderQueueUpdateType.Unspecified,
-                Positions = _queueManager.OrderPositionsById
-                    .Select(x => x.Value.Clone())
-                    .ToArray(),
-            });
-        }
+                OrderQueueUpdateType = updateType,
+                Positions = _queueManager.UpdateOrder(order, updateType),
+            };
 
-        public async Task AddOrder(ReviewOrder order)
+            await notificationService.NotifyOrderPositionsChanged(orderQueue);
+        });
+
+        public Task StartStream(ComposerStream stream, ReviewOrder[] orders) => _locker.Lock(async () =>
         {
-            await _locker.Lock(async () =>
+            _syncVersion++;
+            _queueManager.NearestStreamDate = stream.EventDate;
+            OrderQueue orderQueue = new()
             {
-                _syncVersion++;
-                OrderPosition position = _queueManager.AddOrder(order);
+                SyncVersion = _syncVersion,
+                OrderQueueUpdateType = OrderQueueUpdateType.StreamStarted,
+                Positions = _queueManager.UpdateOrders(orders),
+            };
 
-                await notificationService.NotifyNewOrderAdded(_syncVersion, position);
-            });
-        }
-
-        public async Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
-        {
-            await _locker.Lock(async () =>
-            {
-                _syncVersion++;
-                OrderPosition position = _queueManager.UpdateOrder(order, updateType);
-
-                await notificationService.NotifyOrderPositionChanged(_syncVersion, position, updateType);
-            });
-        }
-
-        public async Task RemoveOrder(ReviewOrder order)
-        {
-            await _locker.Lock(async () =>
-            {
-                _syncVersion++;
-                OrderPosition position = _queueManager.RemoveOrder(order);
-
-                await notificationService.NotifyOrderRemoved(_syncVersion, position);
-            });
-        }
-
-        public async Task StartStream(ComposerStream stream, ReviewOrder[] orders)
-        {
-            await _locker.Lock(async () =>
-            {
-                _syncVersion++;
-                _queueManager.NearestStreamDate = stream.EventDate;
-                OrderQueue orderQueue = new()
-                {
-                    SyncVersion = _syncVersion,
-                    OrderQueueUpdateType = OrderQueueUpdateType.StreamStarted,
-                    Positions = _queueManager.UpdateOrders(orders),
-                };
-
-                await notificationService.NotifyOrderPositionsChanged(orderQueue);
-            });
-        }
+            await notificationService.NotifyOrderPositionsChanged(orderQueue);
+        });
 
         public async Task Initialize()
         {
