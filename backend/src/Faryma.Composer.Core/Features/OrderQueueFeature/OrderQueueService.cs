@@ -34,6 +34,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
         public Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType) => _locker.Lock(async () =>
         {
+            if (updateType == OrderQueueUpdateType.Add && _queueManager.NearestStreamDate == default)
+            {
+                _queueManager.NearestStreamDate = order.CreationStream.EventDate;
+            }
+
             _syncVersion++;
             OrderQueue orderQueue = new()
             {

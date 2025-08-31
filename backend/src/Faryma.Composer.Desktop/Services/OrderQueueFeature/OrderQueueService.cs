@@ -125,6 +125,24 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             });
         }
 
+        private void RemoveOrder(OrderQueuePositionDto position)
+        {
+            if (position.ActivityStatus == OrderActivityStatus.Unspecified)
+            {
+                return;
+            }
+
+            if (position.ActivityStatus == OrderActivityStatus.InProgress)
+            {
+                InProgressOrder = null;
+
+                return;
+            }
+
+            ObservableCollection<ReviewOrderVM> list = GetOrdersList(position.ActivityStatus);
+            list.RemoveAt(position.QueueIndex);
+        }
+
         private void InsertOrder(ReviewOrderDto order, OrderQueuePositionDto position)
         {
             if (position.ActivityStatus == OrderActivityStatus.InProgress)
@@ -136,19 +154,6 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
             ObservableCollection<ReviewOrderVM> list = GetOrdersList(position.ActivityStatus);
             list.Insert(position.QueueIndex, new ReviewOrderVM(order, position));
-        }
-
-        private void RemoveOrder(OrderQueuePositionDto position)
-        {
-            if (position.ActivityStatus == OrderActivityStatus.InProgress)
-            {
-                InProgressOrder = null;
-
-                return;
-            }
-
-            ObservableCollection<ReviewOrderVM> list = GetOrdersList(position.ActivityStatus);
-            list.RemoveAt(position.QueueIndex);
         }
 
         private ObservableCollection<ReviewOrderVM> GetOrdersList(OrderActivityStatus status)
