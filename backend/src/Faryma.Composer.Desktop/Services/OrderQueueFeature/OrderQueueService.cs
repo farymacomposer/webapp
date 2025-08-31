@@ -70,6 +70,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
         public async Task Initialize()
         {
+            await Task.Delay(2000);
             await _signalrClient.StartAsync();
             await UpdateOrderQueue();
         }

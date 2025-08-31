@@ -8,6 +8,7 @@
     xmlns:local="using:Faryma.Composer.Desktop.UI.OrderQueueFeature"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sharedVM="using:Faryma.Composer.Desktop.Shared.ViewModels"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
 
     <Grid>
@@ -38,10 +39,41 @@
                         CornerRadius="4"
                         Spacing="8">
 
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <controls:TitledContentRow
+                                Title="IdempotencyKey"
+                                Content="{x:Bind ViewModel.IdempotencyKey, Mode=OneWay}"
+                                FontFamily="Consolas" />
+                            <Button Command="{x:Bind ViewModel.GenerateIdempotencyKeyCommand}">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72C;" />
+                            </Button>
+                        </StackPanel>
+
+                        <controls:TitledContentRow Title="Nickname">
+                            <TextBox Text="{x:Bind ViewModel.Nickname, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        </controls:TitledContentRow>
+
+                        <controls:TitledContentRow Title="PaymentAmount">
+                            <TextBox
+                                ui:TextBoxExtensions.ValidationMode="Dynamic"
+                                ui:TextBoxExtensions.ValidationType="Number"
+                                Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        </controls:TitledContentRow>
+
+                        <controls:TitledContentRow Title="OrderType">
+                            <ComboBox ItemsSource="{x:Bind ViewModel.OrderTypes, Mode=OneTime}" SelectedItem="{x:Bind ViewModel.OrderType, Mode=TwoWay}" />
+                        </controls:TitledContentRow>
+
+                        <controls:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
+                        <controls:TitledContentRow Title="UserComment" Content="{x:Bind ViewModel.UserComment, Mode=OneWay}" />
+
                         <StackPanel
                             HorizontalAlignment="Center"
                             Orientation="Horizontal"
                             Spacing="24">
+                            <Button Command="{x:Bind ViewModel.ClearOrderCommand}">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" />
+                            </Button>
                             <Button Command="{x:Bind ViewModel.GenerateOrderCommand}">
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72C;" />
                             </Button>
@@ -50,6 +82,16 @@
                                 Content="Создать новый заказ"
                                 Style="{StaticResource AccentButtonStyle}" />
                         </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Spacing="8">
+
+                    <StackPanel
+                        Padding="8"
+                        Background="White"
+                        CornerRadius="4"
+                        Spacing="8">
 
                         <StackPanel Orientation="Horizontal" Spacing="16">
                             <controls:TitledContentRow
@@ -62,54 +104,21 @@
                         </StackPanel>
 
                         <controls:TitledContentRow Title="Nickname">
-                            <TextBox Text="{x:Bind ViewModel.Nickname, Mode=TwoWay}" />
+                            <TextBox Text="{x:Bind ViewModel.Nickname, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                         </controls:TitledContentRow>
 
-                        <controls:TitledContentRow Title="OrderType">
-                            <ComboBox ItemsSource="{x:Bind ViewModel.OrderTypes, Mode=OneTime}" SelectedItem="{x:Bind ViewModel.OrderType, Mode=TwoWay}" />
+                        <controls:TitledContentRow Title="PaymentAmount">
+                            <TextBox
+                                ui:TextBoxExtensions.ValidationMode="Dynamic"
+                                ui:TextBoxExtensions.ValidationType="Number"
+                                Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                         </controls:TitledContentRow>
-
-                        <controls:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
-                        <controls:TitledContentRow Title="PaymentAmount" Content="{x:Bind ViewModel.PaymentAmount, Mode=OneWay}" />
-                        <controls:TitledContentRow Title="UserComment" Content="{x:Bind ViewModel.UserComment, Mode=OneWay}" />
-                    </StackPanel>
-                </StackPanel>
-
-                <StackPanel Spacing="8">
-
-                    <controls:TitledContentRow
-                        Title="Id выбранного заказа"
-                        Content="{x:Bind ViewModel.SelectedOrder.Id, Mode=OneWay, FallbackValue={x:Null}}"
-                        FontSize="16"
-                        Foreground="{StaticResource NegativeBrush}" />
-
-                    <StackPanel
-                        Padding="8"
-                        Background="White"
-                        CornerRadius="4"
-                        Spacing="8">
 
                         <Button
                             HorizontalAlignment="Center"
                             Command="{x:Bind ViewModel.UpReviewOrderCommand}"
                             Content="Поднять в очереди"
                             Style="{StaticResource AccentButtonStyle}" />
-
-                        <StackPanel Orientation="Horizontal" Spacing="16">
-                            <controls:TitledContentRow
-                                Title="IdempotencyKey"
-                                Content="{x:Bind ViewModel.IdempotencyKey, Mode=OneWay}"
-                                FontFamily="Consolas" />
-                            <Button Command="{x:Bind ViewModel.GenerateIdempotencyKeyCommand}">
-                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72C;" />
-                            </Button>
-                        </StackPanel>
-
-                        <controls:TitledContentRow Title="Nickname">
-                            <TextBox Text="{x:Bind ViewModel.Nickname, Mode=TwoWay}" />
-                        </controls:TitledContentRow>
-
-                        <controls:TitledContentRow Title="PaymentAmount" Content="{x:Bind ViewModel.PaymentAmount, Mode=OneWay}" />
                     </StackPanel>
 
                     <StackPanel
@@ -118,24 +127,32 @@
                         CornerRadius="4"
                         Spacing="8">
 
+                        <controls:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
+
                         <Button
                             HorizontalAlignment="Center"
                             Command="{x:Bind ViewModel.AddTrackUrlCommand}"
                             Content="Добавить ссылку на трек"
                             Style="{StaticResource AccentButtonStyle}" />
-
-                        <controls:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
                     </StackPanel>
 
                     <Button
+                        HorizontalAlignment="Center"
                         Command="{x:Bind ViewModel.FreezeReviewOrderCommand}"
                         Content="Заморозить"
                         Style="{StaticResource AccentButtonStyle}" />
 
                     <Button
+                        HorizontalAlignment="Center"
                         Command="{x:Bind ViewModel.CancelReviewOrderCommand}"
                         Content="Отменить"
                         Style="{StaticResource AccentButtonStyle}" />
+
+                    <controls:TitledContentRow
+                        Title="Id выбранного заказа"
+                        Content="{x:Bind ViewModel.SelectedOrder.Id, Mode=OneWay, FallbackValue={x:Null}}"
+                        FontSize="16"
+                        Foreground="{StaticResource NegativeBrush}" />
                 </StackPanel>
             </StackPanel>
 
@@ -161,11 +178,10 @@
 
             <Grid Background="#64C4FF">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="38" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <StackPanel
-                    Padding="0,4"
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     Spacing="16">
@@ -190,10 +206,13 @@
 
             <Grid Grid.Column="1" Background="Silver">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="38" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock HorizontalAlignment="Center" Text="ScheduledOrders" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="ScheduledOrders" />
                 <ListView
                     Grid.Row="1"
                     ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
@@ -209,11 +228,10 @@
 
             <Grid Grid.Column="2" Background="#75FF7B">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="38" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <StackPanel
-                    Padding="0,4"
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     Spacing="16">
@@ -238,10 +256,13 @@
 
             <Grid Grid.Column="3" Background="#FDFF90">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="38" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock HorizontalAlignment="Center" Text="CompletedOrders" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="CompletedOrders" />
                 <ListView
                     Grid.Row="1"
                     ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"

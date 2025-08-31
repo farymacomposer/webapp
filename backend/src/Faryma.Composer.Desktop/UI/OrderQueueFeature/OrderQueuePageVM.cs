@@ -51,7 +51,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         /// Сумма платежа
         /// </summary>
         [ObservableProperty]
-        public partial decimal? PaymentAmount { get; set; }
+        public partial string? PaymentAmount { get; set; }
 
         /// <summary>
         /// Комментарий пользователя
@@ -67,7 +67,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
             IdempotencyKey = faker.Random.Guid();
             Nickname = faker.Internet.UserName();
             TrackUrl = faker.Internet.Url().OrNull(faker);
-            PaymentAmount = faker.Finance.Amount(750, 5000, 0);
+            PaymentAmount = faker.Finance.Amount(750, 5000, 0).ToString();
             UserComment = faker.Lorem.Sentence(5, 15).OrNull(faker);
         }
 
@@ -87,12 +87,14 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [RelayCommand]
         private async Task CreateReviewOrder()
         {
+            _ = int.TryParse(PaymentAmount, out int paymentAmount);
+
             await reviewOrderService.CreateReviewOrder(IdempotencyKey, new CreateReviewOrderRequest
             {
                 Nickname = Nickname,
                 OrderType = OrderType,
                 TrackUrl = TrackUrl,
-                PaymentAmount = PaymentAmount,
+                PaymentAmount = paymentAmount,
                 UserComment = UserComment,
             });
         }
@@ -100,11 +102,13 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [RelayCommand]
         private async Task UpReviewOrder()
         {
+            _ = int.TryParse(PaymentAmount, out int paymentAmount);
+
             await reviewOrderService.UpReviewOrder(IdempotencyKey, new UpReviewOrderRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
                 Nickname = Nickname,
-                PaymentAmount = PaymentAmount,
+                PaymentAmount = paymentAmount,
             });
         }
 
