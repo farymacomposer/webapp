@@ -89,7 +89,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         {
             _ = int.TryParse(PaymentAmount, out int paymentAmount);
 
-            await reviewOrderService.CreateReviewOrder(IdempotencyKey, new CreateReviewOrderRequest
+            await reviewOrderService.Post(IdempotencyKey, new CreateReviewOrderRequest
             {
                 Nickname = Nickname,
                 OrderType = OrderType,
@@ -104,7 +104,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         {
             _ = int.TryParse(PaymentAmount, out int paymentAmount);
 
-            await reviewOrderService.UpReviewOrder(IdempotencyKey, new UpReviewOrderRequest
+            await reviewOrderService.Post(IdempotencyKey, new UpReviewOrderRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
                 Nickname = Nickname,
@@ -115,7 +115,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [RelayCommand]
         private async Task AddTrackUrl()
         {
-            await reviewOrderService.AddTrackUrl(new AddTrackUrlRequest
+            await reviewOrderService.Post(new AddTrackUrlRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
                 TrackUrl = TrackUrl,
@@ -125,7 +125,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [RelayCommand]
         private async Task TakeOrderInProgress()
         {
-            await reviewOrderService.TakeOrderInProgress(new TakeOrderInProgressRequest
+            await reviewOrderService.Post(new TakeOrderInProgressRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
             });
@@ -134,7 +134,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [RelayCommand]
         private async Task CompleteReviewOrder()
         {
-            await reviewOrderService.CompleteReviewOrder(new CompleteReviewOrderRequest
+            await reviewOrderService.Post(new CompleteReviewOrderRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
                 Rating = 20,
@@ -144,7 +144,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [RelayCommand]
         private async Task FreezeReviewOrder()
         {
-            await reviewOrderService.FreezeReviewOrder(new FreezeReviewOrderRequest
+            await reviewOrderService.Post(new FreezeReviewOrderRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
             });
@@ -153,7 +153,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [RelayCommand]
         private async Task UnfreezeReviewOrder()
         {
-            await reviewOrderService.UnfreezeReviewOrder(new UnfreezeReviewOrderRequest
+            await reviewOrderService.Post(new UnfreezeReviewOrderRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
             });
@@ -162,7 +162,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [RelayCommand]
         private async Task CancelReviewOrder()
         {
-            await reviewOrderService.CancelReviewOrder(new CancelReviewOrderRequest
+            await reviewOrderService.Post(new CancelReviewOrderRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
             });

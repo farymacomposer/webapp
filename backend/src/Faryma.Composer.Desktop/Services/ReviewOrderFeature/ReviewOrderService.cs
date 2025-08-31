@@ -15,9 +15,16 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
     {
         private HttpClient HttpClient => httpClientFactory.CreateClient("Faryma.Composer.Api");
 
-        public async Task CreateReviewOrder(Guid idempotencyKey, CreateReviewOrderRequest request)
+        public async Task Post<T>(Guid idempotencyKey, T request)
         {
-            HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/ReviewOrder/CreateReviewOrder");
+            string requestUri = request switch
+            {
+                CreateReviewOrderRequest => "/api/ReviewOrder/CreateReviewOrder",
+                UpReviewOrderRequest => "/api/ReviewOrder/UpReviewOrder",
+                _ => throw new InvalidOperationException()
+            };
+
+            HttpRequestMessage requestMessage = new(HttpMethod.Post, requestUri);
             requestMessage.Headers.Add("Idempotency-Key", idempotencyKey.ToString("D"));
             requestMessage.Content = JsonContent.Create(request);
 
@@ -26,8 +33,6 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
             try
             {
                 responseMessage.EnsureSuccessStatusCode();
-                CreateReviewOrderResponse? response = await responseMessage.Content.ReadFromJsonAsync<CreateReviewOrderResponse>();
-                logger.LogInformation("{@response}", response);
             }
             catch (Exception)
             {
@@ -35,115 +40,24 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
             }
         }
 
-        public async Task UpReviewOrder(Guid idempotencyKey, UpReviewOrderRequest request)
+        public async Task Post<T>(T request)
         {
-            HttpRequestMessage requestMessage = new(HttpMethod.Post, "/api/ReviewOrder/UpReviewOrder");
-            requestMessage.Headers.Add("Idempotency-Key", idempotencyKey.ToString("D"));
-            requestMessage.Content = JsonContent.Create(request);
+            string requestUri = request switch
+            {
+                AddTrackUrlRequest => "/api/ReviewOrder/AddTrackUrl",
+                TakeOrderInProgressRequest => "/api/ReviewOrder/TakeOrderInProgress",
+                CompleteReviewOrderRequest => "/api/ReviewOrder/CompleteReviewOrder",
+                FreezeReviewOrderRequest => "/api/ReviewOrder/FreezeReviewOrder",
+                UnfreezeReviewOrderRequest => "/api/ReviewOrder/UnfreezeReviewOrder",
+                CancelReviewOrderRequest => "/api/ReviewOrder/CancelReviewOrder",
+                _ => throw new InvalidOperationException()
+            };
 
-            HttpResponseMessage responseMessage = await HttpClient.SendAsync(requestMessage);
+            HttpResponseMessage responseMessage = await HttpClient.PostAsJsonAsync(requestUri, request);
 
             try
             {
                 responseMessage.EnsureSuccessStatusCode();
-                UpReviewOrderResponse? response = await responseMessage.Content.ReadFromJsonAsync<UpReviewOrderResponse>();
-                logger.LogInformation("{@response}", response);
-            }
-            catch (Exception)
-            {
-                logger.LogError("{content}", await responseMessage.Content.ReadAsStringAsync());
-            }
-        }
-
-        public async Task AddTrackUrl(AddTrackUrlRequest request)
-        {
-            HttpResponseMessage responseMessage = await HttpClient.PostAsJsonAsync("/api/ReviewOrder/AddTrackUrl", request);
-
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
-                AddTrackUrlResponse? response = await responseMessage.Content.ReadFromJsonAsync<AddTrackUrlResponse>();
-                logger.LogInformation("{@response}", response);
-            }
-            catch (Exception)
-            {
-                logger.LogError("{content}", await responseMessage.Content.ReadAsStringAsync());
-            }
-        }
-
-        public async Task TakeOrderInProgress(TakeOrderInProgressRequest request)
-        {
-            HttpResponseMessage responseMessage = await HttpClient.PostAsJsonAsync("/api/ReviewOrder/TakeOrderInProgress", request);
-
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
-                TakeOrderInProgressResponse? response = await responseMessage.Content.ReadFromJsonAsync<TakeOrderInProgressResponse>();
-                logger.LogInformation("{@response}", response);
-            }
-            catch (Exception)
-            {
-                logger.LogError("{content}", await responseMessage.Content.ReadAsStringAsync());
-            }
-        }
-
-        public async Task CompleteReviewOrder(CompleteReviewOrderRequest request)
-        {
-            HttpResponseMessage responseMessage = await HttpClient.PostAsJsonAsync("/api/ReviewOrder/CompleteReviewOrder", request);
-
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
-                CompleteReviewOrderResponse? response = await responseMessage.Content.ReadFromJsonAsync<CompleteReviewOrderResponse>();
-                logger.LogInformation("{@response}", response);
-            }
-            catch (Exception)
-            {
-                logger.LogError("{content}", await responseMessage.Content.ReadAsStringAsync());
-            }
-        }
-
-        public async Task FreezeReviewOrder(FreezeReviewOrderRequest request)
-        {
-            HttpResponseMessage responseMessage = await HttpClient.PostAsJsonAsync("/api/ReviewOrder/FreezeReviewOrder", request);
-
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
-                FreezeReviewOrderResponse? response = await responseMessage.Content.ReadFromJsonAsync<FreezeReviewOrderResponse>();
-                logger.LogInformation("{@response}", response);
-            }
-            catch (Exception)
-            {
-                logger.LogError("{content}", await responseMessage.Content.ReadAsStringAsync());
-            }
-        }
-
-        public async Task UnfreezeReviewOrder(UnfreezeReviewOrderRequest request)
-        {
-            HttpResponseMessage responseMessage = await HttpClient.PostAsJsonAsync("/api/ReviewOrder/UnfreezeReviewOrder", request);
-
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
-                UnfreezeReviewOrderResponse? response = await responseMessage.Content.ReadFromJsonAsync<UnfreezeReviewOrderResponse>();
-                logger.LogInformation("{@response}", response);
-            }
-            catch (Exception)
-            {
-                logger.LogError("{content}", await responseMessage.Content.ReadAsStringAsync());
-            }
-        }
-
-        public async Task CancelReviewOrder(CancelReviewOrderRequest request)
-        {
-            HttpResponseMessage responseMessage = await HttpClient.PostAsJsonAsync("/api/ReviewOrder/CancelReviewOrder", request);
-
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
-                CancelReviewOrderResponse? response = await responseMessage.Content.ReadFromJsonAsync<CancelReviewOrderResponse>();
-                logger.LogInformation("{@response}", response);
             }
             catch (Exception)
             {
