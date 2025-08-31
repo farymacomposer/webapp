@@ -94,7 +94,7 @@
 
                     <Button
                         HorizontalAlignment="Center"
-                        Command="{x:Bind ViewModel.CancelReviewOrderCommand}"
+                        Command="{x:Bind ViewModel.UpdateOrderQueueCommand}"
                         Content="Обновить очередь"
                         Style="{StaticResource AccentButtonStyle}" />
                 </StackPanel>
