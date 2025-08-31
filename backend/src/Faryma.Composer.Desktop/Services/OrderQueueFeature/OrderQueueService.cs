@@ -9,6 +9,7 @@ using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 
 namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
@@ -18,6 +19,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         private readonly DispatcherQueue _dispatcherQueue;
         private readonly HttpClient _httpClient;
         private readonly HubConnection _signalrClient;
+        private readonly ILogger<OrderQueueService> _logger;
 
         /// <summary>
         /// Версия для синхронизации состояния очереди
@@ -51,9 +53,10 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         /// </summary>
         public ObservableCollection<ReviewOrderVM> FrozenOrders { get; } = [];
 
-        public OrderQueueService(IHttpClientFactory httpClientFactory)
+        public OrderQueueService(IHttpClientFactory httpClientFactory, ILogger<OrderQueueService> logger)
         {
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            _logger = logger;
 
             _httpClient = httpClientFactory.CreateClient("Faryma.Composer.Api");
 
@@ -79,6 +82,8 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         {
             GetOrderQueueResponse response = (await _httpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue"))!;
 
+            _logger.LogInformation("{@response}", response);
+
             SyncVersion = response.SyncVersion;
 
             if (response.InProgressOrder is not null)
@@ -102,86 +107,106 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
         }
 
-        private Task OnNewOrderAdded(NewOrderAddedEvent message) => _dispatcherQueue.EnqueueAsync(async () =>
+        private Task OnNewOrderAdded(NewOrderAddedEvent message)
         {
-            if (await CheckSyncVersion(message.SyncVersion))
+            _logger.LogInformation("{@message}", message);
+
+            return _dispatcherQueue.EnqueueAsync(async () =>
             {
-                if (message.CurrentPosition.ActivityStatus is not (OrderActivityStatus.Scheduled or OrderActivityStatus.Active))
+                if (await CheckSyncVersion(message.SyncVersion))
                 {
-                    throw new InvalidOperationException(message.CurrentPosition.ActivityStatus.ToString());
+                    if (message.CurrentPosition.ActivityStatus is not (OrderActivityStatus.Scheduled or OrderActivityStatus.Active))
+                    {
+                        throw new InvalidOperationException(message.CurrentPosition.ActivityStatus.ToString());
+                    }
+
+                    InsertOrder(message.Order, message.CurrentPosition);
                 }
+            });
+        }
 
-                InsertOrder(message.Order, message.CurrentPosition);
-            }
-        });
-
-        private Task OnOrderPositionChanged(OrderPositionChangedEvent message) => _dispatcherQueue.EnqueueAsync(async () =>
+        private Task OnOrderPositionChanged(OrderPositionChangedEvent message)
         {
-            if (await CheckSyncVersion(message.SyncVersion))
+            _logger.LogInformation("{@message}", message);
+
+            return _dispatcherQueue.EnqueueAsync(async () =>
             {
-                switch (message.OrderQueueUpdateType)
+                if (await CheckSyncVersion(message.SyncVersion))
                 {
-                    case OrderQueueUpdateType.AddTrackUrl:
+                    switch (message.OrderQueueUpdateType)
+                    {
+                        case OrderQueueUpdateType.AddTrackUrl:
 
-                        ObservableCollection<ReviewOrderVM> list = GetOrdersList(message.CurrentPosition.ActivityStatus);
-                        list[message.CurrentPosition.QueueIndex].Update(message.Order, message.CurrentPosition);
+                            ObservableCollection<ReviewOrderVM> list = GetOrdersList(message.CurrentPosition.ActivityStatus);
+                            list[message.CurrentPosition.QueueIndex].Update(message.Order, message.CurrentPosition);
 
-                        break;
+                            break;
 
-                    case OrderQueueUpdateType.Up
-                        or OrderQueueUpdateType.TakeInProgress
-                        or OrderQueueUpdateType.Complete
-                        or OrderQueueUpdateType.Freeze
-                        or OrderQueueUpdateType.Unfreeze:
+                        case OrderQueueUpdateType.Up
+                            or OrderQueueUpdateType.TakeInProgress
+                            or OrderQueueUpdateType.Complete
+                            or OrderQueueUpdateType.Freeze
+                            or OrderQueueUpdateType.Unfreeze:
 
-                        RemoveOrder(message.PreviousPosition);
-                        InsertOrder(message.Order, message.CurrentPosition);
+                            RemoveOrder(message.PreviousPosition);
+                            InsertOrder(message.Order, message.CurrentPosition);
 
-                        break;
+                            break;
 
-                    default:
+                        default:
+                            throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
+                    }
+                }
+            });
+        }
+
+        private Task OnOrderPositionsChanged(OrderPositionsChangedEvent message)
+        {
+            _logger.LogInformation("{@message}", message);
+
+            return _dispatcherQueue.EnqueueAsync(async () =>
+            {
+                if (await CheckSyncVersion(message.SyncVersion))
+                {
+                    if (message.OrderQueueUpdateType
+                        is OrderQueueUpdateType.StreamStarted
+                        or OrderQueueUpdateType.StreamCompleted)
+                    {
+                        foreach (OrderPositionDto item in message.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
+                        {
+                            RemoveOrder(item.PreviousPosition);
+                        }
+
+                        foreach (OrderPositionDto item in message.OrderPositions.OrderBy(x => x.CurrentPosition.QueueIndex))
+                        {
+                            InsertOrder(item.Order, item.CurrentPosition);
+                        }
+                    }
+                    else
+                    {
                         throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
-                }
-            }
-        });
-
-        private Task OnOrderPositionsChanged(OrderPositionsChangedEvent message) => _dispatcherQueue.EnqueueAsync(async () =>
-        {
-            if (await CheckSyncVersion(message.SyncVersion))
-            {
-                if (message.OrderQueueUpdateType
-                    is OrderQueueUpdateType.StreamStarted
-                    or OrderQueueUpdateType.StreamCompleted)
-                {
-                    foreach (OrderPositionDto item in message.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
-                    {
-                        RemoveOrder(item.PreviousPosition);
-                    }
-
-                    foreach (OrderPositionDto item in message.OrderPositions.OrderBy(x => x.CurrentPosition.QueueIndex))
-                    {
-                        InsertOrder(item.Order, item.CurrentPosition);
                     }
                 }
-                else
-                {
-                    throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
-                }
-            }
-        });
+            });
+        }
 
-        private Task OnOrderRemoved(OrderRemovedEvent message) => _dispatcherQueue.EnqueueAsync(async () =>
+        private Task OnOrderRemoved(OrderRemovedEvent message)
         {
-            if (await CheckSyncVersion(message.SyncVersion))
-            {
-                if (message.Order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
-                {
-                    throw new InvalidOperationException(message.Order.Status.ToString());
-                }
+            _logger.LogInformation("{@message}", message);
 
-                RemoveOrder(message.PreviousPosition);
-            }
-        });
+            return _dispatcherQueue.EnqueueAsync(async () =>
+            {
+                if (await CheckSyncVersion(message.SyncVersion))
+                {
+                    if (message.Order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
+                    {
+                        throw new InvalidOperationException(message.Order.Status.ToString());
+                    }
+
+                    RemoveOrder(message.PreviousPosition);
+                }
+            });
+        }
 
         private void InsertOrder(ReviewOrderDto order, OrderQueuePositionDto position)
         {
