@@ -126,13 +126,6 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
             CurrentPosition = currentPosition;
         }
 
-        public void Update(ReviewOrderDto dto, OrderQueuePositionDto currentPosition)
-        {
-            Dto = dto;
-            CurrentPosition = currentPosition;
-            OnPropertyChanged("");
-        }
-
         [RelayCommand]
         private void Select() => App.GetService<OrderQueuePageVM>().SelectedOrder = this;
     }

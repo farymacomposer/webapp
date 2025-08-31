@@ -7,7 +7,6 @@ using Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature.Events;
 using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
-using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
@@ -66,10 +65,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 .WithAutomaticReconnect()
                 .Build();
 
-            _signalrClient.On<NewOrderAddedEvent>("NewOrderAdded", OnNewOrderAdded);
-            _signalrClient.On<OrderPositionChangedEvent>("OrderPositionChanged", OnOrderPositionChanged);
             _signalrClient.On<OrderPositionsChangedEvent>("OrderPositionsChanged", OnOrderPositionsChanged);
-            _signalrClient.On<OrderRemovedEvent>("OrderRemoved", OnOrderRemoved);
         }
 
         public async Task Initialize()
@@ -108,59 +104,6 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
         }
 
-        private Task OnNewOrderAdded(NewOrderAddedEvent message)
-        {
-            _logger.LogInformation("{@message}", message);
-
-            return _dispatcherQueue.EnqueueAsync(async () =>
-            {
-                if (await CheckSyncVersion(message.SyncVersion))
-                {
-                    if (message.CurrentPosition.ActivityStatus is not (OrderActivityStatus.Scheduled or OrderActivityStatus.Active))
-                    {
-                        throw new InvalidOperationException(message.CurrentPosition.ActivityStatus.ToString());
-                    }
-
-                    InsertOrder(message.Order, message.CurrentPosition);
-                }
-            });
-        }
-
-        private Task OnOrderPositionChanged(OrderPositionChangedEvent message)
-        {
-            _logger.LogInformation("{@message}", message);
-
-            return _dispatcherQueue.EnqueueAsync(async () =>
-            {
-                if (await CheckSyncVersion(message.SyncVersion))
-                {
-                    switch (message.OrderQueueUpdateType)
-                    {
-                        case OrderQueueUpdateType.AddTrackUrl:
-
-                            ObservableCollection<ReviewOrderVM> list = GetOrdersList(message.CurrentPosition.ActivityStatus);
-                            list[message.CurrentPosition.QueueIndex].Update(message.Order, message.CurrentPosition);
-
-                            break;
-
-                        case OrderQueueUpdateType.Up
-                            or OrderQueueUpdateType.TakeInProgress
-                            or OrderQueueUpdateType.Complete
-                            or OrderQueueUpdateType.Freeze
-                            or OrderQueueUpdateType.Unfreeze:
-
-                            RemoveOrder(message.PreviousPosition);
-                            InsertOrder(message.Order, message.CurrentPosition);
-
-                            break;
-
-                        default:
-                            throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
-                    }
-                }
-            });
-        }
-
         private Task OnOrderPositionsChanged(OrderPositionsChangedEvent message)
         {
             _logger.LogInformation("{@message}", message);
@@ -169,42 +112,15 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             {
                 if (await CheckSyncVersion(message.SyncVersion))
                 {
-                    if (message.OrderQueueUpdateType
-                        is OrderQueueUpdateType.StreamStarted
-                        or OrderQueueUpdateType.StreamCompleted)
+                    foreach (OrderPositionDto item in message.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
                     {
-                        foreach (OrderPositionDto item in message.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
-                        {
-                            RemoveOrder(item.PreviousPosition);
-                        }
-
-                        foreach (OrderPositionDto item in message.OrderPositions.OrderBy(x => x.CurrentPosition.QueueIndex))
-                        {
-                            InsertOrder(item.Order, item.CurrentPosition);
-                        }
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException(message.OrderQueueUpdateType.ToString());
-                    }
-                }
-            });
-        }
-
-        private Task OnOrderRemoved(OrderRemovedEvent message)
-        {
-            _logger.LogInformation("{@message}", message);
-
-            return _dispatcherQueue.EnqueueAsync(async () =>
-            {
-                if (await CheckSyncVersion(message.SyncVersion))
-                {
-                    if (message.Order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
-                    {
-                        throw new InvalidOperationException(message.Order.Status.ToString());
+                        RemoveOrder(item.PreviousPosition);
                     }
 
-                    RemoveOrder(message.PreviousPosition);
+                    foreach (OrderPositionDto item in message.OrderPositions.OrderBy(x => x.CurrentPosition.QueueIndex))
+                    {
+                        InsertOrder(item.Order, item.CurrentPosition);
+                    }
                 }
             });
         }
