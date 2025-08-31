@@ -78,7 +78,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             await UpdateOrderQueue();
         }
 
-        private async Task UpdateOrderQueue()
+        public async Task UpdateOrderQueue()
         {
             GetOrderQueueResponse response = (await _httpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue"))!;
 

@@ -167,5 +167,8 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
             });
         }
+
+        [RelayCommand]
+        private Task UpdateOrderQueue() => OrderQueueService.UpdateOrderQueue();
     }
 }

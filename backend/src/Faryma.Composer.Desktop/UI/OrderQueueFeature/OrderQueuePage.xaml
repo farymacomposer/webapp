@@ -61,7 +61,10 @@
                         </controls:TitledContentRow>
 
                         <controls:TitledContentRow Title="OrderType">
-                            <ComboBox ItemsSource="{x:Bind ViewModel.OrderTypes, Mode=OneTime}" SelectedItem="{x:Bind ViewModel.OrderType, Mode=TwoWay}" />
+                            <ComboBox
+                                HorizontalAlignment="Stretch"
+                                ItemsSource="{x:Bind ViewModel.OrderTypes, Mode=OneTime}"
+                                SelectedItem="{x:Bind ViewModel.OrderType, Mode=TwoWay}" />
                         </controls:TitledContentRow>
 
                         <controls:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
@@ -83,6 +86,17 @@
                                 Style="{StaticResource AccentButtonStyle}" />
                         </StackPanel>
                     </StackPanel>
+
+                    <controls:TitledContentRow
+                        Title="SyncVersion"
+                        Content="{x:Bind ViewModel.OrderQueueService.SyncVersion, Mode=OneWay}"
+                        FontSize="16" />
+
+                    <Button
+                        HorizontalAlignment="Center"
+                        Command="{x:Bind ViewModel.CancelReviewOrderCommand}"
+                        Content="Обновить очередь"
+                        Style="{StaticResource AccentButtonStyle}" />
                 </StackPanel>
 
                 <StackPanel Spacing="8">
