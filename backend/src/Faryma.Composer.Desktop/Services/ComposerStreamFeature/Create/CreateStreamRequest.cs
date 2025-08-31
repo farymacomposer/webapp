@@ -5,7 +5,7 @@ namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Create
     /// <summary>
     /// Запрос создания стрима
     /// </summary>
-    public sealed record CreateComposerStreamRequest
+    public sealed record CreateStreamRequest
     {
         /// <summary>
         /// Дата проведения стрима

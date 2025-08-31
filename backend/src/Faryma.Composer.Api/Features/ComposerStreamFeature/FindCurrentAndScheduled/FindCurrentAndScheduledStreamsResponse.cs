@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Api.Shared.Dto;
 
-namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Find
+namespace Faryma.Composer.Api.Features.ComposerStreamFeature.FindCurrentAndScheduled
 {
     /// <summary>
-    /// Ответ на запрос поиска стримов
+    /// Ответ на запрос текущего и запланированных стримов
     /// </summary>
-    public sealed record FindComposerStreamResponse
+    public sealed record FindCurrentAndScheduledStreamsResponse
     {
         /// <summary>
         /// Список стримов

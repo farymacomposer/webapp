@@ -47,6 +47,7 @@ namespace Faryma.Composer.Desktop
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
             await GetService<OrderQueueService>().Initialize();
+            await GetService<OrderQueuePageVM>().Initialize();
 
             MainWindow window = new();
             window.Activate();

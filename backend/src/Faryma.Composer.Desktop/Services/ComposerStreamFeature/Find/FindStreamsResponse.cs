@@ -5,7 +5,7 @@ namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Find
     /// <summary>
     /// Ответ на запрос поиска стримов
     /// </summary>
-    public sealed record FindComposerStreamResponse
+    public sealed record FindStreamsResponse
     {
         /// <summary>
         /// Список стримов

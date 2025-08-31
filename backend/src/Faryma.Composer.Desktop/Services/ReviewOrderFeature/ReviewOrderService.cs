@@ -29,15 +29,7 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
             requestMessage.Content = JsonContent.Create(request);
 
             HttpResponseMessage responseMessage = await HttpClient.SendAsync(requestMessage);
-
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
-            }
-            catch (Exception)
-            {
-                logger.LogError("{content}", await responseMessage.Content.ReadAsStringAsync());
-            }
+            await LogError(responseMessage);
         }
 
         public async Task Post<T>(T request)
@@ -54,7 +46,11 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
             };
 
             HttpResponseMessage responseMessage = await HttpClient.PostAsJsonAsync(requestUri, request);
+            await LogError(responseMessage);
+        }
 
+        private async Task LogError(HttpResponseMessage responseMessage)
+        {
             try
             {
                 responseMessage.EnsureSuccessStatusCode();

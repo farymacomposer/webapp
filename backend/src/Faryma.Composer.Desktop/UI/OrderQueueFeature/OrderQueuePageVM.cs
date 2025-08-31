@@ -1,6 +1,8 @@
-﻿using Bogus;
+﻿using System.Collections.ObjectModel;
+using Bogus;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Faryma.Composer.Desktop.Services.ComposerStreamFeature;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.AddTrackUrl;
@@ -11,6 +13,7 @@ using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Freeze;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.TakeInProgress;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Unfreeze;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Up;
+using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Faryma.Composer.Infrastructure.Enums;
 
@@ -18,6 +21,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
 {
     public sealed partial class OrderQueuePageVM(
         OrderQueueService orderQueueService,
+        ComposerStreamService composerStreamService,
         ReviewOrderService reviewOrderService) : ObservableObject
     {
         public OrderQueueService OrderQueueService { get; } = orderQueueService;
@@ -58,6 +62,26 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         /// </summary>
         [ObservableProperty]
         public partial string? UserComment { get; set; }
+
+        public ObservableCollection<ComposerStreamVM> Streams { get; } = [];
+
+        [ObservableProperty]
+        public partial ComposerStreamVM? SelectedStream { get; set; }
+
+        [ObservableProperty]
+        public partial DateOnly DateFrom { get; set; }
+
+        [ObservableProperty]
+        public partial DateOnly DateTo { get; set; }
+
+        public Task Initialize() => CurrentWeek();
+
+        private static DateOnly StartOfWeek(DateOnly date)
+        {
+            int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+
+            return date.AddDays(-1 * diff);
+        }
 
         [RelayCommand]
         private void GenerateOrder()
@@ -170,5 +194,41 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
 
         [RelayCommand]
         private Task UpdateOrderQueue() => OrderQueueService.UpdateOrderQueue();
+
+        [RelayCommand]
+        private async Task CurrentWeek()
+        {
+            DateFrom = StartOfWeek(DateOnly.FromDateTime(DateTime.Now));
+            DateTo = DateFrom.AddDays(6);
+            await UpdateStreams();
+        }
+
+        [RelayCommand]
+        private async Task PreviousWeek()
+        {
+            DateFrom = DateFrom.AddDays(-6);
+            DateTo = DateTo.AddDays(-6);
+            await UpdateStreams();
+        }
+
+        [RelayCommand]
+        private async Task NextWeek()
+        {
+            DateFrom = DateFrom.AddDays(6);
+            DateTo = DateTo.AddDays(6);
+            await UpdateStreams();
+        }
+
+        private async Task UpdateStreams()
+        {
+            IEnumerable<ComposerStreamDto> streams = await composerStreamService.Find(DateFrom, DateTo);
+
+            Streams.Clear();
+
+            foreach (ComposerStreamDto dto in streams.OrderBy(x => x.EventDate))
+            {
+                Streams.Add(new ComposerStreamVM(dto));
+            }
+        }
     }
 }

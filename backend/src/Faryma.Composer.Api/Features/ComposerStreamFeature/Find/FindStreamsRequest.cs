@@ -5,7 +5,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Find
     /// <summary>
     /// Запрос поиска стримов
     /// </summary>
-    public sealed record FindComposerStreamRequest : IValidatableObject
+    public sealed record FindStreamsRequest : IValidatableObject
     {
         /// <summary>
         /// Начальная дата периода поиска

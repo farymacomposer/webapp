@@ -2,7 +2,11 @@
 using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Cancel;
 using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Complete;
 using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Create;
+using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Find;
+using Faryma.Composer.Desktop.Services.ComposerStreamFeature.FindCurrentAndScheduled;
 using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Start;
+using Faryma.Composer.Desktop.Shared.Dto;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature
@@ -11,17 +15,35 @@ namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature
     {
         private HttpClient HttpClient => httpClientFactory.CreateClient("Faryma.Composer.Api");
 
-        public async Task Initialize()
+        public async Task<IEnumerable<ComposerStreamDto>> Find(DateOnly dateFrom, DateOnly dateTo)
         {
-            await Task.Delay(2000);
-            await Task.Delay(2000);
+            QueryString queryBuilder = QueryString.Empty
+                .Add("DateFrom", dateFrom.ToString("yyyy-MM-dd"))
+                .Add("DateTo", dateTo.ToString("yyyy-MM-dd"));
+
+            string url = $"/api/ComposerStream/FindStreams{queryBuilder}";
+
+            FindStreamsResponse response = (await HttpClient.GetFromJsonAsync<FindStreamsResponse>(url))!;
+
+            logger.LogInformation("{@response}", response);
+
+            return response.Streams;
+        }
+
+        public async Task<IEnumerable<ComposerStreamDto>> FindCurrentAndScheduled()
+        {
+            FindCurrentAndScheduledStreamsResponse response = (await HttpClient.GetFromJsonAsync<FindCurrentAndScheduledStreamsResponse>("/api/ComposerStream/FindCurrentAndScheduledStreams"))!;
+
+            logger.LogInformation("{@response}", response);
+
+            return response.Streams;
         }
 
         public async Task Post<T>(T request)
         {
             string requestUri = request switch
             {
-                CreateComposerStreamRequest => "/api/ComposerStream/CreateStream",
+                CreateStreamRequest => "/api/ComposerStream/CreateStream",
                 StartStreamRequest => "/api/ComposerStream/StartStream",
                 CompleteStreamRequest => "/api/ComposerStream/CompleteStream",
                 CancelStreamRequest => "/api/ComposerStream/CancelStream",

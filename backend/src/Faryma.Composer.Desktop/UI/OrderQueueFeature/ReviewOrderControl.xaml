@@ -70,8 +70,8 @@
 
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="4">
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="Streamid:" />
-                    <TextBlock Text="{Binding Streamid}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="StreamId:" />
+                    <TextBlock Text="{Binding StreamId}" />
                 </StackPanel>
                 <TextBlock Text="{Binding StreamEventDate}" />
                 <TextBlock Text="{Binding StreamStatus}" />

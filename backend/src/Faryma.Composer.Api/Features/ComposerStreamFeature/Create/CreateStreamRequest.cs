@@ -6,7 +6,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Create
     /// <summary>
     /// Запрос создания стрима
     /// </summary>
-    public sealed record CreateComposerStreamRequest : IValidatableObject
+    public sealed record CreateStreamRequest : IValidatableObject
     {
         /// <summary>
         /// Дата проведения стрима
