@@ -20,7 +20,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
             .AsNoTracking()
             .Include(x => x.CreationStream)
             .Include(x => x.Payments)
-            .Where(x => x.CreationStreamId == creationStreamId)
+            .Where(x => x.CreationStreamId == creationStreamId && x.Status != ReviewOrderStatus.Canceled)
             .ToArrayAsync();
 
         public Task<ReviewOrder?> FindInProgress() => context.ReviewOrders
