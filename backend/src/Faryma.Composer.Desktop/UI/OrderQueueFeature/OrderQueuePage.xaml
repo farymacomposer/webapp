@@ -63,7 +63,6 @@
                         </controls:TitledContentRow>
 
                         <controls:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
-                        <controls:TitledContentRow Title="UserComment" Content="{x:Bind ViewModel.UserComment, Mode=OneWay}" />
 
                         <StackPanel
                             HorizontalAlignment="Center"
@@ -145,6 +144,12 @@
                             Style="{StaticResource AccentButtonStyle}" />
                     </StackPanel>
 
+                    <controls:TitledContentRow
+                        Title="Id выбранного заказа"
+                        Content="{x:Bind ViewModel.SelectedOrder.Id, Mode=OneWay, FallbackValue={x:Null}}"
+                        FontSize="16"
+                        Foreground="{StaticResource NegativeBrush}" />
+
                     <Button
                         HorizontalAlignment="Center"
                         Command="{x:Bind ViewModel.FreezeReviewOrderCommand}"
@@ -156,12 +161,6 @@
                         Command="{x:Bind ViewModel.CancelReviewOrderCommand}"
                         Content="Отменить"
                         Style="{StaticResource AccentButtonStyle}" />
-
-                    <controls:TitledContentRow
-                        Title="Id выбранного заказа"
-                        Content="{x:Bind ViewModel.SelectedOrder.Id, Mode=OneWay, FallbackValue={x:Null}}"
-                        FontSize="16"
-                        Foreground="{StaticResource NegativeBrush}" />
                 </StackPanel>
             </StackPanel>
 
@@ -286,7 +285,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition Width="16" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="300" />
                     </Grid.ColumnDefinitions>
 
                     <local:ReviewOrderControl DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />

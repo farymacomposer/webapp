@@ -12,6 +12,8 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         {
             NavigationCacheMode = NavigationCacheMode.Required;
             InitializeComponent();
+
+            ViewModel.Page = this;
         }
 
         public async Task ShowDialog(string message)

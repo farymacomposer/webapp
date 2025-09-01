@@ -27,6 +27,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         ComposerStreamService composerStreamService,
         ReviewOrderService reviewOrderService) : ObservableObject
     {
+        public OrderQueuePage Page { get; set; } = null!;
         public OrderQueueService OrderQueueService { get; } = orderQueueService;
         public ReviewOrderType[] OrderTypes { get; } = Enum.GetValues<ReviewOrderType>();
         public ComposerStreamType[] StreamTypes { get; } = Enum.GetValues<ComposerStreamType>();
@@ -100,6 +101,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         public partial ComposerStreamType StreamType { get; set; }
 
         public Task Initialize() => CurrentWeek();
+        public Task ShowDialog(string message) => Page.ShowDialog(message);
 
         private static DateOnly StartOfWeek(DateOnly date)
         {
