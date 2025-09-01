@@ -169,10 +169,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// </summary>
         private OrderPosition RemoveOrder(ReviewOrder order)
         {
+            SaveCurrentPositionsToPrevious();
+
             OrderPosition position = OrderPositionsById[order.Id];
             OrderPositionsById.Remove(order.Id);
 
-            SaveCurrentPositionsToPrevious();
             UpdateActive();
             UpdateInProgress();
             UpdateScheduled();
