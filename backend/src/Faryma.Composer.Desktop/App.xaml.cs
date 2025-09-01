@@ -32,6 +32,7 @@ namespace Faryma.Composer.Desktop
             services.AddSingleton<ReviewOrderService>();
             services.AddSingleton<ComposerStreamService>();
 
+            services.AddSingleton<OrderQueuePage>();
             services.AddSingleton<OrderQueuePageVM>();
 
             _services = services.BuildServiceProvider();
@@ -43,6 +44,7 @@ namespace Faryma.Composer.Desktop
         }
 
         public static T GetService<T>() where T : notnull => _services.GetRequiredService<T>();
+        public static Task ShowDialog(string message) => GetService<OrderQueuePage>().ShowDialog(message);
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {

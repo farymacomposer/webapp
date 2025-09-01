@@ -58,7 +58,9 @@ namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature
             }
             catch (Exception)
             {
-                logger.LogError("{content}", await responseMessage.Content.ReadAsStringAsync());
+                string content = await responseMessage.Content.ReadAsStringAsync();
+                await App.ShowDialog(content);
+                logger.LogError("{content}", content);
             }
         }
     }

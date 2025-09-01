@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
@@ -11,6 +12,19 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         {
             NavigationCacheMode = NavigationCacheMode.Required;
             InitializeComponent();
+        }
+
+        public async Task ShowDialog(string message)
+        {
+            ContentDialog dialog = new()
+            {
+                XamlRoot = XamlRoot,
+                Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                Title = message,
+                CloseButtonText = "OK"
+            };
+
+            await dialog.ShowAsync();
         }
     }
 }
