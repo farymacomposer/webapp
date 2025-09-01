@@ -178,6 +178,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdateScheduled();
             UpdateFrozen();
 
+            position.PositionHistory.Current.UpdatePosition(0, OrderActivityStatus.Canceled);
+
             return position;
         }
 

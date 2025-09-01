@@ -33,6 +33,11 @@
         /// <summary>
         /// Заморожен и не будет обрабатываться
         /// </summary>
-        Frozen = 5
+        Frozen = 5,
+
+        /// <summary>
+        /// Отменен
+        /// </summary>
+        Canceled = 6,
     }
 }

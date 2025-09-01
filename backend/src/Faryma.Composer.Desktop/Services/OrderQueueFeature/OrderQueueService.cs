@@ -145,6 +145,11 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
         private void InsertOrder(ReviewOrderDto order, OrderQueuePositionDto position)
         {
+            if (position.ActivityStatus == OrderActivityStatus.Canceled)
+            {
+                return;
+            }
+
             if (position.ActivityStatus == OrderActivityStatus.InProgress)
             {
                 InProgressOrder = new ReviewOrderVM(order, position);
