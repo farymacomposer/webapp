@@ -17,7 +17,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// <summary>
         /// История изменений позиции заказа в очереди
         /// </summary>
-        public OrderPositionHistory PositionHistory { get; init; } = new();
+        public required OrderPositionHistory PositionHistory { get; init; }
 
         /// <summary>
         /// Записывает текущее состояние в предыдущее

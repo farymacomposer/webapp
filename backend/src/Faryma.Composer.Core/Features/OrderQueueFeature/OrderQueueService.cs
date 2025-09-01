@@ -116,7 +116,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 LastIssuedNickname = lastOrder?.MainNormalizedNickname,
                 LastOutOfQueueNickname = lastOutOfQueueNickname,
                 LastNicknameByStreamDate = lastNicknameByStreamDate,
-                OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
+                OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition
+                {
+                    Order = v,
+                    PositionHistory = OrderPositionHistory.Create(),
+                }),
             };
 
             if (orders.Length > 0)
