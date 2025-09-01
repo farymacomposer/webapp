@@ -16,112 +16,112 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
         /// <summary>
         /// Id заказа
         /// </summary>
-        public long Id => dto.Id;
+        public long Id { get; } = dto.Id;
 
         /// <summary>
         /// Дата и время создания заказа
         /// </summary>
-        public DateTime CreatedAt => dto.CreatedAt;
+        public DateTime CreatedAt { get; } = dto.CreatedAt;
 
         /// <summary>
         /// Дата и время взятия заказа в работу
         /// </summary>
-        public DateTime? InProgressAt => dto.InProgressAt;
+        public DateTime? InProgressAt { get; } = dto.InProgressAt;
 
         /// <summary>
         /// Дата и время выполнения заказа
         /// </summary>
-        public DateTime? CompletedAt => dto.CompletedAt;
+        public DateTime? CompletedAt { get; } = dto.CompletedAt;
 
         /// <summary>
         /// Тип заказа
         /// </summary>
-        public ReviewOrderType Type => dto.Type;
+        public ReviewOrderType Type { get; } = dto.Type;
 
         /// <summary>
         /// Тип категории заказа
         /// </summary>
-        public OrderCategoryType CategoryType => dto.CategoryType;
+        public OrderCategoryType CategoryType { get; } = dto.CategoryType;
 
         /// <summary>
         /// Статус заказа
         /// </summary>
-        public ReviewOrderStatus Status => dto.Status;
+        public ReviewOrderStatus Status { get; } = dto.Status;
 
         /// <summary>
         /// Заказ заморожен
         /// </summary>
-        public bool IsFrozen => dto.IsFrozen;
+        public bool IsFrozen { get; } = dto.IsFrozen;
 
         /// <summary>
         /// Ссылка на трек
         /// </summary>
-        public string? TrackUrl => dto.TrackUrl;
+        public string? TrackUrl { get; } = dto.TrackUrl;
 
         /// <summary>
         /// Комментарий пользователя
         /// </summary>
-        public string? UserComment => dto.UserComment;
+        public string? UserComment { get; } = dto.UserComment;
 
         /// <summary>
         /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
         /// </summary>
-        public string MainNickname => dto.MainNickname;
+        public string MainNickname { get; } = dto.MainNickname;
 
         /// <summary>
         /// Общая стоимость заказа (номинал + платежи)
         /// </summary>
-        public decimal TotalAmount => dto.TotalAmount;
+        public decimal TotalAmount { get; } = dto.TotalAmount;
 
         /// <summary>
         /// Позиция заказа в очереди
         /// </summary>
-        public int QueueIndex => currentPosition.QueueIndex;
+        public int QueueIndex { get; } = currentPosition.QueueIndex;
 
         /// <summary>
         /// Статус активности заказа
         /// </summary>
-        public OrderActivityStatus ActivityStatus => currentPosition.ActivityStatus;
+        public OrderActivityStatus ActivityStatus { get; } = currentPosition.ActivityStatus;
 
         /// <summary>
         /// Тип категории заказа
         /// </summary>
-        public OrderCategoryType CurrentCategoryType => currentPosition.CategoryType;
+        public OrderCategoryType CurrentCategoryType { get; } = currentPosition.CategoryType;
 
         /// <summary>
         /// Номер категории, если заказ относится к долговой категории
         /// </summary>
-        public int CategoryDebtNumber => currentPosition.CategoryDebtNumber;
+        public int CategoryDebtNumber { get; } = currentPosition.CategoryDebtNumber;
 
         /// <summary>
         /// Id стрима
         /// </summary>
-        public long StreamId => dto.CreationStream.Id;
+        public long StreamId { get; } = dto.CreationStream.Id;
 
         /// <summary>
         /// Дата проведения стрима
         /// </summary>
-        public DateOnly StreamEventDate => dto.CreationStream.EventDate;
+        public DateOnly StreamEventDate { get; } = dto.CreationStream.EventDate;
 
         /// <summary>
         /// Статус стрима
         /// </summary>
-        public ComposerStreamStatus StreamStatus => dto.CreationStream.Status;
+        public ComposerStreamStatus StreamStatus { get; } = dto.CreationStream.Status;
 
         /// <summary>
         /// Тип стрима
         /// </summary>
-        public ComposerStreamType StreamType => dto.CreationStream.Type;
+        public ComposerStreamType StreamType { get; } = dto.CreationStream.Type;
 
         /// <summary>
         /// Дата и время начала стрима
         /// </summary>
-        public DateTime? StreamStartedAt => dto.CreationStream.StartedAt;
+        public DateTime? StreamStartedAt { get; } = dto.CreationStream.StartedAt;
 
         /// <summary>
         /// Дата и время завершения стрима
         /// </summary>
-        public DateTime? StreamCompletedAt => dto.CreationStream.CompletedAt;
+        public DateTime? StreamCompletedAt { get; } = dto.CreationStream.CompletedAt;
 
         [RelayCommand]
         private void Select() => App.GetService<OrderQueuePageVM>().SelectedOrder = this;

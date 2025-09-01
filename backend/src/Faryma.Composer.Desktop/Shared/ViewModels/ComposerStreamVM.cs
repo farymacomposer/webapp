@@ -12,31 +12,31 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
         /// <summary>
         /// Id стрима
         /// </summary>
-        public long Id => dto.Id;
+        public long Id { get; } = dto.Id;
 
         /// <summary>
         /// Дата проведения стрима
         /// </summary>
-        public DateOnly EventDate => dto.EventDate;
+        public DateOnly EventDate { get; } = dto.EventDate;
 
         /// <summary>
         /// Статус стрима
         /// </summary>
-        public ComposerStreamStatus Status => dto.Status;
+        public ComposerStreamStatus Status { get; } = dto.Status;
 
         /// <summary>
         /// Тип стрима
         /// </summary>
-        public ComposerStreamType Type => dto.Type;
+        public ComposerStreamType Type { get; } = dto.Type;
 
         /// <summary>
         /// Дата и время начала стрима
         /// </summary>
-        public DateTime? StartedAt => dto.StartedAt;
+        public DateTime? StartedAt { get; } = dto.StartedAt;
 
         /// <summary>
         /// Дата и время завершения стрима
         /// </summary>
-        public DateTime? CompletedAt => dto.CompletedAt;
+        public DateTime? CompletedAt { get; } = dto.CompletedAt;
     }
 }
