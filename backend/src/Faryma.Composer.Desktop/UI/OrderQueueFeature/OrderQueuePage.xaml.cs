@@ -22,7 +22,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
             {
                 XamlRoot = XamlRoot,
                 Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-                Title = message,
+                Content = message,
                 CloseButtonText = "OK"
             };
 
