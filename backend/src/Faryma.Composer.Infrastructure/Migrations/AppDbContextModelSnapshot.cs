@@ -26,7 +26,7 @@ namespace Faryma.Composer.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "composer_stream_type", new[] { "unspecified", "donation", "debt", "charity" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "order_category_type", new[] { "unspecified", "out_of_queue", "donation", "debt" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "review_order_status", new[] { "unspecified", "preorder", "pending", "in_progress", "completed", "canceled" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "review_order_type", new[] { "unspecified", "out_of_queue", "donation", "free", "charity" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "review_order_type", new[] { "unspecified", "out_of_queue", "donation", "free", "charity", "custom" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "transaction_type", new[] { "unspecified", "deposit", "payment" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
