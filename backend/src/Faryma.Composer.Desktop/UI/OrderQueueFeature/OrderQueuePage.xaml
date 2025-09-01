@@ -173,7 +173,7 @@
 
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="268" />
+                        <ColumnDefinition Width="400" />
                         <ColumnDefinition Width="16" />
                         <ColumnDefinition />
                         <ColumnDefinition Width="16" />
@@ -192,7 +192,8 @@
                                     BorderBrush="{ThemeResource SystemControlForegroundChromeMediumBrush}"
                                     BorderThickness="0,1,0,0"
                                     Orientation="Horizontal"
-                                    Spacing="8">
+                                    Spacing="16">
+
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <Button
                                             Width="32"
@@ -205,13 +206,22 @@
                                             FontSize="16"
                                             Text="{x:Bind Date, Mode=OneWay}" />
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="{x:Bind Stream.Status, Mode=OneWay, FallbackValue={x:Null}}" />
-                                        <TextBlock Text="{x:Bind Stream.Type, Mode=OneWay, FallbackValue={x:Null}}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="{x:Bind Stream.StartedAt, Mode=OneWay, FallbackValue={x:Null}}" />
-                                        <TextBlock Text="{x:Bind Stream.CompletedAt, Mode=OneWay, FallbackValue={x:Null}}" />
+
+                                    <StackPanel>
+                                        <StackPanel
+                                            HorizontalAlignment="Center"
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                            <TextBlock Text="{x:Bind Stream.Status, Mode=OneWay, FallbackValue={x:Null}}" />
+                                            <TextBlock Text="{x:Bind Stream.Type, Mode=OneWay, FallbackValue={x:Null}}" />
+                                        </StackPanel>
+                                        <StackPanel
+                                            HorizontalAlignment="Center"
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                            <TextBlock Text="{x:Bind Stream.StartedAt, Mode=OneWay, FallbackValue={x:Null}}" />
+                                            <TextBlock Text="{x:Bind Stream.CompletedAt, Mode=OneWay, FallbackValue={x:Null}}" />
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
                             </DataTemplate>

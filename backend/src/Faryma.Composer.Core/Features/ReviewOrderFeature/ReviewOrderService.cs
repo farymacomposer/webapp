@@ -162,14 +162,14 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 throw new ReviewOrderException("Невозможно взять в работу заказ", order);
             }
 
+            ComposerStream liveStream = await uow.ComposerStreamRepository.FindLive()
+                ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима", order);
+
             ReviewOrder? inProgress = await uow.ReviewOrderRepository.FindInProgress();
             if (inProgress is not null && inProgress.Id != reviewOrderId)
             {
                 throw new ReviewOrderException($"Невозможно взять в работу заказ, пока заказ Id: {inProgress.Id} находится в работе", order);
             }
-
-            ComposerStream liveStream = await uow.ComposerStreamRepository.FindLive()
-                ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима", order);
 
             OrderQueuePosition position = await orderQueueService.GetCurrentQueuePosition(order);
 
