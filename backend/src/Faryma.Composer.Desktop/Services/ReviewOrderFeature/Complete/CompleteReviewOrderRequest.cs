@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature.Complete
+﻿namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature.Complete
 {
     /// <summary>
     /// Запрос выполнения заказа
@@ -15,7 +13,6 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature.Complete
         /// <summary>
         /// Оценка трека (0-26)
         /// </summary>
-        [Range(0, 26, ErrorMessage = "Оценка должна быть от 0 до 26")]
         public required int Rating { get; init; }
     }
 }

@@ -1,8 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using Bogus;
+﻿using Bogus;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Desktop.Services.ComposerStreamFeature;
+using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Cancel;
+using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Complete;
+using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Create;
+using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Start;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.AddTrackUrl;
@@ -26,6 +29,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
     {
         public OrderQueueService OrderQueueService { get; } = orderQueueService;
         public ReviewOrderType[] OrderTypes { get; } = Enum.GetValues<ReviewOrderType>();
+        public ComposerStreamType[] StreamTypes { get; } = Enum.GetValues<ComposerStreamType>();
 
         [ObservableProperty]
         public partial ReviewOrderVM? SelectedOrder { get; set; }
@@ -63,7 +67,25 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [ObservableProperty]
         public partial string? UserComment { get; set; }
 
-        public ObservableCollection<ComposerStreamVM> Streams { get; } = [];
+        /// <summary>
+        /// Оценка трека (0-26)
+        /// </summary>
+        [ObservableProperty]
+        public partial string? Rating { get; set; }
+
+        public StreamContainerVM[] StreamSchedule { get; } =
+        [
+            new StreamContainerVM(),
+            new StreamContainerVM(),
+            new StreamContainerVM(),
+            new StreamContainerVM(),
+            new StreamContainerVM(),
+            new StreamContainerVM(),
+            new StreamContainerVM(),
+        ];
+
+        [ObservableProperty]
+        public partial DateOnly SelectedEventDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         [ObservableProperty]
         public partial ComposerStreamVM? SelectedStream { get; set; }
@@ -73,6 +95,9 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
 
         [ObservableProperty]
         public partial DateOnly DateTo { get; set; }
+
+        [ObservableProperty]
+        public partial ComposerStreamType StreamType { get; set; }
 
         public Task Initialize() => CurrentWeek();
 
@@ -90,7 +115,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
 
             IdempotencyKey = faker.Random.Guid();
             Nickname = faker.Internet.UserName();
-            TrackUrl = faker.Internet.Url().OrNull(faker);
+            TrackUrl = faker.Internet.Url();
             PaymentAmount = faker.Finance.Amount(750, 5000, 0).ToString();
             UserComment = faker.Lorem.Sentence(5, 15).OrNull(faker);
         }
@@ -158,10 +183,12 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         [RelayCommand]
         private async Task CompleteReviewOrder()
         {
+            _ = int.TryParse(Rating, out int rating);
+
             await reviewOrderService.Post(new CompleteReviewOrderRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
-                Rating = 20,
+                Rating = rating,
             });
         }
 
@@ -196,39 +223,66 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         private Task UpdateOrderQueue() => OrderQueueService.UpdateOrderQueue();
 
         [RelayCommand]
-        private async Task CurrentWeek()
-        {
-            DateFrom = StartOfWeek(DateOnly.FromDateTime(DateTime.Now));
-            DateTo = DateFrom.AddDays(6);
-            await UpdateStreams();
-        }
+        private Task CurrentWeek() => UpdateStreamSchedule(StartOfWeek(DateOnly.FromDateTime(DateTime.Now)));
 
         [RelayCommand]
-        private async Task PreviousWeek()
-        {
-            DateFrom = DateFrom.AddDays(-6);
-            DateTo = DateTo.AddDays(-6);
-            await UpdateStreams();
-        }
+        private Task PreviousWeek() => UpdateStreamSchedule(DateFrom.AddDays(-7));
 
         [RelayCommand]
-        private async Task NextWeek()
-        {
-            DateFrom = DateFrom.AddDays(6);
-            DateTo = DateTo.AddDays(6);
-            await UpdateStreams();
-        }
+        private Task NextWeek() => UpdateStreamSchedule(DateFrom.AddDays(7));
 
-        private async Task UpdateStreams()
+        private async Task UpdateStreamSchedule(DateOnly dateFrom)
         {
+            DateFrom = dateFrom;
+            DateTo = dateFrom.AddDays(6);
+
             IEnumerable<ComposerStreamDto> streams = await composerStreamService.Find(DateFrom, DateTo);
 
-            Streams.Clear();
-
-            foreach (ComposerStreamDto dto in streams.OrderBy(x => x.EventDate))
+            DateOnly date = dateFrom;
+            foreach (StreamContainerVM container in StreamSchedule)
             {
-                Streams.Add(new ComposerStreamVM(dto));
+                container.Date = date;
+                ComposerStreamDto? dto = streams.FirstOrDefault(x => x.EventDate == date);
+                container.Stream = (dto is null) ? null : new ComposerStreamVM(dto);
+                date = date.AddDays(1);
             }
+        }
+
+        [RelayCommand]
+        private async Task CreateStream()
+        {
+            await composerStreamService.Post(new CreateStreamRequest
+            {
+                EventDate = SelectedEventDate,
+                Type = StreamType,
+            });
+        }
+
+        [RelayCommand]
+        private async Task StartStream()
+        {
+            await composerStreamService.Post(new StartStreamRequest
+            {
+                ComposerStreamId = SelectedStream?.Id ?? 0,
+            });
+        }
+
+        [RelayCommand]
+        private async Task CompleteStream()
+        {
+            await composerStreamService.Post(new CompleteStreamRequest
+            {
+                ComposerStreamId = SelectedStream?.Id ?? 0,
+            });
+        }
+
+        [RelayCommand]
+        private async Task CancelStream()
+        {
+            await composerStreamService.Post(new CancelStreamRequest
+            {
+                ComposerStreamId = SelectedStream?.Id ?? 0,
+            });
         }
     }
 }

@@ -17,24 +17,19 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid>
+        <Grid Padding="16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="16" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <StackPanel
-                Padding="16"
-                Orientation="Horizontal"
-                Spacing="16">
+            <StackPanel Orientation="Horizontal" Spacing="16">
 
                 <StackPanel Spacing="8">
 
                     <StackPanel
-                        Width="516"
                         Padding="8"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
                         Background="White"
                         CornerRadius="4"
                         Spacing="8">
@@ -170,35 +165,28 @@
                 </StackPanel>
             </StackPanel>
 
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition />
+                    <RowDefinition Height="16" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Command="{x:Bind ViewModel.CurrentWeekCommand}" Content="Сегодня" />
-                        <Button Command="{x:Bind ViewModel.PreviousWeekCommand}">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76B;" />
-                        </Button>
-                        <Button Command="{x:Bind ViewModel.NextWeekCommand}">
-                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76C;" />
-                        </Button>
-                        <TextBlock />
-                    </StackPanel>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="268" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
 
                     <ListView
-                        Grid.Row="1"
-                        Background="Red"
-                        ItemsSource="{x:Bind ViewModel.Streams}">
+                        ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
+                        ItemsSource="{x:Bind ViewModel.StreamSchedule}"
+                        SelectionMode="None">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="sharedVM:ComposerStreamVM">
+                            <DataTemplate x:DataType="sharedVM:StreamContainerVM">
                                 <StackPanel
                                     Padding="6,4"
                                     Background="#E4FFFFFF"
@@ -208,36 +196,122 @@
                                     Spacing="8">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <Button
-                                            Command="{Binding SelectCommand}"
-                                            Content="{Binding Id}"
+                                            Width="32"
+                                            Height="30"
+                                            Command="{x:Bind SelectCommand}"
+                                            Content="{x:Bind Stream.Id, Mode=OneWay, FallbackValue={x:Null}}"
                                             Style="{StaticResource AccentButtonStyle}" />
                                         <TextBlock
                                             VerticalAlignment="Center"
                                             FontSize="16"
-                                            Text="{Binding EventDate}" />
+                                            Text="{x:Bind Date, Mode=OneWay}" />
                                     </StackPanel>
-                                    <TextBlock Text="{Binding Status}" />
-                                    <TextBlock Text="{Binding Type}" />
-                                    <TextBlock Text="{Binding StartedAt}" />
-                                    <TextBlock Text="{Binding CompletedAt}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{x:Bind Stream.Status, Mode=OneWay, FallbackValue={x:Null}}" />
+                                        <TextBlock Text="{x:Bind Stream.Type, Mode=OneWay, FallbackValue={x:Null}}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{x:Bind Stream.StartedAt, Mode=OneWay, FallbackValue={x:Null}}" />
+                                        <TextBlock Text="{x:Bind Stream.CompletedAt, Mode=OneWay, FallbackValue={x:Null}}" />
+                                    </StackPanel>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <ItemsStackPanel Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
                     </ListView>
+
+                    <StackPanel Grid.Column="2" Spacing="8">
+
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button Command="{x:Bind ViewModel.CurrentWeekCommand}" Content="Сегодня" />
+                            <Button Command="{x:Bind ViewModel.PreviousWeekCommand}">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76B;" />
+                            </Button>
+                            <Button Command="{x:Bind ViewModel.NextWeekCommand}">
+                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76C;" />
+                            </Button>
+                            <TextBlock />
+                        </StackPanel>
+
+                        <StackPanel
+                            Grid.Column="2"
+                            Padding="8"
+                            Background="White"
+                            CornerRadius="4"
+                            Spacing="8">
+
+                            <controls:TitledContentRow Title="EventDate" Content="{x:Bind ViewModel.SelectedEventDate, Mode=OneWay}" />
+
+                            <controls:TitledContentRow Title="StreamType">
+                                <ComboBox
+                                    HorizontalAlignment="Stretch"
+                                    ItemsSource="{x:Bind ViewModel.StreamTypes, Mode=OneTime}"
+                                    SelectedItem="{x:Bind ViewModel.StreamType, Mode=TwoWay}" />
+                            </controls:TitledContentRow>
+
+                            <Button
+                                HorizontalAlignment="Center"
+                                Command="{x:Bind ViewModel.CreateStreamCommand}"
+                                Content="Создать новый стрим"
+                                Style="{StaticResource AccentButtonStyle}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="4" Spacing="8">
+
+                        <controls:TitledContentRow
+                            Title="Id выбранного стрима"
+                            Content="{x:Bind ViewModel.SelectedStream.Id, Mode=OneWay, FallbackValue={x:Null}}"
+                            FontSize="16"
+                            Foreground="{StaticResource NegativeBrush}"
+                            Style="{StaticResource RightContentAlignment}" />
+
+                        <Button
+                            Command="{x:Bind ViewModel.StartStreamCommand}"
+                            Content="Начать стрим"
+                            Style="{StaticResource AccentButtonStyle}" />
+
+                        <Button
+                            Command="{x:Bind ViewModel.CompleteStreamCommand}"
+                            Content="Завершить стрим"
+                            Style="{StaticResource AccentButtonStyle}" />
+
+                        <Button
+                            Command="{x:Bind ViewModel.CancelStreamCommand}"
+                            Content="Отменить стрим"
+                            Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
                 </Grid>
 
-                <StackPanel Grid.Row="1" Spacing="16">
-                    <Button
-                        Command="{x:Bind ViewModel.CompleteReviewOrderCommand}"
-                        Content="Выполнить"
-                        Style="{StaticResource AccentButtonStyle}" />
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
                     <local:ReviewOrderControl DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
-                </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="2"
+                        Padding="8"
+                        Background="White"
+                        CornerRadius="4"
+                        Spacing="8">
+
+                        <controls:TitledContentRow Title="Rating">
+                            <TextBox
+                                ui:TextBoxExtensions.ValidationMode="Dynamic"
+                                ui:TextBoxExtensions.ValidationType="Number"
+                                Text="{x:Bind ViewModel.Rating, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        </controls:TitledContentRow>
+
+                        <Button
+                            HorizontalAlignment="Center"
+                            Command="{x:Bind ViewModel.CompleteReviewOrderCommand}"
+                            Content="Выполнить"
+                            Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
+                </Grid>
             </Grid>
         </Grid>
 

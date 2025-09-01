@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Desktop.Shared.Dto;
-using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Desktop.Shared.ViewModels
@@ -40,8 +38,5 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
         /// Дата и время завершения стрима
         /// </summary>
         public DateTime? CompletedAt => dto.CompletedAt;
-
-        [RelayCommand]
-        private void Select() => App.GetService<OrderQueuePageVM>().SelectedStream = this;
     }
 }
