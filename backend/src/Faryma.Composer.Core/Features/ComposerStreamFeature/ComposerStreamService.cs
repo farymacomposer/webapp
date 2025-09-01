@@ -43,6 +43,12 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
                 throw new ComposerStreamException("Невозможно начать стрим", stream);
             }
 
+            ComposerStream? live = await uow.ComposerStreamRepository.FindLive();
+            if (live is not null && live.Id != composerStreamId)
+            {
+                throw new ComposerStreamException($"Невозможно начать стрим, пока стрим Id: {live.Id} запущен", stream);
+            }
+
             stream.Status = ComposerStreamStatus.Live;
             stream.StartedAt = DateTime.UtcNow;
 

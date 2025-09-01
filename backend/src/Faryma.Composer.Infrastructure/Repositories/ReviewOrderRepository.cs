@@ -22,9 +22,9 @@ namespace Faryma.Composer.Infrastructure.Repositories
             .Where(x => x.CreationStreamId == creationStreamId)
             .ToArrayAsync();
 
-        public Task<ReviewOrder?> FindAnotherOrderInProgress(long id) => context.ReviewOrders
+        public Task<ReviewOrder?> FindInProgress() => context.ReviewOrders
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id != id && x.Status == ReviewOrderStatus.InProgress);
+            .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress);
 
         public ReviewOrder CreateDonation(
             ComposerStream stream,
