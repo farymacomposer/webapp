@@ -19,6 +19,25 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// </summary>
         public required OrderPositionHistory PositionHistory { get; init; }
 
+        public static OrderPosition Create(ReviewOrder order)
+        {
+            return new()
+            {
+                Order = order,
+                PositionHistory = new OrderPositionHistory
+                {
+                    Current = new OrderQueuePosition
+                    {
+                        Category = new OrderCategoryInfo()
+                    },
+                    Previous = new OrderQueuePosition
+                    {
+                        Category = new OrderCategoryInfo()
+                    }
+                }
+            };
+        }
+
         /// <summary>
         /// Записывает текущее состояние в предыдущее
         /// </summary>

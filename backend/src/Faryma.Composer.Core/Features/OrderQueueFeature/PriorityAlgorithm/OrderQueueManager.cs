@@ -106,12 +106,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// </summary>
         private OrderPosition AddOrder(ReviewOrder order)
         {
-            OrderPosition position = new()
-            {
-                Order = order,
-                PositionHistory = OrderPositionHistory.Create(),
-            };
-
+            OrderPosition position = OrderPosition.Create(order);
             OrderPositionsById.Add(order.Id, position);
 
             SaveCurrentPositionsToPrevious();

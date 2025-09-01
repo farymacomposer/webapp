@@ -20,21 +20,6 @@
         /// </summary>
         public bool IsPositionJumped => Math.Abs(Previous.QueueIndex - Current.QueueIndex) > 1;
 
-        public static OrderPositionHistory Create()
-        {
-            return new()
-            {
-                Current = new OrderQueuePosition
-                {
-                    Category = new OrderCategoryInfo()
-                },
-                Previous = new OrderQueuePosition
-                {
-                    Category = new OrderCategoryInfo()
-                }
-            };
-        }
-
         public OrderPositionHistory Clone()
         {
             return new()
