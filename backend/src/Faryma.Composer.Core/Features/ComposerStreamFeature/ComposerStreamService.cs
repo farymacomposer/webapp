@@ -54,7 +54,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             await uow.SaveChangesAsync();
 
-            ReviewOrder[] orders = await uow.ReviewOrderRepository.GetOrdersForStream(stream.Id);
+            ReviewOrder[] orders = await uow.ReviewOrderRepository.GetOrdersToStartStream(stream.Id);
             await orderQueueService.StartStream(stream, orders);
 
             return stream;
@@ -73,10 +73,20 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
                 throw new ComposerStreamException("Невозможно завершить стрим", stream);
             }
 
+            ReviewOrder? inProgress = await uow.ReviewOrderRepository.FindInProgress();
+            if (inProgress is not null)
+            {
+                throw new ComposerStreamException($"Невозможно завершить стрим, пока заказ Id: {inProgress.Id} находится в работе", stream);
+            }
+
             stream.Status = ComposerStreamStatus.Completed;
             stream.CompletedAt = DateTime.UtcNow;
 
             await uow.SaveChangesAsync();
+
+            ComposerStream? nearestStream = await uow.ComposerStreamRepository.FindNearest(stream.EventDate);
+            ReviewOrder[] orders = await uow.ReviewOrderRepository.GetOrdersToCompleteStream(stream.Id);
+            await orderQueueService.CompleteStream(nearestStream, orders);
 
             return stream;
         }

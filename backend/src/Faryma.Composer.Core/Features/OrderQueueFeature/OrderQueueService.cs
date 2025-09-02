@@ -34,12 +34,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
 
         public Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType) => _locker.Lock(async () =>
         {
+            _syncVersion++;
+
             if (updateType == OrderQueueUpdateType.OrderCreated && _queueManager.NearestStreamDate == default)
             {
                 _queueManager.NearestStreamDate = order.CreationStream.EventDate;
             }
 
-            _syncVersion++;
             OrderQueue orderQueue = new()
             {
                 SyncVersion = _syncVersion,
@@ -50,15 +51,36 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             await notificationService.NotifyOrderPositionsChanged(orderQueue);
         });
 
-        public Task StartStream(ComposerStream stream, ReviewOrder[] orders) => _locker.Lock(async () =>
+        public Task StartStream(ComposerStream creationStream, ReviewOrder[] orders) => _locker.Lock(async () =>
         {
             _syncVersion++;
-            _queueManager.NearestStreamDate = stream.EventDate;
+
+            _queueManager.NearestStreamDate = creationStream.EventDate;
+
             OrderQueue orderQueue = new()
             {
                 SyncVersion = _syncVersion,
                 OrderQueueUpdateType = OrderQueueUpdateType.StreamStarted,
-                Positions = _queueManager.UpdateOrders(orders),
+                Positions = _queueManager.UpdateOrders(orders, OrderQueueUpdateType.StreamStarted),
+            };
+
+            await notificationService.NotifyOrderPositionsChanged(orderQueue);
+        });
+
+        public Task CompleteStream(ComposerStream? nearestStream, ReviewOrder[] orders) => _locker.Lock(async () =>
+        {
+            _syncVersion++;
+
+            if (nearestStream is not null)
+            {
+                _queueManager.NearestStreamDate = nearestStream.EventDate;
+            }
+
+            OrderQueue orderQueue = new()
+            {
+                SyncVersion = _syncVersion,
+                OrderQueueUpdateType = OrderQueueUpdateType.StreamCompleted,
+                Positions = _queueManager.UpdateOrders(orders, OrderQueueUpdateType.StreamCompleted),
             };
 
             await notificationService.NotifyOrderPositionsChanged(orderQueue);

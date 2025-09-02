@@ -20,6 +20,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// <summary>
         /// Позиции заказов
         /// </summary>
-        public required IEnumerable<OrderPosition> Positions { get; init; }
+        public required OrderPosition[] Positions { get; init; }
     }
 }

@@ -54,40 +54,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             };
         }
 
-        public IEnumerable<OrderPosition> UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
-        {
-            OrderPosition position = updateType switch
-            {
-                OrderQueueUpdateType.OrderCreated => AddOrder(order),
-                OrderQueueUpdateType.OrderCanceled => RemoveOrder(order),
-                _ => UpdateOrderInternal(order, updateType),
-            };
-
-            return OrderPositionsById
-                .Select(x => x.Value)
-                .Where(x => x.PositionHistory.IsPositionJumped)
-                .Append(position)
-                .ToHashSet();
-        }
-
-        /// <summary>
-        /// Обновляет заказы
-        /// </summary>
-        public IEnumerable<OrderPosition> UpdateOrders(ReviewOrder[] orders)
-        {
-            List<OrderPosition> positions = [];
-            foreach (ReviewOrder order in orders)
-            {
-                OrderPosition position = OrderPositionsById[order.Id];
-                position.Order = order;
-                positions.Add(position);
-            }
-
-            UpdateAllPositions();
-
-            return positions;
-        }
-
         /// <summary>
         /// Обновляет позиции заказов
         /// </summary>
@@ -102,33 +68,67 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         }
 
         /// <summary>
-        /// Добавляет заказ
+        /// Обновляет заказы
         /// </summary>
-        private OrderPosition AddOrder(ReviewOrder order)
+        public OrderPosition[] UpdateOrders(ReviewOrder[] orders, OrderQueueUpdateType updateType)
         {
-            OrderPosition position = OrderPosition.Create(order);
-            OrderPositionsById.Add(order.Id, position);
+            foreach (ReviewOrder order in orders)
+            {
+                OrderPositionsById[order.Id].Order = order;
+            }
 
             SaveCurrentPositionsToPrevious();
             UpdateActive();
             UpdateScheduled();
+            UpdateFrozen();
 
-            return position;
+            if (updateType == OrderQueueUpdateType.StreamCompleted)
+            {
+                UpdateRemoved();
+            }
+
+            OrderPosition[] result = OrderPositionsById
+                .Select(x => x.Value)
+                .Where(x => x.PositionHistory.IsStatusChanged || x.PositionHistory.IsPositionJumped)
+                .ToArray();
+
+            if (updateType == OrderQueueUpdateType.StreamCompleted)
+            {
+                foreach (ReviewOrder order in orders)
+                {
+                    OrderPositionsById.Remove(order.Id);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
         /// Обновляет заказ
         /// </summary>
-        private OrderPosition UpdateOrderInternal(ReviewOrder order, OrderQueueUpdateType updateType)
+        public OrderPosition[] UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
         {
-            OrderPosition position = OrderPositionsById[order.Id];
-            position.Order = order;
+            OrderPosition position;
+            if (updateType == OrderQueueUpdateType.OrderCreated)
+            {
+                position = OrderPosition.Create(order);
+                OrderPositionsById.Add(order.Id, position);
+            }
+            else
+            {
+                position = OrderPositionsById[order.Id];
+                position.Order = order;
+            }
 
             switch (updateType)
             {
-                case OrderQueueUpdateType.TrackUrlAdded:
+                case OrderQueueUpdateType.OrderCreated:
 
-                    return position;
+                    SaveCurrentPositionsToPrevious();
+                    UpdateActive();
+                    UpdateScheduled();
+
+                    break;
 
                 case OrderQueueUpdateType.OrderMovedUp
                     or OrderQueueUpdateType.OrderFrozen
@@ -159,31 +159,32 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
                     break;
 
+                case OrderQueueUpdateType.OrderCanceled:
+
+                    SaveCurrentPositionsToPrevious();
+                    UpdateActive();
+                    UpdateScheduled();
+                    UpdateFrozen();
+                    position.UpdateCurrentPosition(0, OrderActivityStatus.Removed);
+
+                    OrderPositionsById.Remove(order.Id);
+
+                    break;
+
+                case OrderQueueUpdateType.TrackUrlAdded:
+
+                    break;
+
                 default:
                     throw new OrderQueueException($"Тип обновления очереди '{updateType}' не поддерживается");
             }
 
-            return position;
-        }
-
-        /// <summary>
-        /// Удаляет заказ
-        /// </summary>
-        private OrderPosition RemoveOrder(ReviewOrder order)
-        {
-            SaveCurrentPositionsToPrevious();
-
-            OrderPosition position = OrderPositionsById[order.Id];
-            OrderPositionsById.Remove(order.Id);
-
-            UpdateActive();
-            UpdateInProgress();
-            UpdateScheduled();
-            UpdateFrozen();
-
-            position.PositionHistory.Current.UpdatePosition(0, OrderActivityStatus.Canceled);
-
-            return position;
+            return OrderPositionsById
+                .Select(x => x.Value)
+                .Where(x => x.PositionHistory.IsStatusChanged || x.PositionHistory.IsPositionJumped)
+                .Append(position)
+                .DistinctBy(x => x.Order.Id)
+                .ToArray();
         }
 
         /// <summary>
@@ -220,9 +221,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// </summary>
         private void UpdateActive()
         {
-            int index = 0;
             OrderPriorityManager manager = new(this);
 
+            int index = 0;
             while (true)
             {
                 (CategoryState state, bool isOnlyNicknameLeft) = manager.DetermineNextState();
@@ -291,6 +292,19 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 .ToArray();
 
             UpdatePositions(orders, OrderActivityStatus.Frozen);
+        }
+
+        /// <summary>
+        /// Обновляет позиции удаленных из очереди заказов
+        /// </summary>
+        private void UpdateRemoved()
+        {
+            ReviewOrder[] orders = OrderPositionsById
+                .Select(x => x.Value.Order)
+                .Where(x => x.ProcessingStream?.Status == ComposerStreamStatus.Completed)
+                .ToArray();
+
+            UpdatePositions(orders, OrderActivityStatus.Removed);
         }
 
         /// <summary>

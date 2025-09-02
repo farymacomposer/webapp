@@ -20,6 +20,11 @@
         /// </summary>
         public bool IsPositionJumped => Math.Abs(Previous.QueueIndex - Current.QueueIndex) > 1;
 
+        /// <summary>
+        /// Статус активности заказа был изменен
+        /// </summary>
+        public bool IsStatusChanged => Previous.ActivityStatus != Current.ActivityStatus;
+
         public OrderPositionHistory Clone()
         {
             return new()

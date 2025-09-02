@@ -36,8 +36,8 @@
         Frozen = 5,
 
         /// <summary>
-        /// Заказ отменен
+        /// Заказ удален из очереди
         /// </summary>
-        Canceled = 6,
+        Removed = 6,
     }
 }

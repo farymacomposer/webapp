@@ -16,16 +16,25 @@ namespace Faryma.Composer.Infrastructure.Repositories
             .Include(x => x.Review)
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        public Task<ReviewOrder[]> GetOrdersForStream(long creationStreamId) => context.ReviewOrders
-            .AsNoTracking()
-            .Include(x => x.CreationStream)
-            .Include(x => x.Payments)
-            .Where(x => x.CreationStreamId == creationStreamId && x.Status != ReviewOrderStatus.Canceled)
-            .ToArrayAsync();
-
         public Task<ReviewOrder?> FindInProgress() => context.ReviewOrders
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress);
+
+        public Task<ReviewOrder[]> GetOrdersToStartStream(long creationStreamId) => context.ReviewOrders
+            .AsNoTracking()
+            .Include(x => x.CreationStream)
+            .Include(x => x.Payments)
+            .Where(x => x.CreationStreamId == creationStreamId
+                && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
+            .ToArrayAsync();
+
+        public Task<ReviewOrder[]> GetOrdersToCompleteStream(long creationStreamId) => context.ReviewOrders
+            .AsNoTracking()
+            .Include(x => x.CreationStream)
+            .Include(x => x.ProcessingStream)
+            .Include(x => x.Payments)
+            .Where(x => x.CreationStreamId == creationStreamId && x.Status == ReviewOrderStatus.Completed)
+            .ToArrayAsync();
 
         public ReviewOrder CreateDonation(
             ComposerStream stream,
