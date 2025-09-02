@@ -111,7 +111,6 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             return stream;
         }
 
-        // TODO: Исправить логику
         public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -164,9 +163,10 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
         private async Task<ComposerStream> GetOrCreateStream((DateOnly EventDate, ComposerStreamType Type) streamInfo)
         {
+            DateOnly eventDate = streamInfo.EventDate;
+
             while (true)
             {
-                DateOnly eventDate = streamInfo.EventDate;
                 ComposerStream? stream = await uow.ComposerStreamRepository.Find(eventDate);
 
                 if (stream is null)
@@ -191,7 +191,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
                     return stream;
                 }
 
-                eventDate = eventDate.AddDays(6);
+                eventDate = eventDate.AddDays(7);
             }
         }
     }
