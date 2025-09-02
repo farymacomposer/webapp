@@ -117,6 +117,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
 
             IdempotencyKey = faker.Random.Guid();
             Nickname = faker.Internet.UserName();
+            OrderType = ReviewOrderType.Donation;
             TrackUrl = faker.Internet.Url();
             PaymentAmount = faker.Finance.Amount(750, 5000, 0).ToString();
             UserComment = faker.Lorem.Sentence(5, 15).OrNull(faker);

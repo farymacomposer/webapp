@@ -293,15 +293,12 @@
 
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="16" />
                         <ColumnDefinition Width="300" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <local:ReviewOrderControl DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
-
                     <StackPanel
-                        Grid.Column="2"
                         Padding="8"
                         Background="White"
                         CornerRadius="4"
@@ -320,6 +317,8 @@
                             Content="Выполнить"
                             Style="{StaticResource AccentButtonStyle}" />
                     </StackPanel>
+
+                    <local:ReviewOrderControl Grid.Column="2" DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
                 </Grid>
             </Grid>
         </Grid>
