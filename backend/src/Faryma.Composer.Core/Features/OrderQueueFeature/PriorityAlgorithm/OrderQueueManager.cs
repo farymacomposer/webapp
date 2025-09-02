@@ -191,16 +191,16 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// </summary>
         private void SetLastNickname(ReviewOrder order)
         {
-            LastIssuedNickname = order.MainNickname;
+            LastIssuedNickname = order.MainNormalizedNickname;
 
             if (order.Type == ReviewOrderType.OutOfQueue)
             {
-                LastOutOfQueueNickname = order.MainNickname;
+                LastOutOfQueueNickname = order.MainNormalizedNickname;
             }
             else
             {
                 DateOnly streamDate = order.CreationStream.EventDate;
-                LastNicknameByStreamDate[streamDate] = order.MainNickname;
+                LastNicknameByStreamDate[streamDate] = order.MainNormalizedNickname;
             }
         }
 
