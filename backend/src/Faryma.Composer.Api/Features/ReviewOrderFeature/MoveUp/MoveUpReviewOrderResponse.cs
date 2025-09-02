@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Api.Shared.Dto;
 
-namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Up
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.MoveUp
 {
     /// <summary>
     /// Ответ на запрос поднятия заказа в очереди
     /// </summary>
-    public sealed record UpReviewOrderResponse
+    public sealed record MoveUpReviewOrderResponse
     {
         /// <summary>
         /// Заказ разбора трека

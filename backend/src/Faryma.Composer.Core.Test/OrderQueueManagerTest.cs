@@ -839,7 +839,7 @@ namespace Faryma.Composer.Core.Test
                 LastIssuedNickname = null,
                 LastOutOfQueueNickname = null,
                 LastNicknameByStreamDate = new Dictionary<DateOnly, string>(),
-                OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
+                OrderPositionsById = orders.ToDictionary(k => k.Id, OrderPosition.Create),
             };
         }
     }

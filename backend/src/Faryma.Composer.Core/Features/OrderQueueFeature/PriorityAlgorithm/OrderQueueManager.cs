@@ -58,8 +58,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         {
             OrderPosition position = updateType switch
             {
-                OrderQueueUpdateType.Add => AddOrder(order),
-                OrderQueueUpdateType.Cancel => RemoveOrder(order),
+                OrderQueueUpdateType.OrderCreated => AddOrder(order),
+                OrderQueueUpdateType.OrderCanceled => RemoveOrder(order),
                 _ => UpdateOrderInternal(order, updateType),
             };
 
@@ -126,11 +126,13 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
             switch (updateType)
             {
-                case OrderQueueUpdateType.AddTrackUrl:
+                case OrderQueueUpdateType.TrackUrlAdded:
 
                     return position;
 
-                case OrderQueueUpdateType.Up or OrderQueueUpdateType.Freeze or OrderQueueUpdateType.Unfreeze:
+                case OrderQueueUpdateType.OrderMovedUp
+                    or OrderQueueUpdateType.OrderFrozen
+                    or OrderQueueUpdateType.OrderUnfrozen:
 
                     SaveCurrentPositionsToPrevious();
                     UpdateActive();
@@ -139,7 +141,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
                     break;
 
-                case OrderQueueUpdateType.TakeInProgress:
+                case OrderQueueUpdateType.OrderTaken:
 
                     LastPriorityManagerState = MapCategoryState(position.PositionHistory.Current.Category.Type);
                     SetLastNickname(order);
@@ -150,7 +152,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
                     break;
 
-                case OrderQueueUpdateType.Complete:
+                case OrderQueueUpdateType.OrderCompleted:
 
                     SaveCurrentPositionsToPrevious();
                     UpdateCompleted();

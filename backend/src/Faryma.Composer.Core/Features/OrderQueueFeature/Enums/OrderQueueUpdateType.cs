@@ -11,52 +11,52 @@
         Unspecified = 0,
 
         /// <summary>
-        /// Добавление заказа
+        /// Заказ был добавлен
         /// </summary>
-        Add = 1,
+        OrderCreated = 1,
 
         /// <summary>
-        /// Поднятие заказа в очереди
+        /// Заказ был поднят в очереди
         /// </summary>
-        Up = 2,
+        OrderMovedUp = 2,
 
         /// <summary>
-        /// Добавление/изменение ссылки на трек в заказе
+        /// Была добавлена/изменена ссылка на трек в заказе
         /// </summary>
-        AddTrackUrl = 3,
+        TrackUrlAdded = 3,
 
         /// <summary>
-        /// Взятие заказа в работу
+        /// Заказ был взят в работу
         /// </summary>
-        TakeInProgress = 4,
+        OrderTaken = 4,
 
         /// <summary>
-        /// Выполнение заказа
+        /// Заказ был выполнен
         /// </summary>
-        Complete = 5,
+        OrderCompleted = 5,
 
         /// <summary>
-        /// Заморозка заказа
+        /// Заказ был заморожен
         /// </summary>
-        Freeze = 6,
+        OrderFrozen = 6,
 
         /// <summary>
-        /// Разморозка заказа
+        /// Заказ был разморожен
         /// </summary>
-        Unfreeze = 7,
+        OrderUnfrozen = 7,
 
         /// <summary>
-        /// Отмена заказа
+        /// Заказ был отменен
         /// </summary>
-        Cancel = 8,
+        OrderCanceled = 8,
 
         /// <summary>
-        /// Стрим запущен
+        /// Стрим был запущен
         /// </summary>
         StreamStarted = 9,
 
         /// <summary>
-        /// Стрим завершен
+        /// Стрим был завершен
         /// </summary>
         StreamCompleted = 10,
     }

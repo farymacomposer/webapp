@@ -6,7 +6,7 @@ using Faryma.Composer.Api.Features.ReviewOrderFeature.Create;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze;
-using Faryma.Composer.Api.Features.ReviewOrderFeature.Up;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.MoveUp;
 using Faryma.Composer.Api.Shared.Dto;
 using Faryma.Composer.Core.Features.ReviewOrderFeature;
 using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
@@ -93,11 +93,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         /// </summary>
         /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос поднятия заказа в очереди</param>
-        [HttpPost(nameof(UpReviewOrder))]
+        [HttpPost(nameof(MoveUpReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<UpReviewOrderResponse>> UpReviewOrder(
+        public async Task<ActionResult<MoveUpReviewOrderResponse>> MoveUpReviewOrder(
             [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
-            [FromBody] UpReviewOrderRequest request)
+            [FromBody] MoveUpReviewOrderRequest request)
         {
             if (idempotencyKey == Guid.Empty)
             {
@@ -105,19 +105,19 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
             }
 
             string key = $"UpReviewOrder:{idempotencyKey}";
-            if (cache.TryGetValue(key, out UpReviewOrderResponse? response))
+            if (cache.TryGetValue(key, out MoveUpReviewOrderResponse? response))
             {
                 return Ok(response);
             }
 
-            Transaction transaction = await reviewOrderService.Up(new UpCommand
+            Transaction transaction = await reviewOrderService.MoveUp(new MoveUpCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Nickname = request.Nickname.Trim(),
                 PaymentAmount = request.PaymentAmount,
             });
 
-            response = new UpReviewOrderResponse
+            response = new MoveUpReviewOrderResponse
             {
                 ReviewOrder = ReviewOrderDto.Map(transaction.ReviewOrder!),
                 PaymentTransactionId = transaction.Id

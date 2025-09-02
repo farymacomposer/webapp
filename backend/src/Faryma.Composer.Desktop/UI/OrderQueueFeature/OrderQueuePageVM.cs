@@ -13,9 +13,9 @@ using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Cancel;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Complete;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Dto;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Freeze;
+using Faryma.Composer.Desktop.Services.ReviewOrderFeature.MoveUp;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.TakeInProgress;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Unfreeze;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Up;
 using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Faryma.Composer.Infrastructure.Enums;
@@ -151,11 +151,11 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         }
 
         [RelayCommand]
-        private async Task UpReviewOrder()
+        private async Task MoveUpReviewOrder()
         {
             _ = int.TryParse(PaymentAmount, out int paymentAmount);
 
-            await reviewOrderService.Post(IdempotencyKey, new UpReviewOrderRequest
+            await reviewOrderService.Post(IdempotencyKey, new MoveUpReviewOrderRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
                 Nickname = Nickname,

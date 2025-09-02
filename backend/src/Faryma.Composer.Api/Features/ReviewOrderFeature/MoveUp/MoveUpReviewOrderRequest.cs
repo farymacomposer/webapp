@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Up
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature.MoveUp
 {
     /// <summary>
     /// Запрос поднятия заказа в очереди
     /// </summary>
-    public sealed record UpReviewOrderRequest : IValidatableObject
+    public sealed record MoveUpReviewOrderRequest : IValidatableObject
     {
         /// <summary>
         /// Псевдоним пользователя

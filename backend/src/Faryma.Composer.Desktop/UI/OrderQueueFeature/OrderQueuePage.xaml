@@ -124,7 +124,7 @@
 
                         <Button
                             HorizontalAlignment="Center"
-                            Command="{x:Bind ViewModel.UpReviewOrderCommand}"
+                            Command="{x:Bind ViewModel.MoveUpReviewOrderCommand}"
                             Content="Поднять в очереди"
                             Style="{StaticResource AccentButtonStyle}" />
                     </StackPanel>

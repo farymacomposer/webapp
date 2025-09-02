@@ -33,7 +33,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Add);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
 
             return order;
         }
@@ -55,7 +55,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Add);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
 
             return order;
         }
@@ -75,7 +75,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Add);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
 
             return order;
         }
@@ -100,12 +100,12 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Add);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
 
             return order;
         }
 
-        public async Task<Transaction> Up(UpCommand command)
+        public async Task<Transaction> MoveUp(MoveUpCommand command)
         {
             ReviewOrder order = await uow.ReviewOrderRepository.Get(command.ReviewOrderId);
 
@@ -121,7 +121,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Up);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderMovedUp);
 
             return payment;
         }
@@ -144,7 +144,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.AddTrackUrl);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.TrackUrlAdded);
 
             return order;
         }
@@ -180,7 +180,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.TakeInProgress);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderTaken);
 
             return order;
         }
@@ -206,7 +206,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Complete);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCompleted);
 
             return order;
         }
@@ -228,7 +228,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Freeze);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderFrozen);
 
             return order;
         }
@@ -250,7 +250,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Unfreeze);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderUnfrozen);
 
             return order;
         }
@@ -272,7 +272,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.Cancel);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCanceled);
 
             return order;
         }

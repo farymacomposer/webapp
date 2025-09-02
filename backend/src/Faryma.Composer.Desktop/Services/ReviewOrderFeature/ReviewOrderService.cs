@@ -4,9 +4,9 @@ using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Cancel;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Complete;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Dto;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Freeze;
+using Faryma.Composer.Desktop.Services.ReviewOrderFeature.MoveUp;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.TakeInProgress;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Unfreeze;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Up;
 using Microsoft.Extensions.Logging;
 
 namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
@@ -20,7 +20,7 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature
             string requestUri = request switch
             {
                 CreateReviewOrderRequest => "/api/ReviewOrder/CreateReviewOrder",
-                UpReviewOrderRequest => "/api/ReviewOrder/UpReviewOrder",
+                MoveUpReviewOrderRequest => "/api/ReviewOrder/MoveUpReviewOrder",
                 _ => throw new InvalidOperationException()
             };
 

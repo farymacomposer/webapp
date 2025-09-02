@@ -1,9 +1,9 @@
-﻿namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature.Up
+﻿namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature.MoveUp
 {
     /// <summary>
     /// Запрос поднятия заказа в очереди
     /// </summary>
-    public sealed record UpReviewOrderRequest
+    public sealed record MoveUpReviewOrderRequest
     {
         /// <summary>
         /// Псевдоним пользователя

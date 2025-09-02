@@ -3,7 +3,7 @@
     /// <summary>
     /// Команда поднятия заказа в очереди
     /// </summary>
-    public sealed record UpCommand
+    public sealed record MoveUpCommand
     {
         /// <summary>
         /// Id заказа разбора трека
