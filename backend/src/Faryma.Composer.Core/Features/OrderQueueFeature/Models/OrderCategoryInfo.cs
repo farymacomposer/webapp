@@ -10,11 +10,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// <summary>
         /// Тип категории заказа
         /// </summary>
-        public OrderCategoryType Type { get; init; }
+        public required OrderCategoryType Type { get; init; }
 
         /// <summary>
         /// Номер категории, если заказ относится к долговой категории
         /// </summary>
-        public int DebtNumber { get; init; }
+        public required int DebtNumber { get; init; }
     }
 }

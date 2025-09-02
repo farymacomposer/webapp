@@ -4,9 +4,9 @@ using Faryma.Composer.Api.Features.ReviewOrderFeature.Cancel;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Complete;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Create;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze;
+using Faryma.Composer.Api.Features.ReviewOrderFeature.MoveUp;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze;
-using Faryma.Composer.Api.Features.ReviewOrderFeature.MoveUp;
 using Faryma.Composer.Api.Shared.Dto;
 using Faryma.Composer.Core.Features.ReviewOrderFeature;
 using Faryma.Composer.Core.Features.ReviewOrderFeature.Commands;
@@ -104,7 +104,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 return BadRequest("Требуется заголовок Idempotency-Key");
             }
 
-            string key = $"UpReviewOrder:{idempotencyKey}";
+            string key = $"MoveUpReviewOrder:{idempotencyKey}";
             if (cache.TryGetValue(key, out MoveUpReviewOrderResponse? response))
             {
                 return Ok(response);

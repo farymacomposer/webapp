@@ -28,11 +28,19 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
                 {
                     Current = new OrderQueuePosition
                     {
-                        Category = new OrderCategoryInfo()
+                        Category = new OrderCategoryInfo
+                        {
+                            Type = OrderCategoryType.Unspecified,
+                            DebtNumber = 0
+                        }
                     },
                     Previous = new OrderQueuePosition
                     {
-                        Category = new OrderCategoryInfo()
+                        Category = new OrderCategoryInfo
+                        {
+                            Type = OrderCategoryType.Unspecified,
+                            DebtNumber = 0
+                        }
                     }
                 }
             };
