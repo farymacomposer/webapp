@@ -3,12 +3,16 @@
     x:Class="Faryma.Composer.Desktop.UI.OrderQueueFeature.ReviewOrderControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Faryma.Composer.Desktop.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Faryma.Composer.Desktop.UI.OrderQueueFeature"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sharedVM="using:Faryma.Composer.Desktop.Shared.ViewModels"
     d:DataContext="{d:DesignInstance Type=sharedVM:ReviewOrderVM}"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:HighlightConverter x:Key="HighlightConverter" />
+    </UserControl.Resources>
 
     <Grid
         Padding="6,4"
@@ -24,10 +28,15 @@
                     Command="{Binding SelectCommand}"
                     Content="{Binding Id}"
                     Style="{StaticResource AccentButtonStyle}" />
-                <TextBlock
-                    VerticalAlignment="Center"
-                    FontSize="16"
-                    Text="{Binding MainNickname}" />
+                <Border
+                    Padding="6,0"
+                    Background="{Binding MainNickname, Converter={StaticResource HighlightConverter}}"
+                    CornerRadius="4">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        Text="{Binding MainNickname}" />
+                </Border>
             </StackPanel>
             <TextBlock
                 FontSize="16"
