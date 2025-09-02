@@ -16,7 +16,6 @@
 
     <Grid
         Padding="6,4,12,4"
-        Background="#E4FFFFFF"
         BorderBrush="{ThemeResource SystemControlForegroundChromeMediumBrush}"
         BorderThickness="0,1,0,0">
 
@@ -52,12 +51,12 @@
             Orientation="Horizontal"
             Spacing="8">
 
-            <StackPanel>
+            <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="{Binding InProgressAt}" />
                 <TextBlock Text="{Binding CompletedAt}" />
             </StackPanel>
 
-            <StackPanel>
+            <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="{Binding Type}" />
                 <TextBlock Text="{Binding CategoryType}" />
                 <TextBlock Text="{Binding Status}" />
@@ -67,7 +66,10 @@
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel>
+            <StackPanel
+                Padding="6,4"
+                Background="{Binding CurrentCategoryType, Converter={StaticResource HighlightConverter}}"
+                CornerRadius="4">
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <TextBlock Foreground="{StaticResource NeutralBrush}" Text="QueueIndex:" />
                     <TextBlock Text="{Binding QueueIndex}" />
@@ -80,7 +82,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel>
+            <StackPanel VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <TextBlock Foreground="{StaticResource NeutralBrush}" Text="StreamId:" />
                     <TextBlock Text="{Binding StreamId}" />

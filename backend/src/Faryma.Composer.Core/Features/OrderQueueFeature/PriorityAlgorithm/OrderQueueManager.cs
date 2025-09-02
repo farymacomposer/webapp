@@ -89,7 +89,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
             OrderPosition[] result = OrderPositionsById
                 .Select(x => x.Value)
-                .Where(x => x.PositionHistory.IsStatusChanged || x.PositionHistory.IsPositionJumped)
+                .Where(x => x.PositionHistory.IsStatusChanged
+                    || x.PositionHistory.IsPositionJumped
+                    || orders.Contains(x.Order))
                 .ToArray();
 
             if (updateType == OrderQueueUpdateType.StreamCompleted)
