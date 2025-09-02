@@ -16,6 +16,7 @@
     <LangVersion>preview</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SignAssembly>false</SignAssembly>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,7 +48,7 @@
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.3" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
@@ -62,18 +63,18 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Page Update="UI\OrderQueue\OrderQueuePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  
+
   <ItemGroup>
     <Folder Include="Services\OrderQueueFeature\Enums\" />
     <Folder Include="Shared\Enums\" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Page Update="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml">
       <Generator>MSBuild:Compile</Generator>
