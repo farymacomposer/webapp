@@ -15,7 +15,7 @@
     </UserControl.Resources>
 
     <Grid
-        Padding="6,4"
+        Padding="6,4,12,4"
         Background="#E4FFFFFF"
         BorderBrush="{ThemeResource SystemControlForegroundChromeMediumBrush}"
         BorderThickness="0,1,0,0">
@@ -48,6 +48,7 @@
 
         <StackPanel
             HorizontalAlignment="Right"
+            VerticalAlignment="Center"
             Orientation="Horizontal"
             Spacing="8">
 
@@ -87,8 +88,6 @@
                 <TextBlock Text="{Binding StreamEventDate}" />
                 <TextBlock Text="{Binding StreamStatus}" />
                 <TextBlock Text="{Binding StreamType}" />
-                <TextBlock Text="{Binding StreamStartedAt}" />
-                <TextBlock Text="{Binding StreamCompletedAt}" />
             </StackPanel>
         </StackPanel>
     </Grid>

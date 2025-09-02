@@ -113,16 +113,6 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
         /// </summary>
         public ComposerStreamType StreamType { get; } = dto.CreationStream.Type;
 
-        /// <summary>
-        /// Дата и время начала стрима
-        /// </summary>
-        public DateTime? StreamStartedAt { get; } = dto.CreationStream.StartedAt;
-
-        /// <summary>
-        /// Дата и время завершения стрима
-        /// </summary>
-        public DateTime? StreamCompletedAt { get; } = dto.CreationStream.CompletedAt;
-
         [RelayCommand]
         private void Select() => App.GetService<OrderQueuePageVM>().SelectedOrder = this;
     }
