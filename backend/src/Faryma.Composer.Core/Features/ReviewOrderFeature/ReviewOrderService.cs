@@ -268,11 +268,12 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
                 throw new ReviewOrderException("Невозможно отменить заказ", order);
             }
 
+            ReviewOrderStatus lastStatus = order.Status;
             order.Status = ReviewOrderStatus.Canceled;
 
             await uow.SaveChangesAsync();
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCanceled);
+            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCanceled, lastStatus);
 
             return order;
         }

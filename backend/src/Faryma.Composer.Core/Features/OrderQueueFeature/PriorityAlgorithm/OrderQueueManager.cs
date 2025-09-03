@@ -227,7 +227,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// <summary>
         ///
         /// </summary>
-        private void SetLastNickname(ReviewOrder order)
+        public void SetLastNickname(ReviewOrder order)
         {
             LastIssuedNickname = order.MainNormalizedNickname;
 

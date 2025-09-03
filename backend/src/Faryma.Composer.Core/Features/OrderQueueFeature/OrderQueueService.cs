@@ -5,6 +5,7 @@ using Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm;
 using Faryma.Composer.Core.Utils;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -62,13 +63,24 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 .ToArray(),
         });
 
-        public Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType) => _locker.Lock(async () =>
+        public Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType, ReviewOrderStatus lastStatus = ReviewOrderStatus.Unspecified) => _locker.Lock(async () =>
         {
             _syncVersion++;
 
             if (updateType == OrderQueueUpdateType.OrderCreated && _queueManager.NearestStreamDate == default)
             {
                 _queueManager.NearestStreamDate = order.CreationStream.EventDate;
+            }
+
+            if (updateType == OrderQueueUpdateType.OrderCanceled && lastStatus == ReviewOrderStatus.InProgress)
+            {
+                await using AppDbContext context = await contextFactory.CreateDbContextAsync();
+                ReviewOrderRepository reviewOrderRepository = new(context);
+                ReviewOrder? last = await reviewOrderRepository.FindLastCompleted();
+                if (last is not null)
+                {
+                    _queueManager.SetLastNickname(last);
+                }
             }
 
             OrderQueue orderQueue = new()

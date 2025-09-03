@@ -88,6 +88,17 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 InProgressOrder = new ReviewOrderVM(response.InProgressOrder.Order, response.InProgressOrder.CurrentPosition);
             }
 
+            if (ActiveOrders.Count > 0)
+            {
+                foreach (OrderPositionDto item in response.ActiveOrders)
+                {
+                    if (ActiveOrders[item.CurrentPosition.QueueIndex].Id != item.Order.Id)
+                    {
+                        throw new InvalidOperationException("Нарушена очередность");
+                    }
+                }
+            }
+
             Update(response.ActiveOrders, ActiveOrders);
             Update(response.CompletedOrders, CompletedOrders);
             Update(response.ScheduledOrders, ScheduledOrders);

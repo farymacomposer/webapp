@@ -58,7 +58,9 @@ namespace Faryma.Composer.Infrastructure.Repositories
             .Where(x => x.Status == ReviewOrderStatus.Preorder
                 || x.Status == ReviewOrderStatus.Pending
                 || x.Status == ReviewOrderStatus.InProgress
-                || (x.ProcessingStream != null && x.ProcessingStream.Status == ComposerStreamStatus.Live))
+                || (x.ProcessingStream != null
+                    && x.ProcessingStream.Status == ComposerStreamStatus.Live
+                    && x.Status == ReviewOrderStatus.Completed))
             .ToArrayAsync();
 
         public ReviewOrder CreateDonation(
