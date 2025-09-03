@@ -21,6 +21,19 @@ namespace Faryma.Composer.Infrastructure.Repositories
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress);
 
+        public Task<ReviewOrder?> FindLastCompleted() => context.ReviewOrders
+            .AsNoTracking()
+            .Where(x => x.Status == ReviewOrderStatus.InProgress || x.Status == ReviewOrderStatus.Completed)
+            .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
+            .LastOrDefaultAsync();
+
+        public Task<string?> FindLastOutOfQueueNickname() => context.ReviewOrders
+            .Where(x => x.Type == ReviewOrderType.OutOfQueue
+                && (x.Status == ReviewOrderStatus.InProgress || x.Status == ReviewOrderStatus.Completed))
+            .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
+            .Select(x => x.MainNormalizedNickname)
+            .LastOrDefaultAsync();
+
         public Task<ReviewOrder[]> GetOrdersToStartStream(long creationStreamId) => context.ReviewOrders
             .AsNoTracking()
             .Include(x => x.CreationStream)
@@ -35,6 +48,17 @@ namespace Faryma.Composer.Infrastructure.Repositories
             .Include(x => x.ProcessingStream)
             .Include(x => x.Payments)
             .Where(x => x.CreationStreamId == creationStreamId && x.Status == ReviewOrderStatus.Completed)
+            .ToArrayAsync();
+
+        public Task<ReviewOrder[]> GetOrdersInQueue() => context.ReviewOrders
+            .AsNoTracking()
+            .Include(x => x.CreationStream)
+            .Include(x => x.ProcessingStream)
+            .Include(x => x.Payments)
+            .Where(x => x.Status == ReviewOrderStatus.Preorder
+                || x.Status == ReviewOrderStatus.Pending
+                || x.Status == ReviewOrderStatus.InProgress
+                || (x.ProcessingStream != null && x.ProcessingStream.Status == ComposerStreamStatus.Live))
             .ToArrayAsync();
 
         public ReviewOrder CreateDonation(

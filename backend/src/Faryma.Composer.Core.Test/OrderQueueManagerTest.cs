@@ -799,7 +799,7 @@ namespace Faryma.Composer.Core.Test
                 LastPriorityManagerState = CategoryState.Initial,
                 LastIssuedNickname = null,
                 LastOutOfQueueNickname = null,
-                LastNicknameByStreamDate = new Dictionary<DateOnly, string>(),
+                LastNicknamesByStreamDate = new Dictionary<DateOnly, string>(),
                 OrderPositionsById = orders.ToDictionary(k => k.Id, OrderPosition.Create),
             };
         }

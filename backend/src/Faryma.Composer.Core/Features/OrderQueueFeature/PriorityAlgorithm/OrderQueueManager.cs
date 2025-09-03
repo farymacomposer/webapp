@@ -33,7 +33,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// <summary>
         /// Последний никнейм в донатной и долговых категориях (по дате стрима)
         /// </summary>
-        public required Dictionary<DateOnly, string> LastNicknameByStreamDate { get; init; }
+        public required Dictionary<DateOnly, string> LastNicknamesByStreamDate { get; init; }
 
         /// <summary>
         /// Заказы и их позиции в очереди
@@ -67,10 +67,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdateFrozen();
         }
 
-        /// <summary>
-        /// Обновляет заказы
-        /// </summary>
-        public OrderPosition[] UpdateOrders(ReviewOrder[] orders, OrderQueueUpdateType updateType)
+        public OrderPosition[] StartStream(ReviewOrder[] orders)
         {
             foreach (ReviewOrder order in orders)
             {
@@ -82,10 +79,28 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdateScheduled();
             UpdateFrozen();
 
-            if (updateType == OrderQueueUpdateType.StreamCompleted)
+            OrderPosition[] result = OrderPositionsById
+                .Select(x => x.Value)
+                .Where(x => x.PositionHistory.IsStatusChanged
+                    || x.PositionHistory.IsPositionJumped
+                    || orders.Contains(x.Order))
+                .ToArray();
+
+            return result;
+        }
+
+        public OrderPosition[] CompleteStream(ReviewOrder[] orders)
+        {
+            foreach (ReviewOrder order in orders)
             {
-                UpdateRemoved();
+                OrderPositionsById[order.Id].Order = order;
             }
+
+            SaveCurrentPositionsToPrevious();
+            UpdateActive();
+            UpdateScheduled();
+            UpdateFrozen();
+            UpdateRemoved();
 
             OrderPosition[] result = OrderPositionsById
                 .Select(x => x.Value)
@@ -94,12 +109,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                     || orders.Contains(x.Order))
                 .ToArray();
 
-            if (updateType == OrderQueueUpdateType.StreamCompleted)
+            foreach (ReviewOrder order in orders)
             {
-                foreach (ReviewOrder order in orders)
-                {
-                    OrderPositionsById.Remove(order.Id);
-                }
+                OrderPositionsById.Remove(order.Id);
             }
 
             return result;
@@ -226,7 +238,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             else
             {
                 DateOnly streamDate = order.CreationStream.EventDate;
-                LastNicknameByStreamDate[streamDate] = order.MainNormalizedNickname;
+                LastNicknamesByStreamDate[streamDate] = order.MainNormalizedNickname;
             }
         }
 

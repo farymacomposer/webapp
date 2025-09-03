@@ -14,7 +14,10 @@ namespace Faryma.Composer.Core.Features.AppSettings
         public async Task Initialize()
         {
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            Settings = await context.AppSettings.SingleAsync();
+
+            Settings = await context.AppSettings
+                .AsNoTracking()
+                .SingleAsync();
         }
 
         public async Task<AppSettingsEntity> Update(AppSettingsModel item)
