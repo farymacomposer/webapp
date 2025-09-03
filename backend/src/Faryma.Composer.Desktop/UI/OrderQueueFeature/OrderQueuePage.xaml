@@ -318,7 +318,10 @@
                             Style="{StaticResource AccentButtonStyle}" />
                     </StackPanel>
 
-                    <Border Grid.Column="2" Background="White">
+                    <Border
+                        Grid.Column="2"
+                        Height="100"
+                        Background="White">
                         <local:ReviewOrderControl DataContext="{x:Bind ViewModel.OrderQueueService.InProgressOrder, Mode=OneWay}" />
                     </Border>
                 </Grid>

@@ -31,9 +31,10 @@
                     Padding="6,0"
                     Background="{Binding MainNickname, Converter={StaticResource HighlightConverter}}"
                     CornerRadius="4">
-                    <TextBlock
+                    <TextBox
                         VerticalAlignment="Center"
                         FontSize="16"
+                        IsReadOnly="True"
                         Text="{Binding MainNickname}" />
                 </Border>
             </StackPanel>
