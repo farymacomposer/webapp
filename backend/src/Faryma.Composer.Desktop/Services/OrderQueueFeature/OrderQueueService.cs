@@ -114,7 +114,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 {
                     foreach (OrderPositionDto item in message.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
                     {
-                        RemoveOrder(item.PreviousPosition);
+                        RemoveOrder(item.Order, item.PreviousPosition);
                     }
 
                     foreach (OrderPositionDto item in message.OrderPositions.OrderBy(x => x.CurrentPosition.QueueIndex))
@@ -125,7 +125,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             });
         }
 
-        private void RemoveOrder(OrderQueuePositionDto position)
+        private void RemoveOrder(ReviewOrderDto order, OrderQueuePositionDto position)
         {
             if (position.ActivityStatus == OrderActivityStatus.Unspecified)
             {
@@ -140,6 +140,12 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
 
             ObservableCollection<ReviewOrderVM> list = GetOrdersList(position.ActivityStatus);
+
+            if (list[position.QueueIndex].Id != order.Id)
+            {
+                throw new InvalidOperationException("Нарушена очередность");
+            }
+
             list.RemoveAt(position.QueueIndex);
         }
 

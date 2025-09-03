@@ -12,6 +12,7 @@ namespace Faryma.Composer.Infrastructure.Repositories
 
         public Task<ReviewOrder?> Find(long id) => context.ReviewOrders
             .Include(x => x.CreationStream)
+            .Include(x => x.ProcessingStream)
             .Include(x => x.Payments)
             .Include(x => x.Review)
             .FirstOrDefaultAsync(x => x.Id == id);
