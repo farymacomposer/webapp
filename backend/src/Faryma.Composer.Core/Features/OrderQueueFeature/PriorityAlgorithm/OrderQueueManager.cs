@@ -181,9 +181,32 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                     throw new OrderQueueException($"Тип обновления очереди '{updateType}' не поддерживается");
             }
 
+            OrderPosition[] active = OrderPositionsById
+                .Select(x => x.Value)
+                .Where(x => x.PositionHistory.Current.ActivityStatus == OrderActivityStatus.Active)
+                .OrderBy(x => x.PositionHistory.Current.QueueIndex)
+                .ToArray();
+
+            List<OrderPosition> swaps = [];
+
+            for (int i = 0; i < active.Length - 1; i++)
+            {
+                OrderPosition current = active[i];
+                OrderPosition next = active[i + 1];
+
+                if (current.PositionHistory.Previous.QueueIndex == next.PositionHistory.Current.QueueIndex
+                    && current.PositionHistory.Current.QueueIndex == next.PositionHistory.Previous.QueueIndex)
+                {
+                    swaps.Add(current);
+                    swaps.Add(next);
+                    i++;
+                }
+            }
+
             return OrderPositionsById
                 .Select(x => x.Value)
                 .Where(x => x.PositionHistory.IsStatusChanged || x.PositionHistory.IsPositionJumped)
+                .Concat(swaps)
                 .Append(position)
                 .DistinctBy(x => x.Order.Id)
                 .ToArray();
