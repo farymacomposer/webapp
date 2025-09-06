@@ -47,9 +47,9 @@ namespace Faryma.Composer.Infrastructure.Repositories
             .Include(x => x.CreationStream)
             .Include(x => x.ProcessingStream)
             .Include(x => x.Payments)
-            .Where(x => x.CreationStreamId == completedStreamId
+            .Where(x => (x.CreationStreamId == completedStreamId
                 && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
-            .Where(x => x.ProcessingStreamId == completedStreamId && x.Status == ReviewOrderStatus.Completed)
+                || (x.ProcessingStreamId == completedStreamId && x.Status == ReviewOrderStatus.Completed))
             .ToArrayAsync();
 
         public Task<ReviewOrder[]> GetOrdersInQueue() => context.ReviewOrders
