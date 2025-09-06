@@ -14,7 +14,7 @@ namespace Faryma.Composer.Infrastructure
                 .Build();
 
             DbContextOptionsBuilder<AppDbContext> optionsBuilder = new();
-            optionsBuilder.UseNpgsql(ConnectionStringHelper.Get(configuration), x => x.MigrationsHistoryTable("__EFMigrationsHistory", "app"));
+            optionsBuilder.UseNpgsql(ConnectionStringHelper.Get(configuration), o => o.MigrationsHistoryTable("__EFMigrationsHistory", "app"));
 
             return new AppDbContext(optionsBuilder.Options);
         }

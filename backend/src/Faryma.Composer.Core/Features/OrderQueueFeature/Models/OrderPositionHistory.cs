@@ -8,12 +8,19 @@
         /// <summary>
         /// Предыдущая позиция заказа в очереди
         /// </summary>
-        public OrderQueuePosition Previous { get; init; } = new();
+        public required OrderQueuePosition Previous { get; init; }
 
         /// <summary>
         /// Текущая позиция заказа в очереди
         /// </summary>
-        public OrderQueuePosition Current { get; init; } = new();
+        public required OrderQueuePosition Current { get; init; }
+
+        /// <summary>
+        /// Позиция заказа в очереди была изменена
+        /// </summary>
+        public bool IsPositionChanged => Previous.ActivityStatus != Current.ActivityStatus
+            || Previous.QueueIndex != Current.QueueIndex
+            || Previous.Category != Current.Category;
 
         public OrderPositionHistory Clone()
         {

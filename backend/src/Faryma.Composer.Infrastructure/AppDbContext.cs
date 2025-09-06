@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -77,6 +78,13 @@ namespace Faryma.Composer.Infrastructure
             builder.HasDefaultSchema("app");
             base.OnModelCreating(builder);
 
+            builder.HasPostgresEnum<ComposerStreamStatus>();
+            builder.HasPostgresEnum<ComposerStreamType>();
+            builder.HasPostgresEnum<OrderCategoryType>();
+            builder.HasPostgresEnum<ReviewOrderStatus>();
+            builder.HasPostgresEnum<ReviewOrderType>();
+            builder.HasPostgresEnum<TransactionType>();
+
             builder.Entity<ComposerStream>()
                 .HasMany(cs => cs.CreatedReviewOrders)
                 .WithOne(ro => ro.CreationStream)
@@ -116,13 +124,11 @@ namespace Faryma.Composer.Infrastructure
                 }
             );
 
-            builder.Entity<AppSettingsEntity>().HasData(
-                new AppSettingsEntity
-                {
-                    Id = 1,
-                    ReviewOrderNominalAmount = 750,
-                }
-            );
+            builder.Entity<AppSettingsEntity>().HasData(new AppSettingsEntity
+            {
+                Id = 1,
+                ReviewOrderNominalAmount = 750,
+            });
 
             builder.Entity<TrackGenre>().HasData(
                 new TrackGenre { Id = 1, Name = "электронное" },

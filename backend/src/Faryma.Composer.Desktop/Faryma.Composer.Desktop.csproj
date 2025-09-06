@@ -1,0 +1,100 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <RootNamespace>Faryma.Composer.Desktop</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <Nullable>enable</Nullable>
+    <UseRidGraph>true</UseRidGraph>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>preview</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SignAssembly>false</SignAssembly>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml" />
+    <None Remove="UI\OrderQueueFeature\OrderQueuePage.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\CategoryState.cs" Link="Services\OrderQueueFeature\Enums\CategoryState.cs" />
+    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderActivityStatus.cs" Link="Services\OrderQueueFeature\Enums\OrderActivityStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" Link="Services\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamStatus.cs" Link="Shared\Enums\ComposerStreamStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamType.cs" Link="Shared\Enums\ComposerStreamType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\OrderCategoryType.cs" Link="Shared\Enums\OrderCategoryType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderStatus.cs" Link="Shared\Enums\ReviewOrderStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderType.cs" Link="Shared\Enums\ReviewOrderType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\TransactionType.cs" Link="Shared\Enums\TransactionType.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <!--
+    Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+    Tools extension to be activated for this project even if the Windows App SDK Nuget
+    package has not yet been restored.
+  -->
+  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <ProjectCapability Include="Msix" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bogus" Version="35.6.3" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.250402" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\OrderQueue\OrderQueuePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\OrderQueueFeature\Enums\" />
+    <Folder Include="Shared\Enums\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <!--
+    Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
+    Explorer "Package and Publish" context menu entry to be enabled for this project even if
+    the Windows App SDK Nuget package has not yet been restored.
+  -->
+  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+  </PropertyGroup>
+
+  <!-- Publish Properties -->
+  <PropertyGroup>
+    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
+    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+  </PropertyGroup>
+</Project>

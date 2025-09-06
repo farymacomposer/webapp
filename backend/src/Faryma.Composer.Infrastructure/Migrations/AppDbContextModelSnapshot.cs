@@ -22,6 +22,12 @@ namespace Faryma.Composer.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "composer_stream_status", new[] { "unspecified", "planned", "live", "completed", "canceled" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "composer_stream_type", new[] { "unspecified", "donation", "debt", "charity" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "order_category_type", new[] { "unspecified", "out_of_queue", "donation", "debt" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "review_order_status", new[] { "unspecified", "preorder", "pending", "in_progress", "completed", "canceled" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "review_order_type", new[] { "unspecified", "out_of_queue", "donation", "free", "charity", "custom" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "transaction_type", new[] { "unspecified", "deposit", "payment" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.AppSettingsEntity", b =>
@@ -61,14 +67,14 @@ namespace Faryma.Composer.Infrastructure.Migrations
                     b.Property<DateOnly>("EventDate")
                         .HasColumnType("date");
 
+                    b.Property<DateTime?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("WentLiveAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

@@ -7,21 +7,21 @@ namespace Faryma.Composer.Api.Auth.Options
         [ConfigurationKeyName("ISSUER")]
         [Required]
         [Url]
-        public required string Issuer { get; set; }
+        public required string Issuer { get; init; }
 
         [ConfigurationKeyName("AUDIENCE")]
         [Required]
         [Url]
-        public required string Audience { get; set; }
+        public required string Audience { get; init; }
 
         [ConfigurationKeyName("SECRET_KEY")]
         [Required]
         [MinLength(36)]
-        public required string SecretKey { get; set; }
+        public required string SecretKey { get; init; }
 
         [ConfigurationKeyName("EXPIRY_IN_MINUTES")]
         [Required]
         [Range(1, 1440)]
-        public required int ExpiryInMinutes { get; set; }
+        public required int ExpiryInMinutes { get; init; }
     }
 }

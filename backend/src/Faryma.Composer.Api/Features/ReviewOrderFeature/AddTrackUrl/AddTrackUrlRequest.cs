@@ -10,13 +10,13 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.AddTrackUrl
         /// <summary>
         /// Id заказа разбора трека
         /// </summary>
-        public required long ReviewOrderId { get; set; }
+        public required long ReviewOrderId { get; init; }
 
         /// <summary>
         /// Ссылка на трек
         /// </summary>
         [Required]
         [Url(ErrorMessage = "Некорректная ссылка на трек")]
-        public required string TrackUrl { get; set; }
+        public required string TrackUrl { get; init; }
     }
 }

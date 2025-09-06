@@ -31,7 +31,7 @@ namespace Faryma.Composer.Api.Shared.Dto
         /// <summary>
         /// Дата и время начала стрима
         /// </summary>
-        public required DateTime? WentLiveAt { get; init; }
+        public required DateTime? StartedAt { get; init; }
 
         /// <summary>
         /// Дата и время завершения стрима
@@ -46,7 +46,7 @@ namespace Faryma.Composer.Api.Shared.Dto
                 EventDate = item.EventDate,
                 Status = item.Status,
                 Type = item.Type,
-                WentLiveAt = item.WentLiveAt,
+                StartedAt = item.StartedAt,
                 CompletedAt = item.CompletedAt,
             };
         }

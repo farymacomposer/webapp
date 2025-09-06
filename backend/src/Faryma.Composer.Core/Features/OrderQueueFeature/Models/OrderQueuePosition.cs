@@ -20,7 +20,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// <summary>
         /// Категория заказа
         /// </summary>
-        public OrderCategoryInfo Category { get; set; } = new();
+        public required OrderCategoryInfo Category { get; set; }
 
         /// <summary>
         /// Копирует состояние из другой позиции в текущую

@@ -322,8 +322,8 @@ namespace Faryma.Composer.Core.Test
                 GetDonation("08.01.2000", 11, "Nick6", 800), // долг x2
                 GetDonation("08.01.2000", 12, "Nick7", 700), // долг x2
 
-                GetDonation("07.01.2000", 13, "Nick8", 900), // долг x3
-                GetDonation("07.01.2000", 14, "Nick9", 800), // долг x3
+                GetDonation("07.01.2000", 13, "Nick8",  900), // долг x3
+                GetDonation("07.01.2000", 14, "Nick9",  800), // долг x3
                 GetDonation("07.01.2000", 15, "Nick10", 700), // долг x3
             ];
 
@@ -332,20 +332,20 @@ namespace Faryma.Composer.Core.Test
 
             Check([
                 (1,  "Nick1"),
-                (13, "Nick8"), // долг x3
+                (13, "Nick8"),  // долг x3
                 (2,  "Nick1"),
-                (10, "Nick5"), // долг x2
+                (10, "Nick5"),  // долг x2
                 (3,  "Nick1"),
-                (7,  "Nick2"), // долг x1
+                (7,  "Nick2"),  // долг x1
                 (4,  "Nick1"),
-                (14, "Nick9"), // долг x3
+                (14, "Nick9"),  // долг x3
                 (5,  "Nick1"),
-                (11, "Nick6"), // долг x2
+                (11, "Nick6"),  // долг x2
                 (6,  "Nick1"),
-                (8,  "Nick3"), // долг x1
+                (8,  "Nick3"),  // долг x1
                 (15, "Nick10"), // долг x3
-                (12, "Nick7"), // долг x2
-                (9,  "Nick4"), // долг x1
+                (12, "Nick7"),  // долг x2
+                (9,  "Nick4"),  // долг x1
             ], queueManager);
         }
 
@@ -635,8 +635,8 @@ namespace Faryma.Composer.Core.Test
                 GetDonation("08.01.2000", 11, "Nick6", 800), // долг x2
                 GetDonation("08.01.2000", 12, "Nick7", 700), // долг x2
 
-                GetDonation("07.01.2000", 13, "Nick8", 900), // долг x3
-                GetDonation("07.01.2000", 14, "Nick9", 800), // долг x3
+                GetDonation("07.01.2000", 13, "Nick8",  900), // долг x3
+                GetDonation("07.01.2000", 14, "Nick9",  800), // долг x3
                 GetDonation("07.01.2000", 15, "Nick10", 700), // долг x3
             ];
 
@@ -740,24 +740,83 @@ namespace Faryma.Composer.Core.Test
             queueManager.UpdateAllPositions();
 
             Check([
-                (0, 4, OrderActivityStatus.Scheduled,    "Nick1"),
-                (1, 5, OrderActivityStatus.Scheduled,    "Nick1"),
-                (2, 6, OrderActivityStatus.Scheduled,    "Nick2"),
+                (0, 4, OrderActivityStatus.Scheduled, "Nick1"),
+                (1, 5, OrderActivityStatus.Scheduled, "Nick1"),
+                (2, 6, OrderActivityStatus.Scheduled, "Nick2"),
 
-                (0, 1, OrderActivityStatus.Active,    "Nick1"),
-                (1, 3, OrderActivityStatus.Active,    "Nick2"),
-                (2, 2, OrderActivityStatus.Active,    "Nick1"),
-                (3, 11, OrderActivityStatus.Active,   "Nick2"), // долг x2
-                (4, 9, OrderActivityStatus.Active,    "Nick6"), // долг x1
-                (5, 10, OrderActivityStatus.Active,   "Nick1"), // долг x2
-                (6, 7, OrderActivityStatus.Active,    "Nick2"), // долг x1
-                (7, 12, OrderActivityStatus.Active,   "Nick9"), // долг x2
-                (8, 8, OrderActivityStatus.Active,    "Nick2"), // долг x1
+                (0, 1, OrderActivityStatus.Active,  "Nick1"),
+                (1, 3, OrderActivityStatus.Active,  "Nick2"),
+                (2, 2, OrderActivityStatus.Active,  "Nick1"),
+                (3, 11, OrderActivityStatus.Active, "Nick2"), // долг x2
+                (4, 9, OrderActivityStatus.Active,  "Nick6"), // долг x1
+                (5, 10, OrderActivityStatus.Active, "Nick1"), // долг x2
+                (6, 7, OrderActivityStatus.Active,  "Nick2"), // долг x1
+                (7, 12, OrderActivityStatus.Active, "Nick9"), // долг x2
+                (8, 8, OrderActivityStatus.Active,  "Nick2"), // долг x1
 
                 (0, 13, OrderActivityStatus.Frozen, "Nick2"),
                 (1, 14, OrderActivityStatus.Frozen, "Nick2"),
                 (2, 15, OrderActivityStatus.Frozen, "Nick9"),
             ], queueManager);
+        }
+
+        [Fact]
+        public void TakeOrderOutOfTurn()
+        {
+            ReviewOrder order1 = GetDonation("10.01.2000", 1, "Nick1", 1000);
+            ReviewOrder order2 = GetDonation("10.01.2000", 2, "Nick2", 1000);
+            ReviewOrder order3 = GetDonation("10.01.2000", 3, "Nick1", 1000);
+            ReviewOrder order4 = GetDonation("10.01.2000", 4, "Nick2", 1000);
+
+            OrderQueueManager queueManager = GetManager(Array.Empty<ReviewOrder>(), "10.01.2000");
+
+            Create(queueManager, order1);
+            Create(queueManager, order2);
+            Create(queueManager, order3);
+            Create(queueManager, order4);
+            TakeInProgress(queueManager, order2);
+            Complete(queueManager, order2);
+            TakeInProgress(queueManager, order1);
+
+            Check([
+                (0, 2, OrderActivityStatus.Completed, "Nick2"),
+
+                (0, 1, OrderActivityStatus.InProgress, "Nick1"),
+
+                (0, 4, OrderActivityStatus.Active, "Nick2"),
+                (1, 3, OrderActivityStatus.Active, "Nick1"),
+            ], queueManager);
+        }
+
+        private static OrderQueueManager GetManager(ReviewOrder[] orders, string currentStreamDate)
+        {
+            return new()
+            {
+                NearestStreamDate = DateOnly.Parse(currentStreamDate, CultureInfo.GetCultureInfo("ru-RU")),
+                LastPriorityManagerState = CategoryState.Initial,
+                LastIssuedNickname = null,
+                LastOutOfQueueNickname = null,
+                LastNicknamesByStreamDate = new Dictionary<DateOnly, string>(),
+                OrderPositionsById = orders.ToDictionary(k => k.Id, OrderPosition.Create),
+            };
+        }
+
+        private static void Create(OrderQueueManager queueManager, ReviewOrder order) => queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
+
+        private static void TakeInProgress(OrderQueueManager queueManager, ReviewOrder order)
+        {
+            OrderQueuePosition position = queueManager.GetCurrentQueuePosition(order);
+
+            order.CategoryType = position.Category.Type;
+            order.Status = ReviewOrderStatus.InProgress;
+
+            queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderTaken);
+        }
+
+        private static void Complete(OrderQueueManager queueManager, ReviewOrder order)
+        {
+            order.Status = ReviewOrderStatus.Completed;
+            queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCompleted);
         }
 
         private void Check((long id, string nick)[] values, OrderQueueManager queueManager)
@@ -770,6 +829,7 @@ namespace Faryma.Composer.Core.Test
                 Assert.Equal(
                     (index, id, _normalizer.NormalizeName(nick)),
                     (item.PositionHistory.Current.QueueIndex, id, item.Order.MainNormalizedNickname));
+
                 index++;
             }
         }
@@ -803,7 +863,7 @@ namespace Faryma.Composer.Core.Test
                 {
                     EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,
-                    Status = ComposerStreamStatus.Planned,
+                    Status = ComposerStreamStatus.Live,
                 }
             };
         }
@@ -825,21 +885,8 @@ namespace Faryma.Composer.Core.Test
                 {
                     EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,
-                    Status = ComposerStreamStatus.Planned,
+                    Status = ComposerStreamStatus.Live,
                 }
-            };
-        }
-
-        private OrderQueueManager GetManager(ReviewOrder[] orders, string currentStreamDate)
-        {
-            return new()
-            {
-                NearestStreamDate = DateOnly.Parse(currentStreamDate, CultureInfo.GetCultureInfo("ru-RU")),
-                LastPriorityManagerState = CategoryState.Initial,
-                LastIssuedNickname = null,
-                LastOutOfQueueNickname = null,
-                LastNicknameByStreamDate = new Dictionary<DateOnly, string>(),
-                OrderPositionsById = orders.ToDictionary(k => k.Id, v => new OrderPosition { Order = v }),
             };
         }
     }

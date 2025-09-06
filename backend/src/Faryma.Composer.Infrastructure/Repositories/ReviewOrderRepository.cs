@@ -12,19 +12,58 @@ namespace Faryma.Composer.Infrastructure.Repositories
 
         public Task<ReviewOrder?> Find(long id) => context.ReviewOrders
             .Include(x => x.CreationStream)
+            .Include(x => x.ProcessingStream)
             .Include(x => x.Payments)
+            .Include(x => x.Review)
             .FirstOrDefaultAsync(x => x.Id == id);
 
-        public Task<ReviewOrder[]> GetOrdersForStream(long creationStreamId) => context.ReviewOrders
+        public Task<ReviewOrder?> FindInProgress() => context.ReviewOrders
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress);
+
+        public Task<ReviewOrder?> FindLastCompleted() => context.ReviewOrders
+            .AsNoTracking()
+            .Where(x => x.Status == ReviewOrderStatus.InProgress || x.Status == ReviewOrderStatus.Completed)
+            .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
+            .LastOrDefaultAsync();
+
+        public Task<string?> FindLastOutOfQueueNickname() => context.ReviewOrders
+            .Where(x => x.Type == ReviewOrderType.OutOfQueue
+                && (x.Status == ReviewOrderStatus.InProgress || x.Status == ReviewOrderStatus.Completed))
+            .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
+            .Select(x => x.MainNormalizedNickname)
+            .LastOrDefaultAsync();
+
+        public Task<ReviewOrder[]> GetOrdersToStartStream(long startedStreamId) => context.ReviewOrders
             .AsNoTracking()
             .Include(x => x.CreationStream)
             .Include(x => x.Payments)
-            .Where(x => x.CreationStreamId == creationStreamId)
+            .Where(x => x.CreationStreamId == startedStreamId
+                && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
             .ToArrayAsync();
 
-        public Task<ReviewOrder?> FindAnotherOrderInProgress(long id) => context.ReviewOrders
+        public Task<ReviewOrder[]> GetOrdersToCompleteStream(long completedStreamId) => context.ReviewOrders
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id != id && x.Status == ReviewOrderStatus.InProgress);
+            .Include(x => x.CreationStream)
+            .Include(x => x.ProcessingStream)
+            .Include(x => x.Payments)
+            .Where(x => (x.CreationStreamId == completedStreamId
+                && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
+                || (x.ProcessingStreamId == completedStreamId && x.Status == ReviewOrderStatus.Completed))
+            .ToArrayAsync();
+
+        public Task<ReviewOrder[]> GetOrdersInQueue() => context.ReviewOrders
+            .AsNoTracking()
+            .Include(x => x.CreationStream)
+            .Include(x => x.ProcessingStream)
+            .Include(x => x.Payments)
+            .Where(x => x.Status == ReviewOrderStatus.Preorder
+                || x.Status == ReviewOrderStatus.Pending
+                || x.Status == ReviewOrderStatus.InProgress
+                || (x.ProcessingStream != null
+                    && x.ProcessingStream.Status == ComposerStreamStatus.Live
+                    && x.Status == ReviewOrderStatus.Completed))
+            .ToArrayAsync();
 
         public ReviewOrder CreateDonation(
             ComposerStream stream,

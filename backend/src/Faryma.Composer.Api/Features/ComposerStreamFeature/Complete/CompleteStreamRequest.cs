@@ -8,6 +8,6 @@
         /// <summary>
         /// Id стрима
         /// </summary>
-        public required long ComposerStreamId { get; set; }
+        public required long ComposerStreamId { get; init; }
     }
 }

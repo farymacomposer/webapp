@@ -65,7 +65,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             {
                 foreach ((DateOnly streamDate, OrderCategory category) in categories)
                 {
-                    if (queueManager.LastNicknameByStreamDate.TryGetValue(streamDate, out string? nickname))
+                    if (queueManager.LastNicknamesByStreamDate.TryGetValue(streamDate, out string? nickname))
                     {
                         category.SetLastIssuedNickname(nickname);
                     }

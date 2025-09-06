@@ -32,11 +32,21 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 .ToArrayAsync();
         }
 
-        public Task<ComposerStream?> FindNearest(DateOnly today)
+        public Task<ComposerStream?> FindNearest(DateOnly date)
         {
             return context.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live
-                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
+                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= date))
+                .OrderBy(x => x.EventDate)
+                .FirstOrDefaultAsync();
+        }
+
+        public Task<ComposerStream?> FindNearest(DateOnly date, ComposerStreamType type)
+        {
+            return context.ComposerStreams
+                .Where(x => x.Type == type
+                    && x.EventDate >= date
+                    && (x.Status == ComposerStreamStatus.Planned || x.Status == ComposerStreamStatus.Live))
                 .OrderBy(x => x.EventDate)
                 .FirstOrDefaultAsync();
         }
@@ -50,5 +60,17 @@ namespace Faryma.Composer.Infrastructure.Repositories
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
                 .ToArrayAsync();
         }
+
+        public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate() => context.ComposerStreams
+            .Where(x => x.ProcessedReviewOrders.Any(x => x.Type != ReviewOrderType.OutOfQueue)
+                && x.CreatedReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
+            .Select(x => new
+            {
+                x.EventDate,
+                x.ProcessedReviewOrders.Where(x => x.Type != ReviewOrderType.OutOfQueue)
+                    .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
+                    .Last().MainNormalizedNickname
+            })
+            .ToDictionaryAsync(k => k.EventDate, v => v.MainNormalizedNickname);
     }
 }

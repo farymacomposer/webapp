@@ -3,7 +3,7 @@ using Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Complete;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Create;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Find;
-using Faryma.Composer.Api.Features.ComposerStreamFeature.GetCurrentAndScheduled;
+using Faryma.Composer.Api.Features.ComposerStreamFeature.FindCurrentAndScheduled;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Start;
 using Faryma.Composer.Api.Shared.Dto;
 using Faryma.Composer.Core.Features.ComposerStreamFeature;
@@ -24,11 +24,11 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         /// Возвращает список стримов
         /// </summary>
         [HttpGet(nameof(FindStreams))]
-        public async Task<ActionResult<FindComposerStreamResponse>> FindStreams([FromQuery] FindComposerStreamRequest request)
+        public async Task<ActionResult<FindStreamsResponse>> FindStreams([FromQuery] FindStreamsRequest request)
         {
             ComposerStream[] streams = await composerStreamService.Find(request.DateFrom, request.DateTo);
 
-            return Ok(new FindComposerStreamResponse
+            return Ok(new FindStreamsResponse
             {
                 Streams = streams.Select(ComposerStreamDto.Map)
             });
@@ -53,7 +53,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         /// </summary>
         [HttpPost(nameof(CreateStream))]
         [AuthorizeComposer]
-        public async Task<ActionResult<CreateComposerStreamResponse>> CreateStream(CreateComposerStreamRequest request)
+        public async Task<ActionResult<CreateStreamResponse>> CreateStream(CreateStreamRequest request)
         {
             ComposerStream stream = await composerStreamService.Create(new CreateCommand
             {
@@ -61,7 +61,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
                 Type = request.Type
             });
 
-            return Ok(new CreateComposerStreamResponse
+            return Ok(new CreateStreamResponse
             {
                 ComposerStream = ComposerStreamDto.Map(stream)
             });

@@ -1,4 +1,6 @@
-﻿using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
+using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
@@ -14,8 +16,14 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         public required int SyncVersion { get; init; }
 
         /// <summary>
+        /// Тип обновления очереди
+        /// </summary>
+        public required OrderQueueUpdateType OrderQueueUpdateType { get; init; }
+
+        /// <summary>
         /// Позиции заказов
         /// </summary>
+        [Required]
         public required IEnumerable<OrderPositionDto> OrderPositions { get; init; }
 
         public static OrderPositionsChangedEvent Map(OrderQueue orderQueue)
@@ -23,6 +31,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
             return new()
             {
                 SyncVersion = orderQueue.SyncVersion,
+                OrderQueueUpdateType = orderQueue.OrderQueueUpdateType,
                 OrderPositions = orderQueue.Positions.Select(OrderPositionDto.Map),
             };
         }
