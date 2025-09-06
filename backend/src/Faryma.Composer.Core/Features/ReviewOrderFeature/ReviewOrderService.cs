@@ -291,7 +291,7 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             }
             else
             {
-                return await uow.ComposerStreamRepository.FindNearest(today, ComposerStreamType.Debt);
+                return await uow.ComposerStreamRepository.FindNearest(today);
             }
         }
     }

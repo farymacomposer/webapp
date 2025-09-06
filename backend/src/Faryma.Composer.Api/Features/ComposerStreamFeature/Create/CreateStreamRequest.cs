@@ -28,7 +28,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature.Create
 
             if (EventDate < DateOnly.FromDateTime(DateTime.UtcNow))
             {
-                yield return new ValidationResult("Дата стрима не может быть в прошлом, выберите другую дату");
+                yield return new ValidationResult("Нельзя создать стрим на прошедшую дату");
             }
         }
     }
