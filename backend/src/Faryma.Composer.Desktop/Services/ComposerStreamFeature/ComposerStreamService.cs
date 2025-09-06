@@ -39,7 +39,7 @@ namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature
             return response.Streams;
         }
 
-        public async Task Post<T>(T request)
+        public async Task<ComposerStreamDto> Post<T>(T request)
         {
             string requestUri = request switch
             {
@@ -55,12 +55,18 @@ namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature
             try
             {
                 responseMessage.EnsureSuccessStatusCode();
+
+                StreamResponse response = await responseMessage.Content.ReadFromJsonAsync<StreamResponse>()
+                    ?? throw new InvalidOperationException();
+
+                return response.ComposerStream;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 string content = await responseMessage.Content.ReadAsStringAsync();
-                await App.ShowDialog(content);
                 logger.LogError("{content}", content);
+
+                throw new InvalidOperationException(content, ex);
             }
         }
     }

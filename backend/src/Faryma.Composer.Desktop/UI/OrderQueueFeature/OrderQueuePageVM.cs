@@ -252,40 +252,42 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         }
 
         [RelayCommand]
-        private async Task CreateStream()
+        private Task CreateStream() => UpdateStream(composerStreamService.Post(new CreateStreamRequest
         {
-            await composerStreamService.Post(new CreateStreamRequest
-            {
-                EventDate = SelectedEventDate,
-                Type = StreamType,
-            });
-        }
+            EventDate = SelectedEventDate,
+            Type = StreamType,
+        }));
 
         [RelayCommand]
-        private async Task StartStream()
+        private Task StartStream() => UpdateStream(composerStreamService.Post(new StartStreamRequest
         {
-            await composerStreamService.Post(new StartStreamRequest
-            {
-                ComposerStreamId = SelectedStream?.Id ?? 0,
-            });
-        }
+            ComposerStreamId = SelectedStream?.Id ?? 0,
+        }));
 
         [RelayCommand]
-        private async Task CompleteStream()
+        private Task CompleteStream() => UpdateStream(composerStreamService.Post(new CompleteStreamRequest
         {
-            await composerStreamService.Post(new CompleteStreamRequest
-            {
-                ComposerStreamId = SelectedStream?.Id ?? 0,
-            });
-        }
+            ComposerStreamId = SelectedStream?.Id ?? 0,
+        }));
 
         [RelayCommand]
-        private async Task CancelStream()
+        private Task CancelStream() => UpdateStream(composerStreamService.Post(new CancelStreamRequest
         {
-            await composerStreamService.Post(new CancelStreamRequest
+            ComposerStreamId = SelectedStream?.Id ?? 0,
+        }));
+
+        private async Task UpdateStream(Task<ComposerStreamDto> task)
+        {
+            try
             {
-                ComposerStreamId = SelectedStream?.Id ?? 0,
-            });
+                ComposerStreamDto dto = await task;
+                StreamContainerVM? container = StreamSchedule.FirstOrDefault(x => x.Date == dto.EventDate);
+                container?.Stream = new ComposerStreamVM(dto);
+            }
+            catch (Exception ex)
+            {
+                await App.ShowDialog(ex.Message);
+            }
         }
     }
 }
