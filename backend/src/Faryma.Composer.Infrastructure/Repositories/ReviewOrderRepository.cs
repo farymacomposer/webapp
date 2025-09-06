@@ -34,20 +34,22 @@ namespace Faryma.Composer.Infrastructure.Repositories
             .Select(x => x.MainNormalizedNickname)
             .LastOrDefaultAsync();
 
-        public Task<ReviewOrder[]> GetOrdersToStartStream(long creationStreamId) => context.ReviewOrders
+        public Task<ReviewOrder[]> GetOrdersToStartStream(long startedStreamId) => context.ReviewOrders
             .AsNoTracking()
             .Include(x => x.CreationStream)
             .Include(x => x.Payments)
-            .Where(x => x.CreationStreamId == creationStreamId
+            .Where(x => x.CreationStreamId == startedStreamId
                 && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
             .ToArrayAsync();
 
-        public Task<ReviewOrder[]> GetOrdersToCompleteStream(long processingStreamId) => context.ReviewOrders
+        public Task<ReviewOrder[]> GetOrdersToCompleteStream(long completedStreamId) => context.ReviewOrders
             .AsNoTracking()
             .Include(x => x.CreationStream)
             .Include(x => x.ProcessingStream)
             .Include(x => x.Payments)
-            .Where(x => x.ProcessingStreamId == processingStreamId && x.Status == ReviewOrderStatus.Completed)
+            .Where(x => x.CreationStreamId == completedStreamId
+                && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
+            .Where(x => x.ProcessingStreamId == completedStreamId && x.Status == ReviewOrderStatus.Completed)
             .ToArrayAsync();
 
         public Task<ReviewOrder[]> GetOrdersInQueue() => context.ReviewOrders
