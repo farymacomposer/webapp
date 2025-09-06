@@ -44,8 +44,9 @@ namespace Faryma.Composer.Infrastructure.Repositories
         public Task<ComposerStream?> FindNearest(DateOnly date, ComposerStreamType type)
         {
             return context.ComposerStreams
-                .Where(x => x.Status == ComposerStreamStatus.Live
-                    || (x.Type == type && x.Status == ComposerStreamStatus.Planned && x.EventDate >= date))
+                .Where(x => x.Type == type
+                    && x.EventDate >= date
+                    && (x.Status == ComposerStreamStatus.Planned || x.Status == ComposerStreamStatus.Live))
                 .OrderBy(x => x.EventDate)
                 .FirstOrDefaultAsync();
         }
