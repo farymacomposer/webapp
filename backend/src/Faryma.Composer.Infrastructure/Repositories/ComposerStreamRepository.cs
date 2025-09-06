@@ -32,11 +32,20 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 .ToArrayAsync();
         }
 
-        public Task<ComposerStream?> FindNearest(DateOnly today)
+        public Task<ComposerStream?> FindNearest(DateOnly date)
         {
             return context.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live
-                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
+                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= date))
+                .OrderBy(x => x.EventDate)
+                .FirstOrDefaultAsync();
+        }
+
+        public Task<ComposerStream?> FindNearest(DateOnly date, ComposerStreamType type)
+        {
+            return context.ComposerStreams
+                .Where(x => x.Status == ComposerStreamStatus.Live
+                    || (x.Type == type && x.Status == ComposerStreamStatus.Planned && x.EventDate >= date))
                 .OrderBy(x => x.EventDate)
                 .FirstOrDefaultAsync();
         }

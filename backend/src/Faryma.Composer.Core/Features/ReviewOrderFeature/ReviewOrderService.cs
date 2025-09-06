@@ -1,5 +1,4 @@
 ﻿using Faryma.Composer.Core.Features.AppSettings;
-using Faryma.Composer.Core.Features.ComposerStreamFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
@@ -15,16 +14,18 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         UnitOfWork uow,
         UserNicknameService userNicknameService,
         AppSettingsService appSettingsService,
-        ComposerStreamService composerStreamService,
         OrderQueueService orderQueueService)
     {
         public async Task<ReviewOrder> CreateOutOfQueue(CreateOutOfQueueOrderCommand command)
         {
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
-            ComposerStream stream = await composerStreamService.GetOrCreateForOutOfQueueOrder();
+
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            ComposerStream? nearestStream = await uow.ComposerStreamRepository.FindNearest(today)
+                ?? throw new ReviewOrderException("Заказ не создан. Нет доступного стрима.");
 
             ReviewOrder order = uow.ReviewOrderRepository.CreateFree(
-                stream,
+                nearestStream,
                 userNickname,
                 appSettingsService.Settings.ReviewOrderNominalAmount,
                 command.TrackUrl,
@@ -41,13 +42,14 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         public async Task<ReviewOrder> CreateDonation(CreateDonationOrderCommand command)
         {
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
-            ComposerStream stream = await composerStreamService.GetOrCreateForOrder(userNickname);
+            ComposerStream nearestStream = await FindNearestStream(userNickname)
+                ?? throw new ReviewOrderException("Заказ не создан. Нет доступного стрима.");
 
             Transaction deposit = uow.TransactionRepository.CreateDeposit(userNickname.Account, command.PaymentAmount);
             Transaction payment = uow.TransactionRepository.CreatePayment(userNickname.Account, command.PaymentAmount);
 
             ReviewOrder order = uow.ReviewOrderRepository.CreateDonation(
-                stream,
+                nearestStream,
                 payment,
                 appSettingsService.Settings.ReviewOrderNominalAmount,
                 command.TrackUrl,
@@ -63,10 +65,11 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
         public async Task<ReviewOrder> CreateFree(CreateFreeOrderCommand command)
         {
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
-            ComposerStream stream = await composerStreamService.GetOrCreateForOrder(userNickname);
+            ComposerStream nearestStream = await FindNearestStream(userNickname)
+                ?? throw new ReviewOrderException("Заказ не создан. Нет доступного стрима.");
 
             ReviewOrder order = uow.ReviewOrderRepository.CreateFree(
-                stream,
+                nearestStream,
                 userNickname,
                 appSettingsService.Settings.ReviewOrderNominalAmount,
                 command.TrackUrl,
@@ -82,16 +85,16 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
 
         public async Task<ReviewOrder> CreateCharity(CreateCharityOrderCommand command)
         {
-            ComposerStream? stream = await uow.ComposerStreamRepository.FindLive();
-            if (stream is null || stream.Type == ComposerStreamType.Charity)
+            ComposerStream? liveStream = await uow.ComposerStreamRepository.FindLive();
+            if (liveStream is null || liveStream.Type != ComposerStreamType.Charity)
             {
-                throw new ReviewOrderException("Благотворительный заказ можно создать только на благотворительном стриме");
+                throw new ReviewOrderException("Заказ не создан. Не запущен благотворительный стрим.");
             }
 
             UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
 
             ReviewOrder order = uow.ReviewOrderRepository.CreateFree(
-                stream,
+                liveStream,
                 userNickname,
                 appSettingsService.Settings.ReviewOrderNominalAmount,
                 command.TrackUrl,
@@ -276,6 +279,20 @@ namespace Faryma.Composer.Core.Features.ReviewOrderFeature
             await orderQueueService.CancelOrder(order, previousStatus);
 
             return order;
+        }
+
+        private async Task<ComposerStream?> FindNearestStream(UserNickname userNickname)
+        {
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            if (await uow.UserNicknameRepository.HasOrders(userNickname))
+            {
+                return await uow.ComposerStreamRepository.FindNearest(today, ComposerStreamType.Donation);
+            }
+            else
+            {
+                return await uow.ComposerStreamRepository.FindNearest(today, ComposerStreamType.Debt);
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Faryma.Composer.Core.Features.ComposerStreamFeature.Commands;
 using Faryma.Composer.Core.Features.OrderQueueFeature;
-using Faryma.Composer.Core.Utils;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
@@ -106,90 +105,6 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
             await uow.SaveChangesAsync();
 
             return stream;
-        }
-
-        public async Task<ComposerStream> GetOrCreateForOrder(UserNickname userNickname)
-        {
-            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-
-            ComposerStream? nearestStream = await uow.ComposerStreamRepository.FindNearest(today);
-
-            if (nearestStream is not null && nearestStream.Type == ComposerStreamType.Donation)
-            {
-                return nearestStream;
-            }
-
-            if (await uow.UserNicknameRepository.HasOrders(userNickname))
-            {
-                return await GetOrCreateStream(GetDonationStreamInfo(today));
-            }
-
-            if (nearestStream is not null && nearestStream.Type == ComposerStreamType.Debt)
-            {
-                return nearestStream;
-            }
-
-            return await GetOrCreateStream(GetNearestStreamInfo(today));
-        }
-
-        public async Task<ComposerStream> GetOrCreateForOutOfQueueOrder()
-        {
-            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-
-            ComposerStream? nearestStream = await uow.ComposerStreamRepository.FindNearest(today);
-
-            return nearestStream ?? await GetOrCreateStream(GetNearestStreamInfo(today));
-        }
-
-        private (DateOnly EventDate, ComposerStreamType Type) GetDonationStreamInfo(DateOnly today)
-        {
-            DateOnly donationStreamDate = today.GetNextDateForDay(DayOfWeek.Saturday);
-
-            return (donationStreamDate, ComposerStreamType.Donation);
-        }
-
-        private (DateOnly EventDate, ComposerStreamType Type) GetNearestStreamInfo(DateOnly today)
-        {
-            DateOnly debtStreamDate = today.GetNextDateForDay(DayOfWeek.Tuesday);
-
-            (DateOnly EventDate, ComposerStreamType Type) debtStreamInfo = (debtStreamDate, ComposerStreamType.Debt);
-            (DateOnly EventDate, ComposerStreamType Type) donationStreamInfo = GetDonationStreamInfo(today);
-
-            return (debtStreamInfo.EventDate < donationStreamInfo.EventDate) ? debtStreamInfo : donationStreamInfo;
-        }
-
-        private async Task<ComposerStream> GetOrCreateStream((DateOnly EventDate, ComposerStreamType Type) streamInfo)
-        {
-            DateOnly eventDate = streamInfo.EventDate;
-
-            while (true)
-            {
-                ComposerStream? stream = await uow.ComposerStreamRepository.Find(eventDate);
-
-                if (stream is null)
-                {
-                    stream = uow.ComposerStreamRepository.Create(eventDate, streamInfo.Type);
-
-                    try
-                    {
-                        await uow.SaveChangesAsync();
-
-                        return stream;
-                    }
-                    catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
-                    {
-                        uow.Remove(stream);
-
-                        return await uow.ComposerStreamRepository.Get(eventDate);
-                    }
-                }
-                else if (stream.Status == ComposerStreamStatus.Planned && stream.Type == streamInfo.Type)
-                {
-                    return stream;
-                }
-
-                eventDate = eventDate.AddDays(7);
-            }
         }
     }
 }
