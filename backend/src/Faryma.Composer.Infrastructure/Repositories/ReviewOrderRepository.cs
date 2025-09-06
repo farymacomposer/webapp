@@ -42,12 +42,12 @@ namespace Faryma.Composer.Infrastructure.Repositories
                 && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
             .ToArrayAsync();
 
-        public Task<ReviewOrder[]> GetOrdersToCompleteStream(long creationStreamId) => context.ReviewOrders
+        public Task<ReviewOrder[]> GetOrdersToCompleteStream(long processingStreamId) => context.ReviewOrders
             .AsNoTracking()
             .Include(x => x.CreationStream)
             .Include(x => x.ProcessingStream)
             .Include(x => x.Payments)
-            .Where(x => x.CreationStreamId == creationStreamId && x.Status == ReviewOrderStatus.Completed)
+            .Where(x => x.ProcessingStreamId == processingStreamId && x.Status == ReviewOrderStatus.Completed)
             .ToArrayAsync();
 
         public Task<ReviewOrder[]> GetOrdersInQueue() => context.ReviewOrders

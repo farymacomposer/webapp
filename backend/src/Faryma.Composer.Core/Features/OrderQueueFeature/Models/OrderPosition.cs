@@ -12,18 +12,21 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// <summary>
         /// Заказ разбора трека
         /// </summary>
-        public required ReviewOrder Order { get; set; }
+        public ReviewOrder Order { get; private set; } = null!;
 
         /// <summary>
         /// История изменений позиции заказа в очереди
         /// </summary>
         public required OrderPositionHistory PositionHistory { get; init; }
 
+        public bool IsOrderUpdated { get; private set; }
+
         public static OrderPosition Create(ReviewOrder order)
         {
             return new()
             {
                 Order = order,
+                IsOrderUpdated = true,
                 PositionHistory = new OrderPositionHistory
                 {
                     Current = new OrderQueuePosition
@@ -46,10 +49,20 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
             };
         }
 
+        public void UpdateOrder(ReviewOrder order)
+        {
+            Order = order;
+            IsOrderUpdated = true;
+        }
+
         /// <summary>
         /// Записывает текущее состояние в предыдущее
         /// </summary>
-        public void SaveCurrentPositionToPrevious() => PositionHistory.Previous.CopyFrom(PositionHistory.Current);
+        public void SaveCurrentPositionToPrevious()
+        {
+            PositionHistory.Previous.CopyFrom(PositionHistory.Current);
+            IsOrderUpdated = false;
+        }
 
         /// <summary>
         /// Обновляет текущую позицию заказа в очереди

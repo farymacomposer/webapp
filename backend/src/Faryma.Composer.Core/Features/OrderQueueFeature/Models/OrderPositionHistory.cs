@@ -16,14 +16,11 @@
         public required OrderQueuePosition Current { get; init; }
 
         /// <summary>
-        /// Позиция заказа в очереди была изменена более чем на один шаг
+        /// Позиция заказа в очереди была изменена
         /// </summary>
-        public bool IsPositionJumped => Math.Abs(Previous.QueueIndex - Current.QueueIndex) > 1;
-
-        /// <summary>
-        /// Статус активности заказа был изменен
-        /// </summary>
-        public bool IsStatusChanged => Previous.ActivityStatus != Current.ActivityStatus;
+        public bool IsPositionChanged => Previous.ActivityStatus != Current.ActivityStatus
+            || Previous.QueueIndex != Current.QueueIndex
+            || Previous.Category != Current.Category;
 
         public OrderPositionHistory Clone()
         {

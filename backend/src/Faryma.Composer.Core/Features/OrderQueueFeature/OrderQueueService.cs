@@ -52,7 +52,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         }
 
         public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrder order) =>
-            _locker.Lock(() => _queueManager.OrderPositionsById[order.Id].PositionHistory.Current.Clone());
+            _locker.Lock(() => _queueManager.GetCurrentQueuePosition(order));
 
         public Task<OrderQueue> GetOrderQueue() => _locker.Lock(() => new OrderQueue
         {
@@ -63,25 +63,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 .ToArray(),
         });
 
-        public Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType, ReviewOrderStatus lastStatus = ReviewOrderStatus.Unspecified) => _locker.Lock(async () =>
+        public Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType) => _locker.Lock(async () =>
         {
             _syncVersion++;
-
-            if (updateType == OrderQueueUpdateType.OrderCreated && _queueManager.NearestStreamDate == default)
-            {
-                _queueManager.NearestStreamDate = order.CreationStream.EventDate;
-            }
-
-            if (updateType == OrderQueueUpdateType.OrderCanceled && lastStatus == ReviewOrderStatus.InProgress)
-            {
-                await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-                ReviewOrderRepository reviewOrderRepository = new(context);
-                ReviewOrder? last = await reviewOrderRepository.FindLastCompleted();
-                if (last is not null)
-                {
-                    _queueManager.SetLastNickname(last);
-                }
-            }
 
             OrderQueue orderQueue = new()
             {
@@ -93,36 +77,72 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             await notificationService.NotifyOrderPositionsChanged(orderQueue);
         });
 
-        public Task StartStream(ComposerStream creationStream, ReviewOrder[] orders) => _locker.Lock(async () =>
+        public Task CancelOrder(ReviewOrder order, ReviewOrderStatus previousStatus) => _locker.Lock(async () =>
         {
             _syncVersion++;
 
-            _queueManager.NearestStreamDate = creationStream.EventDate;
-
-            OrderQueue orderQueue = new()
+            if (previousStatus == ReviewOrderStatus.InProgress)
             {
-                SyncVersion = _syncVersion,
-                OrderQueueUpdateType = OrderQueueUpdateType.StreamStarted,
-                Positions = _queueManager.StartStream(orders),
-            };
-
-            await notificationService.NotifyOrderPositionsChanged(orderQueue);
-        });
-
-        public Task CompleteStream(ComposerStream? nearestStream, ReviewOrder[] orders) => _locker.Lock(async () =>
-        {
-            _syncVersion++;
-
-            if (nearestStream is not null)
-            {
-                _queueManager.NearestStreamDate = nearestStream.EventDate;
+                await using AppDbContext context = await contextFactory.CreateDbContextAsync();
+                ReviewOrderRepository reviewOrderRepository = new(context);
+                ReviewOrder? lastCompleted = await reviewOrderRepository.FindLastCompleted();
+                if (lastCompleted is not null)
+                {
+                    _queueManager.LastPriorityManagerState = OrderQueueManager.MapCategoryState(lastCompleted.CategoryType);
+                    _queueManager.SetLastNickname(lastCompleted);
+                }
             }
 
             OrderQueue orderQueue = new()
             {
                 SyncVersion = _syncVersion,
+                OrderQueueUpdateType = OrderQueueUpdateType.OrderCanceled,
+                Positions = _queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCanceled),
+            };
+
+            await notificationService.NotifyOrderPositionsChanged(orderQueue);
+        });
+
+        public Task StartStream(ComposerStream stream) => _locker.Lock(async () =>
+        {
+            _syncVersion++;
+
+            _queueManager.NearestStreamDate = stream.EventDate;
+
+            await using AppDbContext context = await contextFactory.CreateDbContextAsync();
+            ReviewOrderRepository reviewOrderRepository = new(context);
+            ReviewOrder[] orders = await reviewOrderRepository.GetOrdersToStartStream(stream.Id);
+
+            OrderQueue orderQueue = new()
+            {
+                SyncVersion = _syncVersion,
+                OrderQueueUpdateType = OrderQueueUpdateType.StreamStarted,
+                Positions = _queueManager.UpdateOrders(orders),
+            };
+
+            await notificationService.NotifyOrderPositionsChanged(orderQueue);
+        });
+
+        public Task CompleteStream(ComposerStream stream) => _locker.Lock(async () =>
+        {
+            _syncVersion++;
+
+            await using AppDbContext context = await contextFactory.CreateDbContextAsync();
+            ComposerStreamRepository composerStreamRepository = new(context);
+            ComposerStream? nearestStream = await composerStreamRepository.FindNearest(stream.EventDate);
+            if (nearestStream is not null)
+            {
+                _queueManager.NearestStreamDate = nearestStream.EventDate;
+            }
+
+            ReviewOrderRepository reviewOrderRepository = new(context);
+            ReviewOrder[] orders = await reviewOrderRepository.GetOrdersToCompleteStream(stream.Id);
+
+            OrderQueue orderQueue = new()
+            {
+                SyncVersion = _syncVersion,
                 OrderQueueUpdateType = OrderQueueUpdateType.StreamCompleted,
-                Positions = _queueManager.CompleteStream(orders),
+                Positions = _queueManager.UpdateOrders(orders),
             };
 
             await notificationService.NotifyOrderPositionsChanged(orderQueue);

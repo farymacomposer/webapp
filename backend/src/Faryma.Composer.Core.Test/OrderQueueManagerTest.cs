@@ -763,20 +763,17 @@ namespace Faryma.Composer.Core.Test
         [Fact]
         public void TakeOrderOutOfTurn()
         {
-            ReviewOrder[] items =
-            [
-                GetDonation("10.01.2000", 1, "Nick1", 1000),
-                GetDonation("10.01.2000", 2, "Nick2", 1000),
-                GetDonation("10.01.2000", 3, "Nick1", 1000),
-                GetDonation("10.01.2000", 4, "Nick2", 1000),
-            ];
+            ReviewOrder order1 = GetDonation("10.01.2000", 1, "Nick1", 1000);
+            ReviewOrder order2 = GetDonation("10.01.2000", 2, "Nick2", 1000);
+            ReviewOrder order3 = GetDonation("10.01.2000", 3, "Nick1", 1000);
+            ReviewOrder order4 = GetDonation("10.01.2000", 4, "Nick2", 1000);
 
-            OrderQueueManager queueManager = GetManager(items, "10.01.2000");
-            queueManager.UpdateAllPositions();
+            OrderQueueManager queueManager = GetManager(Array.Empty<ReviewOrder>(), "10.01.2000");
 
-            ReviewOrder order1 = items[0];
-            ReviewOrder order2 = items[1];
-
+            Create(queueManager, order1);
+            Create(queueManager, order2);
+            Create(queueManager, order3);
+            Create(queueManager, order4);
             TakeInProgress(queueManager, order2);
             Complete(queueManager, order2);
             TakeInProgress(queueManager, order1);
@@ -804,9 +801,15 @@ namespace Faryma.Composer.Core.Test
             };
         }
 
+        private static void Create(OrderQueueManager queueManager, ReviewOrder order) => queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
+
         private static void TakeInProgress(OrderQueueManager queueManager, ReviewOrder order)
         {
+            OrderQueuePosition position = queueManager.GetCurrentQueuePosition(order);
+
+            order.CategoryType = position.Category.Type;
             order.Status = ReviewOrderStatus.InProgress;
+
             queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderTaken);
         }
 
