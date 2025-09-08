@@ -2,12 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Repositories
+namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
 {
-    public sealed class UserNicknameRepository(AppDbContext context, ILookupNormalizer normalizer)
+    public sealed class UserNickname_RW_Repository(AppDbContext context, ILookupNormalizer normalizer)
     {
-        public Task<bool> HasOrders(UserNickname userNickname) => context.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0);
-
         public UserNickname Create(string nickname)
         {
             return context.Add(new UserNickname

@@ -37,10 +37,10 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         /// <summary>
         /// Возвращает текущий и запланированные стримы
         /// </summary>
-        [HttpGet(nameof(FindCurrentAndScheduledStreams))]
-        public async Task<ActionResult<FindCurrentAndScheduledStreamsResponse>> FindCurrentAndScheduledStreams()
+        [HttpGet(nameof(FindLiveAndPlanned))]
+        public async Task<ActionResult<FindCurrentAndScheduledStreamsResponse>> FindLiveAndPlanned()
         {
-            ComposerStream[] streams = await composerStreamService.FindCurrentAndScheduled();
+            ComposerStream[] streams = await composerStreamService.FindLiveAndPlanned();
 
             return Ok(new FindCurrentAndScheduledStreamsResponse
             {

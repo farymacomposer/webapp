@@ -1,8 +1,8 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 
-namespace Faryma.Composer.Infrastructure.Repositories
+namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
 {
-    public sealed class ReviewRepository(AppDbContext context)
+    public sealed class Review_RW_Repository(AppDbContext context)
     {
         public Review Create(
             ReviewOrder inProgressOrder,

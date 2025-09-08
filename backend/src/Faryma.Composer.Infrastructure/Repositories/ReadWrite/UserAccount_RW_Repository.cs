@@ -1,8 +1,8 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 
-namespace Faryma.Composer.Infrastructure.Repositories
+namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
 {
-    public sealed class UserAccountRepository(AppDbContext context)
+    public sealed class UserAccount_RW_Repository(AppDbContext context)
     {
         public UserAccount Create(UserNickname userNickname)
         {
