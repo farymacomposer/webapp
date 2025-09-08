@@ -10,9 +10,9 @@ namespace Faryma.Composer.Infrastructure.Entities
     public sealed class Transaction : BaseEntity
     {
         /// <summary>
-        /// Сумма операции
+        /// Дата и время совершения операции
         /// </summary>
-        public required decimal Amount { get; set; }
+        public required DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// Тип операции
@@ -20,9 +20,9 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required TransactionType Type { get; set; }
 
         /// <summary>
-        /// Дата и время совершения операции
+        /// Сумма операции
         /// </summary>
-        public required DateTime CreatedAt { get; set; }
+        public required decimal Amount { get; set; }
 
         public Guid UserAccountId { get; set; }
         public long? ReviewOrderId { get; set; }

@@ -1472,8 +1472,56 @@ dotnet_diagnostic.CA1806.severity = warning
 # CA1822: Пометьте члены как статические
 dotnet_diagnostic.CA1822.severity = suggestion
 
+# CA1825: избегайте выделения массива нулевой длины
+dotnet_diagnostic.CA1825.severity = error
+
+# CA1826: используйте свойство вместо метода Linq Enumerable
+dotnet_diagnostic.CA1826.severity = error
+
+# CA1827: не используйте Count()/LongCount() при использовании Any()
+dotnet_diagnostic.CA1827.severity = error
+
+# CA1828: не используйте CountAsync/LongCountAsync при использовании AnyAsync
+dotnet_diagnostic.CA1828.severity = error
+
+# CA1829: используйте свойство Length/Count вместо метода Enumerable.Count
+dotnet_diagnostic.CA1829.severity = error
+
+# CA1830: предпочитайте строго типизированные перегрузки методов Добавления и вставки в StringBuilder
+dotnet_diagnostic.CA1830.severity = error
+
+# CA1834: используйте StringBuilder.Append(char) для одно символьных строк
+dotnet_diagnostic.CA1834.severity = error
+
+# CA1835: предпочитать перегрузки методов ReadAsync/WriteAsync, основанные на памяти, в классах, основанных на потоках
+dotnet_diagnostic.CA1835.severity = error
+
+# CA1836: предпочитать IsEmpty over Count при наличии
+dotnet_diagnostic.CA1836.severity = error
+
+# CA1837: используйте Environment.ProcessId вместо Process.GetCurrentProcess(). Идентификатор
+dotnet_diagnostic.CA1837.severity = error
+
+# CA1839. использование Environment.ProcessPath вместо Process.GetCurrentProcess().MainModule.FileName
+dotnet_diagnostic.CA1839.severity = error
+
+# CA1840. использование Environment.CurrentManagedThreadId вместо Thread.CurrentThread.ManagedThreadId
+dotnet_diagnostic.CA1840.severity = error
+
+# CA1841: предпочтение словарных методов Contains
+dotnet_diagnostic.CA1841.severity = error
+
 # CA1842: Не используйте "WhenAll" с одной задачей
 dotnet_diagnostic.CA1842.severity = error
+
+# CA1843: не используйте WaitAll с одной задачей
+dotnet_diagnostic.CA1843.severity = error
+
+# CA1845: используйте string.Concat на основе диапазона
+dotnet_diagnostic.CA1845.severity = error
+
+# CA1846: предпочтение AsSpan вместо Substring
+dotnet_diagnostic.CA1846.severity = error
 
 # CA1847: Использовать знаковый литерал для поиска одного знака
 dotnet_diagnostic.CA1847.severity = warning
@@ -1481,8 +1529,35 @@ dotnet_diagnostic.CA1847.severity = warning
 # CA1852: Seal internal types
 dotnet_diagnostic.CA1852.severity = warning
 
+# CA1853: ненужный вызов "Dictionary.ContainsKey(key)"
+dotnet_diagnostic.CA1853.severity = error
+
+# CA1854: предпочитать IDictionary.TryGetValue(TKey, out TValue) метод
+dotnet_diagnostic.CA1854.severity = error
+
+# CA1858: используйте StartsWith вместо IndexOf
+dotnet_diagnostic.CA1858.severity = error
+
+# CA1859: используйте конкретные типы, если это возможно для повышения производительности
+dotnet_diagnostic.CA1859.severity = warning
+
+# CA1860: избегайте использования метода расширения "Enumerable.Any()"
+dotnet_diagnostic.CA1860.severity = error
+
+# CA1861: избегайте массивов констант в качестве аргументов
+dotnet_diagnostic.CA1861.severity = error
+
+# CA1864: предпочитать метод IDictionary.TryAdd(TKey, TValue)"
+dotnet_diagnostic.CA1864.severity = error
+
+# CA1868: ненужный вызов "Contains" для наборов
+dotnet_diagnostic.CA1868.severity = error
+
 # CA1869: Избегайте создания нового экземпляра "JsonSerializerOptions" для каждой операции сериализации. Выполняйте кэширование и повторно используйте экземпляры
 dotnet_diagnostic.CA1869.severity = error
+
+# CA1870: использование кэшированного экземпляра SearchValues
+dotnet_diagnostic.CA1870.severity = error
 
 # CA2017: Несоответствие счетчика параметров
 dotnet_diagnostic.CA2017.severity = error

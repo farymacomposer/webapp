@@ -32,6 +32,7 @@ services:
 
   db:
     image: postgres:17
+    command: -c config_file=/etc/postgresql/postgresql.conf
     container_name: composer-db
     environment:
       POSTGRES_DB: ${POSTGRES__DATABASE}
@@ -41,10 +42,12 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgresql/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     networks:
       - composer-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ${POSTGRES__DATABASE}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES__USERNAME} -d ${POSTGRES__DATABASE}"]
       interval: 5s
       timeout: 5s
       retries: 5
