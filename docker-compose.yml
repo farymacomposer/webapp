@@ -21,8 +21,6 @@ services:
       JWT__EXPIRY_IN_MINUTES: ${JWT__EXPIRY_IN_MINUTES}
     ports:
       - "${WEBAPI_PORT}:8080"
-    volumes:
-      - webapi-data:/root/.aspnet/DataProtection-Keys
     networks:
       - composer-net
     depends_on:
@@ -39,8 +37,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES__PASSWORD}
     ports:
       - "${DB_PORT}:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
     networks:
       - composer-net
     healthcheck:
