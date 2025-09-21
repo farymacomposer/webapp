@@ -26,6 +26,6 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto
         /// <summary>
         /// Номер категории, если заказ относится к долговой категории
         /// </summary>
-        public required int CategoryDebtNumber { get; init; }
+        public required int CategoryDebtIndex { get; init; }
     }
 }

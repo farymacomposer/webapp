@@ -9,7 +9,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
     public sealed class DebtOrderCategories(List<(DateOnly StreamDate, OrderCategory Category)> debtCategoriesByStreamDate)
     {
         /// <summary>
-        /// Счетчик для чередования долговых категорий (X3-X2-X1)
+        /// Счетчик для чередования долговых категорий
         /// </summary>
         private int _roundRobinCounter;
 
@@ -24,7 +24,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public bool HasOrderFromNewNickname(string? nicknameToSkip) => debtCategoriesByStreamDate.Any(x => x.Category.HasOrderFromNewNickname(nicknameToSkip));
 
         /// <summary>
-        /// Последовательно перебирает долговые категории (X3-X2-X1) и извлекает заказ из категории, в которой есть заказы
+        /// Последовательно перебирает долговые категории и извлекает заказ из категории, в которой есть заказы
         /// </summary>
         public ReviewOrder DequeueRoundRobin(string? nicknameToSkip)
         {
@@ -46,7 +46,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         }
 
         /// <summary>
-        /// Последовательно перебирает долговые категории (X3-X2-X1) и извлекает заказ из категории, в которой существует заказ с другим никнеймом
+        /// Последовательно перебирает долговые категории и извлекает заказ из категории, в которой существует заказ с другим никнеймом
         /// </summary>
         public ReviewOrder DequeueRoundRobinFromOtherNickname(string? nicknameToSkip)
         {
@@ -68,15 +68,15 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         }
 
         /// <summary>
-        /// Обновляет категории заказов (X3-X2-X1)
+        /// Обновляет категории заказов
         /// </summary>
         public void UpdateOrderCategories(OrderQueueManager queueManager)
         {
-            int debtNumber = 1;
+            int debtIndex = 0;
             foreach ((DateOnly streamDate, OrderCategory category) in debtCategoriesByStreamDate.AsEnumerable().Reverse())
             {
-                category.UpdateOrdersCategory(queueManager, OrderCategoryType.Debt, debtNumber);
-                debtNumber++;
+                category.UpdateOrdersCategory(queueManager, OrderCategoryType.Debt, debtIndex);
+                debtIndex++;
             }
         }
     }

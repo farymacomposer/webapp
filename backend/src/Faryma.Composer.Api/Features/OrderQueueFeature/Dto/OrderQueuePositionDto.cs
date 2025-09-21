@@ -25,9 +25,9 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Dto
         public required OrderCategoryType CategoryType { get; init; }
 
         /// <summary>
-        /// Номер категории, если заказ относится к долговой категории
+        /// Индекс категории, если заказ относится к долговой категории
         /// </summary>
-        public required int CategoryDebtNumber { get; init; }
+        public required int CategoryDebtIndex { get; init; }
 
         public static OrderQueuePositionDto Map(OrderQueuePosition item)
         {
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Dto
                 QueueIndex = item.QueueIndex,
                 ActivityStatus = item.ActivityStatus,
                 CategoryType = item.Category.Type,
-                CategoryDebtNumber = item.Category.DebtNumber,
+                CategoryDebtIndex = item.Category.DebtIndex,
             };
         }
     }

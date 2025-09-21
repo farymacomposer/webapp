@@ -91,7 +91,7 @@ namespace Faryma.Composer.Desktop.Shared.ViewModels
         /// <summary>
         /// Номер категории, если заказ относится к долговой категории
         /// </summary>
-        public int CategoryDebtNumber { get; } = currentPosition.CategoryDebtNumber;
+        public int CategoryDebtIndex { get; } = currentPosition.CategoryDebtIndex;
 
         /// <summary>
         /// Id стрима

@@ -52,7 +52,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         }
 
         public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrder order) =>
-            _locker.Lock(() => _queueManager.GetCurrentQueuePosition(order));
+            _locker.Lock(() => _queueManager.GetCurrentQueuePosition(order).Clone());
 
         public Task<OrderQueue> GetOrderQueue() => _locker.Lock(() => new OrderQueue
         {
