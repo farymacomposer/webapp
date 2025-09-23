@@ -72,16 +72,27 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// </summary>
         public void UpdateOrderCategories(OrderQueueManager queueManager)
         {
+            DateOnly? lastDebtCategoryDate = queueManager.PriorityManagerState.LastDebtCategoryDate;
+
             int debtIndex = 0;
             foreach ((DateOnly streamDate, OrderCategory category) in debtCategoriesByStreamDate.AsEnumerable().Reverse())
             {
-                if (streamDate >= queueManager.PriorityManagerState.LastDebtCategoryDate)
+                if (streamDate > lastDebtCategoryDate)
                 {
-                    _roundRobinCounter = debtCategoriesByStreamDate.Count - debtIndex - 1;
+                    _roundRobinCounter = debtCategoriesByStreamDate.Count - debtIndex + 1;
+                }
+                else if (streamDate == lastDebtCategoryDate)
+                {
+                    _roundRobinCounter = debtCategoriesByStreamDate.Count - debtIndex;
                 }
 
                 category.UpdateOrdersCategory(queueManager, OrderCategoryType.Debt, debtIndex);
                 debtIndex++;
+            }
+
+            if (lastDebtCategoryDate < debtCategoriesByStreamDate[0].StreamDate)
+            {
+                _roundRobinCounter = 0;
             }
         }
     }

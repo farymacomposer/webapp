@@ -83,7 +83,10 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             }
 
             _debtCategories = new DebtOrderCategories(categories);
-            _debtCategories.UpdateOrderCategories(queueManager);
+            if (categories.Count > 0)
+            {
+                _debtCategories.UpdateOrderCategories(queueManager);
+            }
         }
 
         /// <summary>
