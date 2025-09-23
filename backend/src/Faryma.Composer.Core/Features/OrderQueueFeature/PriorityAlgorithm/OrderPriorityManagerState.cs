@@ -30,8 +30,10 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public required Dictionary<DateOnly, string> LastNicknamesByStreamDate { get; init; }
 
         /// <summary>
-        ///
+        /// Последняя дата долговой категории
         /// </summary>
+        public required DateOnly? LastDebtCategoryDate { get; set; }
+
         public static CategoryState MapCategoryState(OrderCategoryType categoryType)
         {
             return categoryType switch
@@ -43,9 +45,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             };
         }
 
-        /// <summary>
-        /// Устанавливает последний обработанный никнейм
-        /// </summary>
         public void UpdateFromOrder(ReviewOrder order)
         {
             LastPriorityManagerState = MapCategoryState(order.CategoryType);
@@ -57,6 +56,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             }
             else
             {
+                if (order.CategoryType == OrderCategoryType.Debt)
+                {
+                    LastDebtCategoryDate = order.CreationStream.EventDate;
+                }
+
                 DateOnly streamDate = order.CreationStream.EventDate;
                 LastNicknamesByStreamDate[streamDate] = order.MainNormalizedNickname;
             }

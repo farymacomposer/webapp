@@ -798,6 +798,7 @@ namespace Faryma.Composer.Core.Test
                 {
                     LastPriorityManagerState = CategoryState.Initial,
                     LastIssuedNickname = null,
+                    LastDebtCategoryDate = null,
                     LastOutOfQueueNickname = null,
                     LastNicknamesByStreamDate = new Dictionary<DateOnly, string>(),
                 }
