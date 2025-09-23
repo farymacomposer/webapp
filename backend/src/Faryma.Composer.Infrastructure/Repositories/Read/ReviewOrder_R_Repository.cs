@@ -27,25 +27,27 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
         {
             return await context.ReviewOrders
                 .AsNoTracking()
+                .Include(x => x.CreationStream)
                 .Where(x => x.CategoryType == OrderCategoryType.Debt && x.Status == ReviewOrderStatus.InProgress)
                 .FirstOrDefaultAsync()
                 ?? await context.ReviewOrders
                     .AsNoTracking()
+                    .Include(x => x.CreationStream)
                     .Where(x => x.CategoryType == OrderCategoryType.Debt && x.Status == ReviewOrderStatus.Completed)
                     .OrderBy(x => x.CompletedAt)
                     .LastOrDefaultAsync();
         }
 
-        public async Task<string?> FindLastTakenOutOfQueueNickname()
+        public async Task<ReviewOrder?> FindLastTakenOutOfQueue()
         {
             return await context.ReviewOrders
+                .AsNoTracking()
                 .Where(x => x.Type == ReviewOrderType.OutOfQueue && x.Status == ReviewOrderStatus.InProgress)
-                .Select(x => x.MainNormalizedNickname)
                 .FirstOrDefaultAsync()
                 ?? await context.ReviewOrders
+                    .AsNoTracking()
                     .Where(x => x.Type == ReviewOrderType.OutOfQueue && x.Status == ReviewOrderStatus.Completed)
                     .OrderBy(x => x.CompletedAt)
-                    .Select(x => x.MainNormalizedNickname)
                     .LastOrDefaultAsync();
         }
 

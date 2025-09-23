@@ -32,7 +32,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             ComposerStream? nearestStream = await composerStream_R.FindNearest(today);
             ReviewOrder? lastTakenOrder = await reviewOrder_R.FindLastTaken();
             ReviewOrder? lastTakenDebtOrder = await reviewOrder_R.FindLastTakenDebt();
-            string? lastOutOfQueueNickname = await reviewOrder_R.FindLastTakenOutOfQueueNickname();
+            ReviewOrder? lastOutOfQueue = await reviewOrder_R.FindLastTakenOutOfQueue();
             Dictionary<DateOnly, string> lastNicknamesByStreamDate = await composerStream_R.GetLastNicknamesByStreamDate();
             ReviewOrder[] orders = await reviewOrder_R.GetOrdersInQueue();
 
@@ -45,7 +45,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                     LastPriorityManagerState = (lastTakenOrder is null) ? CategoryState.Initial : OrderPriorityManagerState.MapCategoryState(lastTakenOrder.CategoryType),
                     LastIssuedNickname = lastTakenOrder?.MainNormalizedNickname,
                     LastDebtCategoryDate = lastTakenDebtOrder?.CreationStream.EventDate,
-                    LastOutOfQueueNickname = lastOutOfQueueNickname,
+                    LastOutOfQueueNickname = lastOutOfQueue?.MainNormalizedNickname,
                     LastNicknamesByStreamDate = lastNicknamesByStreamDate,
                 }
             };

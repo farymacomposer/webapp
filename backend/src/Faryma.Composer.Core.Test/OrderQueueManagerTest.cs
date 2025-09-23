@@ -763,17 +763,13 @@ namespace Faryma.Composer.Core.Test
         [Fact]
         public void TakeOrderOutOfTurn()
         {
-            ReviewOrder order1 = GetDonation("10.01.2000", 1, "Nick1", 1000);
-            ReviewOrder order2 = GetDonation("10.01.2000", 2, "Nick2", 1000);
-            ReviewOrder order3 = GetDonation("10.01.2000", 3, "Nick1", 1000);
-            ReviewOrder order4 = GetDonation("10.01.2000", 4, "Nick2", 1000);
-
             OrderQueueManager queueManager = GetManager(Array.Empty<ReviewOrder>(), "10.01.2000");
 
-            Create(queueManager, order1);
-            Create(queueManager, order2);
-            Create(queueManager, order3);
-            Create(queueManager, order4);
+            ReviewOrder order1 = Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 1000));
+            ReviewOrder order2 = Create(queueManager, GetDonation("10.01.2000", 2, "Nick2", 1000));
+            ReviewOrder order3 = Create(queueManager, GetDonation("10.01.2000", 3, "Nick1", 1000));
+            ReviewOrder order4 = Create(queueManager, GetDonation("10.01.2000", 4, "Nick2", 1000));
+
             TakeInProgress(queueManager, order2);
             Complete(queueManager, order2);
             TakeInProgress(queueManager, order1);
@@ -786,6 +782,63 @@ namespace Faryma.Composer.Core.Test
                 (0, 4, OrderActivityStatus.Active, "Nick2"),
                 (1, 3, OrderActivityStatus.Active, "Nick1"),
             ], queueManager);
+        }
+
+        [Fact]
+        public void Test()
+        {
+            OrderQueueManager queueManager = GetManager(Array.Empty<ReviewOrder>(), "10.01.2000");
+
+            ReviewOrder order1 = Create(queueManager, GetDonation("07.01.2000", 1, "Nick1", 1000)); // долг x3
+            ReviewOrder order2 = Create(queueManager, GetDonation("07.01.2000", 2, "Nick2", 1000)); // долг x3
+            ReviewOrder order3 = Create(queueManager, GetDonation("07.01.2000", 3, "Nick3", 1000)); // долг x3
+
+            ReviewOrder order4 = Create(queueManager, GetDonation("08.01.2000", 4, "Nick4", 1000)); // долг x2
+            ReviewOrder order5 = Create(queueManager, GetDonation("08.01.2000", 5, "Nick5", 1000)); // долг x2
+            ReviewOrder order6 = Create(queueManager, GetDonation("08.01.2000", 6, "Nick6", 1000)); // долг x2
+
+            ReviewOrder order7 = Create(queueManager, GetDonation("09.01.2000", 7, "Nick7", 1000)); // долг x1
+            ReviewOrder order8 = Create(queueManager, GetDonation("09.01.2000", 8, "Nick8", 1000)); // долг x1
+            ReviewOrder order9 = Create(queueManager, GetDonation("09.01.2000", 9, "Nick9", 1000)); // долг x1
+
+            ReviewOrder order10 = Create(queueManager, GetDonation("10.01.2000", 10, "Nick10", 1000));
+            ReviewOrder order11 = Create(queueManager, GetDonation("10.01.2000", 11, "Nick11", 1000));
+            ReviewOrder order12 = Create(queueManager, GetDonation("10.01.2000", 12, "Nick12", 1000));
+
+            (long id, string nick)[] expected = [
+                (10, "Nick10"),
+                (1,  "Nick1"), // долг x3
+                (11, "Nick11"),
+                (4,  "Nick4"), // долг x2
+                (12, "Nick12"),
+                (7,  "Nick7"), // долг x1
+                (2,  "Nick2"), // долг x3
+                (5,  "Nick5"), // долг x2
+                (8,  "Nick8"), // долг x1
+                (3,  "Nick3"), // долг x3
+                (6,  "Nick6"), // долг x2
+                (9,  "Nick9"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+
+            while (true)
+            {
+                OrderPosition? current = queueManager.OrderPositionsById
+                    .Select(x => x.Value)
+                    .Where(x => x.PositionHistory.Current.ActivityStatus == OrderActivityStatus.Active)
+                    .OrderBy(x => x.PositionHistory.Current.QueueIndex)
+                    .FirstOrDefault();
+
+                if (current is null)
+                {
+                    break;
+                }
+
+                TakeInProgressAndComplete(queueManager, current.Order);
+            }
+
+            Check(expected, queueManager);
         }
 
         private static OrderQueueManager GetManager(ReviewOrder[] orders, string currentStreamDate)
@@ -805,7 +858,18 @@ namespace Faryma.Composer.Core.Test
             };
         }
 
-        private static void Create(OrderQueueManager queueManager, ReviewOrder order) => queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
+        private static ReviewOrder Create(OrderQueueManager queueManager, ReviewOrder order)
+        {
+            queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
+
+            return order;
+        }
+
+        private static void TakeInProgressAndComplete(OrderQueueManager queueManager, ReviewOrder order)
+        {
+            TakeInProgress(queueManager, order);
+            Complete(queueManager, order);
+        }
 
         private static void TakeInProgress(OrderQueueManager queueManager, ReviewOrder order)
         {
@@ -819,7 +883,9 @@ namespace Faryma.Composer.Core.Test
 
         private static void Complete(OrderQueueManager queueManager, ReviewOrder order)
         {
+            order.CompletedAt = DateTime.Now;
             order.Status = ReviewOrderStatus.Completed;
+
             queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCompleted);
         }
 
