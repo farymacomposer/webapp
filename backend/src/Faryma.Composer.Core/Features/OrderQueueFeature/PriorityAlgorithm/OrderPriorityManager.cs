@@ -36,8 +36,10 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
         public OrderPriorityManager(OrderQueueManager queueManager)
         {
-            _currentState = queueManager.LastPriorityManagerState;
-            _lastIssuedNickname = queueManager.LastIssuedNickname;
+            OrderPriorityManagerState state = queueManager.PriorityManagerState;
+
+            _currentState = state.LastPriorityManagerState;
+            _lastIssuedNickname = state.LastIssuedNickname;
 
             _outOfQueueCategory = new OrderCategory(queueManager.OrderPositionsById
                 .Select(x => x.Value.Order)
@@ -47,7 +49,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 .OrderBy(x => x.CreatedAt)
                 .ToList());
 
-            _outOfQueueCategory.SetLastIssuedNickname(queueManager.LastOutOfQueueNickname);
+            _outOfQueueCategory.SetLastIssuedNickname(state.LastOutOfQueueNickname);
             _outOfQueueCategory.UpdateOrdersCategory(queueManager, OrderCategoryType.OutOfQueue);
 
             List<(DateOnly StreamDate, OrderCategory Category)> categories = queueManager.OrderPositionsById
@@ -65,7 +67,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             {
                 foreach ((DateOnly streamDate, OrderCategory category) in categories)
                 {
-                    if (queueManager.LastNicknamesByStreamDate.TryGetValue(streamDate, out string? nickname))
+                    if (state.LastNicknamesByStreamDate.TryGetValue(streamDate, out string? nickname))
                     {
                         category.SetLastIssuedNickname(nickname);
                     }

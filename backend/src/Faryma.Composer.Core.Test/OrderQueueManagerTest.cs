@@ -793,11 +793,14 @@ namespace Faryma.Composer.Core.Test
             return new()
             {
                 NearestStreamDate = DateOnly.Parse(currentStreamDate, CultureInfo.GetCultureInfo("ru-RU")),
-                LastPriorityManagerState = CategoryState.Initial,
-                LastIssuedNickname = null,
-                LastOutOfQueueNickname = null,
-                LastNicknamesByStreamDate = new Dictionary<DateOnly, string>(),
                 OrderPositionsById = orders.ToDictionary(k => k.Id, OrderPosition.Create),
+                PriorityManagerState = new OrderPriorityManagerState
+                {
+                    LastPriorityManagerState = CategoryState.Initial,
+                    LastIssuedNickname = null,
+                    LastOutOfQueueNickname = null,
+                    LastNicknamesByStreamDate = new Dictionary<DateOnly, string>(),
+                }
             };
         }
 

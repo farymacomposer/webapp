@@ -38,11 +38,14 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             _queueManager = new OrderQueueManager
             {
                 NearestStreamDate = nearestStream?.EventDate ?? today,
-                LastPriorityManagerState = (lastTakenOrder is null) ? CategoryState.Initial : OrderQueueManager.MapCategoryState(lastTakenOrder.CategoryType),
-                LastIssuedNickname = lastTakenOrder?.MainNormalizedNickname,
-                LastOutOfQueueNickname = lastOutOfQueueNickname,
-                LastNicknamesByStreamDate = lastNicknamesByStreamDate,
                 OrderPositionsById = orders.ToDictionary(k => k.Id, OrderPosition.Create),
+                PriorityManagerState = new OrderPriorityManagerState
+                {
+                    LastPriorityManagerState = (lastTakenOrder is null) ? CategoryState.Initial : OrderPriorityManagerState.MapCategoryState(lastTakenOrder.CategoryType),
+                    LastIssuedNickname = lastTakenOrder?.MainNormalizedNickname,
+                    LastOutOfQueueNickname = lastOutOfQueueNickname,
+                    LastNicknamesByStreamDate = lastNicknamesByStreamDate,
+                }
             };
 
             if (orders.Length > 0)
@@ -88,8 +91,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 ReviewOrder? lastTakenOrder = await reviewOrder_R.FindLastTaken();
                 if (lastTakenOrder is not null)
                 {
-                    _queueManager.LastPriorityManagerState = OrderQueueManager.MapCategoryState(lastTakenOrder.CategoryType);
-                    _queueManager.SetLastNickname(lastTakenOrder);
+                    _queueManager.PriorityManagerState.UpdateFromOrder(lastTakenOrder);
                 }
             }
 
