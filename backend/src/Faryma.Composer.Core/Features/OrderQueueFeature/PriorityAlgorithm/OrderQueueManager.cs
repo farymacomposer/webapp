@@ -25,6 +25,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// </summary>
         public required OrderPriorityManagerState PriorityManagerState { get; init; }
 
+        /// <summary>
+        /// Возвращает текущую позицию заказа
+        /// </summary>
         public OrderQueuePosition GetCurrentQueuePosition(ReviewOrder order) => OrderPositionsById[order.Id].PositionHistory.Current;
 
         /// <summary>
@@ -226,6 +229,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             }
         }
 
+        /// <summary>
+        /// Возвращает обновленные позиции заказов
+        /// </summary>
         private OrderPosition[] GetUpdatedOrderPositions()
         {
             OrderPosition[] result = OrderPositionsById

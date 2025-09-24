@@ -19,6 +19,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// </summary>
         public required OrderPositionHistory PositionHistory { get; init; }
 
+        /// <summary>
+        /// Признак обновления заказа
+        /// </summary>
         public bool IsOrderUpdated { get; private set; }
 
         public static OrderPosition Create(ReviewOrder order)
