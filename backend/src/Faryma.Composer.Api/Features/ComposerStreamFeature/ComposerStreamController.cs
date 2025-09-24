@@ -3,7 +3,7 @@ using Faryma.Composer.Api.Features.ComposerStreamFeature.Cancel;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Complete;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Create;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Find;
-using Faryma.Composer.Api.Features.ComposerStreamFeature.FindCurrentAndScheduled;
+using Faryma.Composer.Api.Features.ComposerStreamFeature.FindLiveAndPlanned;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Start;
 using Faryma.Composer.Api.Shared.Dto;
 using Faryma.Composer.Core.Features.ComposerStreamFeature;
@@ -38,11 +38,11 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         /// Возвращает текущий и запланированные стримы
         /// </summary>
         [HttpGet(nameof(FindLiveAndPlanned))]
-        public async Task<ActionResult<FindCurrentAndScheduledStreamsResponse>> FindLiveAndPlanned()
+        public async Task<ActionResult<FindLiveAndPlannedStreamsResponse>> FindLiveAndPlanned()
         {
             ComposerStream[] streams = await composerStreamService.FindLiveAndPlanned();
 
-            return Ok(new FindCurrentAndScheduledStreamsResponse
+            return Ok(new FindLiveAndPlannedStreamsResponse
             {
                 Streams = streams.Select(ComposerStreamDto.Map)
             });

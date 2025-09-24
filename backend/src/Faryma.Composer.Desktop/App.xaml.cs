@@ -2,6 +2,7 @@
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.Services.ReviewOrderFeature;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
+using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Serilog;
@@ -33,6 +34,7 @@ namespace Faryma.Composer.Desktop
             services.AddSingleton<ComposerStreamService>();
 
             services.AddSingleton<OrderQueuePageVM>();
+            services.AddSingleton<ReviewOrderPageVM>();
 
             _services = services.BuildServiceProvider();
         }

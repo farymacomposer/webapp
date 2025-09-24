@@ -8,7 +8,6 @@ using Faryma.Composer.Desktop.Services.OrderQueueFeature.Events;
 using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 
 namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
@@ -18,7 +17,6 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         private readonly DispatcherQueue _dispatcherQueue;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly HubConnection _signalrClient;
-        private readonly ILogger<OrderQueueService> _logger;
 
         /// <summary>
         /// Версия для синхронизации состояния очереди
@@ -54,11 +52,10 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
         private HttpClient HttpClient => _httpClientFactory.CreateClient("Faryma.Composer.Api");
 
-        public OrderQueueService(IHttpClientFactory httpClientFactory, ILogger<OrderQueueService> logger)
+        public OrderQueueService(IHttpClientFactory httpClientFactory)
         {
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
             _httpClientFactory = httpClientFactory;
-            _logger = logger;
 
             _signalrClient = new HubConnectionBuilder()
                 .WithUrl($"{App.BaseAddress}/api/OrderQueueNotificationHub")
@@ -78,8 +75,6 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         public async Task UpdateOrderQueue()
         {
             GetOrderQueueResponse response = (await HttpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue"))!;
-
-            _logger.LogInformation("{@response}", response);
 
             SyncVersion = response.SyncVersion;
 
@@ -117,8 +112,6 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
         private Task OnOrderPositionsChanged(OrderPositionsChangedEvent message)
         {
-            _logger.LogInformation("{@message}", message);
-
             return _dispatcherQueue.EnqueueAsync(async () =>
             {
                 if (await CheckSyncVersion(message.SyncVersion))

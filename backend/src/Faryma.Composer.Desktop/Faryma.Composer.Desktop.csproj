@@ -32,6 +32,7 @@
   <ItemGroup>
     <None Remove="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml" />
     <None Remove="UI\OrderQueueFeature\OrderQueuePage.xaml" />
+    <None Remove="UI\ReviewOrderFeature\ReviewOrderPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -67,8 +68,8 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
     <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
@@ -83,6 +84,12 @@
   <ItemGroup>
     <Folder Include="Services\OrderQueueFeature\Enums\" />
     <Folder Include="Shared\Enums\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\ReviewOrderFeature\ReviewOrderPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>
