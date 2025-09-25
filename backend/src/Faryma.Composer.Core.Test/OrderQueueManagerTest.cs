@@ -583,6 +583,47 @@ namespace Faryma.Composer.Core.Test
         }
 
         [Fact]
+        public void Debt_X4_Alt2()
+        {
+            OrderQueueManager queueManager = GetManager("04.10.2025");
+
+            Create(queueManager, GetDonation("01.10.2025", 60, "Nick60", 700)); // долг x1
+            Create(queueManager, GetDonation("01.10.2025", 59, "Nick59", 700)); // долг x1
+            Create(queueManager, GetDonation("01.10.2025", 55, "Nick55", 700)); // долг x1
+
+            Create(queueManager, GetDonation("30.09.2025", 51, "Nick51", 700)); // долг x2
+            Create(queueManager, GetDonation("30.09.2025", 48, "Nick48", 700)); // долг x2
+            Create(queueManager, GetDonation("30.09.2025", 47, "Nick47", 700)); // долг x2
+
+            Create(queueManager, GetDonation("29.09.2025", 38, "Nick38", 700)); // долг x3
+            Create(queueManager, GetDonation("29.09.2025", 40, "Nick40", 700)); // долг x3
+
+            Create(queueManager, GetDonation("26.09.2025", 7, "Nick7", 900)); // долг x4
+            Create(queueManager, GetDonation("26.09.2025", 9, "Nick9", 900)); // долг x4
+            Create(queueManager, GetDonation("26.09.2025", 3, "Nick3", 900)); // долг x4
+
+            (long id, string nick)[] expected = [
+                (7,  "Nick7"),  // долг x4
+                (38, "Nick38"), // долг x3
+                (51, "Nick51"), // долг x2
+                (60, "Nick60"), // долг x1
+
+                (9,  "Nick9"),  // долг x4
+                (40, "Nick40"), // долг x3
+                (48, "Nick48"), // долг x2
+                (59, "Nick59"), // долг x1
+
+                (3,  "Nick3"),  // долг x4
+                (47, "Nick47"), // долг x2
+                (55, "Nick55"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
         public void OutOfQueue()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
