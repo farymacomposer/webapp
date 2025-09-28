@@ -6,33 +6,60 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
     /// <summary>
     /// Долговые категории
     /// </summary>
-    public sealed class DebtOrderCategories(List<(DateOnly StreamDate, OrderCategory Category)> debtCategoriesByStreamDate)
+    public sealed class DebtOrderCategories
     {
         /// <summary>
-        /// Счетчик для чередования долговых категорий (X3-X2-X1)
+        /// Долговые категории по дате стрима
+        /// </summary>
+        private readonly List<(DateOnly StreamDate, OrderCategory Category)> _debtCategoriesByStreamDate;
+
+        /// <summary>
+        /// Счетчик для чередования долговых категорий
         /// </summary>
         private int _roundRobinCounter;
 
         /// <summary>
         /// В категориях есть заказы
         /// </summary>
-        public bool HasOrders => debtCategoriesByStreamDate.Any(x => x.Category.HasOrders);
+        public bool HasOrders => _debtCategoriesByStreamDate.Any(x => x.Category.HasOrders);
+
+        public DebtOrderCategories(OrderQueueManager queueManager, List<(DateOnly StreamDate, OrderCategory Category)> debtCategoriesByStreamDate)
+        {
+            _debtCategoriesByStreamDate = debtCategoriesByStreamDate;
+
+            if (debtCategoriesByStreamDate.Count > 0)
+            {
+                DateOnly? lastDebtCategoryDate = queueManager.PriorityManagerState.LastDebtCategoryDate;
+
+                int debtIndex = 0;
+                foreach ((DateOnly streamDate, OrderCategory category) in debtCategoriesByStreamDate.AsEnumerable().Reverse())
+                {
+                    if (streamDate > lastDebtCategoryDate)
+                    {
+                        _roundRobinCounter = debtCategoriesByStreamDate.Count - debtIndex - 1;
+                    }
+
+                    category.UpdateOrdersCategory(queueManager, OrderCategoryType.Debt, debtIndex);
+                    debtIndex++;
+                }
+            }
+        }
 
         /// <summary>
         /// В категориях существует заказ с другим никнеймом и никнейм не совпадает с последним выданным никнеймом из категорий
         /// </summary>
-        public bool HasOrderFromNewNickname(string? nicknameToSkip) => debtCategoriesByStreamDate.Any(x => x.Category.HasOrderFromNewNickname(nicknameToSkip));
+        public bool HasOrderFromNewNickname(string? nicknameToSkip) => _debtCategoriesByStreamDate.Any(x => x.Category.HasOrderFromNewNickname(nicknameToSkip));
 
         /// <summary>
-        /// Последовательно перебирает долговые категории (X3-X2-X1) и извлекает заказ из категории, в которой есть заказы
+        /// Последовательно перебирает долговые категории и извлекает заказ из категории, в которой есть заказы
         /// </summary>
         public ReviewOrder DequeueRoundRobin(string? nicknameToSkip)
         {
             while (true)
             {
-                int index = _roundRobinCounter % debtCategoriesByStreamDate.Count;
+                int index = _roundRobinCounter % _debtCategoriesByStreamDate.Count;
 
-                (DateOnly streamDate, OrderCategory category) = debtCategoriesByStreamDate[index];
+                (DateOnly streamDate, OrderCategory category) = _debtCategoriesByStreamDate[index];
                 if (category.HasOrders)
                 {
                     ReviewOrder order = category.Dequeue(nicknameToSkip);
@@ -46,15 +73,15 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         }
 
         /// <summary>
-        /// Последовательно перебирает долговые категории (X3-X2-X1) и извлекает заказ из категории, в которой существует заказ с другим никнеймом
+        /// Последовательно перебирает долговые категории и извлекает заказ из категории, в которой существует заказ с другим никнеймом
         /// </summary>
         public ReviewOrder DequeueRoundRobinFromOtherNickname(string? nicknameToSkip)
         {
             while (true)
             {
-                int index = _roundRobinCounter % debtCategoriesByStreamDate.Count;
+                int index = _roundRobinCounter % _debtCategoriesByStreamDate.Count;
 
-                (DateOnly streamDate, OrderCategory category) = debtCategoriesByStreamDate[index];
+                (DateOnly streamDate, OrderCategory category) = _debtCategoriesByStreamDate[index];
                 if (category.HasOrderFromOtherNickname(nicknameToSkip))
                 {
                     ReviewOrder order = category.Dequeue(nicknameToSkip);
@@ -64,19 +91,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
                 }
 
                 _roundRobinCounter++;
-            }
-        }
-
-        /// <summary>
-        /// Обновляет категории заказов (X3-X2-X1)
-        /// </summary>
-        public void UpdateOrderCategories(OrderQueueManager queueManager)
-        {
-            int debtNumber = 1;
-            foreach ((DateOnly streamDate, OrderCategory category) in debtCategoriesByStreamDate.AsEnumerable().Reverse())
-            {
-                category.UpdateOrdersCategory(queueManager, OrderCategoryType.Debt, debtNumber);
-                debtNumber++;
             }
         }
     }

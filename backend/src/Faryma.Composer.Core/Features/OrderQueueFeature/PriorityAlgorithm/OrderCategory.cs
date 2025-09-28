@@ -72,11 +72,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         /// <summary>
         /// Обновляет категорию заказов
         /// </summary>
-        public void UpdateOrdersCategory(OrderQueueManager queueManager, OrderCategoryType type, int debtNumber = 0)
+        public void UpdateOrdersCategory(OrderQueueManager queueManager, OrderCategoryType type, int debtIndex = 0)
         {
             foreach (ReviewOrder item in orders)
             {
-                queueManager.OrderPositionsById[item.Id].UpdateCurrentCategory(type, debtNumber);
+                queueManager.OrderPositionsById[item.Id].UpdateCurrentCategory(type, debtIndex);
             }
         }
     }

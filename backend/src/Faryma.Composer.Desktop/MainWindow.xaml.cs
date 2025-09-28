@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
+using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -16,7 +17,14 @@ namespace Faryma.Composer.Desktop
             new()
             {
                 Index = 0,
-                Title = "Очередь",
+                Title = "Заказы",
+                Icon = "\xE71D",
+                PageType = typeof(ReviewOrderPage),
+            },
+            new()
+            {
+                Index = 1,
+                Title = "Тест очереди",
                 Icon = "\xE71D",
                 PageType = typeof(OrderQueuePage),
             },

@@ -15,6 +15,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{36D591C7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Desktop", "src\Faryma.Composer.Desktop\Faryma.Composer.Desktop.csproj", "{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{5B96642E-C846-4CB5-9DDB-FB89991A1F45}"
+	ProjectSection(SolutionItems) = preProject
+		..\.env = ..\.env
+		..\backend.Dockerfile = ..\backend.Dockerfile
+		..\docker-compose.yml = ..\docker-compose.yml
+		entrypoint.sh = entrypoint.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

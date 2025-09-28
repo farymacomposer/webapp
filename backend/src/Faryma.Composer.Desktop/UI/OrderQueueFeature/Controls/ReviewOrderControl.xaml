@@ -78,8 +78,8 @@
                 <TextBlock Text="{Binding ActivityStatus}" />
                 <TextBlock Text="{Binding CurrentCategoryType}" />
                 <StackPanel Orientation="Horizontal" Spacing="4">
-                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="DebtNumber:" />
-                    <TextBlock Text="{Binding CategoryDebtNumber}" />
+                    <TextBlock Foreground="{StaticResource NeutralBrush}" Text="DebtIndex:" />
+                    <TextBlock Text="{Binding CategoryDebtIndex}" />
                 </StackPanel>
             </StackPanel>
 

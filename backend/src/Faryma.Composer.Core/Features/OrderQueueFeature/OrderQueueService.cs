@@ -6,7 +6,7 @@ using Faryma.Composer.Core.Utils;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
-using Faryma.Composer.Infrastructure.Repositories;
+using Faryma.Composer.Infrastructure.Repositories.Read;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Core.Features.OrderQueueFeature
@@ -24,25 +24,30 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         public async Task Initialize()
         {
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ReviewOrderRepository reviewOrderRepository = new(context);
-            ComposerStreamRepository composerStreamRepository = new(context);
+            ReviewOrder_R_Repository reviewOrder_R = new(context);
+            ComposerStream_R_Repository composerStream_R = new(context);
 
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
-            ComposerStream? nearestStream = await composerStreamRepository.FindNearest(today);
-            ReviewOrder? lastOrder = await reviewOrderRepository.FindLastCompleted();
-            string? lastOutOfQueueNickname = await reviewOrderRepository.FindLastOutOfQueueNickname();
-            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await composerStreamRepository.GetLastNicknamesByStreamDate();
-            ReviewOrder[] orders = await reviewOrderRepository.GetOrdersInQueue();
+            ComposerStream? nearestStream = await composerStream_R.FindNearest(today);
+            ReviewOrder? lastTakenOrder = await reviewOrder_R.FindLastTaken();
+            ReviewOrder? lastTakenDebt = await reviewOrder_R.FindLastTakenDebt();
+            ReviewOrder? lastTakenOutOfQueue = await reviewOrder_R.FindLastTakenOutOfQueue();
+            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await composerStream_R.GetLastNicknamesByStreamDate();
+            ReviewOrder[] orders = await reviewOrder_R.GetOrdersInQueue();
 
             _queueManager = new OrderQueueManager
             {
                 NearestStreamDate = nearestStream?.EventDate ?? today,
-                LastPriorityManagerState = (lastOrder is null) ? CategoryState.Initial : OrderQueueManager.MapCategoryState(lastOrder.CategoryType),
-                LastIssuedNickname = lastOrder?.MainNormalizedNickname,
-                LastOutOfQueueNickname = lastOutOfQueueNickname,
-                LastNicknamesByStreamDate = lastNicknamesByStreamDate,
                 OrderPositionsById = orders.ToDictionary(k => k.Id, OrderPosition.Create),
+                PriorityManagerState = new OrderPriorityManagerState
+                {
+                    LastPriorityManagerState = (lastTakenOrder is null) ? CategoryState.Initial : OrderPriorityManagerState.MapCategoryState(lastTakenOrder.CategoryType),
+                    LastIssuedNickname = lastTakenOrder?.MainNormalizedNickname,
+                    LastDebtCategoryDate = lastTakenDebt?.CreationStream.EventDate,
+                    LastOutOfQueueNickname = lastTakenOutOfQueue?.MainNormalizedNickname,
+                    LastNicknamesByStreamDate = lastNicknamesByStreamDate,
+                }
             };
 
             if (orders.Length > 0)
@@ -52,7 +57,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         }
 
         public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrder order) =>
-            _locker.Lock(() => _queueManager.GetCurrentQueuePosition(order));
+            _locker.Lock(() => _queueManager.GetCurrentQueuePosition(order).Clone());
 
         public Task<OrderQueue> GetOrderQueue() => _locker.Lock(() => new OrderQueue
         {
@@ -84,12 +89,11 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             if (previousStatus == ReviewOrderStatus.InProgress)
             {
                 await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-                ReviewOrderRepository reviewOrderRepository = new(context);
-                ReviewOrder? lastCompleted = await reviewOrderRepository.FindLastCompleted();
-                if (lastCompleted is not null)
+                ReviewOrder_R_Repository reviewOrder_R = new(context);
+                ReviewOrder? lastTakenOrder = await reviewOrder_R.FindLastTaken();
+                if (lastTakenOrder is not null)
                 {
-                    _queueManager.LastPriorityManagerState = OrderQueueManager.MapCategoryState(lastCompleted.CategoryType);
-                    _queueManager.SetLastNickname(lastCompleted);
+                    _queueManager.PriorityManagerState.UpdateFromOrder(lastTakenOrder);
                 }
             }
 
@@ -110,8 +114,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             _queueManager.NearestStreamDate = stream.EventDate;
 
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ReviewOrderRepository reviewOrderRepository = new(context);
-            ReviewOrder[] orders = await reviewOrderRepository.GetOrdersToStartStream(stream.Id);
+            ReviewOrder_R_Repository reviewOrder_R = new(context);
+            ReviewOrder[] orders = await reviewOrder_R.GetOrdersToStartStream(stream.Id);
 
             OrderQueue orderQueue = new()
             {
@@ -128,15 +132,15 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             _syncVersion++;
 
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ComposerStreamRepository composerStreamRepository = new(context);
-            ComposerStream? nearestStream = await composerStreamRepository.FindNearest(stream.EventDate);
+            ComposerStream_R_Repository composerStream_R = new(context);
+            ComposerStream? nearestStream = await composerStream_R.FindNearest(stream.EventDate);
             if (nearestStream is not null)
             {
                 _queueManager.NearestStreamDate = nearestStream.EventDate;
             }
 
-            ReviewOrderRepository reviewOrderRepository = new(context);
-            ReviewOrder[] orders = await reviewOrderRepository.GetOrdersToCompleteStream(stream.Id);
+            ReviewOrder_R_Repository reviewOrder_R = new(context);
+            ReviewOrder[] orders = await reviewOrder_R.GetOrdersToCompleteStream(stream.Id);
 
             OrderQueue orderQueue = new()
             {

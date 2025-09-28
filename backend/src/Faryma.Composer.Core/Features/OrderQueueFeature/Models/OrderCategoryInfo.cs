@@ -13,8 +13,8 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         public required OrderCategoryType Type { get; init; }
 
         /// <summary>
-        /// Номер категории, если заказ относится к долговой категории
+        /// Индекс категории, если заказ относится к долговой категории
         /// </summary>
-        public required int DebtNumber { get; init; }
+        public required int DebtIndex { get; init; }
     }
 }

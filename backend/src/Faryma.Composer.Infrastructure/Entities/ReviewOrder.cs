@@ -12,9 +12,19 @@ namespace Faryma.Composer.Infrastructure.Entities
     public sealed class ReviewOrder : BaseEntity
     {
         /// <summary>
+        /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
+        /// </summary>
+        public required string MainNickname { get; set; }
+        public required string MainNormalizedNickname { get; set; }
+
+        public long CreationStreamId { get; set; }
+
+        /// <summary>
         /// Дата и время создания заказа
         /// </summary>
         public required DateTime CreatedAt { get; set; }
+
+        public long? ProcessingStreamId { get; set; }
 
         /// <summary>
         /// Дата и время взятия заказа в работу
@@ -32,14 +42,14 @@ namespace Faryma.Composer.Infrastructure.Entities
         public required ReviewOrderType Type { get; set; }
 
         /// <summary>
-        /// Тип категории заказа
-        /// </summary>
-        public required OrderCategoryType CategoryType { get; set; }
-
-        /// <summary>
         /// Статус заказа
         /// </summary>
         public required ReviewOrderStatus Status { get; set; }
+
+        /// <summary>
+        /// Тип категории заказа
+        /// </summary>
+        public required OrderCategoryType CategoryType { get; set; }
 
         /// <summary>
         /// Заказ заморожен
@@ -51,6 +61,8 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// </summary>
         public string? TrackUrl { get; set; }
 
+        public long? TrackId { get; set; }
+
         /// <summary>
         /// Номинальная стоимость заказа
         /// </summary>
@@ -60,16 +72,6 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Комментарий пользователя
         /// </summary>
         public string? UserComment { get; set; }
-
-        /// <summary>
-        /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
-        /// </summary>
-        public required string MainNickname { get; set; }
-        public required string MainNormalizedNickname { get; set; }
-
-        public long? TrackId { get; set; }
-        public long CreationStreamId { get; set; }
-        public long? ProcessingStreamId { get; set; }
 
         // Навигационные свойства
 

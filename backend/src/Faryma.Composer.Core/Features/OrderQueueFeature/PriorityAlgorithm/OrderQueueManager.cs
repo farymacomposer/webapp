@@ -16,45 +16,19 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
         public required DateOnly NearestStreamDate { get; set; }
 
         /// <summary>
-        /// Последнее состояние менеджера приоритетов
-        /// </summary>
-        public required CategoryState LastPriorityManagerState { get; set; }
-
-        /// <summary>
-        /// Последний обработанный никнейм
-        /// </summary>
-        public required string? LastIssuedNickname { get; set; }
-
-        /// <summary>
-        /// Последний никнейм в категории - вне очереди
-        /// </summary>
-        public required string? LastOutOfQueueNickname { get; set; }
-
-        /// <summary>
-        /// Последний никнейм в донатной и долговых категориях (по дате стрима)
-        /// </summary>
-        public required Dictionary<DateOnly, string> LastNicknamesByStreamDate { get; init; }
-
-        /// <summary>
         /// Заказы и их позиции в очереди
         /// </summary>
         public required Dictionary<long, OrderPosition> OrderPositionsById { get; init; }
 
         /// <summary>
-        ///
+        /// Состояние менеджера приоритетов активных заказов
         /// </summary>
-        public static CategoryState MapCategoryState(OrderCategoryType categoryType)
-        {
-            return categoryType switch
-            {
-                OrderCategoryType.OutOfQueue => CategoryState.OutOfQueue,
-                OrderCategoryType.Donation => CategoryState.Donation,
-                OrderCategoryType.Debt => CategoryState.Debt,
-                _ => throw new OrderQueueException($"Тип категории заказа '{categoryType}' не поддерживается")
-            };
-        }
+        public required OrderPriorityManagerState PriorityManagerState { get; init; }
 
-        public OrderQueuePosition GetCurrentQueuePosition(ReviewOrder order) => OrderPositionsById[order.Id].PositionHistory.Current.Clone();
+        /// <summary>
+        /// Возвращает текущую позицию заказа
+        /// </summary>
+        public OrderQueuePosition GetCurrentQueuePosition(ReviewOrder order) => OrderPositionsById[order.Id].PositionHistory.Current;
 
         /// <summary>
         /// Обновляет позиции заказов
@@ -104,8 +78,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
 
                 case OrderQueueUpdateType.OrderTaken:
 
-                    LastPriorityManagerState = MapCategoryState(order.CategoryType);
-                    SetLastNickname(order);
+                    PriorityManagerState.UpdateFromOrder(order);
 
                     break;
 
@@ -138,24 +111,6 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             UpdateAllPositions();
 
             return GetUpdatedOrderPositions();
-        }
-
-        /// <summary>
-        /// Устанавливает последний обработанный никнейм
-        /// </summary>
-        public void SetLastNickname(ReviewOrder order)
-        {
-            LastIssuedNickname = order.MainNormalizedNickname;
-
-            if (order.Type == ReviewOrderType.OutOfQueue)
-            {
-                LastOutOfQueueNickname = order.MainNormalizedNickname;
-            }
-            else
-            {
-                DateOnly streamDate = order.CreationStream.EventDate;
-                LastNicknamesByStreamDate[streamDate] = order.MainNormalizedNickname;
-            }
         }
 
         /// <summary>
@@ -274,6 +229,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.PriorityAlgorithm
             }
         }
 
+        /// <summary>
+        /// Возвращает обновленные позиции заказов
+        /// </summary>
         private OrderPosition[] GetUpdatedOrderPositions()
         {
             OrderPosition[] result = OrderPositionsById

@@ -4,21 +4,20 @@ services:
 
   webapi:
     build:
-      #context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: backend.Dockerfile
     container_name: composer-api
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       ASPNETCORE_HTTP_PORTS: 8080
       POSTGRES__HOST: db
       POSTGRES__PORT: 5432
-      POSTGRES__DATABASE: composer_db
-      POSTGRES__USERNAME: postgres
-      POSTGRES__PASSWORD: StrongPassword123!
-      JWT__ISSUER: https://api.com
-      JWT__AUDIENCE: https://client.com
-      JWT__SECRET_KEY: a-string-secret-at-least-256-bits-long
-      JWT__EXPIRY_IN_MINUTES: 60
+      POSTGRES__DATABASE: ${POSTGRES__DATABASE}
+      POSTGRES__USERNAME: ${POSTGRES__USERNAME}
+      POSTGRES__PASSWORD: ${POSTGRES__PASSWORD}
+      JWT__ISSUER: ${JWT__ISSUER}
+      JWT__AUDIENCE: ${JWT__AUDIENCE}
+      JWT__SECRET_KEY: ${JWT__SECRET_KEY}
+      JWT__EXPIRY_IN_MINUTES: ${JWT__EXPIRY_IN_MINUTES}
     ports:
       - "8080:8080"
     networks:
@@ -32,15 +31,15 @@ services:
     image: postgres:17
     container_name: composer-db
     environment:
-      POSTGRES_DB: composer_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: StrongPassword123!
+      POSTGRES_DB: ${POSTGRES__DATABASE}
+      POSTGRES_USER: ${POSTGRES__USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES__PASSWORD}
     ports:
       - "5432:5432"
     networks:
       - composer-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d composer_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES__USERNAME} -d ${POSTGRES__DATABASE}"]
       interval: 5s
       timeout: 5s
       retries: 5

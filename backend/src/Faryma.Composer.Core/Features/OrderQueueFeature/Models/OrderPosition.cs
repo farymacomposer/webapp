@@ -19,6 +19,9 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// </summary>
         public required OrderPositionHistory PositionHistory { get; init; }
 
+        /// <summary>
+        /// Признак обновления заказа
+        /// </summary>
         public bool IsOrderUpdated { get; private set; }
 
         public static OrderPosition Create(ReviewOrder order)
@@ -34,7 +37,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
                         Category = new OrderCategoryInfo
                         {
                             Type = OrderCategoryType.Unspecified,
-                            DebtNumber = 0
+                            DebtIndex = 0
                         }
                     },
                     Previous = new OrderQueuePosition
@@ -42,7 +45,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
                         Category = new OrderCategoryInfo
                         {
                             Type = OrderCategoryType.Unspecified,
-                            DebtNumber = 0
+                            DebtIndex = 0
                         }
                     }
                 }
@@ -72,12 +75,12 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
         /// <summary>
         /// Обновляет текущую категорию заказа
         /// </summary>
-        public void UpdateCurrentCategory(OrderCategoryType type, int debtNumber)
+        public void UpdateCurrentCategory(OrderCategoryType type, int debtIndex)
         {
             PositionHistory.Current.Category = new OrderCategoryInfo
             {
                 Type = type,
-                DebtNumber = debtNumber
+                DebtIndex = debtIndex
             };
         }
 
