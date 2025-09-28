@@ -1,10 +1,6 @@
 ﻿using System.Net.Http.Json;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Cancel;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Complete;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Create;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Find;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature.FindCurrentAndScheduled;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Start;
+using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Requests;
+using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Responses;
 using Faryma.Composer.Desktop.Shared.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -23,16 +19,16 @@ namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature
 
             string url = $"/api/ComposerStream/FindStreams{queryBuilder}";
 
-            FindStreamsResponse response = (await HttpClient.GetFromJsonAsync<FindStreamsResponse>(url))!;
+            StreamsResponse response = (await HttpClient.GetFromJsonAsync<StreamsResponse>(url))!;
 
             logger.LogInformation("{@response}", response);
 
             return response.Streams;
         }
 
-        public async Task<IEnumerable<ComposerStreamDto>> FindCurrentAndScheduled()
+        public async Task<IEnumerable<ComposerStreamDto>> FindLiveAndPlanned()
         {
-            FindCurrentAndScheduledStreamsResponse response = (await HttpClient.GetFromJsonAsync<FindCurrentAndScheduledStreamsResponse>("/api/ComposerStream/FindCurrentAndScheduledStreams"))!;
+            StreamsResponse response = (await HttpClient.GetFromJsonAsync<StreamsResponse>("/api/ComposerStream/FindLiveAndPlanned"))!;
 
             logger.LogInformation("{@response}", response);
 

@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto;
-using Faryma.Composer.Desktop.Services.OrderQueueFeature.Events;
 using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -179,7 +178,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 OrderActivityStatus.Completed => CompletedOrders,
                 OrderActivityStatus.Scheduled => ScheduledOrders,
                 OrderActivityStatus.Frozen => FrozenOrders,
-                _ => throw new InvalidOperationException(status.ToString()),
+                _ => throw new InvalidOperationException($"Статус активности заказа '{status}' не поддерживается"),
             };
         }
 

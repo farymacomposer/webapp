@@ -1,11 +1,11 @@
 ﻿using Faryma.Composer.Desktop.Shared.Dto;
 
-namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.FindCurrentAndScheduled
+namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Responses
 {
     /// <summary>
-    /// Ответ на запрос текущего и запланированных стримов
+    /// Список стримов
     /// </summary>
-    public sealed record FindCurrentAndScheduledStreamsResponse
+    public sealed record StreamsResponse
     {
         /// <summary>
         /// Список стримов

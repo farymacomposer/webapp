@@ -1,9 +1,9 @@
 ﻿using Faryma.Composer.Desktop.Shared.Dto;
 
-namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature
+namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Responses
 {
     /// <summary>
-    /// Ответ на запрос отмены стрима
+    /// Стрим композитора
     /// </summary>
     public sealed record StreamResponse
     {

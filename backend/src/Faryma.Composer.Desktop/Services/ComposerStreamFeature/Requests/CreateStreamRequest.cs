@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Create
+namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Requests
 {
     /// <summary>
     /// Запрос создания стрима

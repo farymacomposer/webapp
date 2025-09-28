@@ -1,9 +1,9 @@
-﻿namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Start
+﻿namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Requests
 {
     /// <summary>
-    /// Запрос запуска стрима
+    /// Запрос отмены стрима
     /// </summary>
-    public sealed record StartStreamRequest
+    public sealed record CancelStreamRequest
     {
         /// <summary>
         /// Id стрима

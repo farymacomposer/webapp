@@ -46,7 +46,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
                 or ReviewOrderType.Free
                 or ReviewOrderType.Charity))
             {
-                yield return new ValidationResult($"Тип заказа не поддерживается `{OrderType}`");
+                yield return new ValidationResult($"Тип заказа '{OrderType}' не поддерживается");
             }
 
             if (PaymentAmount < 0)

@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Complete
+﻿namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Requests
 {
     /// <summary>
     /// Запрос завершения стрима

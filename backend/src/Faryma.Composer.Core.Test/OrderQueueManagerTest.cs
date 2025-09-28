@@ -41,8 +41,6 @@ namespace Faryma.Composer.Core.Test
             Create(queueManager, GetDonation("10.01.2000", 2, "Nick1", 800));
             Create(queueManager, GetDonation("10.01.2000", 3, "Nick2", 700));
 
-            queueManager.UpdateAllPositions();
-
             (long id, string nick)[] expected = [
                 (1, "Nick1"),
                 (3, "Nick2"),
