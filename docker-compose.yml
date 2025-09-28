@@ -4,7 +4,7 @@ services:
 
   webapi:
     build:
-      context: ./backend
+      #context: ./backend
       dockerfile: Dockerfile
     container_name: composer-api
     environment:
