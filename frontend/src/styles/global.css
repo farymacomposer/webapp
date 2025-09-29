@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+    /* Бэкграунд градиент */
+    --main-gradient: linear-gradient(180deg,
+            #1B0C3B 0%,
+            #270E59 10%,
+            #381186 20%,
+            #791FB4 40%,
+            #BC26A0 60%,
+            #C01A57 75%,
+            #921C4B 90%,
+            #20084A 100%);
+    /* Header */
+    --color-header-bg: #0D0719;
+    --color-header: #FFF5EB;
+    /* Colors */
+    --color-secondary: #FFA448;
+}
+
+body {
+    color: #ffff;
+    margin: 0;
+    min-height: 100vh;
+    background: var(--main-gradient);
+    background-attachment: fixed;
+}
+
+.container {
+    max-width: 1200px;
+    /* ширина сайта */
+    margin: 0 auto;
+    /* центрируем по горизонтали */
+    padding: 20px;
+    /* внутренние отступы */
+}
