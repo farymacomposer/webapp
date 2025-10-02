@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import styles from "./SearchBox.module.css";
+import styles from "../../styles/components/header/SearchBox.module.css";
 
 export default function SearchBox() {
     const [query, setQuery] = useState("");

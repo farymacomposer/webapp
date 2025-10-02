@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "./StatusLabel.module.css";
+import styles from "../../styles/components/header/StatusLabel.module.css";
 
 type Props = {
     prefix?: string;        // "стрим идёт,"

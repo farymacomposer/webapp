@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import styles from "./Header.module.css";
+import styles from "../../styles/components/header/Header.module.css";
 
 import StatusLabel from "./StatusLabel";
 import SearchBox from "./SearchBox";
