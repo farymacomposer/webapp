@@ -15,7 +15,9 @@ export default function StatusLabel({
 }: Props) {
     return (
         <div className={`${styles.label} ${styles[variant]}`} role="status" aria-live="polite">
-            <span className={styles.text}>{prefix} <span className={styles.highlight}>{highlight}</span></span>
+            <span className={styles.text}>{prefix}
+                <span className={styles.highlight}>{highlight}</span>
+            </span>
         </div>
     );
 }
