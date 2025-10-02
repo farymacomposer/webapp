@@ -24,15 +24,15 @@ export default function Header() {
                     <StatusLabel />
                     <SearchBox />
                     {/* Генерируем ссылки для страниц */}
-                    {routes.map(r => {
-                        const active = r.exact ? pathname === r.href : pathname.startsWith(r.href);
+                    {routes.map(route => {
+                        const active = route.exact ? pathname === route.href : pathname.startsWith(route.href);
                         return (
                             <Link
-                                key={r.href}
-                                href={r.href}
+                                key={route.href}
+                                href={route.href}
                                 className={`${styles.navLink} ${active ? styles.active : ""}`}
                             >
-                                {r.label}
+                                {route.label}
                             </Link>
                         );
                     })}
