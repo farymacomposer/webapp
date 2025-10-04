@@ -1,0 +1,15 @@
+.label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.text {
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--color-header);
+}
+
+.highlight {
+    color: var(--color-secondary);
+}
