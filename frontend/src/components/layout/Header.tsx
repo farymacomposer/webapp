@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "../../styles/components/header/Header.module.css";
 
-import StatusLabel from "./StatusLabel";
-import SearchBox from "./SearchBox";
+import StatusLabel from "../widgets/StatusLabel";
+import SearchBox from "../widgets/SearchBox";
 
 //Задаём пути
 const routes = [
