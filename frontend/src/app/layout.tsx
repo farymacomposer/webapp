@@ -1,6 +1,5 @@
 import "@/styles/global.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import Header from "@/components/widgets/Header";
 
 export const metadata = {
   title: "Composer",
@@ -13,7 +12,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <Header />
         <main className="container">{children}</main>
-        <Footer />
       </body>
     </html>
   );
