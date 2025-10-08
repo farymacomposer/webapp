@@ -1,4 +1,4 @@
-name: 🔍 → 🧪
+name: Roslynator → Tests
 
 on:
   pull_request:
@@ -19,7 +19,7 @@ jobs:
         run: docker pull ghcr.io/mnham/roslynatoranalyzer:latest
 
       - name: Run Roslynator Analyzer
-        run: docker run -t --rm -v "$(pwd):/src" ghcr.io/mnham/roslynatoranalyzer:latest
+        run: docker run -t --rm -v "${{ github.workspace }}:/src" ghcr.io/mnham/roslynatoranalyzer:latest
 
   tests:
     needs: analyze

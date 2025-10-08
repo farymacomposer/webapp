@@ -1,0 +1,21 @@
+name: ESLint
+
+on:
+  pull_request:
+    branches: [ main, dev ]
+    paths:
+      - 'frontend/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Run ESLint in Docker
+        run: |
+          docker run -t --rm -v "${{ github.workspace }}/frontend:/src" \
+            -w /src \
+            node:20-alpine \
+            sh -c "npm ci && npx eslint ."
