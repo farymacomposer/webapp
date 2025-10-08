@@ -7,21 +7,41 @@
     <SolidColorBrush x:Key="NeutralBrush" Color="#80000000" />
     <SolidColorBrush x:Key="PositiveBrush" Color="#2ECC71" />
 
-    <SolidColorBrush
-        x:Key="TitledContentRowBackground"
-        Opacity="0.02"
-        Color="Black" />
-
     <Style x:Key="HeaderStyle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource NeutralBrush}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="FontSize" Value="20" />
     </Style>
 
+    <Style x:Key="StackPanelCardStyle" TargetType="StackPanel">
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Spacing" Value="16" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style x:Key="GridCardStyle" TargetType="Grid">
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style x:Key="BorderCardStyle" TargetType="Border">
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
     <Style TargetType="controls:TitledContentRow">
         <Setter Property="Spacing" Value="6" />
-        <Setter Property="Background" Value="{StaticResource TitledContentRowBackground}" />
-        <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
+        <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:TitledContentRow">
@@ -35,18 +55,14 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            FontFamily="{TemplateBinding FontFamily}"
-                            Text="{TemplateBinding Title}" />
+                        <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Title}" />
 
                         <Rectangle Grid.Column="1" Width="{TemplateBinding Spacing}" />
 
                         <ContentPresenter
                             Grid.Column="2"
                             VerticalContentAlignment="Center"
-                            Content="{TemplateBinding Content}"
-                            FontFamily="{TemplateBinding FontFamily}" />
+                            Content="{TemplateBinding Content}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -56,8 +72,8 @@
     <Style x:Key="RightContentAlignment" TargetType="controls:TitledContentRow">
         <Setter Property="Spacing" Value="6" />
         <Setter Property="HorizontalContentAlignment" Value="Right" />
-        <Setter Property="Background" Value="{StaticResource TitledContentRowBackground}" />
-        <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
+        <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="controls:TitledContentRow">
@@ -70,17 +86,13 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            FontFamily="{TemplateBinding FontFamily}"
-                            Text="{TemplateBinding Title}" />
+                        <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Title}" />
 
                         <ContentPresenter
                             Grid.Column="2"
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalContentAlignment="Center"
-                            Content="{TemplateBinding Content}"
-                            FontFamily="{TemplateBinding FontFamily}" />
+                            Content="{TemplateBinding Content}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
