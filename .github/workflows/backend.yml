@@ -9,7 +9,7 @@ on:
       - '**.editorconfig'
 
 jobs:
-  analyze:
+  roslynator:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,8 +18,8 @@ jobs:
       - name: Pull Roslynator image
         run: docker pull ghcr.io/mnham/roslynatoranalyzer:latest
 
-      - name: Run Roslynator Analyzer
-        run: docker run -t --rm -v "${{ github.workspace }}:/src" ghcr.io/mnham/roslynatoranalyzer:latest
+      - name: Run Roslynator
+        run: docker run --rm -v "${{ github.workspace }}:/src" ghcr.io/mnham/roslynatoranalyzer:latest
 
   tests:
     needs: analyze
