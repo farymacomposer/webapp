@@ -2,6 +2,22 @@ version: '3.8'
 
 services:
 
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    container_name: composer-frontend
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:8080/api
+    ports:
+      - "3000:3000"
+    networks:
+      - composer-net
+    depends_on:
+      - webapi
+    restart: unless-stopped
+
   webapi:
     build:
       dockerfile: backend.Dockerfile
