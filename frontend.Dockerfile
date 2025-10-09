@@ -3,7 +3,7 @@ FROM node:jod-alpine AS base
 WORKDIR /app
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 RUN apk add --no-cache libc6-compat && \
-    corepack enable && \
+    corepack enable pnpm && \
     pnpm install --frozen-lockfile
 
 # Build stage

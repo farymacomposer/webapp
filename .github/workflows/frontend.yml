@@ -15,7 +15,9 @@ jobs:
 
       - name: Run ESLint
         run: |
-          docker run -t --rm -v "${{ github.workspace }}/frontend:/src" \
+          docker run -t --rm \
+            -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
+            -v "${{ github.workspace }}/frontend:/src" \
             -w /src \
-            node:jod-alpine \
-            sh -c "npm ci && npx eslint ."
+            node:jod-slim \
+            sh -c "corepack enable pnpm && pnpm install --frozen-lockfile && pnpm exec eslint ."
