@@ -4,12 +4,11 @@ services:
 
   frontend:
     build:
-      context: .
       dockerfile: frontend.Dockerfile
     container_name: composer-frontend
     environment:
-      NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://localhost:8080/api
+      NODE_ENV: ${NODE_ENV}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     ports:
       - "3000:3000"
     networks:
@@ -21,7 +20,7 @@ services:
   webapi:
     build:
       dockerfile: backend.Dockerfile
-    container_name: composer-api
+    container_name: composer-webapi
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       ASPNETCORE_HTTP_PORTS: 8080
