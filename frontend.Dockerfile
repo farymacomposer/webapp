@@ -1,5 +1,5 @@
 # Base stage
-FROM node:alpine AS base
+FROM node:jod-alpine AS base
 WORKDIR /app
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 RUN apk add --no-cache libc6-compat && \
@@ -12,7 +12,7 @@ COPY frontend/ .
 RUN pnpm run build
 
 # Runtime stage
-FROM node:alpine AS final
+FROM node:jod-alpine AS final
 WORKDIR /app
 EXPOSE 3000
 
