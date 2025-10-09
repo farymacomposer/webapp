@@ -22,7 +22,7 @@ jobs:
         run: docker run -t --rm -v "${{ github.workspace }}:/src" ghcr.io/mnham/roslynatoranalyzer:latest
 
   Tests:
-    needs: analyze
+    needs: Roslynator
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
