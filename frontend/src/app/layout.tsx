@@ -1,5 +1,5 @@
 import "@/styles/global.css";
-import Header from "@/components/header/Header";
+import Header from "@/components/widgets/Header";
 
 export const metadata = {
   title: "Composer",

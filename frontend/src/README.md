@@ -1,31 +1,30 @@
 
-## Дерево проекта (основное)
+## Обновлённая файловая структура
 
 ```
 src/
+  api/                    # функции для работы с API (fetch, запросы)
   app/                    # страницы (роуты)
-    page.tsx              # главная
-    catalog/page.tsx
-    help/page.tsx
-    stream-space/page.tsx
-    layout.tsx            # общий layout (хедер/контейнер)
-  components/             # UI и доменные модули
-    header/               # Header, SearchBox, StatusLabel (+ их стили)
-    stream/               # карточки стримов, очередь
-    catalog/              # карточки треков, фильтры
-    ui/                   # атомы: Button, Input, Modal и т.п.
-  styles/
-    global.css            # сбросы, шрифты, переменные
-    components/           # стили модулей
-  lib/
-    http/                 # fetcher.ts (общая обёртка над fetch)
-    api/                  # клиентские функции для UI: search и т.п.
-    utils/                # общие утилиты
-  hooks/                  # кастомные хуки (debounce и т.п.)
-  config/                 # routes.ts (думаю нет необходимости, но наслучай если разрастётся проект может быть полезно)
-  types/                  # TS-типы
+    catalog/              # страница каталога
+    help/                 # страница справки
+    stream-space/         # страница стрим-пространства
+    layout.tsx            # общий layout (header, контейнер, wrapper)
+    page.tsx              # главная страница
+  components/             # UI и логические модули интерфейса
+    shared/               # переиспользуемые атомарные элементы (button, input)
+    widgets/              # сложные виджеты, объединяющие несколько компонентов (card, streamWindow)
+  config/                 # конфигурационные файлы проекта (routes, constants)
+  lib/                    # служебные модули и вспомогательные функции
+    hooks/                # кастомные React-хуки (debounce, useFetch и т.п.)
+    utils/                # утилиты и хелперы общего назначения
+  styles/                 # глобальные и модульные стили
+    components/           # стили, сгруппированные по компонентам
+    global.css            # глобальные стили: сбросы, шрифты, переменные
+  types/                  # глобальные TypeScript-типы
+   api/
+   ui/
   data/mocks/             # хард-код для даты если необходимо
-public/                   # статика: шрифты, og-картинки, логотипы
+public/                   # статика: изображения, шрифты, логотипы, og-картинки
 ```
 
 ## Базовые соглашения
