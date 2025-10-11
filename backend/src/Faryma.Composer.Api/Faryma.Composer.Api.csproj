@@ -12,10 +12,11 @@
   <ItemGroup>
     <PackageReference Include="Saunter" Version="0.13.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.10" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.11" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="9.0.6" />
+    <PackageReference Include="TwitchLib.Api" Version="3.9.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -14,23 +14,38 @@
         <MicaBackdrop Kind="BaseAlt" />
     </Window.SystemBackdrop>
 
-    <NavigationView
-        IsBackButtonVisible="Collapsed"
-        IsSettingsVisible="False"
-        Loaded="NavigationViewLoaded"
-        MenuItemsSource="{x:Bind Pages}"
-        PaneDisplayMode="Top"
-        SelectionChanged="NavigationViewSelectionChanged">
-        <NavigationView.MenuItemTemplate>
-            <DataTemplate x:DataType="vm:PageViewModel">
-                <NavigationViewItem Content="{x:Bind Title}">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind Icon}" />
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-            </DataTemplate>
-        </NavigationView.MenuItemTemplate>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
 
-        <Frame x:Name="PageFrame" />
-    </NavigationView>
+        <TitleBar
+            x:Name="titleBar"
+            IsPaneToggleButtonVisible="True"
+            PaneToggleRequested="TitleBar_PaneToggleRequested" />
+
+        <NavigationView
+            x:Name="navView"
+            Grid.Row="1"
+            IsBackButtonVisible="Collapsed"
+            IsPaneToggleButtonVisible="False"
+            IsSettingsVisible="False"
+            Loaded="NavigationViewLoaded"
+            MenuItemsSource="{x:Bind Pages}"
+            SelectionChanged="NavigationViewSelectionChanged">
+            <NavigationView.MenuItemTemplate>
+                <DataTemplate x:DataType="vm:PageViewModel">
+                    <NavigationViewItem Content="{x:Bind Title}">
+                        <NavigationViewItem.Icon>
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind Icon}" />
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                </DataTemplate>
+            </NavigationView.MenuItemTemplate>
+
+            <Frame x:Name="PageFrame" />
+
+        </NavigationView>
+    </Grid>
 </Window>

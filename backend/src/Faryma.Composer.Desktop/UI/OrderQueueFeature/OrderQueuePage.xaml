@@ -136,7 +136,7 @@
                         Title="Id выбранного заказа"
                         Content="{x:Bind ViewModel.SelectedOrder.Id, Mode=OneWay, FallbackValue={x:Null}}"
                         FontSize="16"
-                        Foreground="{StaticResource NegativeBrush}" />
+                        Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
 
                     <Button
                         HorizontalAlignment="Center"
@@ -169,16 +169,21 @@
                     </Grid.ColumnDefinitions>
 
                     <ListView
+                        Padding="16"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
                         ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
                         ItemsSource="{x:Bind ViewModel.StreamSchedule}"
                         SelectionMode="None">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="sharedVM:StreamContainerVM">
                                 <Grid
+                                    Margin="0,2"
                                     Padding="6,4"
-                                    Background="#E4FFFFFF"
-                                    BorderBrush="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                    BorderThickness="0,1,0,0">
+                                    Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                    CornerRadius="4">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="16" />
@@ -254,7 +259,7 @@
                             Title="Id выбранного стрима"
                             Content="{x:Bind ViewModel.SelectedStream.Id, Mode=OneWay, FallbackValue={x:Null}}"
                             FontSize="16"
-                            Foreground="{StaticResource NegativeBrush}"
+                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                             Style="{StaticResource RightContentAlignment}" />
 
                         <Button
