@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
 using Faryma.Composer.Desktop.Services.ComposerStreamFeature;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Requests;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
@@ -14,7 +13,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
 {
     public sealed partial class OrderQueuePageVM(
         OrderQueueService orderQueueService,
-        ComposerStreamService composerStreamService,
+        ComposerStreamHttpClient composerStreamService,
         ReviewOrderHttpClient reviewOrderService) : ObservableObject
     {
         public OrderQueuePage Page { get; set; } = null!;
@@ -207,29 +206,16 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         }
 
         [RelayCommand]
-        private Task CreateStream() => UpdateStream(composerStreamService.Post(new CreateStreamRequest
-        {
-            EventDate = SelectedEventDate,
-            Type = StreamType,
-        }));
+        private Task CreateStream() => UpdateStream(composerStreamService.Create(SelectedEventDate, StreamType));
 
         [RelayCommand]
-        private Task StartStream() => UpdateStream(composerStreamService.Post(new StartStreamRequest
-        {
-            ComposerStreamId = SelectedStream?.Id ?? 0,
-        }));
+        private Task StartStream() => UpdateStream(composerStreamService.Start(SelectedStream?.Id ?? 0));
 
         [RelayCommand]
-        private Task CompleteStream() => UpdateStream(composerStreamService.Post(new CompleteStreamRequest
-        {
-            ComposerStreamId = SelectedStream?.Id ?? 0,
-        }));
+        private Task CompleteStream() => UpdateStream(composerStreamService.Complete(SelectedStream?.Id ?? 0));
 
         [RelayCommand]
-        private Task CancelStream() => UpdateStream(composerStreamService.Post(new CancelStreamRequest
-        {
-            ComposerStreamId = SelectedStream?.Id ?? 0,
-        }));
+        private Task CancelStream() => UpdateStream(composerStreamService.Cancel(SelectedStream?.Id ?? 0));
 
         private async Task UpdateStream(Task<ComposerStreamDto> task)
         {

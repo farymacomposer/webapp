@@ -29,9 +29,9 @@ namespace Faryma.Composer.Desktop
 
             services.AddHttpClient("Faryma.Composer.Api", client => client.BaseAddress = new Uri(BaseAddress));
             services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
+            services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
 
             services.AddSingleton<OrderQueueService>();
-            services.AddSingleton<ComposerStreamService>();
 
             services.AddSingleton<OrderQueuePageVM>();
             services.AddSingleton<ReviewOrderPageVM>();
