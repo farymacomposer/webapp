@@ -6,7 +6,39 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Faryma.Composer.Desktop.UI.ReviewOrderFeature"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:wuxdata="using:Microsoft.UI.Xaml.Data"
     mc:Ignorable="d">
+    <Page.Resources>
+
+        <CollectionViewSource
+            x:Name="cvsGroups"
+            IsSourceGrouped="True"
+            ItemsPath="Items"
+            Source="{x:Bind ViewModel.Groups}" />
+
+        <DataTemplate x:Key="ZoomedInTemplate" x:DataType="local:ControlInfoDataItem">
+            <StackPanel MinWidth="200" Margin="12,6,12,6">
+                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="{x:Bind Title}" />
+                <TextBlock
+                    Width="300"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource BodyTextBlockStyle}"
+                    Text="{x:Bind Subtitle}"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="local:ControlInfoDataGroup">
+            <TextBlock
+                Foreground="{ThemeResource ApplicationForegroundThemeBrush}"
+                Style="{StaticResource SubtitleTextBlockStyle}"
+                Text="{x:Bind Title}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ZoomedOutTemplate" x:DataType="wuxdata:ICollectionViewGroup">
+            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ((local:ControlInfoDataGroup)Group).Title}" />
+        </DataTemplate>
+    </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -22,6 +54,26 @@
             <Button Content="Найти заказ" />
         </StackPanel>
 
-        <Grid Grid.Row="1" />
+        <SemanticZoom x:Name="Control1" Grid.Row="1">
+            <SemanticZoom.ZoomedInView>
+                <ListView
+                    GotFocus="List_GotFocus"
+                    ItemTemplate="{StaticResource ZoomedInTemplate}"
+                    ItemsSource="{x:Bind cvsGroups.View}"
+                    ScrollViewer.IsHorizontalScrollChainingEnabled="False"
+                    SelectionMode="None">
+                    <ListView.GroupStyle>
+                        <GroupStyle HeaderTemplate="{StaticResource ZoomedInGroupHeaderTemplate}" />
+                    </ListView.GroupStyle>
+                </ListView>
+            </SemanticZoom.ZoomedInView>
+            <SemanticZoom.ZoomedOutView>
+                <ListView
+                    GotFocus="List_GotFocus"
+                    ItemTemplate="{StaticResource ZoomedOutTemplate}"
+                    ItemsSource="{x:Bind cvsGroups.View.CollectionGroups}"
+                    SelectionMode="None" />
+            </SemanticZoom.ZoomedOutView>
+        </SemanticZoom>
     </Grid>
 </Page>

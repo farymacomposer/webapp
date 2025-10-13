@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature.MoveUp
+﻿namespace Faryma.Composer.Desktop.Api.ReviewOrder.Requests
 {
     /// <summary>
     /// Запрос поднятия заказа в очереди
@@ -8,7 +8,7 @@
         /// <summary>
         /// Псевдоним пользователя
         /// </summary>
-        public required string? Nickname { get; init; }
+        public required string Nickname { get; init; }
 
         /// <summary>
         /// Id заказа разбора трека
@@ -18,6 +18,6 @@
         /// <summary>
         /// Сумма платежа
         /// </summary>
-        public required decimal? PaymentAmount { get; init; }
+        public required decimal PaymentAmount { get; init; }
     }
 }

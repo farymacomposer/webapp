@@ -16,7 +16,7 @@ namespace Faryma.Composer.Api
         {
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             {
-                Console.WriteLine("Критическая ошибка" + (e.ExceptionObject as Exception)?.ToString());
+                Console.WriteLine("Критическая ошибка" + (e.ExceptionObject as Exception));
                 Environment.Exit(1);
             };
 
@@ -54,7 +54,7 @@ namespace Faryma.Composer.Api
 
             app.UseCors(config => config
                 .AllowAnyOrigin()
-                .AllowAnyMethod()
+                .WithMethods("GET", "POST")
                 .AllowAnyHeader());
 
             app.UseHttpsRedirection();

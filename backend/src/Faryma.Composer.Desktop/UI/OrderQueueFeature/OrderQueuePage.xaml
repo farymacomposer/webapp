@@ -169,11 +169,6 @@
                     </Grid.ColumnDefinitions>
 
                     <ListView
-                        Padding="16"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="4"
                         ItemContainerStyle="{StaticResource DisableListViewItemContainerStyle}"
                         ItemsSource="{x:Bind ViewModel.StreamSchedule}"
                         SelectionMode="None">

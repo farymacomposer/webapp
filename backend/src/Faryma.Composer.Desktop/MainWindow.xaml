@@ -9,7 +9,6 @@
     xmlns:vm="using:Faryma.Composer.Desktop.Shared.ViewModels"
     Title="Faryma.Composer.Desktop"
     mc:Ignorable="d">
-
     <Window.SystemBackdrop>
         <MicaBackdrop Kind="BaseAlt" />
     </Window.SystemBackdrop>

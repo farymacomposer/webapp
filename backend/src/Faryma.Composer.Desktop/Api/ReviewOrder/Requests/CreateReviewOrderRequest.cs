@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature.Dto
+namespace Faryma.Composer.Desktop.Api.ReviewOrder.Requests
 {
     /// <summary>
     /// Запрос создания заказа на разбор
@@ -10,7 +10,7 @@ namespace Faryma.Composer.Desktop.Services.ReviewOrderFeature.Dto
         /// <summary>
         /// Псевдоним пользователя
         /// </summary>
-        public required string? Nickname { get; init; }
+        public required string Nickname { get; init; }
 
         /// <summary>
         /// Тип заказа
