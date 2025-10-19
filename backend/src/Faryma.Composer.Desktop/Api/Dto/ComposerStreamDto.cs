@@ -1,42 +1,40 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Faryma.Composer.Desktop.Shared.Dto;
-using Faryma.Composer.Infrastructure.Enums;
+﻿using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Desktop.Shared.ViewModels
+namespace Faryma.Composer.Desktop.Api.Dto
 {
     /// <summary>
     /// Стрим композитора
     /// </summary>
-    public sealed partial class ComposerStreamVM(ComposerStreamDto dto) : ObservableObject
+    public sealed record ComposerStreamDto
     {
         /// <summary>
         /// Id стрима
         /// </summary>
-        public long Id { get; } = dto.Id;
+        public required long Id { get; init; }
 
         /// <summary>
         /// Дата проведения стрима
         /// </summary>
-        public DateOnly EventDate { get; } = dto.EventDate;
+        public required DateOnly EventDate { get; init; }
 
         /// <summary>
         /// Статус стрима
         /// </summary>
-        public ComposerStreamStatus Status { get; } = dto.Status;
+        public required ComposerStreamStatus Status { get; init; }
 
         /// <summary>
         /// Тип стрима
         /// </summary>
-        public ComposerStreamType Type { get; } = dto.Type;
+        public required ComposerStreamType Type { get; init; }
 
         /// <summary>
         /// Дата и время начала стрима
         /// </summary>
-        public DateTime? StartedAt { get; } = dto.StartedAt;
+        public required DateTime? StartedAt { get; init; }
 
         /// <summary>
         /// Дата и время завершения стрима
         /// </summary>
-        public DateTime? CompletedAt { get; } = dto.CompletedAt;
+        public required DateTime? CompletedAt { get; init; }
     }
 }

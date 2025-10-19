@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 
-namespace Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto
+namespace Faryma.Composer.Desktop.Api.OrderQueue.Dto
 {
     /// <summary>
     /// Изменены позиции заказов

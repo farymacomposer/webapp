@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Desktop.Shared.Dto;
+﻿using Faryma.Composer.Desktop.Api.Dto;
 
-namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature.Responses
+namespace Faryma.Composer.Desktop.Api.ComposerStream.Responses
 {
     /// <summary>
     /// Список стримов

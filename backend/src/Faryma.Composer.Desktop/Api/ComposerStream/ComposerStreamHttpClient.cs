@@ -1,10 +1,10 @@
 ﻿using System.Net.Http.Json;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Responses;
-using Faryma.Composer.Desktop.Shared.Dto;
+using Faryma.Composer.Desktop.Api.ComposerStream.Responses;
+using Faryma.Composer.Desktop.Api.Dto;
 using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.Http;
 
-namespace Faryma.Composer.Desktop.Services.ComposerStreamFeature
+namespace Faryma.Composer.Desktop.Api.ComposerStream
 {
     public sealed class ComposerStreamHttpClient(HttpClient httpClient)
     {

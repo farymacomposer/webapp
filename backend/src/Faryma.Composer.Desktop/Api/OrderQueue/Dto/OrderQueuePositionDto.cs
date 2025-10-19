@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto
+namespace Faryma.Composer.Desktop.Api.OrderQueue.Dto
 {
     /// <summary>
     /// Позиция заказа в очереди, включая его индекс, статус активности и категорию

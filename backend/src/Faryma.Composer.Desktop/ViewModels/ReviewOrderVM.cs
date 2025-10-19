@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto;
-using Faryma.Composer.Desktop.Shared.Dto;
+using Faryma.Composer.Desktop.Api.Dto;
+using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Faryma.Composer.Infrastructure.Enums;
 

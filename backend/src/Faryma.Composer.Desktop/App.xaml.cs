@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Desktop.Api.ReviewOrder;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature;
+﻿using Faryma.Composer.Desktop.Api.ComposerStream;
+using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Faryma.Composer.Desktop.UI.ReviewOrderFeature;

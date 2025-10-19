@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Desktop.Shared.Dto;
+﻿using Faryma.Composer.Desktop.Api.Dto;
 
-namespace Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto
+namespace Faryma.Composer.Desktop.Api.OrderQueue.Dto
 {
     /// <summary>
     /// Представляет позицию заказа в очереди, включая сам заказ и историю перемещений

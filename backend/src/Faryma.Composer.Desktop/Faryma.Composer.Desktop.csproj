@@ -20,6 +20,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\OrderQueueFeature\Enums\**" />
+    <EmbeddedResource Remove="Services\OrderQueueFeature\Enums\**" />
+    <None Remove="Services\OrderQueueFeature\Enums\**" />
+    <Page Remove="Services\OrderQueueFeature\Enums\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
@@ -36,15 +43,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\CategoryState.cs" Link="Services\OrderQueueFeature\Enums\CategoryState.cs" />
-    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderActivityStatus.cs" Link="Services\OrderQueueFeature\Enums\OrderActivityStatus.cs" />
-    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" Link="Services\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamStatus.cs" Link="Shared\Enums\ComposerStreamStatus.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamType.cs" Link="Shared\Enums\ComposerStreamType.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\OrderCategoryType.cs" Link="Shared\Enums\OrderCategoryType.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderStatus.cs" Link="Shared\Enums\ReviewOrderStatus.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderType.cs" Link="Shared\Enums\ReviewOrderType.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\TransactionType.cs" Link="Shared\Enums\TransactionType.cs" />
+    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\CategoryState.cs" Link="Api\OrderQueue\Enums\CategoryState.cs" />
+    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderActivityStatus.cs" Link="Api\OrderQueue\Enums\OrderActivityStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" Link="Api\OrderQueue\Enums\OrderQueueUpdateType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamStatus.cs" Link="Api\Enums\ComposerStreamStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamType.cs" Link="Api\Enums\ComposerStreamType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\OrderCategoryType.cs" Link="Api\Enums\OrderCategoryType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderStatus.cs" Link="Api\Enums\ReviewOrderStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderType.cs" Link="Api\Enums\ReviewOrderType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\TransactionType.cs" Link="Api\Enums\TransactionType.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -82,8 +89,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\OrderQueueFeature\Enums\" />
-    <Folder Include="Shared\Enums\" />
+    <Folder Include="Api\Enums\" />
+    <Folder Include="Api\OrderQueue\Enums\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -114,4 +121,7 @@
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
   </PropertyGroup>
+  <ItemGroup>
+    <PRIResource Remove="Services\OrderQueueFeature\Enums\**" />
+  </ItemGroup>
 </Project>

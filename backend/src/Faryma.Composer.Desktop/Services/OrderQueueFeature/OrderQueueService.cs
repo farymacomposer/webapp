@@ -3,8 +3,8 @@ using System.Net.Http.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto;
-using Faryma.Composer.Desktop.Shared.Dto;
+using Faryma.Composer.Desktop.Api.Dto;
+using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.UI.Dispatching;
@@ -66,7 +66,10 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
         public async Task Initialize()
         {
+#if DEBUG
             await Task.Delay(2000);
+#endif
+
             await _signalrClient.StartAsync();
             await UpdateOrderQueue();
         }

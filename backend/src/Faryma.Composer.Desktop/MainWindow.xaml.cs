@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Faryma.Composer.Desktop.Shared.ViewModels;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
 using Microsoft.UI.Xaml;
@@ -49,5 +49,12 @@ namespace Faryma.Composer.Desktop
         }
 
         private void TitleBar_PaneToggleRequested(TitleBar _, object __) => navView.IsPaneOpen = !navView.IsPaneOpen;
+    }
+
+    public sealed partial class PageViewModel : ObservableObject
+    {
+        public string Icon { get; init; } = null!;
+        public Type PageType { get; init; } = null!;
+        public string Title { get; init; } = null!;
     }
 }
