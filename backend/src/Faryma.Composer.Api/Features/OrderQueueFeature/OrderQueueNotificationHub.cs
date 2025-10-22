@@ -12,19 +12,19 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         public const string HubServerName = nameof(OrderQueueNotificationHub);
         public const string RoutePattern = $"/api/{HubServerName}";
 
-        public override Task OnConnectedAsync() => GetQueueSnapshot();
+        public override Task OnConnectedAsync() => GetOrderQueueSnapshot();
 
-        [Channel(nameof(GetQueueSnapshot), Servers = new[] { HubServerName })]
+        [Channel(nameof(GetOrderQueueSnapshot), Servers = new[] { HubServerName })]
         [SubscribeOperation(
             typeof(object),
             Summary = "Запрос полного снимка очереди",
             Description = "Позволяет клиенту синхронизировать очередь по требованию")]
-        public async Task GetQueueSnapshot()
+        public async Task GetOrderQueueSnapshot()
         {
             OrderQueueSnapshot snapshot = await orderQueueService.GetQueueSnapshot();
             OrderQueueSnapshotMessage message = OrderQueueSnapshotMessage.Map(snapshot);
 
-            await Clients.Caller.ReceiveQueueSnapshot(message);
+            await Clients.Caller.ReceiveOrderQueueSnapshot(message);
         }
     }
 }

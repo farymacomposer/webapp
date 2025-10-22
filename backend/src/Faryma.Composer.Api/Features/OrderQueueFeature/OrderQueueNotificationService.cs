@@ -10,7 +10,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature
         public async Task NotifyQueueUpdated(OrderQueueSnapshot snapshot)
         {
             OrderQueueUpdatedEvent @event = OrderQueueUpdatedEvent.Map(snapshot);
-            await context.Clients.All.ReceiveQueueUpdated(@event);
+            await context.Clients.All.ReceiveOrderQueueUpdated(@event);
         }
     }
 }
