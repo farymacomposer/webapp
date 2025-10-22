@@ -15,6 +15,9 @@ namespace Faryma.Composer.Desktop.Api.OrderQueue
                 .Build();
         }
 
-        public IDisposable OnOrderPositionsChanged(Func<OrderPositionsChangedEvent, Task> handler) => _signalrClient.On("OrderPositionsChanged", handler);
+        public Task Start() => _signalrClient.StartAsync();
+        public Task GetOrderQueueSnapshot() => _signalrClient.SendAsync(nameof(GetOrderQueueSnapshot));
+        public IDisposable ReceiveOrderQueueSnapshot(Func<OrderQueueSnapshotMessage, Task> handler) => _signalrClient.On(nameof(ReceiveOrderQueueSnapshot), handler);
+        public IDisposable ReceiveOrderQueueUpdated(Func<OrderQueueUpdatedEvent, Task> handler) => _signalrClient.On(nameof(ReceiveOrderQueueUpdated), handler);
     }
 }

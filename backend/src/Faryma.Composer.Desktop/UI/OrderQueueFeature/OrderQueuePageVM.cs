@@ -177,7 +177,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         private Task CancelReviewOrder() => reviewOrderService.Cancel(SelectedOrder?.Id ?? 0);
 
         [RelayCommand]
-        private Task UpdateOrderQueue() => OrderQueueService.UpdateOrderQueue();
+        private Task UpdateOrderQueue() => OrderQueueService.GetOrderQueueSnapshot();
 
         [RelayCommand]
         private Task CurrentWeek() => UpdateStreamSchedule(StartOfWeek(DateOnly.FromDateTime(DateTime.Now)));

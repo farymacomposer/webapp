@@ -3,7 +3,7 @@
     /// <summary>
     /// Ответ на запрос получения очереди заказов
     /// </summary>
-    public sealed record GetOrderQueueResponse
+    public sealed record OrderQueueSnapshotMessage
     {
         /// <summary>
         /// Версия для синхронизации состояния очереди

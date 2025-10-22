@@ -5,7 +5,7 @@ namespace Faryma.Composer.Desktop.Api.OrderQueue.Dto
     /// <summary>
     /// Изменены позиции заказов
     /// </summary>
-    public sealed record OrderPositionsChangedEvent
+    public sealed record OrderQueueUpdatedEvent
     {
         /// <summary>
         /// Версия для синхронизации состояния очереди
