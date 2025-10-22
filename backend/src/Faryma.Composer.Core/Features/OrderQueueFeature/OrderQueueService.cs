@@ -59,7 +59,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrder order) =>
             _locker.Lock(() => _queueManager.GetCurrentQueuePosition(order).Clone());
 
-        public Task<OrderQueue> GetOrderQueue() => _locker.Lock(() => new OrderQueue
+        public Task<OrderQueueSnapshot> GetQueueSnapshot() => _locker.Lock(() => new OrderQueueSnapshot
         {
             SyncVersion = _syncVersion,
             OrderQueueUpdateType = OrderQueueUpdateType.Unspecified,
@@ -72,14 +72,14 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
         {
             _syncVersion++;
 
-            OrderQueue orderQueue = new()
+            OrderQueueSnapshot snapshot = new()
             {
                 SyncVersion = _syncVersion,
                 OrderQueueUpdateType = updateType,
                 Positions = _queueManager.UpdateOrder(order, updateType),
             };
 
-            await notificationService.NotifyOrderPositionsChanged(orderQueue);
+            await notificationService.NotifyQueueUpdated(snapshot);
         });
 
         public Task CancelOrder(ReviewOrder order, ReviewOrderStatus previousStatus) => _locker.Lock(async () =>
@@ -97,14 +97,14 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
                 }
             }
 
-            OrderQueue orderQueue = new()
+            OrderQueueSnapshot snapshot = new()
             {
                 SyncVersion = _syncVersion,
                 OrderQueueUpdateType = OrderQueueUpdateType.OrderCanceled,
                 Positions = _queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCanceled),
             };
 
-            await notificationService.NotifyOrderPositionsChanged(orderQueue);
+            await notificationService.NotifyQueueUpdated(snapshot);
         });
 
         public Task StartStream(ComposerStream stream) => _locker.Lock(async () =>
@@ -117,14 +117,14 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             ReviewOrder_R_Repository reviewOrder_R = new(context);
             ReviewOrder[] orders = await reviewOrder_R.GetOrdersToStartStream(stream.Id);
 
-            OrderQueue orderQueue = new()
+            OrderQueueSnapshot snapshot = new()
             {
                 SyncVersion = _syncVersion,
                 OrderQueueUpdateType = OrderQueueUpdateType.StreamStarted,
                 Positions = _queueManager.UpdateOrders(orders),
             };
 
-            await notificationService.NotifyOrderPositionsChanged(orderQueue);
+            await notificationService.NotifyQueueUpdated(snapshot);
         });
 
         public Task CompleteStream(ComposerStream stream) => _locker.Lock(async () =>
@@ -142,14 +142,14 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature
             ReviewOrder_R_Repository reviewOrder_R = new(context);
             ReviewOrder[] orders = await reviewOrder_R.GetOrdersToCompleteStream(stream.Id);
 
-            OrderQueue orderQueue = new()
+            OrderQueueSnapshot snapshot = new()
             {
                 SyncVersion = _syncVersion,
                 OrderQueueUpdateType = OrderQueueUpdateType.StreamCompleted,
                 Positions = _queueManager.UpdateOrders(orders),
             };
 
-            await notificationService.NotifyOrderPositionsChanged(orderQueue);
+            await notificationService.NotifyQueueUpdated(snapshot);
         });
     }
 }

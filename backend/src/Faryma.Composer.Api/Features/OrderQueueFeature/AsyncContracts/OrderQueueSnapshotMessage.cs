@@ -4,12 +4,12 @@ using Faryma.Composer.Core.Features.OrderQueueFeature;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
-namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
+namespace Faryma.Composer.Api.Features.OrderQueueFeature.AsyncContracts
 {
     /// <summary>
-    /// Ответ на запрос получения очереди заказов
+    /// Сообщение о состоянии очереди
     /// </summary>
-    public sealed record GetOrderQueueResponse
+    public sealed record OrderQueueSnapshotMessage
     {
         /// <summary>
         /// Версия для синхронизации состояния очереди
@@ -45,14 +45,14 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.GetOrderQueue
         [Required]
         public ICollection<OrderPositionDto> FrozenOrders { get; } = [];
 
-        public static GetOrderQueueResponse Map(OrderQueue orderQueue)
+        public static OrderQueueSnapshotMessage Map(OrderQueueSnapshot snapshot)
         {
-            GetOrderQueueResponse result = new()
+            OrderQueueSnapshotMessage result = new()
             {
-                SyncVersion = orderQueue.SyncVersion,
+                SyncVersion = snapshot.SyncVersion,
             };
 
-            foreach (OrderPosition position in orderQueue.Positions.OrderBy(x => x.PositionHistory.Current.QueueIndex))
+            foreach (OrderPosition position in snapshot.Positions.OrderBy(x => x.PositionHistory.Current.QueueIndex))
             {
                 OrderPositionDto dto = OrderPositionDto.Map(position);
 

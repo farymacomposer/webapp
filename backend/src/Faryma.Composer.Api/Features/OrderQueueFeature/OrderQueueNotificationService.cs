@@ -1,27 +1,16 @@
-﻿using Faryma.Composer.Api.Features.OrderQueueFeature.Events;
+﻿using Faryma.Composer.Api.Features.OrderQueueFeature.AsyncContracts;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 using Microsoft.AspNetCore.SignalR;
-using Saunter.Attributes;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature
 {
-    public sealed class OrderQueueNotificationHub : Hub
+    public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub, IOrderQueueClient> context) : IOrderQueueNotificationService
     {
-        public const string RoutePattern = "/api/OrderQueueNotificationHub";
-    }
-
-    [AsyncApi]
-    public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub> context) : IOrderQueueNotificationService
-    {
-        public const string HubServerName = "OrderQueueNotificationHub";
-
-        [Channel("OrderPositionsChanged", Servers = new[] { HubServerName })]
-        [SubscribeOperation(typeof(OrderPositionsChangedEvent), Description = "Уведомляет об изменении позиций заказов")]
-        public async Task NotifyOrderPositionsChanged(OrderQueue orderQueue)
+        public async Task NotifyQueueUpdated(OrderQueueSnapshot snapshot)
         {
-            OrderPositionsChangedEvent item = OrderPositionsChangedEvent.Map(orderQueue);
-            await context.Clients.All.SendAsync("OrderPositionsChanged", item);
+            OrderQueueUpdatedEvent @event = OrderQueueUpdatedEvent.Map(snapshot);
+            await context.Clients.All.ReceiveQueueUpdated(@event);
         }
     }
 }

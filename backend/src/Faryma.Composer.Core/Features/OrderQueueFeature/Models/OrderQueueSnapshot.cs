@@ -5,7 +5,7 @@ namespace Faryma.Composer.Core.Features.OrderQueueFeature.Models
     /// <summary>
     /// Очередь заказов
     /// </summary>
-    public sealed record OrderQueue
+    public sealed record OrderQueueSnapshot
     {
         /// <summary>
         /// Версия для синхронизации состояния очереди

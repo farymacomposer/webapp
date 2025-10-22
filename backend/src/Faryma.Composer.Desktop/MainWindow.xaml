@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Faryma.Composer.Desktop"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:Faryma.Composer.Desktop.Shared.ViewModels"
     Title="Faryma.Composer.Desktop"
     mc:Ignorable="d">
     <Window.SystemBackdrop>
@@ -34,7 +33,7 @@
             MenuItemsSource="{x:Bind Pages}"
             SelectionChanged="NavigationViewSelectionChanged">
             <NavigationView.MenuItemTemplate>
-                <DataTemplate x:DataType="vm:PageViewModel">
+                <DataTemplate x:DataType="local:PageViewModel">
                     <NavigationViewItem Content="{x:Bind Title}">
                         <NavigationViewItem.Icon>
                             <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind Icon}" />

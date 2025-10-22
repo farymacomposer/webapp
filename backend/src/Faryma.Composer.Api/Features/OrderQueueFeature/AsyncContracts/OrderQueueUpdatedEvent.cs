@@ -3,12 +3,12 @@ using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
 
-namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
+namespace Faryma.Composer.Api.Features.OrderQueueFeature.AsyncContracts
 {
     /// <summary>
-    /// Изменены позиции заказов
+    /// Событие изменения очереди
     /// </summary>
-    public sealed record OrderPositionsChangedEvent
+    public sealed record OrderQueueUpdatedEvent
     {
         /// <summary>
         /// Версия для синхронизации состояния очереди
@@ -26,13 +26,13 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.Events
         [Required]
         public required IEnumerable<OrderPositionDto> OrderPositions { get; init; }
 
-        public static OrderPositionsChangedEvent Map(OrderQueue orderQueue)
+        public static OrderQueueUpdatedEvent Map(OrderQueueSnapshot snapshot)
         {
             return new()
             {
-                SyncVersion = orderQueue.SyncVersion,
-                OrderQueueUpdateType = orderQueue.OrderQueueUpdateType,
-                OrderPositions = orderQueue.Positions.Select(OrderPositionDto.Map),
+                SyncVersion = snapshot.SyncVersion,
+                OrderQueueUpdateType = snapshot.OrderQueueUpdateType,
+                OrderPositions = snapshot.Positions.Select(OrderPositionDto.Map),
             };
         }
     }

@@ -20,13 +20,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\OrderQueueFeature\Enums\**" />
-    <EmbeddedResource Remove="Services\OrderQueueFeature\Enums\**" />
-    <None Remove="Services\OrderQueueFeature\Enums\**" />
-    <Page Remove="Services\OrderQueueFeature\Enums\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
@@ -34,12 +27,6 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml" />
-    <None Remove="UI\OrderQueueFeature\OrderQueuePage.xaml" />
-    <None Remove="UI\ReviewOrderFeature\ReviewOrderPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +39,11 @@
     <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderStatus.cs" Link="Api\Enums\ReviewOrderStatus.cs" />
     <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderType.cs" Link="Api\Enums\ReviewOrderType.cs" />
     <Compile Include="..\Faryma.Composer.Infrastructure\Enums\TransactionType.cs" Link="Api\Enums\TransactionType.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Api\OrderQueue\Enums\" />
+    <Folder Include="Api\Enums\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,25 +64,26 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.250402" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.10" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251003001" />
     <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="UI\OrderQueue\OrderQueuePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <None Remove="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml" />
+    <None Remove="UI\OrderQueueFeature\OrderQueuePage.xaml" />
+    <None Remove="UI\ReviewOrderFeature\ReviewOrderPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Api\Enums\" />
-    <Folder Include="Api\OrderQueue\Enums\" />
+    <Page Update="UI\OrderQueueFeature\OrderQueuePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>
@@ -121,7 +114,5 @@
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
   </PropertyGroup>
-  <ItemGroup>
-    <PRIResource Remove="Services\OrderQueueFeature\Enums\**" />
-  </ItemGroup>
+
 </Project>
