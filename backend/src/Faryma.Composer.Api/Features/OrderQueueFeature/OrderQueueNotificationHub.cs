@@ -7,24 +7,24 @@ using Saunter.Attributes;
 namespace Faryma.Composer.Api.Features.OrderQueueFeature
 {
     [AsyncApi]
-    public sealed class OrderQueueNotificationHub(OrderQueueService orderQueueService) : Hub<IOrderQueueClient>
+    public sealed class OrderQueueNotificationHub(OrderQueueService orderQueueService) : Hub<IOrderQueueNotificationClient>
     {
         public const string HubServerName = nameof(OrderQueueNotificationHub);
         public const string RoutePattern = $"/api/{HubServerName}";
 
-        public override Task OnConnectedAsync() => GetOrderQueueSnapshot();
+        public override Task OnConnectedAsync() => GetSnapshot();
 
-        [Channel(nameof(GetOrderQueueSnapshot), Servers = new[] { HubServerName })]
+        [Channel(nameof(GetSnapshot), Servers = new[] { HubServerName })]
         [SubscribeOperation(
             typeof(object),
             Summary = "Запрос полного снимка очереди",
             Description = "Позволяет клиенту синхронизировать очередь по требованию")]
-        public async Task GetOrderQueueSnapshot()
+        public async Task GetSnapshot()
         {
             OrderQueueSnapshot snapshot = await orderQueueService.GetQueueSnapshot();
             OrderQueueSnapshotMessage message = OrderQueueSnapshotMessage.Map(snapshot);
 
-            await Clients.Caller.ReceiveOrderQueueSnapshot(message);
+            await Clients.Caller.ReceiveSnapshot(message);
         }
     }
 }

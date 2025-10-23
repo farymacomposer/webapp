@@ -53,12 +53,14 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             await Task.Delay(2000);
 #endif
 
-            _orderQueueHub.ReceiveOrderQueueUpdated(@event => _dispatcherQueue.EnqueueAsync(() => ReceiveOrderQueueUpdated(@event)));
-            _orderQueueHub.ReceiveOrderQueueSnapshot(message => _dispatcherQueue.EnqueueAsync(() => ReceiveOrderQueueSnapshot(message)));
+            _orderQueueHub.ReceiveUpdated(@event => _dispatcherQueue.EnqueueAsync(() => ReceiveUpdated(@event)));
+            _orderQueueHub.ReceiveSnapshot(message => _dispatcherQueue.EnqueueAsync(() => ReceiveSnapshot(message)));
             await _orderQueueHub.Start();
         }
 
-        private async Task ReceiveOrderQueueSnapshot(OrderQueueSnapshotMessage message)
+        public Task UpdateOrderQueue() => _orderQueueHub.GetSnapshot();
+
+        private void ReceiveSnapshot(OrderQueueSnapshotMessage message)
         {
             SyncVersion = message.SyncVersion;
 
@@ -94,9 +96,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
         }
 
-        public Task GetOrderQueueSnapshot() => _orderQueueHub.GetOrderQueueSnapshot();
-
-        private async Task ReceiveOrderQueueUpdated(OrderQueueUpdatedEvent @event)
+        private async Task ReceiveUpdated(OrderQueueUpdatedEvent @event)
         {
             if (await CheckSyncVersion(@event.SyncVersion))
             {
@@ -176,7 +176,7 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
             else
             {
-                await GetOrderQueueSnapshot();
+                await UpdateOrderQueue();
 
                 return false;
             }

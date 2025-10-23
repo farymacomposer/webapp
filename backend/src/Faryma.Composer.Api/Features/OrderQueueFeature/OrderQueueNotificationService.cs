@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature
 {
-    public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub, IOrderQueueClient> context) : IOrderQueueNotificationService
+    public sealed class OrderQueueNotificationService(IHubContext<OrderQueueNotificationHub, IOrderQueueNotificationClient> context) : IOrderQueueNotificationService
     {
         public async Task NotifyQueueUpdated(OrderQueueSnapshot snapshot)
         {
             OrderQueueUpdatedEvent @event = OrderQueueUpdatedEvent.Map(snapshot);
-            await context.Clients.All.ReceiveOrderQueueUpdated(@event);
+            await context.Clients.All.ReceiveUpdated(@event);
         }
     }
 }
