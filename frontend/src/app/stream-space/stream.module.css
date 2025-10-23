@@ -1,0 +1,35 @@
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: calc(100vh - 64px);
+  background: #000;
+  overflow: hidden;
+}
+
+.videoContainer {
+  flex: 1;
+  height: 100%;
+  background: #000;
+  margin-right: 8px; 
+}
+
+.videoContainer iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.chatContainer {
+  width: 400px;
+  height: 100%;
+  background: #0f0f10;
+  border-left: 1px solid #222;
+}
+
+.chatContainer iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
