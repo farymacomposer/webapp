@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Desktop.Services.ComposerStreamFeature;
+﻿using Faryma.Composer.Desktop.Api.ComposerStream;
+using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,10 +28,10 @@ namespace Faryma.Composer.Desktop
                 .CreateLogger()));
 
             services.AddHttpClient("Faryma.Composer.Api", client => client.BaseAddress = new Uri(BaseAddress));
+            services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
+            services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
 
             services.AddSingleton<OrderQueueService>();
-            services.AddSingleton<ReviewOrderService>();
-            services.AddSingleton<ComposerStreamService>();
 
             services.AddSingleton<OrderQueuePageVM>();
             services.AddSingleton<ReviewOrderPageVM>();

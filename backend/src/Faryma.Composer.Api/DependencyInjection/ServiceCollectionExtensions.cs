@@ -113,7 +113,6 @@ namespace Faryma.Composer.Api.DependencyInjection
                     }
                 }
 
-                options.CustomSchemaIds(x => x.FullName);
                 options.UseAllOfToExtendReferenceSchemas();
 
                 OpenApiSecurityScheme scheme = new()
@@ -142,9 +141,9 @@ namespace Faryma.Composer.Api.DependencyInjection
                     Info = new Info(environment.ApplicationName, "v1"),
                     Servers =
                     {
-                        [OrderQueueNotificationService.HubServerName] = new Server(OrderQueueNotificationHub.RoutePattern, "signalr")
+                        [OrderQueueNotificationHub.HubServerName] = new Server(OrderQueueNotificationHub.RoutePattern, "signalr")
                         {
-                            Description = "События очереди заказов"
+                            Description = "Очередь заказов"
                         }
                     }
                 };

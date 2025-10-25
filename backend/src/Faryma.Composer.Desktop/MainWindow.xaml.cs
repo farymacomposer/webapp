@@ -1,29 +1,24 @@
 ﻿using System.Collections;
-using Faryma.Composer.Desktop.Shared.ViewModels;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Animation;
 
 namespace Faryma.Composer.Desktop
 {
     public sealed partial class MainWindow : Window
     {
-        private PageViewModel? _currentPage;
-
         private PageViewModel[] Pages { get; } =
         [
             new()
             {
-                Index = 0,
                 Title = "Заказы",
                 Icon = "\xE71D",
                 PageType = typeof(ReviewOrderPage),
             },
             new()
             {
-                Index = 1,
                 Title = "Тест очереди",
                 Icon = "\xE71D",
                 PageType = typeof(OrderQueuePage),
@@ -33,6 +28,8 @@ namespace Faryma.Composer.Desktop
         public MainWindow()
         {
             InitializeComponent();
+            ExtendsContentIntoTitleBar = true;
+            SetTitleBar(titleBar);
         }
 
         private void NavigationViewLoaded(object sender, RoutedEventArgs _)
@@ -47,21 +44,17 @@ namespace Faryma.Composer.Desktop
         {
             if (args.SelectedItem is PageViewModel page)
             {
-                if (_currentPage is null)
-                {
-                    PageFrame.Navigate(page.PageType);
-                }
-                else
-                {
-                    SlideNavigationTransitionEffect effect = (_currentPage.Index < page.Index)
-                        ? SlideNavigationTransitionEffect.FromRight
-                        : SlideNavigationTransitionEffect.FromLeft;
-
-                    PageFrame.Navigate(page.PageType, null, new SlideNavigationTransitionInfo { Effect = effect });
-                }
-
-                _currentPage = page;
+                PageFrame.Navigate(page.PageType);
             }
         }
+
+        private void TitleBar_PaneToggleRequested(TitleBar _, object __) => navView.IsPaneOpen = !navView.IsPaneOpen;
+    }
+
+    public sealed partial class PageViewModel : ObservableObject
+    {
+        public string Icon { get; init; } = null!;
+        public Type PageType { get; init; } = null!;
+        public string Title { get; init; } = null!;
     }
 }

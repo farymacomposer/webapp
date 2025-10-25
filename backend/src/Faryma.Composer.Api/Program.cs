@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Api.Auth;
+﻿using System.Text.Json.Serialization;
+using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
@@ -16,7 +17,7 @@ namespace Faryma.Composer.Api
         {
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             {
-                Console.WriteLine("Критическая ошибка" + (e.ExceptionObject as Exception)?.ToString());
+                Console.WriteLine("Критическая ошибка" + (e.ExceptionObject as Exception));
                 Environment.Exit(1);
             };
 
@@ -42,7 +43,8 @@ namespace Faryma.Composer.Api
 
                     services
                         .AddSingleton<GlobalExceptionFilter>()
-                        .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>());
+                        .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>())
+                        .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
                     services.AddInfrastructure(builder.Environment);
                 });
@@ -54,7 +56,7 @@ namespace Faryma.Composer.Api
 
             app.UseCors(config => config
                 .AllowAnyOrigin()
-                .AllowAnyMethod()
+                .WithMethods("GET", "POST")
                 .AllowAnyHeader());
 
             app.UseHttpsRedirection();

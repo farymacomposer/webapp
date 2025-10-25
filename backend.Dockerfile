@@ -1,11 +1,11 @@
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["backend/src/Faryma.Composer.Api/Faryma.Composer.Api.csproj", "backend/src/Faryma.Composer.Api/"]
-COPY ["backend/src/Faryma.Composer.Infrastructure/Faryma.Composer.Infrastructure.csproj", "backend/src/Faryma.Composer.Infrastructure/"]
-RUN dotnet restore "backend/src/Faryma.Composer.Api/Faryma.Composer.Api.csproj"
-COPY backend/ backend/
-WORKDIR "/src/backend/src/Faryma.Composer.Api"
+COPY ["backend/src/Faryma.Composer.Api/Faryma.Composer.Api.csproj", "src/Faryma.Composer.Api/"]
+COPY ["backend/src/Faryma.Composer.Infrastructure/Faryma.Composer.Infrastructure.csproj", "src/Faryma.Composer.Infrastructure/"]
+RUN dotnet restore "src/Faryma.Composer.Api/Faryma.Composer.Api.csproj"
+COPY backend/ .
+WORKDIR "/src/src/Faryma.Composer.Api"
 RUN dotnet build "Faryma.Composer.Api.csproj" -c Release -o /app/build
 
 # Publish stage
@@ -14,7 +14,7 @@ RUN dotnet publish "Faryma.Composer.Api.csproj" -c Release -o /app/publish /p:Us
 
 # Migration bundle stage
 FROM build AS migrations
-WORKDIR "/src/backend/src/Faryma.Composer.Infrastructure"
+WORKDIR "/src/src/Faryma.Composer.Infrastructure"
 RUN dotnet new tool-manifest && \
     dotnet tool install dotnet-ef -v d && \
     dotnet ef migrations bundle -v --self-contained -r linux-x64 -o /app/migrations-bundle

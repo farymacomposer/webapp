@@ -1,19 +1,11 @@
 ﻿using Bogus;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature;
-using Faryma.Composer.Desktop.Services.ComposerStreamFeature.Requests;
+using Faryma.Composer.Desktop.Api.ComposerStream;
+using Faryma.Composer.Desktop.Api.Dto;
+using Faryma.Composer.Desktop.Api.ReviewOrder;
+using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.AddTrackUrl;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Cancel;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Complete;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Dto;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Freeze;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.MoveUp;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.TakeInProgress;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature.Unfreeze;
-using Faryma.Composer.Desktop.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Faryma.Composer.Infrastructure.Enums;
 
@@ -21,8 +13,8 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
 {
     public sealed partial class OrderQueuePageVM(
         OrderQueueService orderQueueService,
-        ComposerStreamService composerStreamService,
-        ReviewOrderService reviewOrderService) : ObservableObject
+        ComposerStreamHttpClient composerStreamService,
+        ReviewOrderHttpClient reviewOrderService) : ObservableObject
     {
         public OrderQueuePage Page { get; set; } = null!;
         public OrderQueueService OrderQueueService { get; } = orderQueueService;
@@ -138,7 +130,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         {
             _ = int.TryParse(PaymentAmount, out int paymentAmount);
 
-            await reviewOrderService.Post(IdempotencyKey, new CreateReviewOrderRequest
+            await reviewOrderService.Create(IdempotencyKey, new CreateReviewOrderRequest
             {
                 Nickname = Nickname,
                 OrderType = OrderType,
@@ -153,7 +145,7 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         {
             _ = int.TryParse(PaymentAmount, out int paymentAmount);
 
-            await reviewOrderService.Post(IdempotencyKey, new MoveUpReviewOrderRequest
+            await reviewOrderService.MoveUp(IdempotencyKey, new MoveUpReviewOrderRequest
             {
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
                 Nickname = Nickname,
@@ -162,62 +154,27 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         }
 
         [RelayCommand]
-        private async Task AddTrackUrl()
-        {
-            await reviewOrderService.Post(new AddTrackUrlRequest
-            {
-                ReviewOrderId = SelectedOrder?.Id ?? 0,
-                TrackUrl = TrackUrl,
-            });
-        }
+        private Task AddTrackUrl() => reviewOrderService.AddTrackUrl(SelectedOrder?.Id ?? 0, TrackUrl!);
 
         [RelayCommand]
-        private async Task TakeOrderInProgress()
-        {
-            await reviewOrderService.Post(new TakeOrderInProgressRequest
-            {
-                ReviewOrderId = SelectedOrder?.Id ?? 0,
-            });
-        }
+        private Task TakeOrderInProgress() => reviewOrderService.TakeOrderInProgress(SelectedOrder?.Id ?? 0);
 
         [RelayCommand]
         private async Task CompleteReviewOrder()
         {
             _ = int.TryParse(Rating, out int rating);
 
-            await reviewOrderService.Post(new CompleteReviewOrderRequest
-            {
-                ReviewOrderId = SelectedOrder?.Id ?? 0,
-                Rating = rating,
-            });
+            await reviewOrderService.Complete(SelectedOrder?.Id ?? 0, rating);
         }
 
         [RelayCommand]
-        private async Task FreezeReviewOrder()
-        {
-            await reviewOrderService.Post(new FreezeReviewOrderRequest
-            {
-                ReviewOrderId = SelectedOrder?.Id ?? 0,
-            });
-        }
+        private Task FreezeReviewOrder() => reviewOrderService.Freeze(SelectedOrder?.Id ?? 0);
 
         [RelayCommand]
-        private async Task UnfreezeReviewOrder()
-        {
-            await reviewOrderService.Post(new UnfreezeReviewOrderRequest
-            {
-                ReviewOrderId = SelectedOrder?.Id ?? 0,
-            });
-        }
+        private Task UnfreezeReviewOrder() => reviewOrderService.Unfreeze(SelectedOrder?.Id ?? 0);
 
         [RelayCommand]
-        private async Task CancelReviewOrder()
-        {
-            await reviewOrderService.Post(new CancelReviewOrderRequest
-            {
-                ReviewOrderId = SelectedOrder?.Id ?? 0,
-            });
-        }
+        private Task CancelReviewOrder() => reviewOrderService.Cancel(SelectedOrder?.Id ?? 0);
 
         [RelayCommand]
         private Task UpdateOrderQueue() => OrderQueueService.UpdateOrderQueue();
@@ -249,29 +206,16 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         }
 
         [RelayCommand]
-        private Task CreateStream() => UpdateStream(composerStreamService.Post(new CreateStreamRequest
-        {
-            EventDate = SelectedEventDate,
-            Type = StreamType,
-        }));
+        private Task CreateStream() => UpdateStream(composerStreamService.Create(SelectedEventDate, StreamType));
 
         [RelayCommand]
-        private Task StartStream() => UpdateStream(composerStreamService.Post(new StartStreamRequest
-        {
-            ComposerStreamId = SelectedStream?.Id ?? 0,
-        }));
+        private Task StartStream() => UpdateStream(composerStreamService.Start(SelectedStream?.Id ?? 0));
 
         [RelayCommand]
-        private Task CompleteStream() => UpdateStream(composerStreamService.Post(new CompleteStreamRequest
-        {
-            ComposerStreamId = SelectedStream?.Id ?? 0,
-        }));
+        private Task CompleteStream() => UpdateStream(composerStreamService.Complete(SelectedStream?.Id ?? 0));
 
         [RelayCommand]
-        private Task CancelStream() => UpdateStream(composerStreamService.Post(new CancelStreamRequest
-        {
-            ComposerStreamId = SelectedStream?.Id ?? 0,
-        }));
+        private Task CancelStream() => UpdateStream(composerStreamService.Cancel(SelectedStream?.Id ?? 0));
 
         private async Task UpdateStream(Task<ComposerStreamDto> task)
         {

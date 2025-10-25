@@ -1,21 +1,19 @@
 ﻿using System.Collections.ObjectModel;
-using System.Net.Http.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Desktop.Services.OrderQueueFeature.Dto;
-using Faryma.Composer.Desktop.Shared.Dto;
+using Faryma.Composer.Desktop.Api.Dto;
+using Faryma.Composer.Desktop.Api.OrderQueue;
+using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
-using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.UI.Dispatching;
 
 namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 {
     public sealed partial class OrderQueueService : ObservableObject
     {
-        private readonly DispatcherQueue _dispatcherQueue;
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly HubConnection _signalrClient;
+        private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+        private readonly OrderQueueHubConnection _orderQueueHub = new();
 
         /// <summary>
         /// Версия для синхронизации состояния очереди
@@ -49,42 +47,31 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
         /// </summary>
         public ObservableCollection<ReviewOrderVM> FrozenOrders { get; } = [];
 
-        private HttpClient HttpClient => _httpClientFactory.CreateClient("Faryma.Composer.Api");
-
-        public OrderQueueService(IHttpClientFactory httpClientFactory)
-        {
-            _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-            _httpClientFactory = httpClientFactory;
-
-            _signalrClient = new HubConnectionBuilder()
-                .WithUrl($"{App.BaseAddress}/api/OrderQueueNotificationHub")
-                .WithAutomaticReconnect()
-                .Build();
-
-            _signalrClient.On<OrderPositionsChangedEvent>("OrderPositionsChanged", OnOrderPositionsChanged);
-        }
-
         public async Task Initialize()
         {
+#if DEBUG
             await Task.Delay(2000);
-            await _signalrClient.StartAsync();
-            await UpdateOrderQueue();
+#endif
+
+            _orderQueueHub.ReceiveUpdated(@event => _dispatcherQueue.EnqueueAsync(() => ReceiveUpdated(@event)));
+            _orderQueueHub.ReceiveSnapshot(message => _dispatcherQueue.EnqueueAsync(() => ReceiveSnapshot(message)));
+            await _orderQueueHub.Start();
         }
 
-        public async Task UpdateOrderQueue()
+        public Task UpdateOrderQueue() => _orderQueueHub.GetSnapshot();
+
+        private void ReceiveSnapshot(OrderQueueSnapshotMessage message)
         {
-            GetOrderQueueResponse response = (await HttpClient.GetFromJsonAsync<GetOrderQueueResponse>("/api/OrderQueue/GetOrderQueue"))!;
+            SyncVersion = message.SyncVersion;
 
-            SyncVersion = response.SyncVersion;
-
-            if (response.InProgressOrder is not null)
+            if (message.InProgressOrder is not null)
             {
-                InProgressOrder = new ReviewOrderVM(response.InProgressOrder.Order, response.InProgressOrder.CurrentPosition);
+                InProgressOrder = new ReviewOrderVM(message.InProgressOrder.Order, message.InProgressOrder.CurrentPosition);
             }
 
             if (ActiveOrders.Count > 0)
             {
-                foreach (OrderPositionDto item in response.ActiveOrders)
+                foreach (OrderPositionDto item in message.ActiveOrders)
                 {
                     if (ActiveOrders[item.CurrentPosition.QueueIndex].Id != item.Order.Id)
                     {
@@ -93,10 +80,10 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 }
             }
 
-            Update(response.ActiveOrders, ActiveOrders);
-            Update(response.CompletedOrders, CompletedOrders);
-            Update(response.ScheduledOrders, ScheduledOrders);
-            Update(response.FrozenOrders, FrozenOrders);
+            Update(message.ActiveOrders, ActiveOrders);
+            Update(message.CompletedOrders, CompletedOrders);
+            Update(message.ScheduledOrders, ScheduledOrders);
+            Update(message.FrozenOrders, FrozenOrders);
 
             void Update(ICollection<OrderPositionDto> source, ObservableCollection<ReviewOrderVM> target)
             {
@@ -109,23 +96,20 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             }
         }
 
-        private Task OnOrderPositionsChanged(OrderPositionsChangedEvent message)
+        private async Task ReceiveUpdated(OrderQueueUpdatedEvent @event)
         {
-            return _dispatcherQueue.EnqueueAsync(async () =>
+            if (await CheckSyncVersion(@event.SyncVersion))
             {
-                if (await CheckSyncVersion(message.SyncVersion))
+                foreach (OrderPositionDto item in @event.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
                 {
-                    foreach (OrderPositionDto item in message.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
-                    {
-                        RemoveOrder(item.Order, item.PreviousPosition);
-                    }
-
-                    foreach (OrderPositionDto item in message.OrderPositions.OrderBy(x => x.CurrentPosition.QueueIndex))
-                    {
-                        InsertOrder(item.Order, item.CurrentPosition);
-                    }
+                    RemoveOrder(item.Order, item.PreviousPosition);
                 }
-            });
+
+                foreach (OrderPositionDto item in @event.OrderPositions.OrderBy(x => x.CurrentPosition.QueueIndex))
+                {
+                    InsertOrder(item.Order, item.CurrentPosition);
+                }
+            }
         }
 
         private void RemoveOrder(ReviewOrderDto order, OrderQueuePositionDto position)

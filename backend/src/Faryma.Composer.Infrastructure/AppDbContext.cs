@@ -1,12 +1,13 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure
 {
-    public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options)
+    public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options), IDataProtectionKeyContext
     {
         /// <summary>
         /// Настройки приложения
@@ -72,6 +73,8 @@ namespace Faryma.Composer.Infrastructure
         /// Оценки пользователей
         /// </summary>
         public DbSet<UserTrackRating> UserTrackRatings { get; set; }
+
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
