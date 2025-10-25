@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
@@ -73,12 +74,20 @@ namespace Faryma.Composer.Api.DependencyInjection
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IWebHostEnvironment environment)
         {
             services
+                .AddSingleton<GlobalExceptionFilter>()
+                .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>())
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+            services
+                .AddSingleton<IOrderQueueNotificationService, OrderQueueNotificationService>()
+                .AddSignalR()
+                .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+            services
                 .AddProblemDetails()
                 .AddMemoryCache()
                 .ConfigureSwagger(environment)
-                .AddAsyncApiSpecification(environment)
-                .AddSingleton<IOrderQueueNotificationService, OrderQueueNotificationService>()
-                .AddSignalR();
+                .AddAsyncApiSpecification(environment);
 
             return services;
         }

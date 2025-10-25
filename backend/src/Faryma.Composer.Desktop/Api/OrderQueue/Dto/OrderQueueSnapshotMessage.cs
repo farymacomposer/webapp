@@ -13,7 +13,7 @@
         /// <summary>
         /// Активные заказы
         /// </summary>
-        public required ICollection<OrderPositionDto> ActiveOrders { get; init; }
+        public required IEnumerable<OrderPositionDto> ActiveOrders { get; init; }
 
         /// <summary>
         /// Заказ в работе
@@ -23,16 +23,16 @@
         /// <summary>
         /// Выполненные заказы
         /// </summary>
-        public required ICollection<OrderPositionDto> CompletedOrders { get; init; }
+        public required IEnumerable<OrderPositionDto> CompletedOrders { get; init; }
 
         /// <summary>
         /// Запланированные заказы
         /// </summary>
-        public required ICollection<OrderPositionDto> ScheduledOrders { get; init; }
+        public required IEnumerable<OrderPositionDto> ScheduledOrders { get; init; }
 
         /// <summary>
         /// Замороженные заказы
         /// </summary>
-        public required ICollection<OrderPositionDto> FrozenOrders { get; init; }
+        public required IEnumerable<OrderPositionDto> FrozenOrders { get; init; }
     }
 }

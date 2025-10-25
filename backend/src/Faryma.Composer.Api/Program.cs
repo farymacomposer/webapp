@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Faryma.Composer.Api.Auth;
+﻿using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
@@ -40,11 +39,6 @@ namespace Faryma.Composer.Api
                     {
                         services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
                     }
-
-                    services
-                        .AddSingleton<GlobalExceptionFilter>()
-                        .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>())
-                        .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
                     services.AddInfrastructure(builder.Environment);
                 });

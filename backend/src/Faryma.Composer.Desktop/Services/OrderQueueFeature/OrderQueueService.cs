@@ -69,23 +69,12 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 InProgressOrder = new ReviewOrderVM(message.InProgressOrder.Order, message.InProgressOrder.CurrentPosition);
             }
 
-            if (ActiveOrders.Count > 0)
-            {
-                foreach (OrderPositionDto item in message.ActiveOrders)
-                {
-                    if (ActiveOrders[item.CurrentPosition.QueueIndex].Id != item.Order.Id)
-                    {
-                        throw new InvalidOperationException("Нарушена очередность");
-                    }
-                }
-            }
+            Update(ActiveOrders, message.ActiveOrders);
+            Update(CompletedOrders, message.CompletedOrders);
+            Update(ScheduledOrders, message.ScheduledOrders);
+            Update(FrozenOrders, message.FrozenOrders);
 
-            Update(message.ActiveOrders, ActiveOrders);
-            Update(message.CompletedOrders, CompletedOrders);
-            Update(message.ScheduledOrders, ScheduledOrders);
-            Update(message.FrozenOrders, FrozenOrders);
-
-            void Update(ICollection<OrderPositionDto> source, ObservableCollection<ReviewOrderVM> target)
+            void Update(ObservableCollection<ReviewOrderVM> target, IEnumerable<OrderPositionDto> source)
             {
                 target.Clear();
 
@@ -98,8 +87,10 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
         private async Task ReceiveUpdated(OrderQueueUpdatedEvent @event)
         {
-            if (await CheckSyncVersion(@event.SyncVersion))
+            if (@event.SyncVersion - SyncVersion == 1)
             {
+                SyncVersion = @event.SyncVersion;
+
                 foreach (OrderPositionDto item in @event.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
                 {
                     RemoveOrder(item.Order, item.PreviousPosition);
@@ -109,6 +100,10 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 {
                     InsertOrder(item.Order, item.CurrentPosition);
                 }
+            }
+            else
+            {
+                await UpdateOrderQueue();
             }
         }
 
@@ -164,22 +159,6 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
                 OrderActivityStatus.Frozen => FrozenOrders,
                 _ => throw new InvalidOperationException($"Статус активности заказа '{status}' не поддерживается"),
             };
-        }
-
-        private async Task<bool> CheckSyncVersion(int newSyncVersion)
-        {
-            if (newSyncVersion - SyncVersion == 1)
-            {
-                SyncVersion = newSyncVersion;
-
-                return true;
-            }
-            else
-            {
-                await UpdateOrderQueue();
-
-                return false;
-            }
         }
     }
 }
