@@ -2,9 +2,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
 using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Desktop.Api.Dto;
 using Faryma.Composer.Desktop.Api.OrderQueue;
 using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
+using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Microsoft.UI.Dispatching;
 

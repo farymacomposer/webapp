@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Faryma.Composer.Desktop.Api.ComposerStream.Responses;
-using Faryma.Composer.Desktop.Api.Dto;
+using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.Http;
 

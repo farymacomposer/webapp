@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Desktop.Api.Dto
+namespace Faryma.Composer.Desktop.Api.Shared.Dto
 {
     /// <summary>
     /// Заказ разбора трека

@@ -2,9 +2,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Desktop.Api.ComposerStream;
-using Faryma.Composer.Desktop.Api.Dto;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
+using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Faryma.Composer.Infrastructure.Enums;
