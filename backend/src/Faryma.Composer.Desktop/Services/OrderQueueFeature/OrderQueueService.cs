@@ -53,8 +53,8 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
             await Task.Delay(2000);
 #endif
 
-            _orderQueueHub.ReceiveUpdated(@event => _dispatcherQueue.EnqueueAsync(() => ReceiveUpdated(@event)));
             _orderQueueHub.ReceiveSnapshot(message => _dispatcherQueue.EnqueueAsync(() => ReceiveSnapshot(message)));
+            _orderQueueHub.ReceiveUpdated(@event => _dispatcherQueue.EnqueueAsync(() => ReceiveUpdated(@event)));
             await _orderQueueHub.Start();
         }
 
