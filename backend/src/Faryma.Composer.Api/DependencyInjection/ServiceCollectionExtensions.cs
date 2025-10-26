@@ -80,35 +80,15 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .AddAsyncApiSpecification(environment);
 
             services
-                .AddRest()
-                .AddRealtime()
-                .AddGraphQL();
-
-            return services;
-        }
-
-        private static IServiceCollection AddRest(this IServiceCollection services)
-        {
-            services
                 .AddSingleton<GlobalExceptionFilter>()
                 .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>())
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            return services;
-        }
-
-        private static IServiceCollection AddRealtime(this IServiceCollection services)
-        {
             services
                 .AddSingleton<IOrderQueueNotificationService, OrderQueueNotificationService>()
                 .AddSignalR()
                 .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            return services;
-        }
-
-        private static IServiceCollection AddGraphQL(this IServiceCollection services)
-        {
             services
                 .AddGraphQLServer()
                 .AddQueryType<TrackQuery>()

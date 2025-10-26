@@ -32,8 +32,7 @@ namespace Faryma.Composer.Api
                         .AddPersistenceAndIdentity(context.Configuration)
                         .AddJwtAuthentication(context.Configuration)
                         .AddAuthorization()
-                        .AddCoreServices()
-                        .AddGraphQL();
+                        .AddCoreServices();
 
                     if (builder.Environment.IsDevelopment())
                     {
