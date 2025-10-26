@@ -30,7 +30,7 @@ namespace Faryma.Composer.Api
                     services
                         .AddConfiguration(context.Configuration)
                         .AddPersistenceAndIdentity(context.Configuration)
-                        .AddAuthentication(context.Configuration)
+                        .AddJwtAuthentication(context.Configuration)
                         .AddAuthorization()
                         .AddCoreServices()
                         .AddGraphQL();
@@ -40,7 +40,7 @@ namespace Faryma.Composer.Api
                         services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
                     }
 
-                    services.AddInfrastructure(builder.Environment);
+                    services.AddPresentationLayer(builder.Environment);
                 });
 
             WebApplication app = builder.Build();
