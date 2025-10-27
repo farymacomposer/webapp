@@ -44,7 +44,6 @@ namespace Faryma.Composer.Desktop
         }
 
         public static T GetService<T>() where T : notnull => _services.GetRequiredService<T>();
-        public static Task ShowDialog(string message) => GetService<OrderQueuePageVM>().ShowDialog(message);
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
