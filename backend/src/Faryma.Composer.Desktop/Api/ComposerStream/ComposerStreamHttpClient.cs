@@ -1,6 +1,8 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Faryma.Composer.Desktop.Api.ComposerStream.Responses;
-using Faryma.Composer.Desktop.Api.Dto;
+using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.Http;
 
@@ -8,6 +10,11 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
 {
     public sealed class ComposerStreamHttpClient(HttpClient httpClient)
     {
+        private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web)
+        {
+            Converters = { new JsonStringEnumConverter() }
+        };
+
         public async Task<IEnumerable<ComposerStreamDto>> Find(DateOnly dateFrom, DateOnly dateTo)
         {
             QueryString queryBuilder = QueryString.Empty
@@ -16,14 +23,14 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
 
             string url = $"/api/ComposerStream/FindStreams{queryBuilder}";
 
-            StreamsResponse response = (await httpClient.GetFromJsonAsync<StreamsResponse>(url))!;
+            StreamsResponse response = (await httpClient.GetFromJsonAsync<StreamsResponse>(url, _serializerOptions))!;
 
             return response.Streams;
         }
 
         public async Task<IEnumerable<ComposerStreamDto>> FindLiveAndPlanned()
         {
-            StreamsResponse response = (await httpClient.GetFromJsonAsync<StreamsResponse>("/api/ComposerStream/FindLiveAndPlanned"))!;
+            StreamsResponse response = (await httpClient.GetFromJsonAsync<StreamsResponse>("/api/ComposerStream/FindLiveAndPlanned", _serializerOptions))!;
 
             return response.Streams;
         }
@@ -51,7 +58,7 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
 
         private async Task<ComposerStreamDto> Post<T>(string requestUri, T request)
         {
-            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync(requestUri, request);
+            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync(requestUri, request, _serializerOptions);
 
             responseMessage.EnsureSuccessStatusCode();
 

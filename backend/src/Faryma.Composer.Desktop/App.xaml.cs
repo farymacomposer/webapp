@@ -27,7 +27,6 @@ namespace Faryma.Composer.Desktop
                 .Console(LogEventLevel.Verbose, applyThemeToRedirectedOutput: true)
                 .CreateLogger()));
 
-            services.AddHttpClient("Faryma.Composer.Api", client => client.BaseAddress = new Uri(BaseAddress));
             services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
             services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
 
@@ -45,7 +44,6 @@ namespace Faryma.Composer.Desktop
         }
 
         public static T GetService<T>() where T : notnull => _services.GetRequiredService<T>();
-        public static Task ShowDialog(string message) => GetService<OrderQueuePageVM>().ShowDialog(message);
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {

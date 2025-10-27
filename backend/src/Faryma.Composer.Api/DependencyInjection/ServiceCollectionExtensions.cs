@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
@@ -24,12 +25,12 @@ namespace Faryma.Composer.Api.DependencyInjection
         {
             services
                 .AddOptionsWithValidateOnStart<JwtOptions>()
-                .Bind(configuration.GetSection("JWT"))
+                .Bind(configuration.GetRequiredSection("JWT"))
                 .ValidateDataAnnotations();
 
             services
                 .AddOptionsWithValidateOnStart<PostgreOptions>()
-                .Bind(configuration.GetSection("POSTGRES"))
+                .Bind(configuration.GetRequiredSection("POSTGRES"))
                 .ValidateDataAnnotations();
 
             return services;
@@ -47,14 +48,14 @@ namespace Faryma.Composer.Api.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services
                 .AddScoped<AuthService>()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    JwtOptions jwtOptions = configuration.GetSection("JWT").Get<JwtOptions>()!;
+                    JwtOptions jwtOptions = configuration.GetRequiredSection("JWT").Get<JwtOptions>()!;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -70,21 +71,24 @@ namespace Faryma.Composer.Api.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IWebHostEnvironment environment)
+        public static IServiceCollection AddPresentationLayer(this IServiceCollection services, IWebHostEnvironment environment)
         {
             services
                 .AddProblemDetails()
                 .AddMemoryCache()
                 .ConfigureSwagger(environment)
-                .AddAsyncApiSpecification(environment)
+                .AddAsyncApiSpecification(environment);
+
+            services
+                .AddSingleton<GlobalExceptionFilter>()
+                .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>())
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+            services
                 .AddSingleton<IOrderQueueNotificationService, OrderQueueNotificationService>()
-                .AddSignalR();
+                .AddSignalR()
+                .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            return services;
-        }
-
-        public static IServiceCollection AddGraphQL(this IServiceCollection services)
-        {
             services
                 .AddGraphQLServer()
                 .AddQueryType<TrackQuery>()

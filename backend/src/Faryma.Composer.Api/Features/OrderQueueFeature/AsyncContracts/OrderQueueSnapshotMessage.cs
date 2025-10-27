@@ -20,7 +20,7 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.AsyncContracts
         /// Активные заказы
         /// </summary>
         [Required]
-        public ICollection<OrderPositionDto> ActiveOrders { get; } = [];
+        public List<OrderPositionDto> ActiveOrders { get; } = [];
 
         /// <summary>
         /// Заказ в работе
@@ -31,19 +31,19 @@ namespace Faryma.Composer.Api.Features.OrderQueueFeature.AsyncContracts
         /// Выполненные заказы
         /// </summary>
         [Required]
-        public ICollection<OrderPositionDto> CompletedOrders { get; } = [];
+        public List<OrderPositionDto> CompletedOrders { get; } = [];
 
         /// <summary>
         /// Запланированные заказы
         /// </summary>
         [Required]
-        public ICollection<OrderPositionDto> ScheduledOrders { get; } = [];
+        public List<OrderPositionDto> ScheduledOrders { get; } = [];
 
         /// <summary>
         /// Замороженные заказы
         /// </summary>
         [Required]
-        public ICollection<OrderPositionDto> FrozenOrders { get; } = [];
+        public List<OrderPositionDto> FrozenOrders { get; } = [];
 
         public static OrderQueueSnapshotMessage Map(OrderQueueSnapshot snapshot)
         {

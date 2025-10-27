@@ -2,9 +2,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Desktop.Api.ComposerStream;
-using Faryma.Composer.Desktop.Api.Dto;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
+using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Faryma.Composer.Infrastructure.Enums;
@@ -16,7 +16,6 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         ComposerStreamHttpClient composerStreamService,
         ReviewOrderHttpClient reviewOrderService) : ObservableObject
     {
-        public OrderQueuePage Page { get; set; } = null!;
         public OrderQueueService OrderQueueService { get; } = orderQueueService;
         public ReviewOrderType[] OrderTypes { get; } = Enum.GetValues<ReviewOrderType>();
         public ComposerStreamType[] StreamTypes { get; } = Enum.GetValues<ComposerStreamType>();
@@ -90,7 +89,6 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
         public partial ComposerStreamType StreamType { get; set; }
 
         public Task Initialize() => CurrentWeek();
-        public Task ShowDialog(string message) => Page.ShowDialog(message);
 
         private static DateOnly StartOfWeek(DateOnly date)
         {
@@ -219,16 +217,9 @@ namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
 
         private async Task UpdateStream(Task<ComposerStreamDto> task)
         {
-            try
-            {
-                ComposerStreamDto dto = await task;
-                StreamContainerVM? container = StreamSchedule.FirstOrDefault(x => x.Date == dto.EventDate);
-                container?.Stream = new ComposerStreamVM(dto);
-            }
-            catch (Exception ex)
-            {
-                await App.ShowDialog(ex.Message);
-            }
+            ComposerStreamDto dto = await task;
+            StreamContainerVM? container = StreamSchedule.FirstOrDefault(x => x.Date == dto.EventDate);
+            container?.Stream = new ComposerStreamVM(dto);
         }
     }
 }

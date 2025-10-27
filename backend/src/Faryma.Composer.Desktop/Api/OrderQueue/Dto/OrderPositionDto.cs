@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Desktop.Api.Dto;
+﻿using Faryma.Composer.Desktop.Api.Shared.Dto;
 
 namespace Faryma.Composer.Desktop.Api.OrderQueue.Dto
 {
