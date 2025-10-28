@@ -44,6 +44,7 @@
   <ItemGroup>
     <Folder Include="Api\OrderQueue\Enums\" />
     <Folder Include="Api\Shared\Enums\" />
+    <Folder Include="Navigation\Dialog\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -75,9 +76,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Navigation\Message\MessageDialog.xaml" />
     <None Remove="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml" />
     <None Remove="UI\OrderQueueFeature\OrderQueuePage.xaml" />
     <None Remove="UI\ReviewOrderFeature\ReviewOrderPage.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Navigation\Message\MessageDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

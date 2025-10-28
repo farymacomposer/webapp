@@ -1,5 +1,7 @@
-﻿using Faryma.Composer.Desktop.Api.ComposerStream;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Faryma.Composer.Desktop.Api.ComposerStream;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
+using Faryma.Composer.Desktop.Navigation.Message;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
@@ -30,6 +32,8 @@ namespace Faryma.Composer.Desktop
             services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
             services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
 
+            services.AddSingleton<IMessenger, StrongReferenceMessenger>();
+            services.AddSingleton<MessageService>();
             services.AddSingleton<OrderQueueService>();
 
             services.AddSingleton<OrderQueuePageVM>();
@@ -50,8 +54,16 @@ namespace Faryma.Composer.Desktop
             await GetService<OrderQueueService>().Initialize();
             await GetService<OrderQueuePageVM>().Initialize();
 
-            MainWindow window = new();
+            MessageService messageService = GetService<MessageService>();
+            MainWindow window = new(messageService);
             window.Activate();
+
+            _ = messageService.ShowMessage(new MessageOptions
+            {
+                Title = "Title",
+                Message = "Message",
+                SecondButtonText = "SecondButtonText"
+            });
         }
     }
 }

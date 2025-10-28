@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Faryma.Composer.Desktop.Navigation.Message;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
 using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
 using Microsoft.UI.Xaml;
@@ -25,11 +26,14 @@ namespace Faryma.Composer.Desktop
             },
         ];
 
-        public MainWindow()
+        public MainWindow(MessageService messageService)
         {
             InitializeComponent();
+
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(titleBar);
+
+            messageService.SetFrame(MessageFrame);
         }
 
         private void NavigationViewLoaded(object sender, RoutedEventArgs _)
