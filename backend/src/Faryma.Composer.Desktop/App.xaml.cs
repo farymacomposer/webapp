@@ -2,7 +2,7 @@
 using Faryma.Composer.Desktop.Api.ComposerStream;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Navigation;
-using Faryma.Composer.Desktop.Services.OrderQueueFeature;
+using Faryma.Composer.Desktop.Services;
 using Faryma.Composer.Desktop.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
@@ -30,12 +30,9 @@ namespace Faryma.Composer.Desktop
 
             services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
             services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
-
             services.AddSingleton<IMessenger, StrongReferenceMessenger>();
             services.AddNavigation();
-            services.AddPages();
-
-            services.AddSingleton<OrderQueueService>();
+            services.AddServices();
 
             _services = services.BuildServiceProvider();
         }

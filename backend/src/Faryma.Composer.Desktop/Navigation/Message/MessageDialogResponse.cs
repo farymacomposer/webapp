@@ -6,9 +6,9 @@
     public enum MessageDialogResponse
     {
         /// <summary>
-        /// MessageDialog был закрыт программным способом
+        /// Не задан
         /// </summary>
-        None = 0,
+        Unspecified = 0,
 
         /// <summary>
         /// Была нажата первая кнопка

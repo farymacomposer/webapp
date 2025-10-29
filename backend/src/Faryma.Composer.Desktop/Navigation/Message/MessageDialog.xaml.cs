@@ -21,8 +21,7 @@ namespace Faryma.Composer.Desktop.Navigation
         }
 
         public Task<MessageDialogResponse> WaitResponse() => _responseAwaiter.Task;
-        private void FirstButton_Click(object _, RoutedEventArgs __) => SetResult(MessageDialogResponse.FirstButton);
-        private void SecondButton_Click(object _, RoutedEventArgs __) => SetResult(MessageDialogResponse.SecondButton);
-        private void SetResult(MessageDialogResponse response) => _responseAwaiter.SetResult(response);
+        private void FirstButton_Click(object _, RoutedEventArgs __) => _responseAwaiter.SetResult(MessageDialogResponse.FirstButton);
+        private void SecondButton_Click(object _, RoutedEventArgs __) => _responseAwaiter.SetResult(MessageDialogResponse.SecondButton);
     }
 }

@@ -8,7 +8,7 @@ using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Microsoft.UI.Dispatching;
 
-namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
+namespace Faryma.Composer.Desktop.Services
 {
     public sealed partial class OrderQueueService : ObservableObject
     {

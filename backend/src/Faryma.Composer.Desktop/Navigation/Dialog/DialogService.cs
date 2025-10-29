@@ -10,13 +10,13 @@ namespace Faryma.Composer.Desktop.Navigation
         public void HideDialog() => _frame.Content = null;
         public void SetFrame(ContentControl frame) => _frame = frame;
 
-        public async Task ShowDialog<TDialog>(object? parameter = null) where TDialog : UserControl
+        public async Task ShowDialog<TDialog, TViewModel>(object? parameter = null)
+            where TDialog : UserControl, IDialogControl<TViewModel>
+            where TViewModel : DialogVM
         {
             TDialog dialog = provider.GetRequiredService<TDialog>();
-            if (dialog.DataContext is DialogVM vm)
-            {
-                await vm.OnNavigatedTo(parameter);
-            }
+
+            await dialog.ViewModel.OnNavigatedTo(parameter);
 
             _frame.Content = dialog;
         }
