@@ -44,7 +44,9 @@
   <ItemGroup>
     <Folder Include="Api\OrderQueue\Enums\" />
     <Folder Include="Api\Shared\Enums\" />
-    <Folder Include="Navigation\Dialog\" />
+    <Folder Include="UI\Dialogs\" />
+    <Folder Include="UI\Pages\ReviewOrder\" />
+    <Folder Include="UI\Pages\OrderQueue\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -76,6 +78,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Navigation\Dialog\CustomContentDialog.xaml" />
     <None Remove="Navigation\Message\MessageDialog.xaml" />
     <None Remove="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml" />
     <None Remove="UI\OrderQueueFeature\OrderQueuePage.xaml" />
@@ -83,7 +86,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Navigation\Dialog\CustomContentDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Update="Navigation\Message\MessageDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
@@ -96,12 +111,6 @@
 
   <ItemGroup>
     <Page Update="UI\ReviewOrderFeature\ReviewOrderPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

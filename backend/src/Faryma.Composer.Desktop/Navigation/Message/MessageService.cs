@@ -41,10 +41,10 @@ namespace Faryma.Composer.Desktop.Navigation.Message
         private async Task<MessageDialogResponse> ShowMessageInternal(MessageOptions options, string? subMessage = null)
         {
             options.SubMessage = subMessage;
-            MessageDialog message = new(options);
-            _frame.Content = message;
+            MessageDialog dialog = new(options);
+            _frame.Content = dialog;
 
-            MessageDialogResponse response = await message.WaitResponse();
+            MessageDialogResponse response = await dialog.WaitResponse();
 
             _frame.Content = null;
 

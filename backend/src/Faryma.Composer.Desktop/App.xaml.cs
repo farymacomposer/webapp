@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Faryma.Composer.Desktop.Api.ComposerStream;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
+using Faryma.Composer.Desktop.Navigation;
 using Faryma.Composer.Desktop.Navigation.Message;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.UI.OrderQueueFeature;
-using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Serilog;
@@ -33,11 +33,10 @@ namespace Faryma.Composer.Desktop
             services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
 
             services.AddSingleton<IMessenger, StrongReferenceMessenger>();
-            services.AddSingleton<MessageService>();
-            services.AddSingleton<OrderQueueService>();
+            services.AddNavigation();
+            services.AddPages();
 
-            services.AddSingleton<OrderQueuePageVM>();
-            services.AddSingleton<ReviewOrderPageVM>();
+            services.AddSingleton<OrderQueueService>();
 
             _services = services.BuildServiceProvider();
         }
@@ -54,11 +53,10 @@ namespace Faryma.Composer.Desktop
             await GetService<OrderQueueService>().Initialize();
             await GetService<OrderQueuePageVM>().Initialize();
 
-            MessageService messageService = GetService<MessageService>();
-            MainWindow window = new(messageService);
+            MainWindow window = GetService<MainWindow>();
             window.Activate();
 
-            _ = messageService.ShowMessage(new MessageOptions
+            _ = GetService<MessageService>().ShowMessage(new MessageOptions
             {
                 Title = "Title",
                 Message = "Message",

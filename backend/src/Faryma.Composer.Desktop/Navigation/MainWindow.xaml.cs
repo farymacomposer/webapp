@@ -1,38 +1,25 @@
 ﻿using System.Collections;
-using CommunityToolkit.Mvvm.ComponentModel;
+using Faryma.Composer.Desktop.Navigation.Dialog;
 using Faryma.Composer.Desktop.Navigation.Message;
-using Faryma.Composer.Desktop.UI.OrderQueueFeature;
-using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Faryma.Composer.Desktop
+namespace Faryma.Composer.Desktop.Navigation
 {
     public sealed partial class MainWindow : Window
     {
-        private PageViewModel[] Pages { get; } =
-        [
-            new()
-            {
-                Title = "Заказы",
-                Icon = "\xE71D",
-                PageType = typeof(ReviewOrderPage),
-            },
-            new()
-            {
-                Title = "Тест очереди",
-                Icon = "\xE71D",
-                PageType = typeof(OrderQueuePage),
-            },
-        ];
+        private MainWindowVM ViewModel { get; }
 
-        public MainWindow(MessageService messageService)
+        public MainWindow(MainWindowVM viewModel, DialogService dialogService, MessageService messageService)
         {
+            ViewModel = viewModel;
+
             InitializeComponent();
 
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(titleBar);
 
+            dialogService.SetFrame(DialogFrame);
             messageService.SetFrame(MessageFrame);
         }
 
@@ -46,19 +33,12 @@ namespace Faryma.Composer.Desktop
 
         private void NavigationViewSelectionChanged(NavigationView _, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.SelectedItem is PageViewModel page)
+            if (args.SelectedItem is PageVM page)
             {
                 PageFrame.Navigate(page.PageType);
             }
         }
 
         private void TitleBar_PaneToggleRequested(TitleBar _, object __) => navView.IsPaneOpen = !navView.IsPaneOpen;
-    }
-
-    public sealed partial class PageViewModel : ObservableObject
-    {
-        public string Icon { get; init; } = null!;
-        public Type PageType { get; init; } = null!;
-        public string Title { get; init; } = null!;
     }
 }
