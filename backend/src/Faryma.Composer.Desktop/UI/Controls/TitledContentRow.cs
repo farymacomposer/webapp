@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Faryma.Composer.Desktop.Controls
+namespace Faryma.Composer.Desktop.UI
 {
     public sealed partial class TitledContentRow : ContentControl
     {

@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Desktop.Navigation.Message
+﻿namespace Faryma.Composer.Desktop.Navigation
 {
     /// <summary>
     /// Ответ MessageDialog, при его закрытии

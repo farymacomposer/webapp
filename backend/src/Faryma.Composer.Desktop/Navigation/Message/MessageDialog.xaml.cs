@@ -1,7 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Faryma.Composer.Desktop.Navigation.Message
+namespace Faryma.Composer.Desktop.Navigation
 {
     public sealed partial class MessageDialog : UserControl
     {

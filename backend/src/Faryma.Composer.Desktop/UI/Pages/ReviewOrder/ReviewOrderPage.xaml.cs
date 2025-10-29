@@ -2,7 +2,7 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
-namespace Faryma.Composer.Desktop.UI.ReviewOrderFeature
+namespace Faryma.Composer.Desktop.UI
 {
     public sealed partial class ReviewOrderPage : Page
     {

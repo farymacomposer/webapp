@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Faryma.Composer.Desktop.Controls">
+    xmlns:controls="using:Faryma.Composer.Desktop.UI">
 
     <Style x:Key="StackPanelCardStyle" TargetType="StackPanel">
         <Setter Property="Padding" Value="16" />

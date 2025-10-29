@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Faryma.Composer.Desktop.UI.ReviewOrderFeature
+namespace Faryma.Composer.Desktop.UI
 {
     public sealed partial class ReviewOrderPageVM : ObservableObject
     {

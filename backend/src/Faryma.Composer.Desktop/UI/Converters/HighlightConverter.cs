@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
-namespace Faryma.Composer.Desktop.Converters
+namespace Faryma.Composer.Desktop.UI
 {
     public sealed partial class HighlightConverter : IValueConverter
     {

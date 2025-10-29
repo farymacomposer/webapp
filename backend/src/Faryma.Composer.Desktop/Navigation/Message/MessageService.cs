@@ -3,7 +3,7 @@ using Faryma.Composer.Desktop.Messages.Commands;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Faryma.Composer.Desktop.Navigation.Message
+namespace Faryma.Composer.Desktop.Navigation
 {
     public sealed class MessageService(IMessenger messenger, ILogger<MessageService> logger)
     {

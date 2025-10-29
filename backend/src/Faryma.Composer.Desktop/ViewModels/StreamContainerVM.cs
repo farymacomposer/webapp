@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Faryma.Composer.Desktop.UI.OrderQueueFeature;
+using Faryma.Composer.Desktop.UI;
 
 namespace Faryma.Composer.Desktop.Shared.ViewModels
 {

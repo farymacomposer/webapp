@@ -1,6 +1,6 @@
 ﻿using Windows.UI;
 
-namespace Faryma.Composer.Desktop.Converters
+namespace Faryma.Composer.Desktop.UI
 {
     public static class ColorHelper
     {

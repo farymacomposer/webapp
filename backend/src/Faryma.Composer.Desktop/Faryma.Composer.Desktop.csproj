@@ -45,8 +45,7 @@
     <Folder Include="Api\OrderQueue\Enums\" />
     <Folder Include="Api\Shared\Enums\" />
     <Folder Include="UI\Dialogs\" />
-    <Folder Include="UI\Pages\ReviewOrder\" />
-    <Folder Include="UI\Pages\OrderQueue\" />
+    <Folder Include="UI\Pages\OrderQueue\Controls\" />
   </ItemGroup>
 
   <ItemGroup>

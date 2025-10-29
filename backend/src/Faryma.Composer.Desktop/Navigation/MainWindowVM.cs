@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Faryma.Composer.Desktop.Messages.Commands;
-using Faryma.Composer.Desktop.UI.OrderQueueFeature;
-using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
+using Faryma.Composer.Desktop.UI;
 using Microsoft.UI.Xaml;
 
 namespace Faryma.Composer.Desktop.Navigation

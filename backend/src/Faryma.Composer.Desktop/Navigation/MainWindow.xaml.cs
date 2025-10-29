@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using Faryma.Composer.Desktop.Navigation.Dialog;
-using Faryma.Composer.Desktop.Navigation.Message;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Faryma.Composer.Desktop.Navigation.Dialog
+namespace Faryma.Composer.Desktop.Navigation
 {
     public sealed class DialogService(IServiceProvider provider)
     {

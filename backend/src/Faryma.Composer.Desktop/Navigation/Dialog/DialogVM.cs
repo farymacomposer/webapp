@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Faryma.Composer.Desktop.Navigation.Dialog
+namespace Faryma.Composer.Desktop.Navigation
 {
     public abstract class DialogVM(DialogService dialogService) : ObservableObject
     {

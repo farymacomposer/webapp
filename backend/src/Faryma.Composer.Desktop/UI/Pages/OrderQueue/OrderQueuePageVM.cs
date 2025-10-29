@@ -9,7 +9,7 @@ using Faryma.Composer.Desktop.Services.OrderQueueFeature;
 using Faryma.Composer.Desktop.Shared.ViewModels;
 using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Desktop.UI.OrderQueueFeature
+namespace Faryma.Composer.Desktop.UI
 {
     public sealed partial class OrderQueuePageVM(
         OrderQueueService orderQueueService,

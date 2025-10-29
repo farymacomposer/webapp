@@ -34,7 +34,7 @@
                 MenuItemsSource="{x:Bind ViewModel.Pages}"
                 SelectionChanged="NavigationViewSelectionChanged">
                 <NavigationView.MenuItemTemplate>
-                    <DataTemplate x:DataType="local:PageViewModel">
+                    <DataTemplate x:DataType="local:PageVM">
                         <NavigationViewItem Content="{x:Bind Title}">
                             <NavigationViewItem.Icon>
                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="{x:Bind Icon}" />

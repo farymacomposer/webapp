@@ -2,9 +2,8 @@
 using Faryma.Composer.Desktop.Api.ComposerStream;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Navigation;
-using Faryma.Composer.Desktop.Navigation.Message;
 using Faryma.Composer.Desktop.Services.OrderQueueFeature;
-using Faryma.Composer.Desktop.UI.OrderQueueFeature;
+using Faryma.Composer.Desktop.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Serilog;

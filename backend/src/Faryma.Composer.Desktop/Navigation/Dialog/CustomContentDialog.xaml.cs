@@ -2,7 +2,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Faryma.Composer.Desktop.Navigation.Dialog
+namespace Faryma.Composer.Desktop.Navigation
 {
     public sealed partial class CustomContentDialog : UserControl
     {
