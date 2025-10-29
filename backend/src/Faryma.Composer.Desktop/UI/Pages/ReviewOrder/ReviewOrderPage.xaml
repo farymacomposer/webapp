@@ -50,7 +50,7 @@
             Padding="6,4"
             Orientation="Horizontal"
             Spacing="4">
-            <Button Content="Создать заказ" />
+            <Button Command="{x:Bind ViewModel.OpenTestDialogCommand}" Content="Создать заказ" />
             <Button Content="Найти заказ" />
         </StackPanel>
 

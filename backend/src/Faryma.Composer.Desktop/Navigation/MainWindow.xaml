@@ -48,7 +48,10 @@
             </NavigationView>
         </Grid>
 
-        <ContentControl x:Name="DialogFrame" />
+        <ContentControl
+            x:Name="DialogFrame"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch" />
 
         <Border Background="{ThemeResource ContentDialogSmokeFill}" Visibility="{x:Bind ViewModel.ProgressVisibility, Mode=OneWay}">
             <ProgressRing

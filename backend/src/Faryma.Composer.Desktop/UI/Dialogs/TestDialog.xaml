@@ -9,7 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <commonDialog:CustomContentDialog CloseButtonCommand="{x:Bind ViewModel.HideDialogCommand}" DataContext="{x:Bind ViewModel}">
+    <commonDialog:CustomContentDialog Title="TestDialog" CloseButtonCommand="{x:Bind ViewModel.HideDialogCommand}">
         <commonDialog:CustomContentDialog.DialogContent>
             <Grid>
                 <Grid.RowDefinitions>
@@ -17,7 +17,7 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <TextBlock Text="Text" />
+                <TextBlock Text="{x:Bind ViewModel.MyProperty, Mode=OneWay}" />
 
             </Grid>
         </commonDialog:CustomContentDialog.DialogContent>

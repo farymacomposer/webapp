@@ -1,9 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Faryma.Composer.Desktop.Navigation;
+using Faryma.Composer.Desktop.UI.Dialogs;
 
 namespace Faryma.Composer.Desktop.UI
 {
-    public sealed partial class ReviewOrderPageVM : ObservableObject
+    public sealed partial class ReviewOrderPageVM(DialogService dialogService) : ObservableObject
     {
         public ObservableCollection<ControlInfoDataGroup> Groups { get; } = new()
         {
@@ -42,6 +45,9 @@ namespace Faryma.Composer.Desktop.UI
                 },
             }
         };
+
+        [RelayCommand]
+        private Task OpenTestDialog() => dialogService.ShowDialog<TestDialog, TestDialogVM>("fdf ggf dg  dfg fd gfd gdf fdg fdg fd");
     }
 
     public sealed partial class ControlInfoDataGroup : ObservableObject

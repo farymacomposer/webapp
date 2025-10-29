@@ -9,7 +9,7 @@
 
     <Grid Background="{ThemeResource ContentDialogSmokeFill}">
         <Grid
-            Padding="24,24,24,0"
+            Margin="36"
             HorizontalAlignment="{Binding HorizontalContentAlignment, ElementName=Root}"
             VerticalAlignment="{Binding VerticalContentAlignment, ElementName=Root}"
             Background="{ThemeResource ContentDialogBackground}"
@@ -25,21 +25,17 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+            <Grid Margin="24,24,24,0">
 
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Title}" />
 
                 <Button
-                    Grid.Column="1"
+                    Margin="0,-6,-6,0"
                     Padding="6"
-                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
                     Command="{x:Bind CloseButtonCommand}"
                     Style="{StaticResource FlatButton}">
-                    <SymbolIconSource Symbol="ClosePane" />
+                    <SymbolIcon Symbol="Cancel" />
                 </Button>
             </Grid>
 
