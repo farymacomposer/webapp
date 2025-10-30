@@ -7,50 +7,81 @@
     xmlns:local="using:Faryma.Composer.Desktop.UI"
     xmlns:ui="using:CommunityToolkit.WinUI">
     <UserControl.Resources>
-        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+        <x:Double x:Key="TitledContentWidth">360</x:Double>
     </UserControl.Resources>
 
-    <commonDialog:CustomContentDialog Title="TestDialog" CloseButtonCommand="{x:Bind ViewModel.HideDialogCommand}">
+    <commonDialog:CustomContentDialog Title="Создание нового заказа" CloseButtonCommand="{x:Bind ViewModel.HideDialogCommand}">
         <commonDialog:CustomContentDialog.DialogContent>
-            <StackPanel Style="{StaticResource StackPanelCardStyle}">
-
-                <StackPanel Orientation="Horizontal" Spacing="16">
-                    <local:TitledContentRow
-                        Title="IdempotencyKey"
-                        Content="{x:Bind ViewModel.IdempotencyKey, Mode=OneWay}"
-                        FontFamily="Consolas" />
-                </StackPanel>
-
-                <local:TitledContentRow Title="Nickname">
-                    <TextBox Text="{x:Bind ViewModel.Nickname, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                </local:TitledContentRow>
-
-                <local:TitledContentRow Title="PaymentAmount">
-                    <TextBox
-                        ui:TextBoxExtensions.ValidationMode="Dynamic"
-                        ui:TextBoxExtensions.ValidationType="Number"
-                        Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                </local:TitledContentRow>
-
-                <local:TitledContentRow Title="OrderType">
-                    <ComboBox
-                        HorizontalAlignment="Stretch"
-                        ItemsSource="{x:Bind ViewModel.OrderTypes, Mode=OneTime}"
-                        SelectedItem="{x:Bind ViewModel.OrderType, Mode=TwoWay}" />
-                </local:TitledContentRow>
-
-                <local:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
                 <StackPanel
-                    HorizontalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="24">
+                    Padding="24"
+                    Background="{ThemeResource ContentDialogTopOverlay}"
+                    BorderBrush="{ThemeResource ContentDialogSeparatorBorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    Spacing="16">
+
+                    <local:TitledContentRow Title="Тип заказа">
+                        <ComboBox
+                            Width="{StaticResource TitledContentWidth}"
+                            HorizontalAlignment="Stretch"
+                            ItemsSource="{x:Bind ViewModel.OrderTypes}"
+                            SelectedItem="{x:Bind ViewModel.OrderType, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </local:TitledContentRow>
+
+                    <local:TitledContentRow Title="Никнейм">
+                        <TextBox
+                            Width="{StaticResource TitledContentWidth}"
+                            MaxLength="40"
+                            Text="{x:Bind ViewModel.Nickname, Mode=TwoWay}" />
+                    </local:TitledContentRow>
+
+                    <local:TitledContentRow Title="Сумма платежа" IsEnabled="{x:Bind ViewModel.IsPaymentAmountEnabled, Mode=OneWay}">
+                        <TextBox
+                            Width="{StaticResource TitledContentWidth}"
+                            ui:TextBoxExtensions.ValidationMode="Dynamic"
+                            ui:TextBoxExtensions.ValidationType="Number"
+                            MaxLength="10"
+                            Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </local:TitledContentRow>
+
+                    <local:TitledContentRow Title="Ссылка на трек" Spacing="24">
+                        <TextBox
+                            Width="{StaticResource TitledContentWidth}"
+                            MaxLength="256"
+                            Text="{x:Bind ViewModel.TrackUrl, Mode=TwoWay}" />
+                    </local:TitledContentRow>
+
+                    <local:TitledContentRow Title="Комментарий">
+                        <TextBox
+                            Width="{StaticResource TitledContentWidth}"
+                            MaxHeight="110"
+                            AcceptsReturn="True"
+                            MaxLength="200"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            Text="{x:Bind ViewModel.UserComment, Mode=TwoWay}"
+                            TextWrapping="Wrap" />
+                    </local:TitledContentRow>
+                </StackPanel>
+
+                <Grid Grid.Row="1" Padding="24">
                     <Button
+                        HorizontalAlignment="Right"
                         Command="{x:Bind ViewModel.CreateCommand}"
                         Content="Создать новый заказ"
                         Style="{StaticResource AccentButtonStyle}" />
-                </StackPanel>
-            </StackPanel>
+                </Grid>
+            </Grid>
         </commonDialog:CustomContentDialog.DialogContent>
     </commonDialog:CustomContentDialog>
 </UserControl>

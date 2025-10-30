@@ -1,7 +1,12 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Faryma.Composer.Desktop.UI">
+    xmlns:controls="using:Faryma.Composer.Desktop.UI"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters">
+
+    <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    <controls:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+    <controls:HighlightConverter x:Key="HighlightConverter" />
 
     <Style x:Key="StackPanelCardStyle" TargetType="StackPanel">
         <Setter Property="Padding" Value="16" />

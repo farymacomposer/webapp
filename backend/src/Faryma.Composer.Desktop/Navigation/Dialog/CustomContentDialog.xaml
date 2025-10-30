@@ -22,14 +22,18 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Grid Margin="24,24,24,0">
+            <Grid Padding="24,24,24,0" Background="{ThemeResource ContentDialogTopOverlay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Title, Mode=OneWay}" />
 
                 <Button
-                    Margin="0,-6,-6,0"
+                    Grid.Column="1"
+                    Margin="24,-6,-6,0"
                     Padding="6"
-                    HorizontalAlignment="Right"
                     Command="{x:Bind CloseButtonCommand}"
                     Style="{StaticResource FlatButton}">
                     <SymbolIcon Symbol="Cancel" />

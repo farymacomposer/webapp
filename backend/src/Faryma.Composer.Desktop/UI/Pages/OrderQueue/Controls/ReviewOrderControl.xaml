@@ -9,9 +9,6 @@
     xmlns:sharedVM="using:Faryma.Composer.Desktop.ViewModels"
     d:DataContext="{d:DesignInstance Type=sharedVM:ReviewOrderVM}"
     mc:Ignorable="d">
-    <UserControl.Resources>
-        <local:HighlightConverter x:Key="HighlightConverter" />
-    </UserControl.Resources>
 
     <Grid
         Padding="6,4,12,4"

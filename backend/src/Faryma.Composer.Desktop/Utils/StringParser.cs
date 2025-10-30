@@ -69,7 +69,6 @@ namespace Faryma.Composer.Desktop.Utils
                 if (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59)
                 {
                     result = new TimeSpan(hours, minutes, 0);
-
                     return true;
                 }
             }
