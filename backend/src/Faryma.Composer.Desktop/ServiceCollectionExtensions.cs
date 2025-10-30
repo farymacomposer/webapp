@@ -25,7 +25,8 @@ namespace Faryma.Composer.Desktop
             .AddSingleton<ReviewOrderPageVM>();
 
         private static IServiceCollection AddDialogs(this IServiceCollection services) => services
-            .AddDialog<TestDialog, TestDialogVM>();
+            .AddDialog<TestDialog, TestDialogVM>()
+            .AddDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
 
         private static IServiceCollection AddDialog<TDialog, TViewModel>(this IServiceCollection services)
             where TDialog : UserControl, IDialogControl<TViewModel>
