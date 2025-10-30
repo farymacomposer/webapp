@@ -74,13 +74,13 @@
                     </local:TitledContentRow>
                 </StackPanel>
 
-                <Grid Grid.Row="1" Padding="24">
-                    <Button
-                        HorizontalAlignment="Right"
-                        Command="{x:Bind ViewModel.CreateCommand}"
-                        Content="Создать новый заказ"
-                        Style="{StaticResource AccentButtonStyle}" />
-                </Grid>
+                <Button
+                    Grid.Row="1"
+                    Margin="24"
+                    HorizontalAlignment="Right"
+                    Command="{x:Bind ViewModel.CreateCommand}"
+                    Content="Создать новый заказ"
+                    Style="{StaticResource AccentButtonStyle}" />
             </Grid>
         </commonDialog:CustomContentDialog.DialogContent>
     </commonDialog:CustomContentDialog>

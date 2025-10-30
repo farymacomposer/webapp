@@ -1,7 +1,6 @@
 ﻿using Faryma.Composer.Desktop.Navigation;
 using Faryma.Composer.Desktop.Services;
 using Faryma.Composer.Desktop.UI;
-using Faryma.Composer.Desktop.UI.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 
@@ -25,7 +24,6 @@ namespace Faryma.Composer.Desktop
             .AddSingleton<ReviewOrderPageVM>();
 
         private static IServiceCollection AddDialogs(this IServiceCollection services) => services
-            .AddDialog<TestDialog, TestDialogVM>()
             .AddDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
 
         private static IServiceCollection AddDialog<TDialog, TViewModel>(this IServiceCollection services)

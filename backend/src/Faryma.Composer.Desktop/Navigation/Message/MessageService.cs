@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using Faryma.Composer.Desktop.Api.Exceptions;
 using Faryma.Composer.Desktop.Messages.Commands;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml.Controls;
@@ -21,6 +22,11 @@ namespace Faryma.Composer.Desktop.Navigation
             try
             {
                 await task;
+            }
+            catch (ApiException ex)
+            {
+                logger.LogWarning("{@Result}", ex.Result);
+                await ShowMessage(new MessageOptions { Title = "Ошибка", Message = ex.Result.Message });
             }
             catch (Exception ex)
             {
