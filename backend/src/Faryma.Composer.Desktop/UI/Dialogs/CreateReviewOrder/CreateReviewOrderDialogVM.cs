@@ -3,16 +3,16 @@ using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
 using Faryma.Composer.Desktop.Navigation;
-using Faryma.Composer.Desktop.Validation;
+using Faryma.Composer.Desktop.Services;
 using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Desktop.UI
 {
     public sealed partial class CreateReviewOrderDialogVM(
-        DialogService dialogService,
         ReviewOrderHttpClient reviewOrderClient,
-        MessageService messageService
-        ) : DialogVM(dialogService)
+        MessageService messageService,
+        ValidationService validationService,
+        DialogService dialogService) : DialogVM(dialogService)
     {
         private Guid _idempotencyKey;
 
@@ -73,41 +73,26 @@ namespace Faryma.Composer.Desktop.UI
         [RelayCommand]
         private async Task Create()
         {
-            SimpleValidator validator = new SimpleValidator()
-                .Check(string.IsNullOrWhiteSpace(Nickname), "Не задан псевдоним пользователя");
-
-            if (OrderType == ReviewOrderType.Donation)
-            {
-                validator.CheckNumber<int>(PaymentAmount, "Не задана сумма платежа");
-            }
-
-            if (validator.HasWarnings)
-            {
-                await messageService.ShowWarning(validator.Warnings, new MessageOptions
-                {
-                    Title = "Некорректные данные",
-                });
-
-                return;
-            }
-
             _ = int.TryParse(PaymentAmount, out int paymentAmount);
 
             CreateReviewOrderRequest request = new()
             {
-                Nickname = Nickname!,
+                Nickname = Nickname,
                 OrderType = OrderType,
                 TrackUrl = TrackUrl,
                 PaymentAmount = paymentAmount,
                 UserComment = UserComment,
             };
 
-            await messageService.HandleException(async () =>
+            if (await validationService.Check(request))
             {
-                await reviewOrderClient.Create(_idempotencyKey, request);
+                await messageService.HandleException(async () =>
+                {
+                    await reviewOrderClient.Create(_idempotencyKey, request);
 
-                HideDialog();
-            });
+                    HideDialog();
+                });
+            }
         }
 
         private void Refresh()

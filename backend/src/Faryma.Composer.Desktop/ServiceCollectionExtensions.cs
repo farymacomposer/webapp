@@ -17,7 +17,8 @@ namespace Faryma.Composer.Desktop
             .AddDialogs();
 
         public static IServiceCollection AddServices(this IServiceCollection services) => services
-            .AddSingleton<OrderQueueService>();
+            .AddSingleton<OrderQueueService>()
+            .AddSingleton<ValidationService>();
 
         private static IServiceCollection AddPages(this IServiceCollection services) => services
             .AddSingleton<OrderQueuePageVM>()

@@ -12,15 +12,22 @@ namespace Faryma.Composer.Desktop.Navigation
             InitializeComponent();
 
             Title.Text = options.Title;
+
+            Message.Visibility = GetVisibility(options.Message);
             Message.Text = options.Message;
+
+            SubMessage.Visibility = GetVisibility(options.SubMessage);
             SubMessage.Text = options.SubMessage;
+
+            FirstButton.Visibility = GetVisibility(options.FirstButtonText);
             FirstButton.Content = options.FirstButtonText;
+
+            SecondButton.Visibility = GetVisibility(options.SecondButtonText);
             SecondButton.Content = options.SecondButtonText;
-            FirstButton.Visibility = string.IsNullOrEmpty(options.FirstButtonText) ? Visibility.Collapsed : Visibility.Visible;
-            SecondButton.Visibility = string.IsNullOrEmpty(options.SecondButtonText) ? Visibility.Collapsed : Visibility.Visible;
         }
 
         public Task<MessageDialogResponse> WaitResponse() => _responseAwaiter.Task;
+        private static Visibility GetVisibility(string? value) => string.IsNullOrEmpty(value) ? Visibility.Collapsed : Visibility.Visible;
         private void FirstButton_Click(object _, RoutedEventArgs __) => _responseAwaiter.SetResult(MessageDialogResponse.FirstButton);
         private void SecondButton_Click(object _, RoutedEventArgs __) => _responseAwaiter.SetResult(MessageDialogResponse.SecondButton);
     }

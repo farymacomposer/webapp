@@ -21,21 +21,38 @@ namespace Faryma.Composer.Desktop.Validation
             return this;
         }
 
-        public SimpleValidator CheckNumber<T>(object? value, string warning) where T : INumber<T>
+        public SimpleValidator CheckNumber<T>(string? value, string warning) where T : INumber<T>
         {
             _warnings.Add((!StringParser.TryParseNumber(value, out T? _), warning));
 
             return this;
         }
 
-        public SimpleValidator CheckOptionalNumber<T>(object? value, string warning) where T : INumber<T>
+        public SimpleValidator CheckOptionalNumber<T>(string? value, string warning) where T : INumber<T>
         {
-            if (value is null || (value is string str && string.IsNullOrEmpty(str)))
+            if (string.IsNullOrWhiteSpace(value))
             {
                 return this;
             }
 
             return CheckNumber<T>(value, warning);
+        }
+
+        public SimpleValidator CheckUrl(string? value, string warning)
+        {
+            _warnings.Add((!Uri.TryCreate(value, UriKind.Absolute, out _), warning));
+
+            return this;
+        }
+
+        public SimpleValidator CheckOptionalUrl(string? value, string warning)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return this;
+            }
+
+            return CheckUrl(value, warning);
         }
     }
 }

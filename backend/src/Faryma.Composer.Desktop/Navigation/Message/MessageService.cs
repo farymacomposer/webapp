@@ -42,7 +42,7 @@ namespace Faryma.Composer.Desktop.Navigation
         public Task ShowMessage(MessageOptions options) => ShowMessageInternal(options);
         public Task<MessageDialogResponse> ShowQuestion(MessageOptions options) => ShowMessageInternal(options);
         public Task ShowWarning(Exception ex, MessageOptions options) => ShowMessageInternal(options, ex.ToString());
-        public Task ShowWarning(IEnumerable<string> warnings, MessageOptions options) => ShowMessageInternal(options, string.Join("\n\n", warnings));
+        public Task ShowWarning(IEnumerable<string> warnings, MessageOptions options) => ShowMessageInternal(options, string.Join("\n", warnings));
 
         private async Task<MessageDialogResponse> ShowMessageInternal(MessageOptions options, string? subMessage = null)
         {

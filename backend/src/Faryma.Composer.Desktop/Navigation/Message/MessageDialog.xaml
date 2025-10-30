@@ -28,12 +28,13 @@
                 Background="{ThemeResource ContentDialogTopOverlay}"
                 BorderBrush="{ThemeResource ContentDialogSeparatorBorderBrush}"
                 BorderThickness="0,0,0,1">
+
                 <TextBlock x:Name="Title" Style="{StaticResource SubtitleTextBlockStyle}" />
-                <TextBlock
-                    x:Name="Message"
-                    Margin="0,12"
-                    TextWrapping="WrapWholeWords" />
-                <TextBlock x:Name="SubMessage" TextWrapping="WrapWholeWords" />
+
+                <StackPanel Padding="0,24,0,0">
+                    <TextBlock x:Name="Message" TextWrapping="WrapWholeWords" />
+                    <TextBlock x:Name="SubMessage" TextWrapping="WrapWholeWords" />
+                </StackPanel>
             </StackPanel>
 
             <Grid Grid.Row="1" Padding="24">
