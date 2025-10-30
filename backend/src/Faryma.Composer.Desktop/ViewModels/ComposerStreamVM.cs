@@ -2,7 +2,7 @@
 using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Desktop.Shared.ViewModels
+namespace Faryma.Composer.Desktop.ViewModels
 {
     /// <summary>
     /// Стрим композитора

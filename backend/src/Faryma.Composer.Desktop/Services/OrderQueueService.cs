@@ -5,7 +5,7 @@ using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Desktop.Api.OrderQueue;
 using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
 using Faryma.Composer.Desktop.Api.Shared.Dto;
-using Faryma.Composer.Desktop.Shared.ViewModels;
+using Faryma.Composer.Desktop.ViewModels;
 using Microsoft.UI.Dispatching;
 
 namespace Faryma.Composer.Desktop.Services

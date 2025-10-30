@@ -6,7 +6,7 @@ using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.UI;
 using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Desktop.Shared.ViewModels
+namespace Faryma.Composer.Desktop.ViewModels
 {
     /// <summary>
     /// Заказ разбора трека

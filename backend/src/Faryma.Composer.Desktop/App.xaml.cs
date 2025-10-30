@@ -51,13 +51,6 @@ namespace Faryma.Composer.Desktop
 
             MainWindow window = GetService<MainWindow>();
             window.Activate();
-
-            _ = GetService<MessageService>().ShowMessage(new MessageOptions
-            {
-                Title = "Title",
-                Message = "Message",
-                SecondButtonText = "SecondButtonText"
-            });
         }
     }
 }

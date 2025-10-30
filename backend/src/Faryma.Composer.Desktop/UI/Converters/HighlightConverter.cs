@@ -12,7 +12,7 @@ namespace Faryma.Composer.Desktop.UI
         private const double _saturation = 80;
         private const double _lightness = 60;
 
-        private readonly Dictionary<OrderCategoryType, Color> _categoryTypeColors = new()
+        private static readonly Dictionary<OrderCategoryType, Color> _categoryTypeColors = new()
         {
             [OrderCategoryType.Unspecified] = Colors.Gray,
             [OrderCategoryType.OutOfQueue] = Colors.Gold,

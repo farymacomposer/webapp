@@ -27,7 +27,7 @@
 
             <Grid Margin="24,24,24,0">
 
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Title}" />
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Title, Mode=OneWay}" />
 
                 <Button
                     Margin="0,-6,-6,0"

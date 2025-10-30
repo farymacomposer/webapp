@@ -6,7 +6,7 @@ using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
 using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.Services;
-using Faryma.Composer.Desktop.Shared.ViewModels;
+using Faryma.Composer.Desktop.ViewModels;
 using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Desktop.UI
