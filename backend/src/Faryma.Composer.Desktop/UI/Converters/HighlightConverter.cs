@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
+using ColorHelper = Faryma.Composer.Desktop.Utils.ColorHelper;
 
 namespace Faryma.Composer.Desktop.UI
 {

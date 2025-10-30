@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Desktop.Navigation;
-using Faryma.Composer.Desktop.UI.Dialogs;
 
 namespace Faryma.Composer.Desktop.UI
 {
@@ -47,7 +46,7 @@ namespace Faryma.Composer.Desktop.UI
         };
 
         [RelayCommand]
-        private Task OpenTestDialog() => dialogService.ShowDialog<TestDialog, TestDialogVM>("fdf ggf dg  dfg fd gfd gdf fdg fdg fd");
+        private Task OpenCreateReviewOrderDialog() => dialogService.ShowDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
     }
 
     public sealed partial class ControlInfoDataGroup : ObservableObject

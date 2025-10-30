@@ -4,19 +4,53 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:commonDialog="using:Faryma.Composer.Desktop.Navigation"
-    xmlns:local="using:Faryma.Composer.Desktop.UI">
+    xmlns:local="using:Faryma.Composer.Desktop.UI"
+    xmlns:ui="using:CommunityToolkit.WinUI">
+    <UserControl.Resources>
+        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+    </UserControl.Resources>
 
     <commonDialog:CustomContentDialog Title="TestDialog" CloseButtonCommand="{x:Bind ViewModel.HideDialogCommand}">
         <commonDialog:CustomContentDialog.DialogContent>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
+            <StackPanel Style="{StaticResource StackPanelCardStyle}">
 
-                <TextBlock Text="{x:Bind ViewModel.MyProperty, Mode=OneWay}" />
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <local:TitledContentRow
+                        Title="IdempotencyKey"
+                        Content="{x:Bind ViewModel.IdempotencyKey, Mode=OneWay}"
+                        FontFamily="Consolas" />
+                </StackPanel>
 
-            </Grid>
+                <local:TitledContentRow Title="Nickname">
+                    <TextBox Text="{x:Bind ViewModel.Nickname, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="PaymentAmount">
+                    <TextBox
+                        ui:TextBoxExtensions.ValidationMode="Dynamic"
+                        ui:TextBoxExtensions.ValidationType="Number"
+                        Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="OrderType">
+                    <ComboBox
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{x:Bind ViewModel.OrderTypes, Mode=OneTime}"
+                        SelectedItem="{x:Bind ViewModel.OrderType, Mode=TwoWay}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
+
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="24">
+                    <Button
+                        Command="{x:Bind ViewModel.CreateCommand}"
+                        Content="Создать новый заказ"
+                        Style="{StaticResource AccentButtonStyle}" />
+                </StackPanel>
+            </StackPanel>
         </commonDialog:CustomContentDialog.DialogContent>
     </commonDialog:CustomContentDialog>
 </UserControl>

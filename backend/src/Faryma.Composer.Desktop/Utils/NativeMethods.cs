@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Faryma.Composer.Desktop
+namespace Faryma.Composer.Desktop.Utils
 {
     internal static partial class NativeMethods
     {
