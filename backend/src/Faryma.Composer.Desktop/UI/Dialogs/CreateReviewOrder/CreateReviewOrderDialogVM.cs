@@ -9,7 +9,7 @@ using Faryma.Composer.Infrastructure.Enums;
 namespace Faryma.Composer.Desktop.UI
 {
     public sealed partial class CreateReviewOrderDialogVM(
-        ReviewOrderHttpClient reviewOrderClient,
+        ReviewOrderHttpClient reviewOrderHttpClient,
         MessageService messageService,
         ValidationService validationService,
         DialogService dialogService) : DialogVM(dialogService)
@@ -88,7 +88,7 @@ namespace Faryma.Composer.Desktop.UI
             {
                 await messageService.HandleException(async () =>
                 {
-                    await reviewOrderClient.Create(_idempotencyKey, request);
+                    await reviewOrderHttpClient.Create(_idempotencyKey, request);
 
                     HideDialog();
                 });

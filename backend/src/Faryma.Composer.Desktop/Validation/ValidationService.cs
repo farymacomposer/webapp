@@ -9,13 +9,9 @@ namespace Faryma.Composer.Desktop.Validation
         public async Task<bool> Check(CreateReviewOrderRequest request)
         {
             SimpleValidator validator = new SimpleValidator()
-                .Check(string.IsNullOrWhiteSpace(request.Nickname), "Не задан псевдоним пользователя")
+                .Check(string.IsNullOrWhiteSpace(request.Nickname), "Не задан никнейм пользователя")
+                .Check(request.OrderType == ReviewOrderType.Donation && request.PaymentAmount == 0, "Не задана сумма платежа")
                 .CheckOptionalUrl(request.TrackUrl, "Некорректная ссылка на трек");
-
-            if (request.OrderType == ReviewOrderType.Donation)
-            {
-                validator.Check(request.PaymentAmount == 0, "Не задана сумма платежа");
-            }
 
             if (validator.HasWarnings)
             {
