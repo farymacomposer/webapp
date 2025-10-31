@@ -18,12 +18,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel
-                    Padding="24"
-                    Background="{ThemeResource ContentDialogTopOverlay}"
-                    BorderBrush="{ThemeResource ContentDialogSeparatorBorderBrush}"
-                    BorderThickness="0,0,0,1"
-                    Spacing="16">
+                <StackPanel Style="{StaticResource StackPanelContentDialogStyle}">
 
                     <local:TitledContentRow Title="Тип заказа">
                         <ComboBox
@@ -76,6 +71,7 @@
 
                 <Button
                     Grid.Row="1"
+                    Width="130"
                     Margin="24"
                     HorizontalAlignment="Right"
                     Command="{x:Bind ViewModel.CreateCommand}"

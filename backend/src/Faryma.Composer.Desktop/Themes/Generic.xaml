@@ -17,6 +17,14 @@
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
+    <Style x:Key="StackPanelContentDialogStyle" TargetType="StackPanel">
+        <Setter Property="Padding" Value="24" />
+        <Setter Property="Spacing" Value="16" />
+        <Setter Property="Background" Value="{ThemeResource ContentDialogTopOverlay}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ContentDialogSeparatorBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+
     <Style x:Key="GridCardStyle" TargetType="Grid">
         <Setter Property="Padding" Value="16" />
         <Setter Property="CornerRadius" Value="4" />
