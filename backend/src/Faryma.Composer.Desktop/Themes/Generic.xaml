@@ -6,7 +6,8 @@
 
     <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     <controls:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
-    <controls:HighlightConverter x:Key="HighlightConverter" />
+    <controls:OrderCategoryHighlightConverter x:Key="OrderCategoryHighlightConverter" />
+    <controls:StringHashHighlightConverter x:Key="StringHashHighlightConverter" />
 
     <Style x:Key="StackPanelCardStyle" TargetType="StackPanel">
         <Setter Property="Padding" Value="16" />

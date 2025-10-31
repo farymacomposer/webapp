@@ -24,7 +24,7 @@
                     Style="{StaticResource AccentButtonStyle}" />
                 <Border
                     Padding="6,0"
-                    Background="{Binding MainNickname, Converter={StaticResource HighlightConverter}}"
+                    Background="{Binding MainNickname, Converter={StaticResource StringHashHighlightConverter}}"
                     CornerRadius="4">
                     <TextBox
                         VerticalAlignment="Center"
@@ -65,7 +65,7 @@
 
             <StackPanel
                 Padding="6,4"
-                Background="{Binding CurrentCategoryType, Converter={StaticResource HighlightConverter}}"
+                Background="{Binding CurrentCategoryType, Converter={StaticResource OrderCategoryHighlightConverter}}"
                 CornerRadius="4">
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <TextBlock Foreground="{ThemeResource TextFillColorTertiaryBrush}" Text="QueueIndex:" />
