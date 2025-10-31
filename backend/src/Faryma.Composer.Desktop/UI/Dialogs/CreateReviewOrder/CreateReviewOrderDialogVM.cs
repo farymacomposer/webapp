@@ -29,6 +29,7 @@ namespace Faryma.Composer.Desktop.UI
         /// Тип заказа
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsPaymentAmountEnabled))]
         public partial ReviewOrderType OrderType { get; set; }
 
         /// <summary>
@@ -67,7 +68,6 @@ namespace Faryma.Composer.Desktop.UI
         partial void OnOrderTypeChanged(ReviewOrderType value)
         {
             PaymentAmount = null;
-            OnPropertyChanged(nameof(IsPaymentAmountEnabled));
         }
 
         [RelayCommand]
