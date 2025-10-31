@@ -1,9 +1,8 @@
 ﻿using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
 using Faryma.Composer.Desktop.Navigation;
-using Faryma.Composer.Desktop.Validation;
 using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Desktop.Services
+namespace Faryma.Composer.Desktop.Validation
 {
     public sealed class ValidationService(MessageService messageService)
     {

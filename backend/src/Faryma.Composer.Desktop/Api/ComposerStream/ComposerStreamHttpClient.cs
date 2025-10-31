@@ -75,7 +75,7 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
                 ResultObject result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>()
                     ?? throw new InvalidOperationException();
 
-                throw new ApiException(result);
+                throw new ApiException(result, ex);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Desktop.Navigation;
 using Faryma.Composer.Desktop.Services;
 using Faryma.Composer.Desktop.UI;
+using Faryma.Composer.Desktop.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 

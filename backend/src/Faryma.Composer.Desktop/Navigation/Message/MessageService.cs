@@ -17,10 +17,13 @@ namespace Faryma.Composer.Desktop.Navigation
 
         public async Task HandleException(Task task)
         {
-            messenger.Send<ShowProgressCommand>();
-
             try
             {
+                if (!task.IsCompleted)
+                {
+                    messenger.Send<ShowProgressCommand>();
+                }
+
                 await task;
             }
             catch (ApiException ex)

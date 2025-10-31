@@ -66,7 +66,7 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder
                 ResultObject result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>()
                     ?? throw new InvalidOperationException();
 
-                throw new ApiException(result);
+                throw new ApiException(result, ex);
             }
         }
 
