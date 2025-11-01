@@ -26,6 +26,12 @@ namespace Faryma.Composer.Desktop.Navigation
             },
             new()
             {
+                Title = "Расписание",
+                Icon = "\xE71D",
+                PageType = typeof(ComposerStreamPage),
+            },
+            new()
+            {
                 Title = "Тест очереди",
                 Icon = "\xE71D",
                 PageType = typeof(OrderQueuePage),

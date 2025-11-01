@@ -22,6 +22,7 @@ namespace Faryma.Composer.Desktop
             .AddSingleton<ValidationService>();
 
         private static IServiceCollection AddPages(this IServiceCollection services) => services
+            .AddSingleton<ComposerStreamPageVM>()
             .AddSingleton<OrderQueuePageVM>()
             .AddSingleton<ReviewOrderPageVM>();
 
