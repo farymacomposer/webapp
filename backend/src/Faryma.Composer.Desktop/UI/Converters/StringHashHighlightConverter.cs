@@ -6,9 +6,6 @@ using Windows.UI;
 
 namespace Faryma.Composer.Desktop.UI
 {
-    /// <summary>
-    /// Конвертер для подсветки на основе хэша строки
-    /// </summary>
     public sealed partial class StringHashHighlightConverter : IValueConverter
     {
         private const double _saturation = 80;

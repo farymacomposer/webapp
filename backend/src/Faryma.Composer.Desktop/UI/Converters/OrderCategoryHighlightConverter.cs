@@ -6,12 +6,9 @@ using Microsoft.UI.Xaml.Media;
 
 namespace Faryma.Composer.Desktop.UI
 {
-    /// <summary>
-    /// Конвертер для подсветки по категории заказа
-    /// </summary>
     public sealed partial class OrderCategoryHighlightConverter : IValueConverter
     {
-        private static readonly Dictionary<OrderCategoryType, SolidColorBrush> _categoryTypeBrushes = new()
+        private static readonly Dictionary<OrderCategoryType, SolidColorBrush> _brushes = new()
         {
             [OrderCategoryType.Unspecified] = new SolidColorBrush(Colors.Gray),
             [OrderCategoryType.OutOfQueue] = new SolidColorBrush(Colors.Gold),
@@ -21,7 +18,7 @@ namespace Faryma.Composer.Desktop.UI
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if (value is OrderCategoryType categoryType && _categoryTypeBrushes.TryGetValue(categoryType, out SolidColorBrush? brush))
+            if (value is OrderCategoryType enumValue && _brushes.TryGetValue(enumValue, out SolidColorBrush? brush))
             {
                 return brush;
             }

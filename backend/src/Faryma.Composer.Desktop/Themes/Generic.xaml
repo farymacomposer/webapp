@@ -5,11 +5,11 @@
     xmlns:localUI="using:Faryma.Composer.Desktop.UI">
 
     <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-    <converters:StringFormatConverter x:Key="StringFormatConverter" />
     <localUI:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
     <localUI:OrderCategoryHighlightConverter x:Key="OrderCategoryHighlightConverter" />
     <localUI:StringHashHighlightConverter x:Key="StringHashHighlightConverter" />
     <localUI:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+    <localUI:ComposerStreamStatusHighlightConverter x:Key="ComposerStreamStatusHighlightConverter" />
 
     <Style x:Key="StackPanelCardStyle" TargetType="StackPanel">
         <Setter Property="Padding" Value="16" />

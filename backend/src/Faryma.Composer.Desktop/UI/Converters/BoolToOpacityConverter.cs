@@ -9,7 +9,7 @@ namespace Faryma.Composer.Desktop.UI
         {
             if (value is bool boolean)
             {
-                return boolean ? 1.0 : 0.5;
+                return boolean ? 1.0 : 0.4;
             }
 
             return DependencyProperty.UnsetValue;

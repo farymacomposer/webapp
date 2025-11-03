@@ -65,7 +65,7 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
             {
                 responseMessage.EnsureSuccessStatusCode();
 
-                StreamResponse response = await responseMessage.Content.ReadFromJsonAsync<StreamResponse>()
+                StreamResponse response = await responseMessage.Content.ReadFromJsonAsync<StreamResponse>(_serializerOptions)
                     ?? throw new InvalidOperationException();
 
                 return response.ComposerStream;
@@ -76,6 +76,12 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
                     ?? throw new InvalidOperationException();
 
                 throw new ApiException(result, ex);
+            }
+            catch (Exception ex)
+            {
+                string message = await responseMessage.Content.ReadAsStringAsync();
+
+                throw new(message, ex);
             }
         }
     }
