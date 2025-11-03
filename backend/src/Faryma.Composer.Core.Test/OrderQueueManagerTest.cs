@@ -735,7 +735,6 @@ namespace Faryma.Composer.Core.Test
                 (15, "Nick10"), // долг x3
                 (12, "Nick7"), // долг x2
                 (9,  "Nick4"), // долг x1
-
             ];
 
             Check(expected, queueManager);

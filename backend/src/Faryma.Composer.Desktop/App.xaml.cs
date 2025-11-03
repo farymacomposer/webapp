@@ -47,11 +47,16 @@ namespace Faryma.Composer.Desktop
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
-            await GetService<OrderQueueService>().Initialize();
-            await GetService<OrderQueuePageVM>().Initialize();
+#if DEBUG
+            await Task.Delay(2000);
+#endif
 
             MainWindow window = GetService<MainWindow>();
             window.Activate();
+
+            await GetService<OrderQueueService>().Initialize();
+            await GetService<OrderQueuePageVM>().Initialize();
+            await GetService<ComposerStreamPageVM>().Initialize();
         }
     }
 }

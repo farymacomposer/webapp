@@ -1,21 +1,13 @@
-﻿using Microsoft.VisualBasic;
+﻿using System.Globalization;
 
 namespace Faryma.Composer.Desktop.Utils
 {
     public static class DateTimeExtensions
     {
-        /// <summary>
-        /// Округляет указанное значение DateTime вниз до ближайшего интервала .Trim(TimeSpan.TicksPerMinute)
-        /// </summary>
-        public static DateTime Trim(this DateTime date, long roundTicks) => new(date.Ticks - (date.Ticks % roundTicks), date.Kind);
+        private static readonly CultureInfo _ruCulture = CultureInfo.GetCultureInfo("ru-RU");
 
         /// <summary>
-        /// Возвращает количество дней в месяце
-        /// </summary>
-        public static int GetDaysInMonth(this DateTime date) => DateTime.DaysInMonth(date.Year, date.Month);
-
-        /// <summary>
-        /// Возвращает первый день месяца
+        /// Возвращает первый день месяца
         /// </summary>
         public static DateTime GetFirstDayOfMonth(this DateTime date) => new(date.Year, date.Month, 1);
 
@@ -25,24 +17,14 @@ namespace Faryma.Composer.Desktop.Utils
         public static DateTime GetLastDayOfMonth(this DateTime date) => new(date.Year, date.Month, date.GetDaysInMonth());
 
         /// <summary>
-        /// Возвращает последнюю миллисекунду дня
+        /// Возвращает количество дней в месяце
         /// </summary>
-        public static DateTime GetEndOfDay(this DateTime date) => date.Date.AddDays(1).AddMilliseconds(-1);
+        public static int GetDaysInMonth(this DateTime date) => DateTime.DaysInMonth(date.Year, date.Month);
 
         /// <summary>
-        /// Возвращает день недели
+        /// Возвращает название месяца ("январь", "февраль", ...)
         /// </summary>
-        public static int GetWeekday(this DateTime date) => DateAndTime.Weekday(date, FirstDayOfWeek.Monday);
-
-        /// <summary>
-        /// Возвращает название дня недели
-        /// </summary>
-        public static string GetWeekdayName(this DateTime date, bool abbreviate = false)
-        {
-            int weekday = date.GetWeekday();
-
-            return DateAndTime.WeekdayName(weekday, abbreviate, FirstDayOfWeek.Monday);
-        }
+        public static string GetMonthName(this DateTime date) => _ruCulture.DateTimeFormat.GetMonthName(date.Month);
 
         /// <summary>
         /// Возвращает день начала недели
@@ -53,5 +35,25 @@ namespace Faryma.Composer.Desktop.Utils
 
             return date.AddDays(-1 * diff).Date;
         }
+
+        /// <summary>
+        /// Возвращает сокращенное название дня недели ("пн", "вт", ...)
+        /// </summary>
+        public static string GetAbbreviatedDayName(this DateTime date) => _ruCulture.DateTimeFormat.GetAbbreviatedDayName(date.DayOfWeek);
+
+        /// <summary>
+        /// Возвращает название дня недели ("понедельник", "вторник", ...)
+        /// </summary>
+        public static string GetDayName(this DateTime date) => _ruCulture.DateTimeFormat.GetDayName(date.DayOfWeek);
+
+        /// <summary>
+        /// Округляет указанное значение DateTime вниз до ближайшего интервала .Trim(TimeSpan.TicksPerMinute)
+        /// </summary>
+        public static DateTime Trim(this DateTime date, long roundTicks) => new(date.Ticks - (date.Ticks % roundTicks), date.Kind);
+
+        /// <summary>
+        /// Возвращает последнюю миллисекунду дня
+        /// </summary>
+        public static DateTime GetEndOfDay(this DateTime date) => date.Date.AddDays(1).AddMilliseconds(-1);
     }
 }
