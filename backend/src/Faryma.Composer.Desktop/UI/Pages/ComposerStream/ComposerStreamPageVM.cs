@@ -24,21 +24,18 @@ namespace Faryma.Composer.Desktop.UI
 
         private async Task LoadMonth(DateOnly month)
         {
-            const int gridSize = 42;
-
             CurrentMonth = month.GetFirstDayOfMonth();
             Days.Clear();
 
             await messageService.HandleException(async () =>
             {
                 DateOnly dateFrom = CurrentMonth.StartOfWeek(DayOfWeek.Monday);
-                DateOnly dateTo = dateFrom.AddDays(gridSize - 1);
+                DateOnly dateTo = dateFrom.AddDays(41);
 
                 IEnumerable<ComposerStreamDto> streams = await composerStreamHttpClient.Find(dateFrom, dateTo);
 
-                for (int i = 0; i < gridSize; i++)
+                for (DateOnly date = dateFrom; date <= dateTo; date = date.AddDays(1))
                 {
-                    DateOnly date = dateFrom.AddDays(i);
                     ComposerStreamDto? dto = streams.FirstOrDefault(x => x.EventDate == date);
 
                     Days.Add(new StreamDaySlotVM

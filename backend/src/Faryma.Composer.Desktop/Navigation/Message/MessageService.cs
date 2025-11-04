@@ -12,10 +12,10 @@ namespace Faryma.Composer.Desktop.Navigation
 
         public void SetFrame(ContentControl frame) => _frame = frame;
 
-        public Task HandleException(Func<Task> action) => HandleException(action());
-        public Task HandleException(Action action) => HandleException(async () => action());
+        public Task HandleException(Func<Task> action, string? message = null) => HandleException(action(), message);
+        public Task HandleException(Action action, string? message = null) => HandleException(async () => action(), message);
 
-        public async Task HandleException(Task task)
+        public async Task HandleException(Task task, string? message = null)
         {
             try
             {
@@ -28,13 +28,24 @@ namespace Faryma.Composer.Desktop.Navigation
             }
             catch (ApiException ex)
             {
-                logger.LogWarning("{@Result}", ex.Result);
-                await ShowMessage(new MessageOptions { Title = "Ошибка", Message = ex.Result.Message });
+                logger.LogWarning(ex, "{message}\n{@Result}", message, ex.Result);
+
+                await ShowMessage(new MessageOptions
+                {
+                    Title = "Ошибка",
+                    Message = message,
+                    SubMessage = ex.Result.Message
+                });
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "");
-                await ShowWarning(ex, new MessageOptions { Title = "Ошибка" });
+                logger.LogWarning(ex, "{message}", message);
+
+                await ShowWarning(ex, new MessageOptions
+                {
+                    Title = "Ошибка",
+                    Message = message
+                });
             }
             finally
             {

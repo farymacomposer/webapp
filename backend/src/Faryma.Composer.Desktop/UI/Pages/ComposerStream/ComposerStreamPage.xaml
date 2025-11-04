@@ -15,7 +15,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind ViewModel.CurrentMonth.ToString('MMMM yyyy', x:Null), Mode=OneWay}" />
+        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ViewModel.CurrentMonth.ToString('MMMM yyyy', x:Null), Mode=OneWay}" />
 
         <Grid Grid.Row="1" Margin="0,36,0,0">
             <Grid.ColumnDefinitions>

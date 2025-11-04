@@ -54,9 +54,12 @@ namespace Faryma.Composer.Desktop
             MainWindow window = GetService<MainWindow>();
             window.Activate();
 
-            await GetService<OrderQueueService>().Initialize();
-            await GetService<OrderQueuePageVM>().Initialize();
-            await GetService<ComposerStreamPageVM>().Initialize();
+            await GetService<MessageService>().HandleException(async () =>
+            {
+                await GetService<OrderQueueService>().Initialize();
+                await GetService<OrderQueuePageVM>().Initialize();
+                await GetService<ComposerStreamPageVM>().Initialize();
+            }, "Приложение не инициализировано");
         }
     }
 }

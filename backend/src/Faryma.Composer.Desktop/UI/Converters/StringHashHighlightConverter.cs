@@ -15,7 +15,8 @@ namespace Faryma.Composer.Desktop.UI
         {
             if (value is string str && !string.IsNullOrEmpty(str))
             {
-                int hue = Math.Abs(GetSimpleDeterministicHash(str)) % 360;
+                int hash = GetSimpleDeterministicHash(str);
+                int hue = Math.Abs(hash) % 360;
                 Color color = ColorHelper.FromHsl(hue, _saturation, _lightness);
 
                 return new SolidColorBrush(color);
