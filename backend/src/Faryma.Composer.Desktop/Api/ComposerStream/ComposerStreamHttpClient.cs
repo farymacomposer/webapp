@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Faryma.Composer.Desktop.Api.ComposerStream.Responses;
+using Faryma.Composer.Desktop.Api.Exceptions;
 using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.Http;
@@ -60,12 +61,28 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
         {
             HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync(requestUri, request, _serializerOptions);
 
-            responseMessage.EnsureSuccessStatusCode();
+            try
+            {
+                responseMessage.EnsureSuccessStatusCode();
 
-            StreamResponse response = await responseMessage.Content.ReadFromJsonAsync<StreamResponse>()
-                ?? throw new InvalidOperationException();
+                StreamResponse response = await responseMessage.Content.ReadFromJsonAsync<StreamResponse>(_serializerOptions)
+                    ?? throw new InvalidOperationException();
 
-            return response.ComposerStream;
+                return response.ComposerStream;
+            }
+            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 600)
+            {
+                ResultObject result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>()
+                    ?? throw new InvalidOperationException();
+
+                throw new ApiException(result, ex);
+            }
+            catch (Exception ex)
+            {
+                string message = await responseMessage.Content.ReadAsStringAsync();
+
+                throw new(message, ex);
+            }
         }
     }
 }

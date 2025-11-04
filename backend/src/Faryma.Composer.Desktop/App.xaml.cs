@@ -1,8 +1,10 @@
-﻿using Faryma.Composer.Desktop.Api.ComposerStream;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Faryma.Composer.Desktop.Api.ComposerStream;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
-using Faryma.Composer.Desktop.Services.OrderQueueFeature;
-using Faryma.Composer.Desktop.UI.OrderQueueFeature;
-using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
+using Faryma.Composer.Desktop.Navigation;
+using Faryma.Composer.Desktop.Services;
+using Faryma.Composer.Desktop.UI;
+using Faryma.Composer.Desktop.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Serilog;
@@ -29,11 +31,9 @@ namespace Faryma.Composer.Desktop
 
             services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
             services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
-
-            services.AddSingleton<OrderQueueService>();
-
-            services.AddSingleton<OrderQueuePageVM>();
-            services.AddSingleton<ReviewOrderPageVM>();
+            services.AddSingleton<IMessenger, StrongReferenceMessenger>();
+            services.AddNavigation();
+            services.AddServices();
 
             _services = services.BuildServiceProvider();
         }
@@ -47,11 +47,19 @@ namespace Faryma.Composer.Desktop
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
-            await GetService<OrderQueueService>().Initialize();
-            await GetService<OrderQueuePageVM>().Initialize();
+#if DEBUG
+            await Task.Delay(2000);
+#endif
 
-            MainWindow window = new();
+            MainWindow window = GetService<MainWindow>();
             window.Activate();
+
+            await GetService<MessageService>().HandleException(async () =>
+            {
+                await GetService<OrderQueueService>().Initialize();
+                await GetService<OrderQueuePageVM>().Initialize();
+                await GetService<ComposerStreamPageVM>().Initialize();
+            }, "Приложение не инициализировано");
         }
     }
 }

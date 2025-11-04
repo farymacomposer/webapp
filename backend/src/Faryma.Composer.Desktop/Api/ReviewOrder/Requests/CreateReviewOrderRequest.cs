@@ -10,7 +10,7 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder.Requests
         /// <summary>
         /// Псевдоним пользователя
         /// </summary>
-        public required string Nickname { get; init; }
+        public required string? Nickname { get; init; }
 
         /// <summary>
         /// Тип заказа
@@ -25,7 +25,7 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder.Requests
         /// <summary>
         /// Сумма платежа
         /// </summary>
-        public required decimal? PaymentAmount { get; init; }
+        public required int PaymentAmount { get; init; }
 
         /// <summary>
         /// Комментарий пользователя

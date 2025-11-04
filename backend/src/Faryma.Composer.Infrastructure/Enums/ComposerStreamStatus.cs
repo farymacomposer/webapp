@@ -1,4 +1,6 @@
-﻿namespace Faryma.Composer.Infrastructure.Enums
+﻿using System.ComponentModel;
+
+namespace Faryma.Composer.Infrastructure.Enums
 {
     /// <summary>
     /// Статус стрима
@@ -13,21 +15,25 @@
         /// <summary>
         /// Запланирован
         /// </summary>
+        [Description("Запланирован")]
         Planned = 1,
 
         /// <summary>
         /// Идет в данный момент (стрим запущен)
         /// </summary>
+        [Description("⚫ Live")]
         Live = 2,
 
         /// <summary>
         /// Завершен
         /// </summary>
+        [Description("Завершен")]
         Completed = 3,
 
         /// <summary>
         /// Отменен
         /// </summary>
+        [Description("Отменен")]
         Canceled = 4
     }
 }

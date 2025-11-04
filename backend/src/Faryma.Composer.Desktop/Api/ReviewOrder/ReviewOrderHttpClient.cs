@@ -1,7 +1,10 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Faryma.Composer.Desktop.Api.Exceptions;
 using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
+using Faryma.Composer.Desktop.Api.ReviewOrder.Responses;
+using Faryma.Composer.Desktop.Api.Shared.Dto;
 
 namespace Faryma.Composer.Desktop.Api.ReviewOrder
 {
@@ -12,55 +15,77 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder
             Converters = { new JsonStringEnumConverter() }
         };
 
-        public Task Create(Guid idempotencyKey, CreateReviewOrderRequest request) => Post("/api/ReviewOrder/CreateReviewOrder", idempotencyKey, request);
-        public Task MoveUp(Guid idempotencyKey, MoveUpReviewOrderRequest request) => Post("/api/ReviewOrder/MoveUpReviewOrder", idempotencyKey, request);
+        public Task<ReviewOrderDto> Create(Guid idempotencyKey, CreateReviewOrderRequest request) => Post("/api/ReviewOrder/CreateReviewOrder", idempotencyKey, request);
+        public Task<ReviewOrderDto> MoveUp(Guid idempotencyKey, MoveUpReviewOrderRequest request) => Post("/api/ReviewOrder/MoveUpReviewOrder", idempotencyKey, request);
 
-        public Task AddTrackUrl(long reviewOrderId, string trackUrl) => Post("/api/ReviewOrder/AddTrackUrl", new
+        public Task<ReviewOrderDto> AddTrackUrl(long reviewOrderId, string trackUrl) => Post("/api/ReviewOrder/AddTrackUrl", new
         {
             ReviewOrderId = reviewOrderId,
             TrackUrl = trackUrl,
         });
 
-        public Task TakeOrderInProgress(long reviewOrderId) => Post("/api/ReviewOrder/TakeOrderInProgress", new
+        public Task<ReviewOrderDto> TakeOrderInProgress(long reviewOrderId) => Post("/api/ReviewOrder/TakeOrderInProgress", new
         {
             ReviewOrderId = reviewOrderId,
         });
 
-        public Task Complete(long reviewOrderId, int rating) => Post("/api/ReviewOrder/CompleteReviewOrder", new
+        public Task<ReviewOrderDto> Complete(long reviewOrderId, int rating) => Post("/api/ReviewOrder/CompleteReviewOrder", new
         {
             ReviewOrderId = reviewOrderId,
             Rating = rating,
         });
 
-        public Task Freeze(long reviewOrderId) => Post("/api/ReviewOrder/FreezeReviewOrder", new
+        public Task<ReviewOrderDto> Freeze(long reviewOrderId) => Post("/api/ReviewOrder/FreezeReviewOrder", new
         {
             ReviewOrderId = reviewOrderId,
         });
 
-        public Task Unfreeze(long reviewOrderId) => Post("/api/ReviewOrder/UnfreezeReviewOrder", new
+        public Task<ReviewOrderDto> Unfreeze(long reviewOrderId) => Post("/api/ReviewOrder/UnfreezeReviewOrder", new
         {
             ReviewOrderId = reviewOrderId,
         });
 
-        public Task Cancel(long reviewOrderId) => Post("/api/ReviewOrder/CancelReviewOrder", new
+        public Task<ReviewOrderDto> Cancel(long reviewOrderId) => Post("/api/ReviewOrder/CancelReviewOrder", new
         {
             ReviewOrderId = reviewOrderId,
         });
 
-        private async Task Post<T>(string requestUri, T request)
+        private static async Task<ReviewOrderDto> HandleException(HttpResponseMessage responseMessage)
         {
-            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync(requestUri, request, _serializerOptions);
-            responseMessage.EnsureSuccessStatusCode();
+            try
+            {
+                responseMessage.EnsureSuccessStatusCode();
+
+                ReviewOrderResponse response = await responseMessage.Content.ReadFromJsonAsync<ReviewOrderResponse>()
+                    ?? throw new InvalidOperationException();
+
+                return response.ReviewOrder;
+            }
+            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 600)
+            {
+                ResultObject result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>()
+                    ?? throw new InvalidOperationException();
+
+                throw new ApiException(result, ex);
+            }
         }
 
-        private async Task Post<T>(string requestUri, Guid idempotencyKey, T request)
+        private async Task<ReviewOrderDto> Post<T>(string requestUri, T request)
+        {
+            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync(requestUri, request, _serializerOptions);
+
+            return await HandleException(responseMessage);
+        }
+
+        private async Task<ReviewOrderDto> Post<T>(string requestUri, Guid idempotencyKey, T request)
         {
             HttpRequestMessage requestMessage = new(HttpMethod.Post, requestUri);
             requestMessage.Headers.Add("Idempotency-Key", idempotencyKey.ToString("D"));
             requestMessage.Content = JsonContent.Create(request, options: _serializerOptions);
 
             HttpResponseMessage responseMessage = await httpClient.SendAsync(requestMessage);
-            responseMessage.EnsureSuccessStatusCode();
+
+            return await HandleException(responseMessage);
         }
     }
 }

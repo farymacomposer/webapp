@@ -5,10 +5,10 @@ using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Desktop.Api.OrderQueue;
 using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
 using Faryma.Composer.Desktop.Api.Shared.Dto;
-using Faryma.Composer.Desktop.Shared.ViewModels;
+using Faryma.Composer.Desktop.ViewModels;
 using Microsoft.UI.Dispatching;
 
-namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
+namespace Faryma.Composer.Desktop.Services
 {
     public sealed partial class OrderQueueService : ObservableObject
     {
@@ -49,10 +49,6 @@ namespace Faryma.Composer.Desktop.Services.OrderQueueFeature
 
         public async Task Initialize()
         {
-#if DEBUG
-            await Task.Delay(2000);
-#endif
-
             _orderQueueHub.ReceiveSnapshot(message => _dispatcherQueue.EnqueueAsync(() => ReceiveSnapshot(message)));
             _orderQueueHub.ReceiveUpdated(@event => _dispatcherQueue.EnqueueAsync(() => ReceiveUpdated(@event)));
             await _orderQueueHub.Start();

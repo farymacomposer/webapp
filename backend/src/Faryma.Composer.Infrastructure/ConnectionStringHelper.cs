@@ -7,7 +7,7 @@ namespace Faryma.Composer.Infrastructure
     {
         public static string? Get(IConfiguration configuration)
         {
-            PostgreOptions? options = configuration.GetRequiredSection("POSTGRES").Get<PostgreOptions>();
+            PostgreOptions? options = configuration.GetSection("POSTGRES").Get<PostgreOptions>();
 
             return options?.GetConnectionString();
         }

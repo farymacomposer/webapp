@@ -1,7 +1,7 @@
 # Base stage
 FROM node:jod-alpine AS base
 WORKDIR /src
-COPY frontend/package.json frontend/pnpm-lock.yaml ./
+COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
 RUN apk add --no-cache libc6-compat && \
     corepack enable pnpm && \
     pnpm install --frozen-lockfile
