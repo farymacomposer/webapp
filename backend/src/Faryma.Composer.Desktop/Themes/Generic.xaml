@@ -1,4 +1,5 @@
-﻿<ResourceDictionary
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
@@ -20,14 +21,6 @@
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
-    <Style x:Key="StackPanelContentDialogStyle" TargetType="StackPanel">
-        <Setter Property="Padding" Value="24" />
-        <Setter Property="Spacing" Value="16" />
-        <Setter Property="Background" Value="{ThemeResource ContentDialogTopOverlay}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource ContentDialogSeparatorBorderBrush}" />
-        <Setter Property="BorderThickness" Value="0,0,0,1" />
-    </Style>
-
     <Style x:Key="GridCardStyle" TargetType="Grid">
         <Setter Property="Padding" Value="16" />
         <Setter Property="CornerRadius" Value="4" />
@@ -42,6 +35,22 @@
         <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
         <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
         <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style x:Key="StackPanelContentDialogStyle" TargetType="StackPanel">
+        <Setter Property="Padding" Value="24" />
+        <Setter Property="Spacing" Value="16" />
+        <Setter Property="Background" Value="{ThemeResource ContentDialogTopOverlay}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ContentDialogSeparatorBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+
+    <Style x:Key="GridOverlayDialogStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="36" />
+        <Setter Property="Background" Value="{ThemeResource ContentDialogBackground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ContentDialogBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
     </Style>
 
     <Style TargetType="localUI:TitledContentRow">

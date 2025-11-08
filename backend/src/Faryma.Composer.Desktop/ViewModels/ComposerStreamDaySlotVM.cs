@@ -1,12 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Faryma.Composer.Desktop.ViewModels;
 
-namespace Faryma.Composer.Desktop.UI
+namespace Faryma.Composer.Desktop.ViewModels
 {
-    public sealed partial class StreamDaySlotVM : ObservableObject
+    public sealed partial class ComposerStreamDaySlotVM : ObservableObject
     {
         public DateOnly Date { get; init; }
         public bool IsCurrentMonth { get; init; }
         public ComposerStreamVM? Stream { get; init; }
+        public bool HasStream => Stream is not null;
     }
 }

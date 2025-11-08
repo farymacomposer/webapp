@@ -1,20 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Faryma.Composer.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace Faryma.Composer.Infrastructure
+namespace Faryma.Composer.MigrationsBundle
 {
     public class AppDbMigrationContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
         public AppDbContext CreateDbContext(string[] args)
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
-                .AddUserSecrets<AppDbContext>()
+                .AddUserSecrets<AppDbMigrationContextFactory>()
                 .AddEnvironmentVariables()
                 .Build();
 
             DbContextOptionsBuilder<AppDbContext> optionsBuilder = new();
-            optionsBuilder.UseNpgsql(ConnectionStringHelper.Get(configuration), o => o.MigrationsHistoryTable("__EFMigrationsHistory", "app"));
+
+            optionsBuilder.UseNpgsql(DbContextHelper.GetDataSource(configuration), npgOptions => npgOptions
+                .MigrationsHistoryTable("__EFMigrationsHistory", "app")
+                .MigrationsAssembly("Faryma.Composer.MigrationsBundle"));
 
             return new AppDbContext(optionsBuilder.Options);
         }

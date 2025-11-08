@@ -1,4 +1,5 @@
-﻿<UserControl
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
     x:Class="Faryma.Composer.Desktop.Navigation.CustomContentDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,13 +7,9 @@
 
     <Grid Background="{ThemeResource ContentDialogSmokeFill}">
         <Grid
-            Margin="36"
             HorizontalAlignment="{Binding HorizontalContentAlignment, ElementName=Root}"
             VerticalAlignment="{Binding VerticalContentAlignment, ElementName=Root}"
-            Background="{ThemeResource ContentDialogBackground}"
-            BorderBrush="{ThemeResource ContentDialogBorderBrush}"
-            BorderThickness="1"
-            CornerRadius="8"
+            Style="{StaticResource GridOverlayDialogStyle}"
             Translation="0 0 64">
             <Grid.Shadow>
                 <ThemeShadow />

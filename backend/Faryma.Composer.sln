@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{5B9664
 		entrypoint.sh = entrypoint.sh
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.MigrationsBundle", "src\Faryma.Composer.MigrationsBundle\Faryma.Composer.MigrationsBundle.csproj", "{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}.Release|Any CPU.ActiveCfg = Release|x64
 		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}.Release|Any CPU.Build.0 = Release|x64
 		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}.Release|Any CPU.Deploy.0 = Release|x64
+		{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

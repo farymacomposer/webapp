@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Infrastructure.Abstractions;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Faryma.Composer.Infrastructure.Abstractions;
 using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,11 +19,13 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Тип стрима
         /// </summary>
+        [Column(TypeName = DbContextHelper.ComposerStreamTypeEnum)]
         public required ComposerStreamType Type { get; set; }
 
         /// <summary>
         /// Статус стрима
         /// </summary>
+        [Column(TypeName = DbContextHelper.ComposerStreamStatusEnum)]
         public required ComposerStreamStatus Status { get; set; }
 
         /// <summary>

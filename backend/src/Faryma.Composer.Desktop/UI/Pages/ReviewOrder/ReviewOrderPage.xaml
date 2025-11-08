@@ -47,7 +47,7 @@
             Padding="6,4"
             Orientation="Horizontal"
             Spacing="4">
-            <Button Command="{x:Bind ViewModel.OpenCreateReviewOrderDialogCommand}" Content="Создать заказ" />
+            <Button Command="{x:Bind ViewModel.OpenCreateReviewOrderCommand}" Content="Создать заказ" />
             <Button Content="Найти заказ" />
         </StackPanel>
 

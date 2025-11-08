@@ -12,10 +12,10 @@ namespace Faryma.Composer.Desktop.Navigation
 
         public void SetFrame(ContentControl frame) => _frame = frame;
 
-        public Task HandleException(Func<Task> action, string? message = null) => HandleException(action(), message);
-        public Task HandleException(Action action, string? message = null) => HandleException(async () => action(), message);
+        public Task HandleException(Func<Task> action, string? errorMessage = null) => HandleException(action(), errorMessage);
+        public Task HandleException(Action action, string? errorMessage = null) => HandleException(async () => action(), errorMessage);
 
-        public async Task HandleException(Task task, string? message = null)
+        public async Task HandleException(Task task, string? errorMessage = null)
         {
             try
             {
@@ -28,23 +28,23 @@ namespace Faryma.Composer.Desktop.Navigation
             }
             catch (ApiException ex)
             {
-                logger.LogWarning(ex, "{message}\n{@Result}", message, ex.Result);
+                logger.LogWarning(ex, "{errorMessage}\n{@Result}", errorMessage, ex.Result);
 
                 await ShowMessage(new MessageOptions
                 {
                     Title = "Ошибка",
-                    Message = message,
+                    Message = errorMessage,
                     SubMessage = ex.Result.Message
                 });
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "{message}", message);
+                logger.LogWarning(ex, "{errorMessage}", errorMessage);
 
                 await ShowWarning(ex, new MessageOptions
                 {
                     Title = "Ошибка",
-                    Message = message
+                    Message = errorMessage
                 });
             }
             finally
@@ -56,11 +56,11 @@ namespace Faryma.Composer.Desktop.Navigation
         public Task ShowMessage(MessageOptions options) => ShowMessageInternal(options);
         public Task<MessageDialogResponse> ShowQuestion(MessageOptions options) => ShowMessageInternal(options);
         public Task ShowWarning(Exception ex, MessageOptions options) => ShowMessageInternal(options, ex.ToString());
-        public Task ShowWarning(IEnumerable<string> warnings, MessageOptions options) => ShowMessageInternal(options, string.Join("\n", warnings));
+        public Task ShowWarnings(IEnumerable<string> warnings, MessageOptions options) => ShowMessageInternal(options, string.Join("\n", warnings));
 
         private async Task<MessageDialogResponse> ShowMessageInternal(MessageOptions options, string? subMessage = null)
         {
-            options.SubMessage = subMessage;
+            options.SubMessage ??= subMessage;
             MessageDialog dialog = new(options);
             _frame.Content = dialog;
 

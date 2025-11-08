@@ -46,7 +46,7 @@ namespace Faryma.Composer.Desktop.UI
         };
 
         [RelayCommand]
-        private Task OpenCreateReviewOrderDialog() => dialogService.ShowDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
+        private Task OpenCreateReviewOrder() => dialogService.ShowDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
     }
 
     public sealed partial class ControlInfoDataGroup : ObservableObject

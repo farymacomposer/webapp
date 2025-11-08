@@ -39,16 +39,19 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Тип заказа
         /// </summary>
+        [Column(TypeName = DbContextHelper.ReviewOrderTypeEnum)]
         public required ReviewOrderType Type { get; set; }
 
         /// <summary>
         /// Статус заказа
         /// </summary>
+        [Column(TypeName = DbContextHelper.ReviewOrderStatusEnum)]
         public required ReviewOrderStatus Status { get; set; }
 
         /// <summary>
         /// Тип категории заказа
         /// </summary>
+        [Column(TypeName = DbContextHelper.OrderCategoryTypeEnum)]
         public required OrderCategoryType CategoryType { get; set; }
 
         /// <summary>

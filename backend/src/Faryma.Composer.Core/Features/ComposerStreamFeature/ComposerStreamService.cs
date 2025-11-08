@@ -39,7 +39,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             if (stream.Status != ComposerStreamStatus.Planned)
             {
-                throw new ComposerStreamException("Невозможно начать стрим", stream);
+                throw new ComposerStreamException($"Невозможно начать стрим в статусе '{stream.Status}'", stream);
             }
 
             ComposerStream? live = await uow.ComposerStream_R.FindLive();
@@ -68,7 +68,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             if (stream.Status != ComposerStreamStatus.Live)
             {
-                throw new ComposerStreamException("Невозможно завершить стрим", stream);
+                throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{stream.Status}'", stream);
             }
 
             ReviewOrder? inProgress = await uow.ReviewOrder_R.FindInProgress();
@@ -97,7 +97,7 @@ namespace Faryma.Composer.Core.Features.ComposerStreamFeature
 
             if (stream.Status != ComposerStreamStatus.Planned)
             {
-                throw new ComposerStreamException("Невозможно отменить стрим", stream);
+                throw new ComposerStreamException($"Невозможно отменить стрим в статусе '{stream.Status}'", stream);
             }
 
             stream.Status = ComposerStreamStatus.Canceled;

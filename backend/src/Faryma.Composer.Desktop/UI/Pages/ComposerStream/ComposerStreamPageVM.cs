@@ -18,7 +18,7 @@ namespace Faryma.Composer.Desktop.UI
         [ObservableProperty]
         public partial DateOnly CurrentMonth { get; set; }
 
-        public ObservableCollection<StreamDaySlotVM> Days { get; } = [];
+        public ObservableCollection<ComposerStreamDaySlotVM> Days { get; } = [];
 
         public Task Initialize() => GoToCurrentMonth();
 
@@ -38,7 +38,7 @@ namespace Faryma.Composer.Desktop.UI
                 {
                     ComposerStreamDto? dto = streams.FirstOrDefault(x => x.EventDate == date);
 
-                    Days.Add(new StreamDaySlotVM
+                    Days.Add(new ComposerStreamDaySlotVM
                     {
                         Date = date,
                         IsCurrentMonth = date.Month == CurrentMonth.Month,
@@ -56,5 +56,8 @@ namespace Faryma.Composer.Desktop.UI
 
         [RelayCommand]
         private Task NextMonth() => LoadMonth(CurrentMonth.AddMonths(1));
+
+        [RelayCommand]
+        private Task OpenDaySlotEditor(ComposerStreamDaySlotVM daySlot) => dialogService.ShowDialog<ComposerStreamDaySlotEditorDialog, ComposerStreamDaySlotEditorDialogVM>(daySlot);
     }
 }
