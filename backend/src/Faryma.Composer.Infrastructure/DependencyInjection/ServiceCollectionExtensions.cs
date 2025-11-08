@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
 
 namespace Faryma.Composer.Infrastructure.DependencyInjection
 {
@@ -13,9 +12,9 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
         {
-            NpgsqlDataSource dataSource = DbContextHelper.GetDataSource(configuration);
+            string? connectionString = DbContextHelper.GetConnectionString(configuration);
 
-            services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(dataSource, npgOptions => npgOptions.MapEnum()));
+            services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(connectionString, npgOptions => npgOptions.MapEnum()));
 
             services
                 .AddDataProtection()

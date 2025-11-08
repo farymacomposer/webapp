@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -13,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251108080146_init")]
+    [Migration("20251108090535_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -73,11 +74,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<DateTime?>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("app.composer_stream_status");
+                    b.Property<ComposerStreamStatus>("Status")
+                        .HasColumnType("composer_stream_status");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
+                    b.Property<ComposerStreamType>("Type")
+                        .HasColumnType("composer_stream_type");
 
                     b.HasKey("Id");
 
@@ -128,8 +129,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<int>("CategoryType")
-                        .HasColumnType("integer");
+                    b.Property<OrderCategoryType>("CategoryType")
+                        .HasColumnType("order_category_type");
 
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -160,8 +161,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<long?>("ProcessingStreamId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<ReviewOrderStatus>("Status")
+                        .HasColumnType("review_order_status");
 
                     b.Property<long?>("TrackId")
                         .HasColumnType("bigint");
@@ -169,8 +170,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<string>("TrackUrl")
                         .HasColumnType("text");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
+                    b.Property<ReviewOrderType>("Type")
+                        .HasColumnType("review_order_type");
 
                     b.Property<string>("UserComment")
                         .HasColumnType("text");
@@ -397,8 +398,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<long?>("ReviewOrderId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
+                    b.Property<TransactionType>("Type")
+                        .HasColumnType("transaction_type");
 
                     b.Property<Guid>("UserAccountId")
                         .HasColumnType("uuid");

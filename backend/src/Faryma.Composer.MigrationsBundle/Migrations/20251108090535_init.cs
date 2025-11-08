@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -90,8 +91,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     EventDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<int>(type: "app.composer_stream_status", nullable: false),
+                    Type = table.Column<ComposerStreamType>(type: "composer_stream_type", nullable: false),
+                    Status = table.Column<ComposerStreamStatus>(type: "composer_stream_status", nullable: false),
                     StartedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -393,9 +394,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     ProcessingStreamId = table.Column<long>(type: "bigint", nullable: true),
                     InProgressAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    CategoryType = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<ReviewOrderType>(type: "review_order_type", nullable: false),
+                    Status = table.Column<ReviewOrderStatus>(type: "review_order_status", nullable: false),
+                    CategoryType = table.Column<OrderCategoryType>(type: "order_category_type", nullable: false),
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
@@ -579,7 +580,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<TransactionType>(type: "transaction_type", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     UserAccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: true)
