@@ -1,5 +1,4 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
-using Faryma.Composer.Infrastructure.Enums;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -81,12 +80,7 @@ namespace Faryma.Composer.Infrastructure
             builder.HasDefaultSchema(DbContextHelper.SchemaName);
             base.OnModelCreating(builder);
 
-            builder.HasPostgresEnum<ComposerStreamStatus>(DbContextHelper.SchemaName, "composer_stream_status");
-            builder.HasPostgresEnum<ComposerStreamType>(DbContextHelper.SchemaName, "composer_stream_type");
-            builder.HasPostgresEnum<OrderCategoryType>(DbContextHelper.SchemaName, "order_category_type");
-            builder.HasPostgresEnum<ReviewOrderStatus>(DbContextHelper.SchemaName, "review_order_status");
-            builder.HasPostgresEnum<ReviewOrderType>(DbContextHelper.SchemaName, "review_order_type");
-            builder.HasPostgresEnum<TransactionType>(DbContextHelper.SchemaName, "transaction_type");
+            builder.HasPostgresEnum();
 
             builder.Entity<ComposerStream>()
                 .HasMany(cs => cs.CreatedReviewOrders)
