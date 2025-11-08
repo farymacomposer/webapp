@@ -78,15 +78,15 @@ namespace Faryma.Composer.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.HasDefaultSchema("app");
+            builder.HasDefaultSchema(DbContextHelper.SchemaName);
             base.OnModelCreating(builder);
 
-            builder.HasPostgresEnum<ComposerStreamStatus>();
-            builder.HasPostgresEnum<ComposerStreamType>();
-            builder.HasPostgresEnum<OrderCategoryType>();
-            builder.HasPostgresEnum<ReviewOrderStatus>();
-            builder.HasPostgresEnum<ReviewOrderType>();
-            builder.HasPostgresEnum<TransactionType>();
+            builder.HasPostgresEnum<ComposerStreamStatus>(DbContextHelper.SchemaName, "composer_stream_status");
+            builder.HasPostgresEnum<ComposerStreamType>(DbContextHelper.SchemaName, "composer_stream_type");
+            builder.HasPostgresEnum<OrderCategoryType>(DbContextHelper.SchemaName, "order_category_type");
+            builder.HasPostgresEnum<ReviewOrderStatus>(DbContextHelper.SchemaName, "review_order_status");
+            builder.HasPostgresEnum<ReviewOrderType>(DbContextHelper.SchemaName, "review_order_type");
+            builder.HasPostgresEnum<TransactionType>(DbContextHelper.SchemaName, "transaction_type");
 
             builder.Entity<ComposerStream>()
                 .HasMany(cs => cs.CreatedReviewOrders)
