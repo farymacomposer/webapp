@@ -6,7 +6,7 @@ namespace Faryma.Composer.Desktop.Utils
 {
     public static class EnumHelper
     {
-        public static string? GetDescription(object value) => value
+        public static string? GetDescription(object? value) => value
             ?.GetType()
             .GetField(value.ToString()!)
             ?.GetCustomAttribute<DescriptionAttribute>()

@@ -13,7 +13,7 @@ using Faryma.Composer.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Saunter;
 using Saunter.AsyncApiSchema.v2;
 
@@ -118,20 +118,6 @@ namespace Faryma.Composer.Api.DependencyInjection
                 }
 
                 options.UseAllOfToExtendReferenceSchemas();
-
-                OpenApiSecurityScheme scheme = new()
-                {
-                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-                    Scheme = JwtBearerDefaults.AuthenticationScheme,
-                    Reference = new OpenApiReference
-                    {
-                        Id = JwtBearerDefaults.AuthenticationScheme,
-                        Type = ReferenceType.SecurityScheme
-                    }
-                };
-
-                options.AddSecurityDefinition(scheme.Reference.Id, scheme);
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement { { scheme, Array.Empty<string>() } });
             });
         }
 

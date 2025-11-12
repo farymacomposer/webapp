@@ -10,6 +10,7 @@ namespace Faryma.Composer.Infrastructure.Enums
         /// <summary>
         /// Не задан
         /// </summary>
+        [Description("Не задан")]
         Unspecified = 0,
 
         /// <summary>
@@ -21,7 +22,7 @@ namespace Faryma.Composer.Infrastructure.Enums
         /// <summary>
         /// Идет в данный момент (стрим запущен)
         /// </summary>
-        [Description("⚫ Live")]
+        [Description("Запущен")]
         Live = 2,
 
         /// <summary>

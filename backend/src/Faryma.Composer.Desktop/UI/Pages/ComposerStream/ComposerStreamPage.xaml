@@ -10,125 +10,214 @@
         <local:BindingProxy x:Key="BindingProxy" ViewModel="{x:Bind ViewModel}" />
     </Page.Resources>
 
-    <Grid
-        Width="1000"
-        Margin="36"
-        HorizontalAlignment="Left"
-        VerticalAlignment="Top">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Grid Margin="36">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
 
-        <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ViewModel.CurrentMonth.ToString('MMMM yyyy', x:Null), Mode=OneWay}" />
+        <Grid Width="1000" VerticalAlignment="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1" Margin="0,36,0,0">
+            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ViewModel.CurrentMonth.ToString('MMMM yyyy', x:Null), Mode=OneWay}" />
+
+            <Grid Grid.Row="1" Margin="0,36,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock HorizontalAlignment="Center" Text="Пн" />
+                <TextBlock
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    Text="Вт" />
+                <TextBlock
+                    Grid.Column="2"
+                    HorizontalAlignment="Center"
+                    Text="Ср" />
+                <TextBlock
+                    Grid.Column="3"
+                    HorizontalAlignment="Center"
+                    Text="Чт" />
+                <TextBlock
+                    Grid.Column="4"
+                    HorizontalAlignment="Center"
+                    Text="Пт" />
+                <TextBlock
+                    Grid.Column="5"
+                    HorizontalAlignment="Center"
+                    Text="Сб" />
+                <TextBlock
+                    Grid.Column="6"
+                    HorizontalAlignment="Center"
+                    Text="Вс" />
+            </Grid>
+
+            <ItemsRepeater
+                Grid.Row="2"
+                Height="742"
+                Margin="0,12,0,0"
+                ItemsSource="{x:Bind ViewModel.Days}">
+                <ItemsRepeater.Layout>
+                    <UniformGridLayout
+                        ItemsStretch="Fill"
+                        MaximumRowsOrColumns="7"
+                        MinItemHeight="124"
+                        Orientation="Horizontal" />
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ComposerStreamDaySlotVM">
+                        <Button
+                            Margin="2"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Command="{Binding ViewModel.SelectDaySlotCommand, Source={StaticResource BindingProxy}, Mode=OneTime}"
+                            CommandParameter="{x:Bind}"
+                            Style="{StaticResource FlatButton}">
+                            <Grid>
+
+                                <Grid
+                                    Padding="0"
+                                    Opacity="{x:Bind IsCurrentMonth, Converter={StaticResource BoolToOpacityConverter}}"
+                                    Style="{StaticResource GridCardStyle}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Margin="16,14,16,8" Text="{x:Bind Date.Day}" />
+
+                                    <Grid
+                                        x:Name="StreamArea"
+                                        Grid.Row="1"
+                                        x:Load="{x:Bind HasStream, Mode=OneWay}">
+
+                                        <Border
+                                            Background="{x:Bind Stream.Status, Mode=OneWay, Converter={StaticResource ComposerStreamStatusHighlightConverter}}"
+                                            CornerRadius="0 0 4 4"
+                                            Opacity="0.2" />
+
+                                        <StackPanel Padding="16,16,16,0" Spacing="16">
+                                            <TextBlock Text="{x:Bind Stream.Type, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}}" />
+                                            <TextBlock Text="{x:Bind Stream.Status, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Grid>
+
+                                <Border
+                                    BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+                                    BorderThickness="2"
+                                    CornerRadius="4"
+                                    Visibility="{x:Bind IsSelected, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+
+            <StackPanel
+                Grid.Row="3"
+                Margin="0,24,0,0"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="8">
+
+                <Button Command="{x:Bind ViewModel.PrevMonthCommand}">
+                    <SymbolIcon Symbol="Back" />
+                </Button>
+
+                <Button
+                    VerticalAlignment="Stretch"
+                    Command="{x:Bind ViewModel.GoToCurrentMonthCommand}"
+                    Content="Текущий месяц" />
+
+                <Button Command="{x:Bind ViewModel.NextMonthCommand}">
+                    <SymbolIcon Symbol="Forward" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Column="1" VerticalAlignment="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="16" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="16" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <TextBlock HorizontalAlignment="Center" Text="Пн" />
-            <TextBlock
-                Grid.Column="1"
-                HorizontalAlignment="Center"
-                Text="Вт" />
-            <TextBlock
-                Grid.Column="2"
-                HorizontalAlignment="Center"
-                Text="Ср" />
-            <TextBlock
-                Grid.Column="3"
-                HorizontalAlignment="Center"
-                Text="Чт" />
-            <TextBlock
-                Grid.Column="4"
-                HorizontalAlignment="Center"
-                Text="Пт" />
-            <TextBlock
-                Grid.Column="5"
-                HorizontalAlignment="Center"
-                Text="Сб" />
-            <TextBlock
-                Grid.Column="6"
-                HorizontalAlignment="Center"
-                Text="Вс" />
-        </Grid>
-
-        <ItemsRepeater
-            Grid.Row="2"
-            Height="738"
-            Margin="0,12,0,0"
-            ItemsSource="{x:Bind ViewModel.Days}">
-            <ItemsRepeater.Layout>
-                <UniformGridLayout
-                    ItemsStretch="Fill"
-                    MaximumRowsOrColumns="7"
-                    MinItemHeight="124"
-                    Orientation="Horizontal" />
-            </ItemsRepeater.Layout>
-            <ItemsRepeater.ItemTemplate>
-                <DataTemplate x:DataType="vm:ComposerStreamDaySlotVM">
-                    <Button
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        Command="{Binding ViewModel.OpenDaySlotEditorCommand, Source={StaticResource BindingProxy}, Mode=OneTime}"
-                        CommandParameter="{x:Bind}"
-                        Opacity="{x:Bind IsCurrentMonth, Converter={StaticResource BoolToOpacityConverter}}"
-                        Style="{StaticResource FlatButton}">
-                        <Grid Padding="0" Style="{StaticResource GridCardStyle}">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Margin="16,14,16,8" Text="{x:Bind Date.Day}" />
-
-                            <StackPanel
-                                x:Name="StreamArea"
-                                Grid.Row="1"
-                                Padding="16,16,16,0"
-                                x:Load="{x:Bind HasStream}"
-                                Background="{x:Bind Stream.Status, Converter={StaticResource ComposerStreamStatusHighlightConverter}}"
-                                CornerRadius="0 0 4 4"
-                                Spacing="16">
-
-                                <TextBlock Text="{x:Bind Stream.Type, Converter={StaticResource EnumDescriptionConverter}}" />
-
-                                <TextBlock Text="{x:Bind Stream.Status, Converter={StaticResource EnumDescriptionConverter}}" />
-                            </StackPanel>
-                        </Grid>
-                    </Button>
-                </DataTemplate>
-            </ItemsRepeater.ItemTemplate>
-        </ItemsRepeater>
-
-        <StackPanel
-            Grid.Row="3"
-            Margin="0,24,0,0"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal"
-            Spacing="8">
-
-            <Button Command="{x:Bind ViewModel.PrevMonthCommand}">
-                <SymbolIcon Symbol="Back" />
-            </Button>
+            <StackPanel Style="{StaticResource StackPanelCardStyle}">
+                <local:TitledContentRow Title="Тип стрима">
+                    <ComboBox ItemsSource="{x:Bind ViewModel.StreamTypes}" SelectedItem="{x:Bind ViewModel.SelectedStreamType, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </local:TitledContentRow>
+            </StackPanel>
 
             <Button
-                VerticalAlignment="Stretch"
-                Command="{x:Bind ViewModel.GoToCurrentMonthCommand}"
-                Content="Текущий месяц" />
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                Command="{x:Bind ViewModel.CreateStreamCommand}"
+                Content="Создать стрим" />
 
-            <Button Command="{x:Bind ViewModel.NextMonthCommand}">
-                <SymbolIcon Symbol="Forward" />
-            </Button>
-        </StackPanel>
+            <StackPanel Grid.Row="2" Style="{StaticResource StackPanelCardStyle}">
+
+                <local:TitledContentRow Title="Тип стрима">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedStream.Type, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Статус стрима" Background="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource ComposerStreamStatusHighlightConverter}, TargetNullValue={ThemeResource SubtleFillColorSecondaryBrush}, FallbackValue={x:Null}}">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Начало стрима">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedStream.StartedAt, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Завершение стрима">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedStream.CompletedAt, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+            </StackPanel>
+
+            <StackPanel
+                Grid.Row="2"
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Spacing="16">
+
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Command="{x:Bind ViewModel.StartStreamCommand}"
+                    Content="Начать стрим" />
+
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Command="{x:Bind ViewModel.CompleteStreamCommand}"
+                    Content="Завершить стрим" />
+
+                <Button
+                    HorizontalAlignment="Stretch"
+                    Command="{x:Bind ViewModel.CancelStreamCommand}"
+                    Content="Отменить стрим" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Page>

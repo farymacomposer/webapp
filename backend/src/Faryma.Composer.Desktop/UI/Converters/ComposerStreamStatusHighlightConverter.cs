@@ -10,9 +10,9 @@ namespace Faryma.Composer.Desktop.UI
     {
         private static readonly Dictionary<ComposerStreamStatus, SolidColorBrush> _brushes = new()
         {
-            [ComposerStreamStatus.Planned] = new SolidColorBrush(Colors.DodgerBlue),
-            [ComposerStreamStatus.Live] = new SolidColorBrush(Colors.Gold),
-            [ComposerStreamStatus.Completed] = new SolidColorBrush(Colors.YellowGreen),
+            [ComposerStreamStatus.Planned] = new SolidColorBrush(Colors.RoyalBlue),
+            [ComposerStreamStatus.Live] = new SolidColorBrush(Colors.Goldenrod),
+            [ComposerStreamStatus.Completed] = new SolidColorBrush(Colors.SeaGreen),
             [ComposerStreamStatus.Canceled] = new SolidColorBrush(Colors.Gray),
         };
 
