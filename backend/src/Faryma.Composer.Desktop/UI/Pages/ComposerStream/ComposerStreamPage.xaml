@@ -13,6 +13,7 @@
     <Grid Margin="36">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="16" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
@@ -26,7 +27,7 @@
 
             <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ViewModel.CurrentMonth.ToString('MMMM yyyy', x:Null), Mode=OneWay}" />
 
-            <Grid Grid.Row="1" Margin="0,36,0,0">
+            <Grid Grid.Row="1" Margin="0,36,6,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
@@ -96,7 +97,26 @@
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
 
-                                    <TextBlock Margin="16,14,16,8" Text="{x:Bind Date.Day}" />
+                                    <Border
+                                        Width="24"
+                                        Margin="14,12,0,8"
+                                        HorizontalAlignment="Left">
+                                        <TextBlock HorizontalAlignment="Center" Text="{x:Bind Date.Day}" />
+                                    </Border>
+
+                                    <Border
+                                        x:Name="DayArea"
+                                        Width="24"
+                                        Margin="14,12,0,8"
+                                        HorizontalAlignment="Left"
+                                        x:Load="{x:Bind IsToday}"
+                                        Background="{ThemeResource SystemFillColorSuccessBrush}"
+                                        CornerRadius="4">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            Text="{x:Bind Date.Day}" />
+                                    </Border>
 
                                     <Grid
                                         x:Name="StreamArea"
@@ -128,7 +148,7 @@
 
             <StackPanel
                 Grid.Row="3"
-                Margin="0,24,0,0"
+                Margin="0,24,6,0"
                 HorizontalAlignment="Center"
                 Orientation="Horizontal"
                 Spacing="8">
@@ -148,45 +168,54 @@
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Column="1" VerticalAlignment="Top">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="16" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="16" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
+        <StackPanel
+            Grid.Column="2"
+            Width="400"
+            Margin="0,91,0,0"
+            HorizontalAlignment="Left"
+            Spacing="16">
 
             <StackPanel Style="{StaticResource StackPanelCardStyle}">
-                <local:TitledContentRow Title="Тип стрима">
-                    <ComboBox ItemsSource="{x:Bind ViewModel.StreamTypes}" SelectedItem="{x:Bind ViewModel.SelectedStreamType, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+
+                <local:TitledContentRow Title="Выбранная дата">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedDate, Mode=OneWay}" />
                 </local:TitledContentRow>
+
+                <ComboBox
+                    HorizontalAlignment="Stretch"
+                    Header="Тип стрима"
+                    ItemsSource="{x:Bind ViewModel.StreamTypes}"
+                    SelectedItem="{x:Bind ViewModel.SelectedStreamType, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <Button
+                    Width="150"
+                    HorizontalAlignment="Right"
+                    Command="{x:Bind ViewModel.CreateStreamCommand}"
+                    Content="Создать стрим"
+                    Style="{StaticResource AccentButtonStyle}" />
             </StackPanel>
 
-            <Button
-                Grid.Column="2"
-                HorizontalAlignment="Stretch"
-                Command="{x:Bind ViewModel.CreateStreamCommand}"
-                Content="Создать стрим" />
-
-            <StackPanel Grid.Row="2" Style="{StaticResource StackPanelCardStyle}">
+            <StackPanel Style="{StaticResource StackPanelCardStyle}">
 
                 <local:TitledContentRow Title="Тип стрима">
                     <TextBlock Text="{x:Bind ViewModel.SelectedStream.Type, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
                 </local:TitledContentRow>
 
-                <local:TitledContentRow Title="Статус стрима" Background="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource ComposerStreamStatusHighlightConverter}, TargetNullValue={ThemeResource SubtleFillColorSecondaryBrush}, FallbackValue={x:Null}}">
-                    <TextBlock Text="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
-                </local:TitledContentRow>
+                <Grid>
+                    <Border
+                        Background="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource ComposerStreamStatusHighlightConverter}, FallbackValue={x:Null}}"
+                        CornerRadius="4"
+                        Opacity="0.2" />
+                    <local:TitledContentRow Title="Статус стрима">
+                        <TextBlock Text="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                    </local:TitledContentRow>
+                </Grid>
 
                 <local:TitledContentRow Title="Начало стрима">
                     <TextBlock Text="{x:Bind ViewModel.SelectedStream.StartedAt, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
@@ -195,29 +224,28 @@
                 <local:TitledContentRow Title="Завершение стрима">
                     <TextBlock Text="{x:Bind ViewModel.SelectedStream.CompletedAt, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
                 </local:TitledContentRow>
-            </StackPanel>
-
-            <StackPanel
-                Grid.Row="2"
-                Grid.Column="2"
-                VerticalAlignment="Center"
-                Spacing="16">
 
                 <Button
-                    HorizontalAlignment="Stretch"
+                    Width="150"
+                    HorizontalAlignment="Right"
                     Command="{x:Bind ViewModel.StartStreamCommand}"
-                    Content="Начать стрим" />
+                    Content="Начать стрим"
+                    Style="{StaticResource AccentButtonStyle}" />
 
                 <Button
-                    HorizontalAlignment="Stretch"
+                    Width="150"
+                    HorizontalAlignment="Right"
                     Command="{x:Bind ViewModel.CompleteStreamCommand}"
-                    Content="Завершить стрим" />
+                    Content="Завершить стрим"
+                    Style="{StaticResource AccentButtonStyle}" />
 
                 <Button
-                    HorizontalAlignment="Stretch"
+                    Width="150"
+                    HorizontalAlignment="Right"
                     Command="{x:Bind ViewModel.CancelStreamCommand}"
-                    Content="Отменить стрим" />
+                    Content="Отменить стрим"
+                    Style="{StaticResource AccentButtonStyle}" />
             </StackPanel>
-        </Grid>
+        </StackPanel>
     </Grid>
 </Page>

@@ -17,7 +17,12 @@ namespace Faryma.Composer.Desktop.UI
     {
         private ComposerStreamDaySlotVM? _selectedDaySlot;
 
-        public ComposerStreamType[] StreamTypes { get; } = Enum.GetValues<ComposerStreamType>();
+        public ComposerStreamType[] StreamTypes { get; } =
+        [
+            ComposerStreamType.Donation,
+            ComposerStreamType.Debt,
+            ComposerStreamType.Charity,
+        ];
 
         public ObservableCollection<ComposerStreamDaySlotVM> Days { get; } = [];
 
@@ -25,17 +30,17 @@ namespace Faryma.Composer.Desktop.UI
         public partial DateOnly CurrentMonth { get; set; }
 
         [ObservableProperty]
-        //[NotifyCanExecuteChangedFor(nameof(CreateStreamCommand))]
-        //[NotifyCanExecuteChangedFor(nameof(StartStreamCommand))]
-        //[NotifyCanExecuteChangedFor(nameof(CompleteStreamCommand))]
-        //[NotifyCanExecuteChangedFor(nameof(CancelStreamCommand))]
-        public partial DateOnly SelectedDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        [NotifyCanExecuteChangedFor(nameof(CreateStreamCommand))]
+        public partial DateOnly? SelectedDate { get; set; }
 
         [ObservableProperty]
-        public partial ComposerStreamType SelectedStreamType { get; set; }
+        public partial ComposerStreamType SelectedStreamType { get; set; } = ComposerStreamType.Donation;
 
         [ObservableProperty]
-        //[NotifyCanExecuteChangedFor(nameof(CreateStreamCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CreateStreamCommand))]
+        [NotifyCanExecuteChangedFor(nameof(StartStreamCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CompleteStreamCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CancelStreamCommand))]
         public partial ComposerStreamVM? SelectedStream { get; set; }
 
         public bool CanCreateStream => SelectedStream is null && SelectedDate >= DateOnly.FromDateTime(DateTime.UtcNow);
@@ -49,6 +54,7 @@ namespace Faryma.Composer.Desktop.UI
         {
             CurrentMonth = month.GetFirstDayOfMonth();
             Days.Clear();
+            SelectedDate = null;
             SelectedStream = null;
             _selectedDaySlot = null;
 
@@ -94,16 +100,16 @@ namespace Faryma.Composer.Desktop.UI
             SelectedStreamType = ComposerStreamType.Donation;
         }
 
-        [RelayCommand]
-        private Task CreateStream() => UpdateStream(composerStreamHttpClient.Create(SelectedDate, SelectedStreamType));
+        [RelayCommand(CanExecute = nameof(CanCreateStream))]
+        private Task CreateStream() => UpdateStream(composerStreamHttpClient.Create(SelectedDate!.Value, SelectedStreamType));
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanStartStream))]
         private Task StartStream() => UpdateStream(composerStreamHttpClient.Start(SelectedStream!.Id));
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanCompleteStream))]
         private Task CompleteStream() => UpdateStream(composerStreamHttpClient.Complete(SelectedStream!.Id));
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanCancelStream))]
         private Task CancelStream() => UpdateStream(composerStreamHttpClient.Cancel(SelectedStream!.Id));
 
         private Task UpdateStream(Task<ComposerStreamDto> task) => messageService.HandleException(async () =>
