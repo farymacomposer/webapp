@@ -58,13 +58,13 @@
         </DataTemplate>
     </Page.Resources>
 
-    <Grid Margin="20,27,36,36" ColumnSpacing="16">
+    <Grid Margin="20,27,36,36" ColumnSpacing="12">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <SemanticZoom x:Name="Control1" Width="1000">
+        <SemanticZoom x:Name="SemanticZoomControl" Width="1020">
             <SemanticZoom.ZoomedInView>
                 <ListView
                     GotFocus="List_GotFocus"

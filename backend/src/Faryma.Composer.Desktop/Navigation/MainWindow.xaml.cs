@@ -15,7 +15,7 @@ namespace Faryma.Composer.Desktop.Navigation
             InitializeComponent();
 
             ExtendsContentIntoTitleBar = true;
-            SetTitleBar(titleBar);
+            SetTitleBar(TitleBarControl);
 
             dialogService.SetFrame(DialogFrame);
             messageService.SetFrame(MessageFrame);
@@ -37,6 +37,6 @@ namespace Faryma.Composer.Desktop.Navigation
             }
         }
 
-        private void TitleBar_PaneToggleRequested(TitleBar _, object __) => navView.IsPaneOpen = !navView.IsPaneOpen;
+        private void TitleBar_PaneToggleRequested(TitleBar _, object __) => NavigationViewControl.IsPaneOpen = !NavigationViewControl.IsPaneOpen;
     }
 }
