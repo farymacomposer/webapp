@@ -12,7 +12,8 @@ namespace Faryma.Composer.Desktop.UI
         ReviewOrderHttpClient reviewOrderHttpClient,
         MessageService messageService,
         ValidationService validationService,
-        DialogService dialogService) : DialogVM(dialogService)
+        DialogService dialogService
+        ) : DialogVM(dialogService)
     {
         private Guid _idempotencyKey;
 

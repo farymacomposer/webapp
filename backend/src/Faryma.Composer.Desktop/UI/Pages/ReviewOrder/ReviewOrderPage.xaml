@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Faryma.Composer.Desktop.UI"
     xmlns:wuxdata="using:Microsoft.UI.Xaml.Data">
-    <Page.Resources>
+    <!--<Page.Resources>
 
         <CollectionViewSource
             x:Name="cvsGroups"
@@ -72,5 +72,5 @@
                     SelectionMode="None" />
             </SemanticZoom.ZoomedOutView>
         </SemanticZoom>
-    </Grid>
+    </Grid>-->
 </Page>

@@ -70,7 +70,7 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
 
                 return response.ComposerStream;
             }
-            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 600)
+            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 666)
             {
                 ResultObject result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>()
                     ?? throw new InvalidOperationException();

@@ -1,5 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace Faryma.Composer.Desktop.UI
@@ -14,6 +13,6 @@ namespace Faryma.Composer.Desktop.UI
             InitializeComponent();
         }
 
-        private void List_GotFocus(object _, RoutedEventArgs __) => Control1.StartBringIntoView();
+        //private void List_GotFocus(object _, RoutedEventArgs __) => Control1.StartBringIntoView();
     }
 }

@@ -218,11 +218,11 @@
                 </Grid>
 
                 <local:TitledContentRow Title="Начало стрима">
-                    <TextBlock Text="{x:Bind ViewModel.SelectedStream.StartedAt, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                    <TextBlock Text="{x:Bind ViewModel.SelectedStream.StartedAt, Mode=OneWay, FallbackValue={x:Null}}" />
                 </local:TitledContentRow>
 
                 <local:TitledContentRow Title="Завершение стрима">
-                    <TextBlock Text="{x:Bind ViewModel.SelectedStream.CompletedAt, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                    <TextBlock Text="{x:Bind ViewModel.SelectedStream.CompletedAt, Mode=OneWay, FallbackValue={x:Null}}" />
                 </local:TitledContentRow>
 
                 <Button

@@ -10,7 +10,7 @@ namespace Faryma.Composer.Desktop.ViewModels
         /// <summary>
         /// Дата
         /// </summary>
-        public DateOnly Date { get; init; }
+        public required DateOnly Date { get; init; }
 
         /// <summary>
         /// Сегодня
@@ -20,14 +20,14 @@ namespace Faryma.Composer.Desktop.ViewModels
         /// <summary>
         /// Текущий месяц
         /// </summary>
-        public bool IsCurrentMonth { get; init; }
+        public required bool IsCurrentMonth { get; init; }
 
         /// <summary>
         /// Стрим
         /// </summary>
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasStream))]
-        public partial ComposerStreamVM? Stream { get; set; }
+        public required partial ComposerStreamVM? Stream { get; set; }
 
         /// <summary>
         /// Есть стрим

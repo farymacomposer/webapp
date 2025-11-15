@@ -61,7 +61,7 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder
 
                 return response.ReviewOrder;
             }
-            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 600)
+            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 666)
             {
                 ResultObject result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>()
                     ?? throw new InvalidOperationException();
