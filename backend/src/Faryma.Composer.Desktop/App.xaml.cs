@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using CommunityToolkit.Mvvm.Messaging;
 using Faryma.Composer.Desktop.Api.ComposerStream;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Navigation;
@@ -31,6 +33,11 @@ namespace Faryma.Composer.Desktop
 
             services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
             services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
+            services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.Web)
+            {
+                Converters = { new JsonStringEnumConverter() }
+            });
+
             services.AddSingleton<IMessenger, StrongReferenceMessenger>();
             services.AddNavigation();
             services.AddServices();

@@ -80,9 +80,9 @@ namespace Faryma.Composer.Desktop.UI
             {
                 Nickname = Nickname,
                 OrderType = OrderType,
-                TrackUrl = TrackUrl,
+                TrackUrl = string.IsNullOrWhiteSpace(TrackUrl) ? null : TrackUrl,
                 PaymentAmount = paymentAmount,
-                UserComment = UserComment,
+                UserComment = string.IsNullOrWhiteSpace(UserComment) ? null : UserComment,
             };
 
             if (await validationService.Check(request))
