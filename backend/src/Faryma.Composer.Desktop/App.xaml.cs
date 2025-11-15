@@ -48,7 +48,7 @@ namespace Faryma.Composer.Desktop
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
 #if DEBUG
-            await Task.Delay(2000);
+            await Task.Delay(5000);
 #endif
 
             MainWindow window = GetService<MainWindow>();

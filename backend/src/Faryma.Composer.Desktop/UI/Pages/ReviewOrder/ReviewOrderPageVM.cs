@@ -11,30 +11,38 @@ namespace Faryma.Composer.Desktop.UI
     {
         private readonly DialogService _dialogService;
 
-        public ObservableCollection<ControlInfoDataGroup> Groups { get; } = new()
-        {
-            new ControlInfoDataGroup
-            {
-                Title = "Title1",
-            },
-            new ControlInfoDataGroup
-            {
-                Title = "Title2",
-            }
-        };
+        public ObservableCollection<ReviewOrderGroup> ActivityGroups { get; } = [];
 
         public ReviewOrderPageVM(OrderQueueService orderQueueService, DialogService dialogService)
         {
             _dialogService = dialogService;
+
+            ActivityGroups.Add(new ReviewOrderGroup
+            {
+                Title = "Активные",
+                Orders = orderQueueService.ActiveOrders,
+            });
+
+            ActivityGroups.Add(new ReviewOrderGroup
+            {
+                Title = "Выполненные",
+                Orders = orderQueueService.CompletedOrders,
+            });
+
+            ActivityGroups.Add(new ReviewOrderGroup
+            {
+                Title = "Замороженные",
+                Orders = orderQueueService.FrozenOrders,
+            });
+
+            ActivityGroups.Add(new ReviewOrderGroup
+            {
+                Title = "Запланированные",
+                Orders = orderQueueService.ScheduledOrders,
+            });
         }
 
         [RelayCommand]
         private Task OpenCreateReviewOrder() => _dialogService.ShowDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
-    }
-
-    public sealed partial class ControlInfoDataGroup : ObservableObject
-    {
-        public required string Title { get; set; }
-        public ObservableCollection<ReviewOrderVM> Items { get; } = [];
     }
 }

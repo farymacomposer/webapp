@@ -24,14 +24,16 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
 
             string url = $"/api/ComposerStream/FindStreams{queryBuilder}";
 
-            StreamsResponse response = (await httpClient.GetFromJsonAsync<StreamsResponse>(url, _serializerOptions))!;
+            StreamsResponse response = await httpClient.GetFromJsonAsync<StreamsResponse>(url, _serializerOptions)
+                ?? throw new InvalidOperationException("Не удалось десериализовать StreamResponse");
 
             return response.Streams;
         }
 
         public async Task<IEnumerable<ComposerStreamDto>> FindLiveAndPlanned()
         {
-            StreamsResponse response = (await httpClient.GetFromJsonAsync<StreamsResponse>("/api/ComposerStream/FindLiveAndPlanned", _serializerOptions))!;
+            StreamsResponse response = await httpClient.GetFromJsonAsync<StreamsResponse>("/api/ComposerStream/FindLiveAndPlanned", _serializerOptions)
+                ?? throw new InvalidOperationException("Не удалось десериализовать StreamResponse");
 
             return response.Streams;
         }
@@ -61,28 +63,12 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
         {
             HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync(requestUri, request, _serializerOptions);
 
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
+            await ApiExceptionHelper.EnsureSuccessStatusCode(responseMessage);
 
-                StreamResponse response = await responseMessage.Content.ReadFromJsonAsync<StreamResponse>(_serializerOptions)
-                    ?? throw new InvalidOperationException();
+            StreamResponse response = await responseMessage.Content.ReadFromJsonAsync<StreamResponse>(_serializerOptions)
+                ?? throw new InvalidOperationException("Не удалось десериализовать StreamResponse");
 
-                return response.ComposerStream;
-            }
-            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 666)
-            {
-                ResultObject result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>()
-                    ?? throw new InvalidOperationException();
-
-                throw new ApiException(result, ex);
-            }
-            catch (Exception ex)
-            {
-                string message = await responseMessage.Content.ReadAsStringAsync();
-
-                throw new(message, ex);
-            }
+            return response.ComposerStream;
         }
     }
 }

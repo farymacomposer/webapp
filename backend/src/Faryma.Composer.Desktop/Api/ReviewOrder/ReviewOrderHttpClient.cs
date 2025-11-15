@@ -50,31 +50,16 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder
             ReviewOrderId = reviewOrderId,
         });
 
-        private static async Task<ReviewOrderDto> HandleException(HttpResponseMessage responseMessage)
-        {
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
-
-                ReviewOrderResponse response = await responseMessage.Content.ReadFromJsonAsync<ReviewOrderResponse>()
-                    ?? throw new InvalidOperationException();
-
-                return response.ReviewOrder;
-            }
-            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 666)
-            {
-                ResultObject result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>()
-                    ?? throw new InvalidOperationException();
-
-                throw new ApiException(result, ex);
-            }
-        }
-
         private async Task<ReviewOrderDto> Post<T>(string requestUri, T request)
         {
             HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync(requestUri, request, _serializerOptions);
 
-            return await HandleException(responseMessage);
+            await ApiExceptionHelper.EnsureSuccessStatusCode(responseMessage);
+
+            ReviewOrderResponse response = await responseMessage.Content.ReadFromJsonAsync<ReviewOrderResponse>()
+                ?? throw new InvalidOperationException("Не удалось десериализовать ReviewOrderResponse");
+
+            return response.ReviewOrder;
         }
 
         private async Task<ReviewOrderDto> Post<T>(string requestUri, Guid idempotencyKey, T request)
@@ -85,7 +70,12 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder
 
             HttpResponseMessage responseMessage = await httpClient.SendAsync(requestMessage);
 
-            return await HandleException(responseMessage);
+            await ApiExceptionHelper.EnsureSuccessStatusCode(responseMessage);
+
+            ReviewOrderResponse response = await responseMessage.Content.ReadFromJsonAsync<ReviewOrderResponse>()
+                ?? throw new InvalidOperationException("Не удалось десериализовать ReviewOrderResponse");
+
+            return response.ReviewOrder;
         }
     }
 }
