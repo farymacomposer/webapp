@@ -34,7 +34,11 @@
                             <TextBlock VerticalAlignment="Center" Text="{x:Bind TotalAmount}" />
                         </StackPanel>
 
-                        <TextBlock Text="{x:Bind TrackUrl}" />
+                        <HyperlinkButton
+                            x:Name="TrackUrl"
+                            x:Load="{x:Bind HasTrackUrl}"
+                            Content="{x:Bind TrackUrl}"
+                            NavigateUri="{Binding TrackUrl, Mode=OneTime}" />
                     </StackPanel>
 
                     <TextBlock HorizontalAlignment="Right" Text="{x:Bind CreatedAt}" />

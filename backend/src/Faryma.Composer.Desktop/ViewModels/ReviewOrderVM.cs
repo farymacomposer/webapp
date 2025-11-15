@@ -59,6 +59,11 @@ namespace Faryma.Composer.Desktop.ViewModels
         public string? TrackUrl { get; } = dto.TrackUrl;
 
         /// <summary>
+        /// Есть ссылка на трек
+        /// </summary>
+        public bool HasTrackUrl => TrackUrl is not null;
+
+        /// <summary>
         /// Комментарий пользователя
         /// </summary>
         public string? UserComment { get; } = dto.UserComment;
