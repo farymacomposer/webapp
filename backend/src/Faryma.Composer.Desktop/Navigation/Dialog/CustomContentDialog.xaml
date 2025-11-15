@@ -32,7 +32,7 @@
                     Margin="24,-6,-6,0"
                     Padding="6"
                     Command="{x:Bind CloseButtonCommand}"
-                    Style="{StaticResource FlatButton}">
+                    Style="{StaticResource ButtonFlatStyle}">
                     <SymbolIcon Symbol="Cancel" />
                 </Button>
             </Grid>

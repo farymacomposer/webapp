@@ -10,10 +10,9 @@
         <local:BindingProxy x:Key="BindingProxy" ViewModel="{x:Bind ViewModel}" />
     </Page.Resources>
 
-    <Grid Margin="36">
+    <Grid Margin="36" ColumnSpacing="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="16" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
@@ -85,7 +84,7 @@
                             VerticalAlignment="Stretch"
                             Command="{Binding ViewModel.SelectDaySlotCommand, Source={StaticResource BindingProxy}, Mode=OneTime}"
                             CommandParameter="{x:Bind}"
-                            Style="{StaticResource FlatButton}">
+                            Style="{StaticResource ButtonFlatStyle}">
                             <Grid>
 
                                 <Grid
@@ -169,7 +168,7 @@
         </Grid>
 
         <StackPanel
-            Grid.Column="2"
+            Grid.Column="1"
             Width="400"
             Margin="0,91,0,0"
             HorizontalAlignment="Left"
@@ -181,17 +180,18 @@
                     <TextBlock Text="{x:Bind ViewModel.SelectedDate, Mode=OneWay}" />
                 </local:TitledContentRow>
 
-                <ComboBox
-                    HorizontalAlignment="Stretch"
-                    Header="Тип стрима"
-                    ItemsSource="{x:Bind ViewModel.StreamTypes}"
-                    SelectedItem="{x:Bind ViewModel.SelectedStreamType, Mode=TwoWay}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                <local:TitledContentRow Title="Тип стрима" Style="{StaticResource TitledContentRowAlignmentStyle}">
+                    <ComboBox
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{x:Bind ViewModel.StreamTypes}"
+                        SelectedItem="{x:Bind ViewModel.SelectedStreamType, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </local:TitledContentRow>
 
                 <Button
                     Width="150"
@@ -207,15 +207,15 @@
                     <TextBlock Text="{x:Bind ViewModel.SelectedStream.Type, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
                 </local:TitledContentRow>
 
-                <Grid>
-                    <Border
-                        Background="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource ComposerStreamStatusHighlightConverter}, FallbackValue={x:Null}}"
-                        CornerRadius="4"
-                        Opacity="0.2" />
-                    <local:TitledContentRow Title="Статус стрима">
-                        <TextBlock Text="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
-                    </local:TitledContentRow>
-                </Grid>
+                <local:TitledContentRow Title="Статус стрима">
+                    <Grid>
+                        <Border
+                            Background="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource ComposerStreamStatusHighlightConverter}, FallbackValue={x:Null}}"
+                            CornerRadius="4"
+                            Opacity="0.2" />
+                        <TextBlock Margin="6,2" Text="{x:Bind ViewModel.SelectedStream.Status, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                    </Grid>
+                </local:TitledContentRow>
 
                 <local:TitledContentRow Title="Начало стрима">
                     <TextBlock Text="{x:Bind ViewModel.SelectedStream.StartedAt, Mode=OneWay, FallbackValue={x:Null}}" />

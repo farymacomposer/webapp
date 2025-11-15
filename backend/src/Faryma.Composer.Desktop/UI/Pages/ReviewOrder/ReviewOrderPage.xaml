@@ -11,91 +11,35 @@
         <CollectionViewSource
             x:Name="ActivityGroups"
             IsSourceGrouped="True"
-            ItemsPath="Items"
+            ItemsPath="Orders"
             Source="{x:Bind ViewModel.ActivityGroups}" />
 
         <DataTemplate x:Key="ZoomedInTemplate" x:DataType="vm:ReviewOrderVM">
-            <Grid
-                Padding="6,4,12,4"
-                BorderBrush="{ThemeResource SystemControlForegroundChromeMediumBrush}"
-                BorderThickness="0,1,0,0">
+            <Button
+                Margin="0,2"
+                HorizontalAlignment="Stretch"
+                Style="{StaticResource ButtonFlatStyle}">
+                <Grid Style="{StaticResource GridCardStyle}">
 
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button
-                            Height="30"
-                            MinWidth="32"
-                            Command="{Binding SelectCommand}"
-                            Content="{Binding Id}"
-                            Style="{StaticResource AccentButtonStyle}" />
-                        <Border
-                            Padding="6,0"
-                            Background="{Binding MainNickname, Converter={StaticResource StringHashHighlightConverter}}"
-                            CornerRadius="4">
-                            <TextBox
-                                VerticalAlignment="Center"
-                                FontSize="16"
-                                IsReadOnly="True"
-                                RequestedTheme="Light"
-                                Text="{Binding MainNickname}" />
-                        </Border>
-                    </StackPanel>
-                    <TextBlock
-                        FontSize="16"
-                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                        Text="{Binding TotalAmount}" />
-                    <TextBlock FontSize="16" Text="{Binding CreatedAt}" />
-                    <TextBlock Text="{Binding TrackUrl}" />
-                </StackPanel>
+                    <StackPanel HorizontalAlignment="Left" Spacing="8">
 
-                <StackPanel
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="8">
-
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="{Binding InProgressAt}" />
-                        <TextBlock Text="{Binding CompletedAt}" />
-                    </StackPanel>
-
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Type}" />
-                        <TextBlock Text="{Binding CategoryType}" />
-                        <TextBlock Text="{Binding Status}" />
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Foreground="{ThemeResource TextFillColorTertiaryBrush}" Text="IsFrozen:" />
-                            <TextBlock Text="{Binding IsFrozen}" />
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <Grid Width="200">
+                                <Border
+                                    Background="{x:Bind MainNickname, Converter={StaticResource StringHashHighlightConverter}}"
+                                    CornerRadius="4"
+                                    Opacity="0.2" />
+                                <TextBox IsReadOnly="True" Text="{x:Bind MainNickname}" />
+                            </Grid>
+                            <TextBlock VerticalAlignment="Center" Text="{x:Bind TotalAmount}" />
                         </StackPanel>
+
+                        <TextBlock Text="{x:Bind TrackUrl}" />
                     </StackPanel>
 
-                    <StackPanel
-                        Padding="6,4"
-                        Background="{Binding CurrentCategoryType, Converter={StaticResource OrderCategoryHighlightConverter}}"
-                        CornerRadius="4">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Foreground="{ThemeResource TextFillColorTertiaryBrush}" Text="QueueIndex:" />
-                            <TextBlock Text="{Binding QueueIndex}" />
-                        </StackPanel>
-                        <TextBlock Text="{Binding ActivityStatus}" />
-                        <TextBlock Text="{Binding CurrentCategoryType}" />
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Foreground="{ThemeResource TextFillColorTertiaryBrush}" Text="DebtIndex:" />
-                            <TextBlock Text="{Binding CategoryDebtIndex}" />
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Foreground="{ThemeResource TextFillColorTertiaryBrush}" Text="StreamId:" />
-                            <TextBlock Text="{Binding StreamId}" />
-                        </StackPanel>
-                        <TextBlock Text="{Binding StreamEventDate}" />
-                        <TextBlock Text="{Binding StreamStatus}" />
-                        <TextBlock Text="{Binding StreamType}" />
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
+                    <TextBlock HorizontalAlignment="Right" Text="{x:Bind CreatedAt}" />
+                </Grid>
+            </Button>
         </DataTemplate>
 
         <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="vm:ReviewOrderGroup">
@@ -110,21 +54,13 @@
         </DataTemplate>
     </Page.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
+    <Grid Margin="20,27,36,36" ColumnSpacing="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
 
-        <StackPanel
-            Padding="6,4"
-            Orientation="Horizontal"
-            Spacing="4">
-            <Button Command="{x:Bind ViewModel.OpenCreateReviewOrderCommand}" Content="Создать заказ" />
-            <Button Content="Найти заказ" />
-        </StackPanel>
-
-        <SemanticZoom x:Name="Control1" Grid.Row="1">
+        <SemanticZoom x:Name="Control1" Width="1000">
             <SemanticZoom.ZoomedInView>
                 <ListView
                     GotFocus="List_GotFocus"
@@ -145,5 +81,27 @@
                     SelectionMode="None" />
             </SemanticZoom.ZoomedOutView>
         </SemanticZoom>
+
+        <StackPanel
+            Grid.Column="1"
+            Width="400"
+            Margin="0,40,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Style="{StaticResource StackPanelCardStyle}">
+
+            <Button
+                Width="150"
+                HorizontalAlignment="Right"
+                Command="{x:Bind ViewModel.OpenCreateReviewOrderCommand}"
+                Content="Создать заказ"
+                Style="{StaticResource AccentButtonStyle}" />
+
+            <Button
+                Width="150"
+                HorizontalAlignment="Right"
+                Content="Найти заказ"
+                Style="{StaticResource AccentButtonStyle}" />
+        </StackPanel>
     </Grid>
 </Page>

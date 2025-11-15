@@ -53,29 +53,25 @@
         <Setter Property="CornerRadius" Value="8" />
     </Style>
 
-    <Style TargetType="localUI:TitledContentRow">
-        <Setter Property="Spacing" Value="6" />
-        <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
-        <Setter Property="CornerRadius" Value="4" />
+    <Style x:Key="TitledContentRowDefaultStyle" TargetType="localUI:TitledContentRow">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="localUI:TitledContentRow">
                     <Grid
-                        Padding="16,6"
+                        Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
+                        ColumnSpacing="{TemplateBinding Spacing}"
                         CornerRadius="{TemplateBinding CornerRadius}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
 
                         <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Title}" />
 
-                        <Rectangle Grid.Column="1" Width="{TemplateBinding Spacing}" />
-
                         <ContentPresenter
-                            Grid.Column="2"
+                            Grid.Column="1"
+                            HorizontalContentAlignment="Stretch"
                             VerticalContentAlignment="Center"
                             Content="{TemplateBinding Content}" />
                     </Grid>
@@ -84,17 +80,26 @@
         </Setter>
     </Style>
 
-    <Style x:Key="RightContentAlignment" TargetType="localUI:TitledContentRow">
-        <Setter Property="Spacing" Value="6" />
-        <Setter Property="HorizontalContentAlignment" Value="Right" />
+    <Style BasedOn="{StaticResource TitledContentRowDefaultStyle}" TargetType="localUI:TitledContentRow" />
+
+    <Style
+        x:Key="TitledContentRowCardStyle"
+        BasedOn="{StaticResource TitledContentRowDefaultStyle}"
+        TargetType="localUI:TitledContentRow">
+        <Setter Property="Padding" Value="16,6" />
         <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
         <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style x:Key="TitledContentRowAlignmentStyle" TargetType="localUI:TitledContentRow">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="localUI:TitledContentRow">
                     <Grid
-                        Padding="16,6"
+                        Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
+                        ColumnSpacing="{TemplateBinding Spacing}"
                         CornerRadius="{TemplateBinding CornerRadius}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -104,7 +109,7 @@
                         <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Title}" />
 
                         <ContentPresenter
-                            Grid.Column="2"
+                            Grid.Column="1"
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalContentAlignment="Center"
                             Content="{TemplateBinding Content}" />
@@ -125,7 +130,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="FlatButton" TargetType="Button">
+    <Style x:Key="ButtonFlatStyle" TargetType="Button">
         <Setter Property="Padding" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />

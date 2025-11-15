@@ -45,10 +45,12 @@
                 </ScrollView>
             </Grid>
 
-            <Grid Grid.Row="1" Padding="24">
+            <Grid
+                Grid.Row="1"
+                Padding="24"
+                ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
-                    <ColumnDefinition Width="8" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
@@ -59,7 +61,7 @@
 
                 <Button
                     x:Name="SecondButton"
-                    Grid.Column="2"
+                    Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     Click="SecondButton_Click"
                     Style="{StaticResource AccentButtonStyle}" />
