@@ -9,7 +9,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// Стрим композитора
     /// </summary>
     [Index(nameof(EventDate), IsUnique = true)]
-    public sealed class ComposerStream : BaseEntity
+    public sealed class ComposerStreamEntity : BaseEntity
     {
         /// <summary>
         /// Дата проведения стрима
@@ -43,11 +43,11 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Заказы, созданные в этом стриме
         /// </summary>
-        public ICollection<ReviewOrder> CreatedReviewOrders { get; set; } = [];
+        public ICollection<ReviewOrderEntity> CreatedReviewOrders { get; set; } = [];
 
         /// <summary>
         /// Заказы, взятые в работу в этом стриме
         /// </summary>
-        public ICollection<ReviewOrder> ProcessedReviewOrders { get; set; } = [];
+        public ICollection<ReviewOrderEntity> ProcessedReviewOrders { get; set; } = [];
     }
 }

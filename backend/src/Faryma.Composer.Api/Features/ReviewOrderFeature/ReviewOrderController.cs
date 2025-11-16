@@ -48,7 +48,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 return Ok(response);
             }
 
-            ReviewOrder order = request.OrderType switch
+            ReviewOrderEntity order = request.OrderType switch
             {
                 ReviewOrderType.OutOfQueue => await reviewOrderService.CreateOutOfQueue(new CreateOutOfQueueOrderCommand
                 {
@@ -110,7 +110,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
                 return Ok(response);
             }
 
-            Transaction transaction = await reviewOrderService.MoveUp(new MoveUpCommand
+            TransactionEntity transaction = await reviewOrderService.MoveUp(new MoveUpCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Nickname = request.Nickname.Trim(),
@@ -135,7 +135,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl(AddTrackUrlRequest request)
         {
-            ReviewOrder order = await reviewOrderService.AddTrackUrl(new AddTrackUrlCommand
+            ReviewOrderEntity order = await reviewOrderService.AddTrackUrl(new AddTrackUrlCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 TrackUrl = request.TrackUrl,
@@ -154,7 +154,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request)
         {
-            ReviewOrder order = await reviewOrderService.TakeInProgress(request.ReviewOrderId);
+            ReviewOrderEntity order = await reviewOrderService.TakeInProgress(request.ReviewOrderId);
 
             return Ok(new TakeOrderInProgressResponse
             {
@@ -169,7 +169,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder(CompleteReviewOrderRequest request)
         {
-            ReviewOrder order = await reviewOrderService.Complete(new CompleteCommand
+            ReviewOrderEntity order = await reviewOrderService.Complete(new CompleteCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Rating = request.Rating,
@@ -189,7 +189,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(FreezeReviewOrderRequest request)
         {
-            ReviewOrder order = await reviewOrderService.Freeze(request.ReviewOrderId);
+            ReviewOrderEntity order = await reviewOrderService.Freeze(request.ReviewOrderId);
 
             return Ok(new FreezeReviewOrderResponse
             {
@@ -204,7 +204,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(UnfreezeReviewOrderRequest request)
         {
-            ReviewOrder order = await reviewOrderService.Unfreeze(request.ReviewOrderId);
+            ReviewOrderEntity order = await reviewOrderService.Unfreeze(request.ReviewOrderId);
 
             return Ok(new UnfreezeReviewOrderResponse
             {
@@ -219,7 +219,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrderFeature
         [AuthorizeAdmins]
         public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request)
         {
-            ReviewOrder order = await reviewOrderService.Cancel(request.ReviewOrderId);
+            ReviewOrderEntity order = await reviewOrderService.Cancel(request.ReviewOrderId);
 
             return Ok(new CancelReviewOrderResponse
             {

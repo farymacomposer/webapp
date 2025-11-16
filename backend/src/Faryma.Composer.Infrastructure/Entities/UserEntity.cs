@@ -5,7 +5,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// <summary>
     /// Пользователь системы
     /// </summary>
-    public sealed class User : IdentityUser<Guid>
+    public sealed class UserEntity : IdentityUser<Guid>
     {
         /// <summary>
         /// Имя пользователя
@@ -22,16 +22,16 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Псевдонимы пользователя
         /// </summary>
-        public ICollection<UserNickname> UserNicknames { get; set; } = [];
+        public ICollection<UserNicknameEntity> UserNicknames { get; set; } = [];
 
         /// <summary>
         /// Связь с исполнителями
         /// </summary>
-        public ICollection<TrackArtist> AssociatedArtists { get; set; } = [];
+        public ICollection<TrackArtistEntity> AssociatedArtists { get; set; } = [];
 
         /// <summary>
         /// Оценки треков
         /// </summary>
-        public ICollection<UserTrackRating> TrackRatings { get; set; } = [];
+        public ICollection<UserTrackRatingEntity> TrackRatings { get; set; } = [];
     }
 }

@@ -6,11 +6,11 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
     /// <summary>
     /// Базовая приоритезация для заказов, по сумме и по дате
     /// </summary>
-    public sealed class OrderPriorityComparer : IComparer<ReviewOrder>
+    public sealed class OrderPriorityComparer : IComparer<ReviewOrderEntity>
     {
         public static OrderPriorityComparer Default { get; } = new();
 
-        public int Compare(ReviewOrder x, ReviewOrder y)
+        public int Compare(ReviewOrderEntity x, ReviewOrderEntity y)
         {
             decimal xAmount = x.GetTotalAmount();
             decimal yAmount = y.GetTotalAmount();

@@ -28,7 +28,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// <summary>
         /// Возвращает текущую позицию заказа
         /// </summary>
-        public OrderQueuePosition GetCurrentQueuePosition(ReviewOrder order) => OrderPositionsById[order.Id].PositionHistory.Current;
+        public OrderQueuePosition GetCurrentQueuePosition(ReviewOrderEntity order) => OrderPositionsById[order.Id].PositionHistory.Current;
 
         /// <summary>
         /// Обновляет позиции заказов
@@ -46,11 +46,11 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// <summary>
         /// Обновляет заказы
         /// </summary>
-        public OrderPosition[] UpdateOrders(ReviewOrder[] orders)
+        public OrderPosition[] UpdateOrders(ReviewOrderEntity[] orders)
         {
             SaveCurrentPositionsToPrevious();
 
-            foreach (ReviewOrder order in orders)
+            foreach (ReviewOrderEntity order in orders)
             {
                 OrderPositionsById[order.Id].UpdateOrder(order);
             }
@@ -63,7 +63,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// <summary>
         /// Обновляет заказ
         /// </summary>
-        public OrderPosition[] UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType)
+        public OrderPosition[] UpdateOrder(ReviewOrderEntity order, OrderQueueUpdateType updateType)
         {
             switch (updateType)
             {
@@ -140,7 +140,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
                     break;
                 }
 
-                ReviewOrder order = manager.TakeNextOrder(isOnlyNicknameLeft);
+                ReviewOrderEntity order = manager.TakeNextOrder(isOnlyNicknameLeft);
                 OrderPositionsById[order.Id].UpdateCurrentPosition(index, OrderActivityStatus.Active);
                 index++;
             }
@@ -165,7 +165,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// </summary>
         private void UpdateCompleted()
         {
-            ReviewOrder[] orders = OrderPositionsById
+            ReviewOrderEntity[] orders = OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => x.Status == ReviewOrderStatus.Completed)
                 .OrderBy(x => x.CompletedAt)
@@ -179,7 +179,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// </summary>
         private void UpdateScheduled()
         {
-            ReviewOrder[] orders = OrderPositionsById
+            ReviewOrderEntity[] orders = OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen && x.CreationStream.EventDate > NearestStreamDate)
                 .Order(OrderPriorityComparer.Default)
@@ -193,7 +193,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// </summary>
         private void UpdateFrozen()
         {
-            ReviewOrder[] orders = OrderPositionsById
+            ReviewOrderEntity[] orders = OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => x.IsFrozen)
                 .Order(OrderPriorityComparer.Default)
@@ -207,7 +207,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// </summary>
         private void UpdateRemoved()
         {
-            ReviewOrder[] orders = OrderPositionsById
+            ReviewOrderEntity[] orders = OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => x.Status == ReviewOrderStatus.Canceled
                     || x.ProcessingStream?.Status == ComposerStreamStatus.Completed)
@@ -219,10 +219,10 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// <summary>
         /// Обновляет позиции заказов
         /// </summary>
-        private void UpdatePositions(ReviewOrder[] orders, OrderActivityStatus activityStatus)
+        private void UpdatePositions(ReviewOrderEntity[] orders, OrderActivityStatus activityStatus)
         {
             int index = 0;
-            foreach (ReviewOrder order in orders)
+            foreach (ReviewOrderEntity order in orders)
             {
                 OrderPositionsById[order.Id].UpdateCurrentPosition(index, activityStatus);
                 index++;

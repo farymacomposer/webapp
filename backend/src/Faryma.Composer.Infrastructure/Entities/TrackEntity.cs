@@ -7,7 +7,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// <summary>
     /// Музыкальный трек
     /// </summary>
-    public sealed class Track : BaseEntity
+    public sealed class TrackEntity : BaseEntity
     {
         /// <summary>
         /// Дата и время добавления трека
@@ -53,37 +53,37 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Пользователь, загрузивший трек
         /// </summary>
         [ForeignKey(nameof(AddedByUserNicknameId))]
-        public required UserNickname AddedBy { get; set; }
+        public required UserNicknameEntity AddedBy { get; set; }
 
         /// <summary>
         /// Страна производства
         /// </summary>
         [ForeignKey(nameof(CountryId))]
-        public TrackCountry? Country { get; set; }
+        public TrackCountryEntity? Country { get; set; }
 
         /// <summary>
         /// Связь с исполнителями
         /// </summary>
-        public ICollection<TrackArtist> Artists { get; set; } = [];
+        public ICollection<TrackArtistEntity> Artists { get; set; } = [];
 
         /// <summary>
         /// Связь с жанрами
         /// </summary>
-        public ICollection<TrackGenre> Genres { get; set; } = [];
+        public ICollection<TrackGenreEntity> Genres { get; set; } = [];
 
         /// <summary>
         /// Заказы разборов трека
         /// </summary>
-        public ICollection<ReviewOrder> ReviewOrders { get; set; } = [];
+        public ICollection<ReviewOrderEntity> ReviewOrders { get; set; } = [];
 
         /// <summary>
         /// Результаты разборов трека композитором
         /// </summary>
-        public ICollection<Review> Reviews { get; set; } = [];
+        public ICollection<ReviewEntity> Reviews { get; set; } = [];
 
         /// <summary>
         /// Оценки пользователей
         /// </summary>
-        public ICollection<UserTrackRating> UserRatings { get; set; } = [];
+        public ICollection<UserTrackRatingEntity> UserRatings { get; set; } = [];
     }
 }

@@ -6,7 +6,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// <summary>
     /// Счет пользователя
     /// </summary>
-    public sealed class UserAccount : PersonalEntity
+    public sealed class UserAccountEntity : PersonalEntity
     {
         /// <summary>
         /// Текущий баланс
@@ -21,11 +21,11 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Псевдоним пользователя
         /// </summary>
         [ForeignKey(nameof(UserNicknameId))]
-        public required UserNickname UserNickname { get; set; }
+        public required UserNicknameEntity UserNickname { get; set; }
 
         /// <summary>
         /// Операции по счету
         /// </summary>
-        public ICollection<Transaction> Transactions { get; set; } = [];
+        public ICollection<TransactionEntity> Transactions { get; set; } = [];
     }
 }

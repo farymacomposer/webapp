@@ -53,7 +53,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// <summary>
         /// Последовательно перебирает долговые категории и извлекает заказ из категории, в которой есть заказы
         /// </summary>
-        public ReviewOrder DequeueRoundRobin(string? nicknameToSkip)
+        public ReviewOrderEntity DequeueRoundRobin(string? nicknameToSkip)
         {
             while (true)
             {
@@ -62,7 +62,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
                 (DateOnly streamDate, OrderCategory category) = _debtCategoriesByStreamDate[index];
                 if (category.HasOrders)
                 {
-                    ReviewOrder order = category.Dequeue(nicknameToSkip);
+                    ReviewOrderEntity order = category.Dequeue(nicknameToSkip);
                     _roundRobinCounter++;
 
                     return order;
@@ -75,7 +75,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// <summary>
         /// Последовательно перебирает долговые категории и извлекает заказ из категории, в которой существует заказ с другим никнеймом
         /// </summary>
-        public ReviewOrder DequeueRoundRobinFromOtherNickname(string? nicknameToSkip)
+        public ReviewOrderEntity DequeueRoundRobinFromOtherNickname(string? nicknameToSkip)
         {
             while (true)
             {
@@ -84,7 +84,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
                 (DateOnly streamDate, OrderCategory category) = _debtCategoriesByStreamDate[index];
                 if (category.HasOrderFromOtherNickname(nicknameToSkip))
                 {
-                    ReviewOrder order = category.Dequeue(nicknameToSkip);
+                    ReviewOrderEntity order = category.Dequeue(nicknameToSkip);
                     _roundRobinCounter++;
 
                     return order;

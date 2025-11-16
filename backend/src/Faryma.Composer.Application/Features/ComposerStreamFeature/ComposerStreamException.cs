@@ -6,7 +6,7 @@ namespace Faryma.Composer.Application.Features.ComposerStreamFeature
 {
     public sealed class ComposerStreamException : AppException
     {
-        public ComposerStreamException(string? message, ComposerStream? stream = null, [CallerMemberName] string callerMemberName = null!) : base(message, callerMemberName)
+        public ComposerStreamException(string? message, ComposerStreamEntity? stream = null, [CallerMemberName] string callerMemberName = null!) : base(message, callerMemberName)
         {
             if (stream is not null)
             {

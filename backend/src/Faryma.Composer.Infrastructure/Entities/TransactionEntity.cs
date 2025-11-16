@@ -7,7 +7,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// <summary>
     /// Операция по счету
     /// </summary>
-    public sealed class Transaction : BaseEntity
+    public sealed class TransactionEntity : BaseEntity
     {
         /// <summary>
         /// Дата и время совершения операции
@@ -34,12 +34,12 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Счет пользователя
         /// </summary>
         [ForeignKey(nameof(UserAccountId))]
-        public required UserAccount Account { get; set; }
+        public required UserAccountEntity Account { get; set; }
 
         /// <summary>
         /// Заказ разбора треков
         /// </summary>
         [ForeignKey(nameof(ReviewOrderId))]
-        public ReviewOrder? ReviewOrder { get; set; }
+        public ReviewOrderEntity? ReviewOrder { get; set; }
     }
 }

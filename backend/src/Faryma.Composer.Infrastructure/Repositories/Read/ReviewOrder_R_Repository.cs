@@ -6,14 +6,14 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
 {
     public sealed class ReviewOrder_R_Repository(AppDbContext context)
     {
-        public Task<ReviewOrder?> FindInProgress()
+        public Task<ReviewOrderEntity?> FindInProgress()
         {
             return context.ReviewOrders
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress);
         }
 
-        public async Task<ReviewOrder?> FindLastTaken()
+        public async Task<ReviewOrderEntity?> FindLastTaken()
         {
             return await FindInProgress()
                 ?? await context.ReviewOrders
@@ -23,7 +23,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                     .LastOrDefaultAsync();
         }
 
-        public async Task<ReviewOrder?> FindLastTakenDebt()
+        public async Task<ReviewOrderEntity?> FindLastTakenDebt()
         {
             return await context.ReviewOrders
                 .AsNoTracking()
@@ -38,7 +38,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                     .LastOrDefaultAsync();
         }
 
-        public async Task<ReviewOrder?> FindLastTakenOutOfQueue()
+        public async Task<ReviewOrderEntity?> FindLastTakenOutOfQueue()
         {
             return await context.ReviewOrders
                 .AsNoTracking()
@@ -51,7 +51,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                     .LastOrDefaultAsync();
         }
 
-        public Task<ReviewOrder[]> GetOrdersToStartStream(long startedStreamId)
+        public Task<ReviewOrderEntity[]> GetOrdersToStartStream(long startedStreamId)
         {
             return context.ReviewOrders
                 .AsNoTracking()
@@ -62,7 +62,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                 .ToArrayAsync();
         }
 
-        public Task<ReviewOrder[]> GetOrdersToCompleteStream(long completedStreamId)
+        public Task<ReviewOrderEntity[]> GetOrdersToCompleteStream(long completedStreamId)
         {
             return context.ReviewOrders
                 .AsNoTracking()
@@ -75,7 +75,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                 .ToArrayAsync();
         }
 
-        public Task<ReviewOrder[]> GetOrdersInQueue()
+        public Task<ReviewOrderEntity[]> GetOrdersInQueue()
         {
             return context.ReviewOrders
                 .AsNoTracking()

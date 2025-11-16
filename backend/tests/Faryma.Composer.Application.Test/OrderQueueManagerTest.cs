@@ -866,10 +866,10 @@ namespace Faryma.Composer.Application.Test
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
 
-            ReviewOrder order1 = Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 1000));
-            ReviewOrder order2 = Create(queueManager, GetDonation("10.01.2000", 2, "Nick2", 1000));
-            ReviewOrder order3 = Create(queueManager, GetDonation("10.01.2000", 3, "Nick1", 1000));
-            ReviewOrder order4 = Create(queueManager, GetDonation("10.01.2000", 4, "Nick2", 1000));
+            ReviewOrderEntity order1 = Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 1000));
+            ReviewOrderEntity order2 = Create(queueManager, GetDonation("10.01.2000", 2, "Nick2", 1000));
+            ReviewOrderEntity order3 = Create(queueManager, GetDonation("10.01.2000", 3, "Nick1", 1000));
+            ReviewOrderEntity order4 = Create(queueManager, GetDonation("10.01.2000", 4, "Nick2", 1000));
 
             TakeInProgress(queueManager, order2);
             Complete(queueManager, order2);
@@ -921,20 +921,20 @@ namespace Faryma.Composer.Application.Test
             };
         }
 
-        private static ReviewOrder Create(OrderQueueManager queueManager, ReviewOrder order)
+        private static ReviewOrderEntity Create(OrderQueueManager queueManager, ReviewOrderEntity order)
         {
             queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
 
             return order;
         }
 
-        private static void ProcessOrder(OrderQueueManager queueManager, ReviewOrder order)
+        private static void ProcessOrder(OrderQueueManager queueManager, ReviewOrderEntity order)
         {
             TakeInProgress(queueManager, order);
             Complete(queueManager, order);
         }
 
-        private static void TakeInProgress(OrderQueueManager queueManager, ReviewOrder order)
+        private static void TakeInProgress(OrderQueueManager queueManager, ReviewOrderEntity order)
         {
             OrderQueuePosition position = queueManager.GetCurrentQueuePosition(order);
 
@@ -944,7 +944,7 @@ namespace Faryma.Composer.Application.Test
             queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderTaken);
         }
 
-        private static void Complete(OrderQueueManager queueManager, ReviewOrder order)
+        private static void Complete(OrderQueueManager queueManager, ReviewOrderEntity order)
         {
             order.CompletedAt = DateTime.Now;
             order.Status = ReviewOrderStatus.Completed;
@@ -979,7 +979,7 @@ namespace Faryma.Composer.Application.Test
             }
         }
 
-        private ReviewOrder GetDonation(string eventDate, long id, string name, int amount, bool isFrozen = false)
+        private ReviewOrderEntity GetDonation(string eventDate, long id, string name, int amount, bool isFrozen = false)
         {
             return new()
             {
@@ -992,7 +992,7 @@ namespace Faryma.Composer.Application.Test
                 NominalAmount = amount,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
-                CreationStream = new ComposerStream
+                CreationStream = new ComposerStreamEntity
                 {
                     EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,
@@ -1001,7 +1001,7 @@ namespace Faryma.Composer.Application.Test
             };
         }
 
-        private ReviewOrder GetOutOfQueue(string eventDate, long id, string name)
+        private ReviewOrderEntity GetOutOfQueue(string eventDate, long id, string name)
         {
             return new()
             {
@@ -1014,7 +1014,7 @@ namespace Faryma.Composer.Application.Test
                 NominalAmount = 0,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
-                CreationStream = new ComposerStream
+                CreationStream = new ComposerStreamEntity
                 {
                     EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,

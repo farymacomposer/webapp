@@ -3,18 +3,20 @@
 namespace Faryma.Composer.Infrastructure.Entities
 {
     /// <summary>
-    /// Страна производства музыкального трека
+    /// Музыкальный жанр трека
     /// </summary>
-    public sealed class TrackCountry : BaseEntity
+    public sealed class TrackGenreEntity : BaseEntity
     {
         /// <summary>
-        /// Название страны
+        /// Название жанра
         /// </summary>
         public required string Name { get; set; }
+
+        // Навигационные свойства
 
         /// <summary>
         /// Связь с треками
         /// </summary>
-        public ICollection<Track> Tracks { get; set; } = [];
+        public ICollection<TrackEntity> Tracks { get; set; } = [];
     }
 }

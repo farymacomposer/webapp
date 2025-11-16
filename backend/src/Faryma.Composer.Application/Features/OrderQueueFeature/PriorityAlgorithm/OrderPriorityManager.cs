@@ -126,9 +126,9 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// </summary>
         /// <param name="isOnlyNicknameLeft">Флаг, указывающий, остался ли только один никнейм для обработки</param>
         /// <returns>Следующий заказ для обработки</returns>
-        public ReviewOrder TakeNextOrder(bool isOnlyNicknameLeft)
+        public ReviewOrderEntity TakeNextOrder(bool isOnlyNicknameLeft)
         {
-            ReviewOrder result = _currentState switch
+            ReviewOrderEntity result = _currentState switch
             {
                 CategoryState.OutOfQueue => _outOfQueueCategory.Dequeue(_lastIssuedNickname),
                 CategoryState.Donation => _donationCategory!.Dequeue(_lastIssuedNickname),

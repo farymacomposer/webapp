@@ -6,7 +6,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// <summary>
     /// Результат разбора трека композитором
     /// </summary>
-    public sealed class Review : BaseEntity
+    public sealed class ReviewEntity : BaseEntity
     {
         /// <summary>
         /// Оценка
@@ -32,12 +32,12 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Связанный заказ
         /// </summary>
         [ForeignKey(nameof(ReviewOrderId))]
-        public ReviewOrder? ReviewOrder { get; set; }
+        public ReviewOrderEntity? ReviewOrder { get; set; }
 
         /// <summary>
         /// Связанный музыкальный трек
         /// </summary>
         [ForeignKey(nameof(TrackId))]
-        public Track? Track { get; set; }
+        public TrackEntity? Track { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
 {
     public sealed class ComposerStream_R_Repository(AppDbContext context)
     {
-        public Task<ComposerStream[]> Find(DateOnly dateFrom, DateOnly dateTo)
+        public Task<ComposerStreamEntity[]> Find(DateOnly dateFrom, DateOnly dateTo)
         {
             return context.ComposerStreams
                 .AsNoTracking()
@@ -14,14 +14,14 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                 .ToArrayAsync();
         }
 
-        public Task<ComposerStream?> FindLive()
+        public Task<ComposerStreamEntity?> FindLive()
         {
             return context.ComposerStreams
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
         }
 
-        public Task<ComposerStream?> FindNearest(DateOnly date)
+        public Task<ComposerStreamEntity?> FindNearest(DateOnly date)
         {
             return context.ComposerStreams
                 .AsNoTracking()
@@ -31,7 +31,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                 .FirstOrDefaultAsync();
         }
 
-        public Task<ComposerStream[]> FindLiveAndPlanned()
+        public Task<ComposerStreamEntity[]> FindLiveAndPlanned()
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 

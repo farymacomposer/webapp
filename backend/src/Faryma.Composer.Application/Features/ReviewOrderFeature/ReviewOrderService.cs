@@ -16,15 +16,15 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
         AppSettingsService appSettingsService,
         OrderQueueService orderQueueService)
     {
-        public async Task<ReviewOrder> CreateOutOfQueue(CreateOutOfQueueOrderCommand command)
+        public async Task<ReviewOrderEntity> CreateOutOfQueue(CreateOutOfQueueOrderCommand command)
         {
-            UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname);
 
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
-            ComposerStream? nearestStream = await uow.ComposerStream_RW.FindNearest(today)
+            ComposerStreamEntity? nearestStream = await uow.ComposerStream_RW.FindNearest(today)
                 ?? throw new ReviewOrderException("Заказ не создан. Нет доступного стрима.");
 
-            ReviewOrder order = uow.ReviewOrder_RW.CreateFree(
+            ReviewOrderEntity order = uow.ReviewOrder_RW.CreateFree(
                 nearestStream,
                 userNickname,
                 appSettingsService.Settings.ReviewOrderNominalAmount,
@@ -39,16 +39,16 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        public async Task<ReviewOrder> CreateDonation(CreateDonationOrderCommand command)
+        public async Task<ReviewOrderEntity> CreateDonation(CreateDonationOrderCommand command)
         {
-            UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
-            ComposerStream nearestStream = await FindNearestStream(userNickname)
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname);
+            ComposerStreamEntity nearestStream = await FindNearestStream(userNickname)
                 ?? throw new ReviewOrderException("Заказ не создан. Нет доступного стрима.");
 
-            Transaction deposit = uow.Transaction_RW.CreateDeposit(userNickname.Account, command.PaymentAmount);
-            Transaction payment = uow.Transaction_RW.CreatePayment(userNickname.Account, command.PaymentAmount);
+            TransactionEntity deposit = uow.Transaction_RW.CreateDeposit(userNickname.Account, command.PaymentAmount);
+            TransactionEntity payment = uow.Transaction_RW.CreatePayment(userNickname.Account, command.PaymentAmount);
 
-            ReviewOrder order = uow.ReviewOrder_RW.CreateDonation(
+            ReviewOrderEntity order = uow.ReviewOrder_RW.CreateDonation(
                 nearestStream,
                 payment,
                 appSettingsService.Settings.ReviewOrderNominalAmount,
@@ -62,13 +62,13 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        public async Task<ReviewOrder> CreateFree(CreateFreeOrderCommand command)
+        public async Task<ReviewOrderEntity> CreateFree(CreateFreeOrderCommand command)
         {
-            UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
-            ComposerStream nearestStream = await FindNearestStream(userNickname)
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname);
+            ComposerStreamEntity nearestStream = await FindNearestStream(userNickname)
                 ?? throw new ReviewOrderException("Заказ не создан. Нет доступного стрима.");
 
-            ReviewOrder order = uow.ReviewOrder_RW.CreateFree(
+            ReviewOrderEntity order = uow.ReviewOrder_RW.CreateFree(
                 nearestStream,
                 userNickname,
                 appSettingsService.Settings.ReviewOrderNominalAmount,
@@ -83,17 +83,17 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        public async Task<ReviewOrder> CreateCharity(CreateCharityOrderCommand command)
+        public async Task<ReviewOrderEntity> CreateCharity(CreateCharityOrderCommand command)
         {
-            ComposerStream? liveStream = await uow.ComposerStream_RW.FindLive();
+            ComposerStreamEntity? liveStream = await uow.ComposerStream_RW.FindLive();
             if (liveStream is null || liveStream.Type != ComposerStreamType.Charity)
             {
                 throw new ReviewOrderException("Заказ не создан. Не запущен благотворительный стрим.");
             }
 
-            UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname);
 
-            ReviewOrder order = uow.ReviewOrder_RW.CreateFree(
+            ReviewOrderEntity order = uow.ReviewOrder_RW.CreateFree(
                 liveStream,
                 userNickname,
                 appSettingsService.Settings.ReviewOrderNominalAmount,
@@ -108,18 +108,18 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        public async Task<Transaction> MoveUp(MoveUpCommand command)
+        public async Task<TransactionEntity> MoveUp(MoveUpCommand command)
         {
-            ReviewOrder order = await uow.ReviewOrder_RW.Get(command.ReviewOrderId);
+            ReviewOrderEntity order = await uow.ReviewOrder_RW.Get(command.ReviewOrderId);
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
                 throw new ReviewOrderException("Невозможно поднять заказ", order);
             }
 
-            UserNickname userNickname = await userNicknameService.GetOrCreate(command.Nickname);
-            Transaction deposit = uow.Transaction_RW.CreateDeposit(userNickname.Account, command.PaymentAmount);
-            Transaction payment = uow.Transaction_RW.CreatePayment(userNickname.Account, command.PaymentAmount);
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname);
+            TransactionEntity deposit = uow.Transaction_RW.CreateDeposit(userNickname.Account, command.PaymentAmount);
+            TransactionEntity payment = uow.Transaction_RW.CreatePayment(userNickname.Account, command.PaymentAmount);
             order.Payments.Add(payment);
 
             await uow.SaveChangesAsync();
@@ -129,9 +129,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return payment;
         }
 
-        public async Task<ReviewOrder> AddTrackUrl(AddTrackUrlCommand command)
+        public async Task<ReviewOrderEntity> AddTrackUrl(AddTrackUrlCommand command)
         {
-            ReviewOrder order = await uow.ReviewOrder_RW.Get(command.ReviewOrderId);
+            ReviewOrderEntity order = await uow.ReviewOrder_RW.Get(command.ReviewOrderId);
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
@@ -152,9 +152,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        public async Task<ReviewOrder> TakeInProgress(long reviewOrderId)
+        public async Task<ReviewOrderEntity> TakeInProgress(long reviewOrderId)
         {
-            ReviewOrder order = await uow.ReviewOrder_RW.Get(reviewOrderId);
+            ReviewOrderEntity order = await uow.ReviewOrder_RW.Get(reviewOrderId);
             if (order.Status == ReviewOrderStatus.InProgress)
             {
                 return order;
@@ -165,10 +165,10 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
                 throw new ReviewOrderException("Невозможно взять в работу заказ", order);
             }
 
-            ComposerStream liveStream = await uow.ComposerStream_RW.FindLive()
+            ComposerStreamEntity liveStream = await uow.ComposerStream_RW.FindLive()
                 ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима", order);
 
-            ReviewOrder? inProgress = await uow.ReviewOrder_R.FindInProgress();
+            ReviewOrderEntity? inProgress = await uow.ReviewOrder_R.FindInProgress();
             if (inProgress is not null && inProgress.Id != reviewOrderId)
             {
                 throw new ReviewOrderException($"Невозможно взять в работу заказ, пока заказ Id: {inProgress.Id} находится в работе", order);
@@ -188,9 +188,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        public async Task<ReviewOrder> Complete(CompleteCommand command)
+        public async Task<ReviewOrderEntity> Complete(CompleteCommand command)
         {
-            ReviewOrder order = await uow.ReviewOrder_RW.Get(command.ReviewOrderId);
+            ReviewOrderEntity order = await uow.ReviewOrder_RW.Get(command.ReviewOrderId);
             if (order.Status == ReviewOrderStatus.Completed)
             {
                 return order;
@@ -214,9 +214,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        public async Task<ReviewOrder> Freeze(long reviewOrderId)
+        public async Task<ReviewOrderEntity> Freeze(long reviewOrderId)
         {
-            ReviewOrder order = await uow.ReviewOrder_RW.Get(reviewOrderId);
+            ReviewOrderEntity order = await uow.ReviewOrder_RW.Get(reviewOrderId);
             if (order.IsFrozen)
             {
                 return order;
@@ -236,9 +236,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        public async Task<ReviewOrder> Unfreeze(long reviewOrderId)
+        public async Task<ReviewOrderEntity> Unfreeze(long reviewOrderId)
         {
-            ReviewOrder order = await uow.ReviewOrder_RW.Get(reviewOrderId);
+            ReviewOrderEntity order = await uow.ReviewOrder_RW.Get(reviewOrderId);
             if (!order.IsFrozen)
             {
                 return order;
@@ -258,9 +258,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        public async Task<ReviewOrder> Cancel(long reviewOrderId)
+        public async Task<ReviewOrderEntity> Cancel(long reviewOrderId)
         {
-            ReviewOrder order = await uow.ReviewOrder_RW.Get(reviewOrderId);
+            ReviewOrderEntity order = await uow.ReviewOrder_RW.Get(reviewOrderId);
             if (order.Status == ReviewOrderStatus.Canceled)
             {
                 return order;
@@ -281,7 +281,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
             return order;
         }
 
-        private async Task<ComposerStream?> FindNearestStream(UserNickname userNickname)
+        private async Task<ComposerStreamEntity?> FindNearestStream(UserNicknameEntity userNickname)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
 

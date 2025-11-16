@@ -6,7 +6,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrderFeature
 {
     public sealed class ReviewOrderException : AppException
     {
-        public ReviewOrderException(string message, ReviewOrder? order = null, [CallerMemberName] string callerMemberName = null!) : base(message, callerMemberName)
+        public ReviewOrderException(string message, ReviewOrderEntity? order = null, [CallerMemberName] string callerMemberName = null!) : base(message, callerMemberName)
         {
             if (order is not null)
             {

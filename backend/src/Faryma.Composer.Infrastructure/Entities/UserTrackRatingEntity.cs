@@ -6,7 +6,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// <summary>
     /// Пользовательская оценка трека
     /// </summary>
-    public sealed class UserTrackRating : BaseEntity
+    public sealed class UserTrackRatingEntity : BaseEntity
     {
         /// <summary>
         /// Оценка
@@ -37,12 +37,12 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Оцениваемый трек
         /// </summary>
         [ForeignKey(nameof(TrackId))]
-        public required Track Track { get; set; }
+        public required TrackEntity Track { get; set; }
 
         /// <summary>
         /// Пользователь, оставивший оценку
         /// </summary>
         [ForeignKey(nameof(UserId))]
-        public required User User { get; set; }
+        public required UserEntity User { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
     /// <summary>
     /// Категория заказов
     /// </summary>
-    public sealed class OrderCategory(List<ReviewOrder> orders)
+    public sealed class OrderCategory(List<ReviewOrderEntity> orders)
     {
         /// <summary>
         /// Последний выданный никнейм из категории
@@ -38,16 +38,16 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// <summary>
         /// Извлекает заказ из категории
         /// </summary>
-        public ReviewOrder Dequeue(string? nicknameToSkip)
+        public ReviewOrderEntity Dequeue(string? nicknameToSkip)
         {
-            ReviewOrder? bestMatch = null;
-            ReviewOrder? fallback = null;
-            ReviewOrder first = orders[0];
+            ReviewOrderEntity? bestMatch = null;
+            ReviewOrderEntity? fallback = null;
+            ReviewOrderEntity first = orders[0];
 
             // bestMatch - когда в категории есть никнейм, который не совпадает с последним прослушанным `nicknameToSkip` и с последним из данной категории `_lastIssuedNickname`
             // fallback - когда в категории есть никнейм, который не совпадает с последним прослушанным `nicknameToSkip`
             // first - если в категории остались только заказы, совпадающие с `nicknameToSkip`
-            foreach (ReviewOrder order in orders)
+            foreach (ReviewOrderEntity order in orders)
             {
                 if (order.MainNormalizedNickname != nicknameToSkip)
                 {
@@ -61,7 +61,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
                 }
             }
 
-            ReviewOrder result = bestMatch ?? fallback ?? first;
+            ReviewOrderEntity result = bestMatch ?? fallback ?? first;
             orders.Remove(result);
 
             _lastIssuedNickname = result.MainNormalizedNickname;
@@ -74,7 +74,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// </summary>
         public void UpdateOrdersCategory(OrderQueueManager queueManager, OrderCategoryType type, int debtIndex = 0)
         {
-            foreach (ReviewOrder item in orders)
+            foreach (ReviewOrderEntity item in orders)
             {
                 queueManager.OrderPositionsById[item.Id].UpdateCurrentCategory(type, debtIndex);
             }

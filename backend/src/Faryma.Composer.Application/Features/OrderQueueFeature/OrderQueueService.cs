@@ -29,12 +29,12 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
 
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
-            ComposerStream? nearestStream = await composerStream_R.FindNearest(today);
-            ReviewOrder? lastTakenOrder = await reviewOrder_R.FindLastTaken();
-            ReviewOrder? lastTakenDebt = await reviewOrder_R.FindLastTakenDebt();
-            ReviewOrder? lastTakenOutOfQueue = await reviewOrder_R.FindLastTakenOutOfQueue();
+            ComposerStreamEntity? nearestStream = await composerStream_R.FindNearest(today);
+            ReviewOrderEntity? lastTakenOrder = await reviewOrder_R.FindLastTaken();
+            ReviewOrderEntity? lastTakenDebt = await reviewOrder_R.FindLastTakenDebt();
+            ReviewOrderEntity? lastTakenOutOfQueue = await reviewOrder_R.FindLastTakenOutOfQueue();
             Dictionary<DateOnly, string> lastNicknamesByStreamDate = await composerStream_R.GetLastNicknamesByStreamDate();
-            ReviewOrder[] orders = await reviewOrder_R.GetOrdersInQueue();
+            ReviewOrderEntity[] orders = await reviewOrder_R.GetOrdersInQueue();
 
             _queueManager = new OrderQueueManager
             {
@@ -56,7 +56,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
             }
         }
 
-        public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrder order) =>
+        public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrderEntity order) =>
             _locker.Lock(() => _queueManager.GetCurrentQueuePosition(order).Clone());
 
         public Task<OrderQueueSnapshot> GetQueueSnapshot() => _locker.Lock(() => new OrderQueueSnapshot
@@ -68,7 +68,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
                 .ToArray(),
         });
 
-        public Task UpdateOrder(ReviewOrder order, OrderQueueUpdateType updateType) => _locker.Lock(async () =>
+        public Task UpdateOrder(ReviewOrderEntity order, OrderQueueUpdateType updateType) => _locker.Lock(async () =>
         {
             _syncVersion++;
 
@@ -82,7 +82,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
             await notificationService.NotifyQueueUpdated(snapshot);
         });
 
-        public Task CancelOrder(ReviewOrder order, ReviewOrderStatus previousStatus) => _locker.Lock(async () =>
+        public Task CancelOrder(ReviewOrderEntity order, ReviewOrderStatus previousStatus) => _locker.Lock(async () =>
         {
             _syncVersion++;
 
@@ -90,7 +90,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
             {
                 await using AppDbContext context = await contextFactory.CreateDbContextAsync();
                 ReviewOrder_R_Repository reviewOrder_R = new(context);
-                ReviewOrder? lastTakenOrder = await reviewOrder_R.FindLastTaken();
+                ReviewOrderEntity? lastTakenOrder = await reviewOrder_R.FindLastTaken();
                 if (lastTakenOrder is not null)
                 {
                     _queueManager.PriorityManagerState.UpdateFromOrder(lastTakenOrder);
@@ -107,7 +107,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
             await notificationService.NotifyQueueUpdated(snapshot);
         });
 
-        public Task StartStream(ComposerStream stream) => _locker.Lock(async () =>
+        public Task StartStream(ComposerStreamEntity stream) => _locker.Lock(async () =>
         {
             _syncVersion++;
 
@@ -115,7 +115,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
 
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
             ReviewOrder_R_Repository reviewOrder_R = new(context);
-            ReviewOrder[] orders = await reviewOrder_R.GetOrdersToStartStream(stream.Id);
+            ReviewOrderEntity[] orders = await reviewOrder_R.GetOrdersToStartStream(stream.Id);
 
             OrderQueueSnapshot snapshot = new()
             {
@@ -127,20 +127,20 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
             await notificationService.NotifyQueueUpdated(snapshot);
         });
 
-        public Task CompleteStream(ComposerStream stream) => _locker.Lock(async () =>
+        public Task CompleteStream(ComposerStreamEntity stream) => _locker.Lock(async () =>
         {
             _syncVersion++;
 
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
             ComposerStream_R_Repository composerStream_R = new(context);
-            ComposerStream? nearestStream = await composerStream_R.FindNearest(stream.EventDate);
+            ComposerStreamEntity? nearestStream = await composerStream_R.FindNearest(stream.EventDate);
             if (nearestStream is not null)
             {
                 _queueManager.NearestStreamDate = nearestStream.EventDate;
             }
 
             ReviewOrder_R_Repository reviewOrder_R = new(context);
-            ReviewOrder[] orders = await reviewOrder_R.GetOrdersToCompleteStream(stream.Id);
+            ReviewOrderEntity[] orders = await reviewOrder_R.GetOrdersToCompleteStream(stream.Id);
 
             OrderQueueSnapshot snapshot = new()
             {

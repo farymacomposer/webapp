@@ -48,7 +48,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// <summary>
         /// Обновляет состояние менеджера приоритетов
         /// </summary>
-        public void UpdateFromOrder(ReviewOrder order)
+        public void UpdateFromOrder(ReviewOrderEntity order)
         {
             LastPriorityManagerState = MapCategoryState(order.CategoryType);
             LastIssuedNickname = order.MainNormalizedNickname;

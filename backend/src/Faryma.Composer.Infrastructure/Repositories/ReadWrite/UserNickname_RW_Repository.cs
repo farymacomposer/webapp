@@ -6,16 +6,16 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
 {
     public sealed class UserNickname_RW_Repository(AppDbContext context, ILookupNormalizer normalizer)
     {
-        public UserNickname Create(string nickname)
+        public UserNicknameEntity Create(string nickname)
         {
-            return context.Add(new UserNickname
+            return context.Add(new UserNicknameEntity
             {
                 Nickname = nickname,
                 NormalizedNickname = normalizer.NormalizeName(nickname),
             }).Entity;
         }
 
-        public Task<UserNickname?> Find(string nickname)
+        public Task<UserNicknameEntity?> Find(string nickname)
         {
             string normalized = normalizer.NormalizeName(nickname);
 

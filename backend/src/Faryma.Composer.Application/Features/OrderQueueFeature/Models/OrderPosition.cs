@@ -12,7 +12,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.Models
         /// <summary>
         /// Заказ разбора трека
         /// </summary>
-        public ReviewOrder Order { get; private set; } = null!;
+        public ReviewOrderEntity Order { get; private set; } = null!;
 
         /// <summary>
         /// История изменений позиции заказа в очереди
@@ -24,7 +24,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.Models
         /// </summary>
         public bool IsOrderUpdated { get; private set; }
 
-        public static OrderPosition Create(ReviewOrder order)
+        public static OrderPosition Create(ReviewOrderEntity order)
         {
             return new()
             {
@@ -52,7 +52,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.Models
             };
         }
 
-        public void UpdateOrder(ReviewOrder order)
+        public void UpdateOrder(ReviewOrderEntity order)
         {
             Order = order;
             IsOrderUpdated = true;

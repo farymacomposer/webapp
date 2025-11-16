@@ -8,7 +8,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// Псевдоним пользователя
     /// </summary>
     [Index(nameof(NormalizedNickname), IsUnique = true)]
-    public sealed class UserNickname : PersonalEntity
+    public sealed class UserNicknameEntity : PersonalEntity
     {
         /// <summary>
         /// Псевдоним
@@ -25,21 +25,21 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// Пользователь системы
         /// </summary>
         [ForeignKey(nameof(UserId))]
-        public User? User { get; set; }
+        public UserEntity? User { get; set; }
 
         /// <summary>
         /// Счет пользователя
         /// </summary>
-        public UserAccount Account { get; set; } = null!;
+        public UserAccountEntity Account { get; set; } = null!;
 
         /// <summary>
         /// Загруженные треки
         /// </summary>
-        public ICollection<Track> UploadedTracks { get; set; } = [];
+        public ICollection<TrackEntity> UploadedTracks { get; set; } = [];
 
         /// <summary>
         /// Заказы разборов треков
         /// </summary>
-        public ICollection<ReviewOrder> ReviewOrders { get; set; } = [];
+        public ICollection<ReviewOrderEntity> ReviewOrders { get; set; } = [];
     }
 }

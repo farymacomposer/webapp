@@ -9,7 +9,7 @@ namespace Faryma.Composer.Infrastructure.Entities
     /// Заказ разбора трека
     /// </summary>
     [DebuggerDisplay("MainNickname = {MainNickname}")]
-    public sealed class ReviewOrder : BaseEntity
+    public sealed class ReviewOrderEntity : BaseEntity
     {
         /// <summary>
         /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
@@ -81,35 +81,35 @@ namespace Faryma.Composer.Infrastructure.Entities
         /// <summary>
         /// Результат разбора
         /// </summary>
-        public Review? Review { get; set; }
+        public ReviewEntity? Review { get; set; }
 
         /// <summary>
         /// Связанный музыкальный трек
         /// </summary>
         [ForeignKey(nameof(TrackId))]
-        public Track? Track { get; set; }
+        public TrackEntity? Track { get; set; }
 
         /// <summary>
         /// Связанный cтрим, где создан заказ
         /// </summary>
         [ForeignKey(nameof(CreationStreamId))]
-        public required ComposerStream CreationStream { get; set; }
+        public required ComposerStreamEntity CreationStream { get; set; }
 
         /// <summary>
         /// Связанный cтрим, где заказ взят в работу
         /// </summary>
         [ForeignKey(nameof(ProcessingStreamId))]
-        public ComposerStream? ProcessingStream { get; set; }
+        public ComposerStreamEntity? ProcessingStream { get; set; }
 
         /// <summary>
         /// Пользователь или пользователи, создавшие заказ
         /// </summary>
-        public ICollection<UserNickname> UserNicknames { get; set; } = [];
+        public ICollection<UserNicknameEntity> UserNicknames { get; set; } = [];
 
         /// <summary>
         /// Платежи
         /// </summary>
-        public ICollection<Transaction> Payments { get; set; } = [];
+        public ICollection<TransactionEntity> Payments { get; set; } = [];
 
         /// <summary>
         /// Возвращает общую стоимость заказа

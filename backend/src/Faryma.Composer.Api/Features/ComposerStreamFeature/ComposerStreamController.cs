@@ -26,7 +26,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [HttpGet(nameof(FindStreams))]
         public async Task<ActionResult<FindStreamsResponse>> FindStreams([FromQuery] FindStreamsRequest request)
         {
-            ComposerStream[] streams = await composerStreamService.Find(request.DateFrom, request.DateTo);
+            ComposerStreamEntity[] streams = await composerStreamService.Find(request.DateFrom, request.DateTo);
 
             return Ok(new FindStreamsResponse
             {
@@ -40,7 +40,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [HttpGet(nameof(FindLiveAndPlanned))]
         public async Task<ActionResult<FindLiveAndPlannedStreamsResponse>> FindLiveAndPlanned()
         {
-            ComposerStream[] streams = await composerStreamService.FindLiveAndPlanned();
+            ComposerStreamEntity[] streams = await composerStreamService.FindLiveAndPlanned();
 
             return Ok(new FindLiveAndPlannedStreamsResponse
             {
@@ -55,7 +55,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [AuthorizeComposer]
         public async Task<ActionResult<CreateStreamResponse>> CreateStream(CreateStreamRequest request)
         {
-            ComposerStream stream = await composerStreamService.Create(new CreateCommand
+            ComposerStreamEntity stream = await composerStreamService.Create(new CreateCommand
             {
                 EventDate = request.EventDate,
                 Type = request.Type
@@ -74,7 +74,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [AuthorizeComposer]
         public async Task<ActionResult<StartStreamResponse>> StartStream(StartStreamRequest request)
         {
-            ComposerStream stream = await composerStreamService.Start(request.ComposerStreamId);
+            ComposerStreamEntity stream = await composerStreamService.Start(request.ComposerStreamId);
 
             return Ok(new StartStreamResponse
             {
@@ -89,7 +89,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [AuthorizeComposer]
         public async Task<ActionResult<CompleteStreamResponse>> CompleteStream(CompleteStreamRequest request)
         {
-            ComposerStream stream = await composerStreamService.Complete(request.ComposerStreamId);
+            ComposerStreamEntity stream = await composerStreamService.Complete(request.ComposerStreamId);
 
             return Ok(new CompleteStreamResponse
             {
@@ -104,7 +104,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [AuthorizeComposer]
         public async Task<ActionResult<CancelStreamResponse>> CancelStream(CancelStreamRequest request)
         {
-            ComposerStream stream = await composerStreamService.Cancel(request.ComposerStreamId);
+            ComposerStreamEntity stream = await composerStreamService.Cancel(request.ComposerStreamId);
 
             return Ok(new CancelStreamResponse
             {

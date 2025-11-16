@@ -5,9 +5,9 @@ namespace Faryma.Composer.Application.Features.UserNicknameFeature
 {
     public sealed class UserNicknameService(UnitOfWork uow)
     {
-        public async Task<UserNickname> GetOrCreate(string nickname)
+        public async Task<UserNicknameEntity> GetOrCreate(string nickname)
         {
-            UserNickname? result = await uow.UserNickname_RW.Find(nickname);
+            UserNicknameEntity? result = await uow.UserNickname_RW.Find(nickname);
 
             if (result is null)
             {

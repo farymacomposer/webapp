@@ -11,7 +11,7 @@ namespace Faryma.Composer.Api.Auth
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public sealed class AuthController(AuthService authService, UserManager<User> userManager) : ControllerBase
+    public sealed class AuthController(AuthService authService, UserManager<UserEntity> userManager) : ControllerBase
     {
         /// <summary>
         /// Регистрирует нового пользователя в системе
@@ -19,7 +19,7 @@ namespace Faryma.Composer.Api.Auth
         [HttpPost(nameof(Register))]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            User user = new()
+            UserEntity user = new()
             {
                 CreatedAt = DateTime.UtcNow,
                 UserName = request.UserName,
@@ -42,7 +42,7 @@ namespace Faryma.Composer.Api.Auth
         [HttpPost(nameof(Login))]
         public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
         {
-            User? user = await userManager.FindByNameAsync(request.UserName);
+            UserEntity? user = await userManager.FindByNameAsync(request.UserName);
             if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
             {
                 await Task.Delay(1000);

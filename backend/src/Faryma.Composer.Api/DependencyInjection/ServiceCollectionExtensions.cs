@@ -40,7 +40,7 @@ namespace Faryma.Composer.Api.DependencyInjection
         {
             services
                 .AddPersistence(configuration)
-                .AddIdentityCore<User>(options => options.Password.RequiredLength = 12)
+                .AddIdentityCore<UserEntity>(options => options.Password.RequiredLength = 12)
                 .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
