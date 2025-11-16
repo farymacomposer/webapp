@@ -6,8 +6,8 @@ using Faryma.Composer.Api.Features.ComposerStreamFeature.Find;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.FindLiveAndPlanned;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Start;
 using Faryma.Composer.Api.Shared.Dto;
-using Faryma.Composer.Core.Features.ComposerStreamFeature;
-using Faryma.Composer.Core.Features.ComposerStreamFeature.Commands;
+using Faryma.Composer.Application.Features.ComposerStreamFeature;
+using Faryma.Composer.Application.Features.ComposerStreamFeature.Commands;
 using Faryma.Composer.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc;
 

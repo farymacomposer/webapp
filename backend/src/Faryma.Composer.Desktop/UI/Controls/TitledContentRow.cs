@@ -15,7 +15,7 @@ namespace Faryma.Composer.Desktop.UI
             nameof(Title),
             typeof(string),
             typeof(TitledContentRow),
-            null);
+            new PropertyMetadata(null));
 
         public double Spacing
         {
