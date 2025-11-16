@@ -54,7 +54,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ComposerStream", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ComposerStreamEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -85,7 +85,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("ComposerStreams", "app");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Review", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -118,7 +118,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("Reviews", "app");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrder", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrderEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -184,7 +184,48 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("ReviewOrders", "app");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Track", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackArtistEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique();
+
+                    b.ToTable("TrackArtists", "app");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackCountryEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TrackCountries", "app");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -228,48 +269,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("Tracks", "app");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackArtist", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("NormalizedName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique();
-
-                    b.ToTable("TrackArtists", "app");
-                });
-
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackCountry", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TrackCountries", "app");
-                });
-
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackGenre", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackGenreEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -378,7 +378,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Transaction", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TransactionEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -410,7 +410,27 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("Transactions", "app");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.User", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserAccountEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("UserNicknameId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserNicknameId")
+                        .IsUnique();
+
+                    b.ToTable("UserAccounts", "app");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -479,27 +499,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("AspNetUsers", "app");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserAccount", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid>("UserNicknameId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserNicknameId")
-                        .IsUnique();
-
-                    b.ToTable("UserAccounts", "app");
-                });
-
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserNickname", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserNicknameEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -526,7 +526,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("UserNicknames", "app");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserTrackRating", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserTrackRatingEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -733,7 +733,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("AspNetUserTokens", "app");
                 });
 
-            modelBuilder.Entity("ReviewOrderUserNickname", b =>
+            modelBuilder.Entity("ReviewOrderEntityUserNicknameEntity", b =>
                 {
                     b.Property<long>("ReviewOrdersId")
                         .HasColumnType("bigint");
@@ -745,25 +745,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     b.HasIndex("UserNicknamesId");
 
-                    b.ToTable("ReviewOrderUserNickname", "app");
+                    b.ToTable("ReviewOrderEntityUserNicknameEntity", "app");
                 });
 
-            modelBuilder.Entity("TrackArtistUser", b =>
-                {
-                    b.Property<long>("AssociatedArtistsId")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("UsersId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("AssociatedArtistsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("TrackArtistUser", "app");
-                });
-
-            modelBuilder.Entity("TrackTrackArtist", b =>
+            modelBuilder.Entity("TrackArtistEntityTrackEntity", b =>
                 {
                     b.Property<long>("ArtistsId")
                         .HasColumnType("bigint");
@@ -775,10 +760,25 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     b.HasIndex("TracksId");
 
-                    b.ToTable("TrackTrackArtist", "app");
+                    b.ToTable("TrackArtistEntityTrackEntity", "app");
                 });
 
-            modelBuilder.Entity("TrackTrackGenre", b =>
+            modelBuilder.Entity("TrackArtistEntityUserEntity", b =>
+                {
+                    b.Property<long>("AssociatedArtistsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("UsersId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("AssociatedArtistsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("TrackArtistEntityUserEntity", "app");
+                });
+
+            modelBuilder.Entity("TrackEntityTrackGenreEntity", b =>
                 {
                     b.Property<long>("GenresId")
                         .HasColumnType("bigint");
@@ -790,16 +790,16 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     b.HasIndex("TracksId");
 
-                    b.ToTable("TrackTrackGenre", "app");
+                    b.ToTable("TrackEntityTrackGenreEntity", "app");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Review", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ReviewOrder", "ReviewOrder")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ReviewOrderEntity", "ReviewOrder")
                         .WithOne("Review")
-                        .HasForeignKey("Faryma.Composer.Infrastructure.Entities.Review", "ReviewOrderId");
+                        .HasForeignKey("Faryma.Composer.Infrastructure.Entities.ReviewEntity", "ReviewOrderId");
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackEntity", "Track")
                         .WithMany("Reviews")
                         .HasForeignKey("TrackId");
 
@@ -808,20 +808,20 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("Track");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrder", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrderEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ComposerStream", "CreationStream")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ComposerStreamEntity", "CreationStream")
                         .WithMany("CreatedReviewOrders")
                         .HasForeignKey("CreationStreamId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ComposerStream", "ProcessingStream")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ComposerStreamEntity", "ProcessingStream")
                         .WithMany("ProcessedReviewOrders")
                         .HasForeignKey("ProcessingStreamId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackEntity", "Track")
                         .WithMany("ReviewOrders")
                         .HasForeignKey("TrackId");
 
@@ -832,21 +832,21 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("Track");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Track", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserNickname", "AddedBy")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserNicknameEntity", "AddedBy")
                         .WithMany("UploadedTracks")
                         .HasForeignKey("AddedByUserNicknameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackCountry", "Country")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackCountryEntity", "Country")
                         .WithMany("Tracks")
                         .HasForeignKey("CountryId");
 
                     b.OwnsMany("Faryma.Composer.Infrastructure.Models.TrackTag", "Tags", b1 =>
                         {
-                            b1.Property<long>("TrackId")
+                            b1.Property<long>("TrackEntityId")
                                 .HasColumnType("bigint");
 
                             b1.Property<int>("__synthesizedOrdinal")
@@ -860,14 +860,14 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                                 .IsRequired()
                                 .HasColumnType("text");
 
-                            b1.HasKey("TrackId", "__synthesizedOrdinal");
+                            b1.HasKey("TrackEntityId", "__synthesizedOrdinal");
 
                             b1.ToTable("Tracks", "app");
 
                             b1.ToJson("Tags");
 
                             b1.WithOwner()
-                                .HasForeignKey("TrackId");
+                                .HasForeignKey("TrackEntityId");
                         });
 
                     b.Navigation("AddedBy");
@@ -877,13 +877,13 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("Tags");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Transaction", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TransactionEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ReviewOrder", "ReviewOrder")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ReviewOrderEntity", "ReviewOrder")
                         .WithMany("Payments")
                         .HasForeignKey("ReviewOrderId");
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserAccount", "Account")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserAccountEntity", "Account")
                         .WithMany("Transactions")
                         .HasForeignKey("UserAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -894,35 +894,35 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("ReviewOrder");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserAccount", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserAccountEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserNickname", "UserNickname")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserNicknameEntity", "UserNickname")
                         .WithOne("Account")
-                        .HasForeignKey("Faryma.Composer.Infrastructure.Entities.UserAccount", "UserNicknameId")
+                        .HasForeignKey("Faryma.Composer.Infrastructure.Entities.UserAccountEntity", "UserNicknameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("UserNickname");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserNickname", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserNicknameEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.User", "User")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserEntity", "User")
                         .WithMany("UserNicknames")
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserTrackRating", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserTrackRatingEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", "Track")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackEntity", "Track")
                         .WithMany("UserRatings")
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.User", "User")
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserEntity", "User")
                         .WithMany("TrackRatings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -944,7 +944,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.User", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -953,7 +953,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.User", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -968,7 +968,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.User", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -977,88 +977,93 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.User", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ReviewOrderUserNickname", b =>
+            modelBuilder.Entity("ReviewOrderEntityUserNicknameEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ReviewOrder", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.ReviewOrderEntity", null)
                         .WithMany()
                         .HasForeignKey("ReviewOrdersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserNickname", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserNicknameEntity", null)
                         .WithMany()
                         .HasForeignKey("UserNicknamesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TrackArtistUser", b =>
+            modelBuilder.Entity("TrackArtistEntityTrackEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackArtist", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackArtistEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ArtistsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackEntity", null)
+                        .WithMany()
+                        .HasForeignKey("TracksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TrackArtistEntityUserEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackArtistEntity", null)
                         .WithMany()
                         .HasForeignKey("AssociatedArtistsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.User", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TrackTrackArtist", b =>
+            modelBuilder.Entity("TrackEntityTrackGenreEntity", b =>
                 {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackArtist", null)
-                        .WithMany()
-                        .HasForeignKey("ArtistsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", null)
-                        .WithMany()
-                        .HasForeignKey("TracksId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TrackTrackGenre", b =>
-                {
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackGenre", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackGenreEntity", null)
                         .WithMany()
                         .HasForeignKey("GenresId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Infrastructure.Entities.Track", null)
+                    b.HasOne("Faryma.Composer.Infrastructure.Entities.TrackEntity", null)
                         .WithMany()
                         .HasForeignKey("TracksId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ComposerStream", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ComposerStreamEntity", b =>
                 {
                     b.Navigation("CreatedReviewOrders");
 
                     b.Navigation("ProcessedReviewOrders");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrder", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.ReviewOrderEntity", b =>
                 {
                     b.Navigation("Payments");
 
                     b.Navigation("Review");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.Track", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackCountryEntity", b =>
+                {
+                    b.Navigation("Tracks");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackEntity", b =>
                 {
                     b.Navigation("ReviewOrders");
 
@@ -1067,24 +1072,19 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("UserRatings");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.TrackCountry", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserAccountEntity", b =>
                 {
-                    b.Navigation("Tracks");
+                    b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.User", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserEntity", b =>
                 {
                     b.Navigation("TrackRatings");
 
                     b.Navigation("UserNicknames");
                 });
 
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserAccount", b =>
-                {
-                    b.Navigation("Transactions");
-                });
-
-            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserNickname", b =>
+            modelBuilder.Entity("Faryma.Composer.Infrastructure.Entities.UserNicknameEntity", b =>
                 {
                     b.Navigation("Account")
                         .IsRequired();
