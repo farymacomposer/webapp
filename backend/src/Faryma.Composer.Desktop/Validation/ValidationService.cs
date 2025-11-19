@@ -23,7 +23,7 @@ namespace Faryma.Composer.Desktop.Validation
 
         private Task ShowWarning(IEnumerable<string> warnings)
         {
-            return messageService.ShowWarning(warnings, new MessageOptions
+            return messageService.ShowWarnings(warnings, new MessageOptions
             {
                 Title = "Некорректные данные",
             });

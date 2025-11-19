@@ -5,9 +5,9 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
 {
     public sealed class Transaction_RW_Repository(AppDbContext context)
     {
-        public Transaction CreateDeposit(UserAccount account, decimal amount)
+        public TransactionEntity CreateDeposit(UserAccountEntity account, decimal amount)
         {
-            return context.Add(new Transaction
+            return context.Add(new TransactionEntity
             {
                 CreatedAt = DateTime.UtcNow,
                 Type = TransactionType.Deposit,
@@ -16,9 +16,9 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
             }).Entity;
         }
 
-        public Transaction CreatePayment(UserAccount account, decimal amount)
+        public TransactionEntity CreatePayment(UserAccountEntity account, decimal amount)
         {
-            return context.Add(new Transaction
+            return context.Add(new TransactionEntity
             {
                 CreatedAt = DateTime.UtcNow,
                 Type = TransactionType.Payment,

@@ -37,7 +37,7 @@ namespace Faryma.Composer.Desktop.Validation
 
         public SimpleValidator RequireUrlIfProvided(string? value, string warning)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (value is null)
             {
                 return this;
             }

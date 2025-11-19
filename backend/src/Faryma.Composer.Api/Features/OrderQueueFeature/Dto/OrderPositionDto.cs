@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Api.Shared.Dto;
-using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
+using Faryma.Composer.Application.Features.OrderQueueFeature.Models;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.Dto
 {

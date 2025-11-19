@@ -250,8 +250,7 @@
                             Title="Id выбранного стрима"
                             Content="{x:Bind ViewModel.SelectedStream.Id, Mode=OneWay, FallbackValue={x:Null}}"
                             FontSize="16"
-                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                            Style="{StaticResource RightContentAlignment}" />
+                            Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
 
                         <Button
                             Command="{x:Bind ViewModel.StartStreamCommand}"

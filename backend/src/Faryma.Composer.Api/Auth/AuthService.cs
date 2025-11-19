@@ -10,9 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Faryma.Composer.Api.Auth
 {
-    public sealed class AuthService(UserManager<User> userManager, IOptions<JwtOptions> options)
+    public sealed class AuthService(UserManager<UserEntity> userManager, IOptions<JwtOptions> options)
     {
-        public async Task<string> GenerateJwtToken(User user)
+        public async Task<string> GenerateJwtToken(UserEntity user)
         {
             List<Claim> claims =
             [

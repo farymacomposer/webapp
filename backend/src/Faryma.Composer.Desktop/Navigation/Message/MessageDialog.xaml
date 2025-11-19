@@ -10,10 +10,7 @@
             MaxWidth="1000"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            Background="{ThemeResource ContentDialogBackground}"
-            BorderBrush="{ThemeResource ContentDialogBorderBrush}"
-            BorderThickness="1"
-            CornerRadius="{ThemeResource OverlayCornerRadius}"
+            Style="{StaticResource GridOverlayDialogStyle}"
             Translation="0 0 64">
             <Grid.Shadow>
                 <ThemeShadow />
@@ -23,24 +20,37 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <StackPanel
+            <Grid
                 Padding="24"
                 Background="{ThemeResource ContentDialogTopOverlay}"
                 BorderBrush="{ThemeResource ContentDialogSeparatorBorderBrush}"
                 BorderThickness="0,0,0,1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
                 <TextBlock x:Name="Title" Style="{StaticResource SubtitleTextBlockStyle}" />
 
-                <StackPanel Padding="0,24,0,0">
-                    <TextBlock x:Name="Message" TextWrapping="WrapWholeWords" />
-                    <TextBlock x:Name="SubMessage" TextWrapping="WrapWholeWords" />
-                </StackPanel>
-            </StackPanel>
+                <ScrollView Grid.Row="1">
+                    <StackPanel Padding="0,24,0,0" Spacing="16">
 
-            <Grid Grid.Row="1" Padding="24">
+                        <TextBlock
+                            x:Name="Message"
+                            FontSize="16"
+                            TextWrapping="WrapWholeWords" />
+
+                        <TextBlock x:Name="SubMessage" TextWrapping="WrapWholeWords" />
+                    </StackPanel>
+                </ScrollView>
+            </Grid>
+
+            <Grid
+                Grid.Row="1"
+                Padding="24"
+                ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
-                    <ColumnDefinition Width="8" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
 
@@ -51,7 +61,7 @@
 
                 <Button
                     x:Name="SecondButton"
-                    Grid.Column="2"
+                    Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     Click="SecondButton_Click"
                     Style="{StaticResource AccentButtonStyle}" />

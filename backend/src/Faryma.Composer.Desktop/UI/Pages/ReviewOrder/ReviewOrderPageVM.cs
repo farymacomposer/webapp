@@ -2,62 +2,53 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Desktop.Navigation;
+using Faryma.Composer.Desktop.Services;
+using Faryma.Composer.Desktop.ViewModels;
 
 namespace Faryma.Composer.Desktop.UI
 {
-    public sealed partial class ReviewOrderPageVM(DialogService dialogService) : ObservableObject
+    public sealed partial class ReviewOrderPageVM : ObservableObject
     {
-        public ObservableCollection<ControlInfoDataGroup> Groups { get; } = new()
+        private readonly DialogService _dialogService;
+
+        public ObservableCollection<ReviewOrderGroup> ActivityGroups { get; } = [];
+
+        [ObservableProperty]
+        public partial ReviewOrderVM? SelectedReviewOrder { get; set; }
+
+        public ReviewOrderPageVM(OrderQueueService orderQueueService, DialogService dialogService)
         {
-            new ControlInfoDataGroup
+            _dialogService = dialogService;
+
+            ActivityGroups.Add(new ReviewOrderGroup
             {
-                Title = "Title1",
-                Items =
-                {
-                    new()
-                    {
-                        Title = "Title1",
-                        Subtitle = "Subtitle1"
-                    },
-                    new()
-                    {
-                        Title = "Title1",
-                        Subtitle = "Subtitle2"
-                    }
-                },
-            },
-            new ControlInfoDataGroup
+                Title = "Активные",
+                Orders = orderQueueService.ActiveOrders,
+            });
+
+            ActivityGroups.Add(new ReviewOrderGroup
             {
-                Title = "Title2",
-                Items =
-                {
-                    new()
-                    {
-                        Title = "Title2",
-                        Subtitle = "Subtitle3"
-                    },
-                    new()
-                    {
-                        Title = "Title2",
-                        Subtitle = "Subtitle4"
-                    }
-                },
-            }
-        };
+                Title = "Выполненные",
+                Orders = orderQueueService.CompletedOrders,
+            });
+
+            ActivityGroups.Add(new ReviewOrderGroup
+            {
+                Title = "Замороженные",
+                Orders = orderQueueService.FrozenOrders,
+            });
+
+            ActivityGroups.Add(new ReviewOrderGroup
+            {
+                Title = "Запланированные",
+                Orders = orderQueueService.ScheduledOrders,
+            });
+        }
 
         [RelayCommand]
-        private Task OpenCreateReviewOrderDialog() => dialogService.ShowDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
-    }
+        private Task OpenCreateReviewOrder() => _dialogService.ShowDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
 
-    public sealed partial class ControlInfoDataGroup : ObservableObject
-    {
-        public required string Title { get; set; }
-        public ObservableCollection<ControlInfoDataItem> Items { get; } = [];
-    }
-
-    public sealed partial class ControlInfoDataItem : ObservableObject
-    {
-        public required string Title { get; set; }
-        public required string Subtitle { get; set; }
+        [RelayCommand]
+        private void SelectReviewOrder(ReviewOrderVM reviewOrder) => SelectedReviewOrder = reviewOrder;
     }
 }

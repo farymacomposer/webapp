@@ -4,12 +4,12 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
 {
     public sealed class Review_RW_Repository(AppDbContext context)
     {
-        public Review Create(
-            ReviewOrder inProgressOrder,
+        public ReviewEntity Create(
+            ReviewOrderEntity inProgressOrder,
             int rating,
             DateTime createdAt)
         {
-            return context.Reviews.Add(new Review
+            return context.Reviews.Add(new ReviewEntity
             {
                 ReviewOrder = inProgressOrder,
                 RatingValue = rating,

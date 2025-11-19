@@ -4,28 +4,61 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Faryma.Composer.Desktop.UI"
+    xmlns:vm="using:Faryma.Composer.Desktop.ViewModels"
     xmlns:wuxdata="using:Microsoft.UI.Xaml.Data">
     <Page.Resources>
 
-        <CollectionViewSource
-            x:Name="cvsGroups"
-            IsSourceGrouped="True"
-            ItemsPath="Items"
-            Source="{x:Bind ViewModel.Groups}" />
+        <local:BindingProxy x:Key="BindingProxy" ViewModel="{x:Bind ViewModel}" />
 
-        <DataTemplate x:Key="ZoomedInTemplate" x:DataType="local:ControlInfoDataItem">
-            <StackPanel MinWidth="200" Margin="12,6,12,6">
-                <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="{x:Bind Title}" />
-                <TextBlock
-                    Width="300"
-                    HorizontalAlignment="Left"
-                    Style="{StaticResource BodyTextBlockStyle}"
-                    Text="{x:Bind Subtitle}"
-                    TextWrapping="Wrap" />
-            </StackPanel>
+        <Style
+            x:Key="ButtonReviewOrderCommand"
+            BasedOn="{StaticResource AccentButtonStyle}"
+            TargetType="Button">
+            <Setter Property="Width" Value="150" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+        </Style>
+
+        <CollectionViewSource
+            x:Name="ActivityGroups"
+            IsSourceGrouped="True"
+            ItemsPath="Orders"
+            Source="{x:Bind ViewModel.ActivityGroups}" />
+
+        <DataTemplate x:Key="ZoomedInTemplate" x:DataType="vm:ReviewOrderVM">
+            <Button
+                Margin="0,2"
+                HorizontalAlignment="Stretch"
+                Command="{Binding ViewModel.SelectReviewOrderCommand, Source={StaticResource BindingProxy}, Mode=OneTime}"
+                CommandParameter="{x:Bind}"
+                Style="{StaticResource ButtonFlatStyle}">
+                <Grid Style="{StaticResource GridCardStyle}">
+
+                    <StackPanel HorizontalAlignment="Left" Spacing="8">
+
+                        <Grid Width="200">
+                            <Border
+                                Background="{x:Bind MainNickname, Converter={StaticResource StringHashHighlightConverter}}"
+                                CornerRadius="4"
+                                Opacity="0.2" />
+                            <TextBox IsReadOnly="True" Text="{x:Bind MainNickname}" />
+                        </Grid>
+
+                        <HyperlinkButton
+                            x:Name="TrackUrl"
+                            x:Load="{x:Bind HasTrackUrl}"
+                            Content="{x:Bind TrackUrl}"
+                            NavigateUri="{Binding TrackUrl, Mode=OneTime}" />
+                    </StackPanel>
+
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Text="{x:Bind Id}" />
+                </Grid>
+            </Button>
         </DataTemplate>
 
-        <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="local:ControlInfoDataGroup">
+        <DataTemplate x:Key="ZoomedInGroupHeaderTemplate" x:DataType="vm:ReviewOrderGroup">
             <TextBlock
                 Foreground="{ThemeResource ApplicationForegroundThemeBrush}"
                 Style="{StaticResource SubtitleTextBlockStyle}"
@@ -33,30 +66,23 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ZoomedOutTemplate" x:DataType="wuxdata:ICollectionViewGroup">
-            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ((local:ControlInfoDataGroup)Group).Title}" />
+            <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind ((vm:ReviewOrderGroup)Group).Title}" />
         </DataTemplate>
     </Page.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
 
-        <StackPanel
-            Padding="6,4"
-            Orientation="Horizontal"
-            Spacing="4">
-            <Button Command="{x:Bind ViewModel.OpenCreateReviewOrderDialogCommand}" Content="Создать заказ" />
-            <Button Content="Найти заказ" />
-        </StackPanel>
+    <Grid Margin="20,27,36,36" ColumnSpacing="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
 
-        <SemanticZoom x:Name="Control1" Grid.Row="1">
+        <SemanticZoom x:Name="SemanticZoomControl" Width="1020">
             <SemanticZoom.ZoomedInView>
                 <ListView
                     GotFocus="List_GotFocus"
                     ItemTemplate="{StaticResource ZoomedInTemplate}"
-                    ItemsSource="{x:Bind cvsGroups.View}"
+                    ItemsSource="{x:Bind ActivityGroups.View}"
                     ScrollViewer.IsHorizontalScrollChainingEnabled="False"
                     SelectionMode="None">
                     <ListView.GroupStyle>
@@ -68,9 +94,113 @@
                 <ListView
                     GotFocus="List_GotFocus"
                     ItemTemplate="{StaticResource ZoomedOutTemplate}"
-                    ItemsSource="{x:Bind cvsGroups.View.CollectionGroups}"
+                    ItemsSource="{x:Bind ActivityGroups.View.CollectionGroups}"
                     SelectionMode="None" />
             </SemanticZoom.ZoomedOutView>
         </SemanticZoom>
+
+        <StackPanel
+            Grid.Column="1"
+            Width="500"
+            Margin="0,40,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Spacing="16">
+
+            <StackPanel Style="{StaticResource StackPanelCardStyle}">
+
+                <Button
+                    Command="{x:Bind ViewModel.OpenCreateReviewOrderCommand}"
+                    Content="Создать заказ"
+                    Style="{StaticResource ButtonReviewOrderCommand}" />
+
+                <Button Content="Найти заказ" Style="{StaticResource ButtonReviewOrderCommand}" />
+            </StackPanel>
+
+            <StackPanel Style="{StaticResource StackPanelCardStyle}">
+
+                <local:TitledContentRow Title="Id заказа">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.Id, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Создание заказа">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.CreatedAt, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Взятие заказа в работу">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.InProgressAt, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Выполнение заказа">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.CompletedAt, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Тип заказа">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.Type, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Тип категории заказа">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.CategoryType, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Статус заказа">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.Status, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Заказ заморожен">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.IsFrozen, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Ссылка на трек">
+                    <HyperlinkButton Content="{x:Bind ViewModel.SelectedReviewOrder.TrackUrl, Mode=OneWay, FallbackValue={x:Null}}" NavigateUri="{Binding ViewModel.SelectedReviewOrder.TrackUrl, Mode=OneWay, Source={StaticResource BindingProxy}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Комментарий пользователя">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.UserComment, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Общая стоимость заказа">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.TotalAmount, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Позиция заказа в очереди">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.QueueIndex, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Статус активности заказа">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.ActivityStatus, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Тип категории заказа">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.CurrentCategoryType, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Номер долговой категории">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.CategoryDebtIndex, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Id стрима где создан заказ">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.StreamId, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Дата проведения стрима">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.StreamEventDate, Mode=OneWay, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Статус стрима">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.StreamStatus, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <local:TitledContentRow Title="Тип стрима">
+                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.StreamType, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
+                </local:TitledContentRow>
+
+                <Button Content="Добавить или заменить ссылку на трек" Style="{StaticResource ButtonReviewOrderCommand}" />
+
+                <Button Content="Отменить заказ" Style="{StaticResource ButtonReviewOrderCommand}" />
+
+                <Button Content="Заморозить заказ" Style="{StaticResource ButtonReviewOrderCommand}" />
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>

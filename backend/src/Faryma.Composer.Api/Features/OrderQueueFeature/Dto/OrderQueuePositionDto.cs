@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
+﻿using Faryma.Composer.Application.Features.OrderQueueFeature.Enums;
+using Faryma.Composer.Application.Features.OrderQueueFeature.Models;
 using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.Dto

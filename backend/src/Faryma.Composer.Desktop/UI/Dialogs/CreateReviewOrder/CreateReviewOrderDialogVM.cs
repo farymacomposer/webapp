@@ -12,7 +12,8 @@ namespace Faryma.Composer.Desktop.UI
         ReviewOrderHttpClient reviewOrderHttpClient,
         MessageService messageService,
         ValidationService validationService,
-        DialogService dialogService) : DialogVM(dialogService)
+        DialogService dialogService
+        ) : DialogVM(dialogService)
     {
         private Guid _idempotencyKey;
 
@@ -79,9 +80,9 @@ namespace Faryma.Composer.Desktop.UI
             {
                 Nickname = Nickname,
                 OrderType = OrderType,
-                TrackUrl = TrackUrl,
+                TrackUrl = string.IsNullOrWhiteSpace(TrackUrl) ? null : TrackUrl,
                 PaymentAmount = paymentAmount,
-                UserComment = UserComment,
+                UserComment = string.IsNullOrWhiteSpace(UserComment) ? null : UserComment,
             };
 
             if (await validationService.Check(request))

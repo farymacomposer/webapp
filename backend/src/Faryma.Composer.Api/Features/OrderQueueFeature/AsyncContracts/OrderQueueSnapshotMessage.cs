@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Api.Features.OrderQueueFeature.Dto;
-using Faryma.Composer.Core.Features.OrderQueueFeature;
-using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Core.Features.OrderQueueFeature.Models;
+using Faryma.Composer.Application.Features.OrderQueueFeature;
+using Faryma.Composer.Application.Features.OrderQueueFeature.Enums;
+using Faryma.Composer.Application.Features.OrderQueueFeature.Models;
 
 namespace Faryma.Composer.Api.Features.OrderQueueFeature.AsyncContracts
 {

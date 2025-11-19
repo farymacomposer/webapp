@@ -17,12 +17,12 @@
             </Grid.RowDefinitions>
 
             <TitleBar
-                x:Name="titleBar"
+                x:Name="TitleBarControl"
                 IsPaneToggleButtonVisible="True"
                 PaneToggleRequested="TitleBar_PaneToggleRequested" />
 
             <NavigationView
-                x:Name="navView"
+                x:Name="NavigationViewControl"
                 Grid.Row="1"
                 IsBackButtonVisible="Collapsed"
                 IsPaneToggleButtonVisible="False"

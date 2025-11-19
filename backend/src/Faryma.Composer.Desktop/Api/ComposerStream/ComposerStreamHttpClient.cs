@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Faryma.Composer.Desktop.Api.ComposerStream.Responses;
 using Faryma.Composer.Desktop.Api.Exceptions;
 using Faryma.Composer.Desktop.Api.Shared.Dto;
@@ -9,13 +8,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace Faryma.Composer.Desktop.Api.ComposerStream
 {
-    public sealed class ComposerStreamHttpClient(HttpClient httpClient)
+    public sealed class ComposerStreamHttpClient(HttpClient httpClient, JsonSerializerOptions serializerOptions)
     {
-        private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web)
-        {
-            Converters = { new JsonStringEnumConverter() }
-        };
-
         public async Task<IEnumerable<ComposerStreamDto>> Find(DateOnly dateFrom, DateOnly dateTo)
         {
             QueryString queryBuilder = QueryString.Empty
@@ -24,14 +18,16 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
 
             string url = $"/api/ComposerStream/FindStreams{queryBuilder}";
 
-            StreamsResponse response = (await httpClient.GetFromJsonAsync<StreamsResponse>(url, _serializerOptions))!;
+            StreamsResponse response = await httpClient.GetFromJsonAsync<StreamsResponse>(url, serializerOptions)
+                ?? throw new InvalidOperationException("Не удалось десериализовать StreamResponse");
 
             return response.Streams;
         }
 
         public async Task<IEnumerable<ComposerStreamDto>> FindLiveAndPlanned()
         {
-            StreamsResponse response = (await httpClient.GetFromJsonAsync<StreamsResponse>("/api/ComposerStream/FindLiveAndPlanned", _serializerOptions))!;
+            StreamsResponse response = await httpClient.GetFromJsonAsync<StreamsResponse>("/api/ComposerStream/FindLiveAndPlanned", serializerOptions)
+                ?? throw new InvalidOperationException("Не удалось десериализовать StreamResponse");
 
             return response.Streams;
         }
@@ -59,30 +55,14 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
 
         private async Task<ComposerStreamDto> Post<T>(string requestUri, T request)
         {
-            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync(requestUri, request, _serializerOptions);
+            HttpResponseMessage responseMessage = await httpClient.PostAsJsonAsync(requestUri, request, serializerOptions);
 
-            try
-            {
-                responseMessage.EnsureSuccessStatusCode();
+            await ApiExceptionHelper.EnsureSuccessStatusCode(responseMessage);
 
-                StreamResponse response = await responseMessage.Content.ReadFromJsonAsync<StreamResponse>(_serializerOptions)
-                    ?? throw new InvalidOperationException();
+            StreamResponse response = await responseMessage.Content.ReadFromJsonAsync<StreamResponse>(serializerOptions)
+                ?? throw new InvalidOperationException("Не удалось десериализовать StreamResponse");
 
-                return response.ComposerStream;
-            }
-            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 600)
-            {
-                ResultObject result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>()
-                    ?? throw new InvalidOperationException();
-
-                throw new ApiException(result, ex);
-            }
-            catch (Exception ex)
-            {
-                string message = await responseMessage.Content.ReadAsStringAsync();
-
-                throw new(message, ex);
-            }
+            return response.ComposerStream;
         }
     }
 }

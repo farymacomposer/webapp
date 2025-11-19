@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Faryma.Composer.Core.Features.OrderQueueFeature.Enums;
+using Faryma.Composer.Application.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
 using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.UI;
@@ -59,6 +59,11 @@ namespace Faryma.Composer.Desktop.ViewModels
         public string? TrackUrl { get; } = dto.TrackUrl;
 
         /// <summary>
+        /// Есть ссылка на трек
+        /// </summary>
+        public bool HasTrackUrl => TrackUrl is not null;
+
+        /// <summary>
         /// Комментарий пользователя
         /// </summary>
         public string? UserComment { get; } = dto.UserComment;
@@ -94,7 +99,7 @@ namespace Faryma.Composer.Desktop.ViewModels
         public int CategoryDebtIndex { get; } = currentPosition.CategoryDebtIndex;
 
         /// <summary>
-        /// Id стрима
+        /// Id стрима где создан заказ
         /// </summary>
         public long StreamId { get; } = dto.CreationStream.Id;
 

@@ -12,8 +12,9 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
         {
-            string? connectionString = ConnectionStringHelper.Get(configuration);
-            services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(connectionString));
+            string? connectionString = DbContextHelper.GetConnectionString(configuration);
+
+            services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(connectionString, npgOptions => npgOptions.MapEnum()));
 
             services
                 .AddDataProtection()

@@ -9,13 +9,13 @@ namespace Faryma.Composer.Desktop.UI
             nameof(Spacing),
             typeof(double),
             typeof(TitledContentRow),
-            new PropertyMetadata(0.0));
+            new PropertyMetadata(16.0));
 
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
             nameof(Title),
             typeof(string),
             typeof(TitledContentRow),
-            null);
+            new PropertyMetadata(null));
 
         public double Spacing
         {

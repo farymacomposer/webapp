@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <RootNamespace>Faryma.Composer.Desktop</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -30,9 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\CategoryState.cs" Link="Api\OrderQueue\Enums\CategoryState.cs" />
-    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderActivityStatus.cs" Link="Api\OrderQueue\Enums\OrderActivityStatus.cs" />
-    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" Link="Api\OrderQueue\Enums\OrderQueueUpdateType.cs" />
+    <Compile Include="..\Faryma.Composer.Application\Features\OrderQueueFeature\Enums\CategoryState.cs" Link="Api\OrderQueue\Enums\CategoryState.cs" />
+    <Compile Include="..\Faryma.Composer.Application\Features\OrderQueueFeature\Enums\OrderActivityStatus.cs" Link="Api\OrderQueue\Enums\OrderActivityStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Application\Features\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" Link="Api\OrderQueue\Enums\OrderQueueUpdateType.cs" />
     <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamStatus.cs" Link="Api\Shared\Enums\ComposerStreamStatus.cs" />
     <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamType.cs" Link="Api\Shared\Enums\ComposerStreamType.cs" />
     <Compile Include="..\Faryma.Composer.Infrastructure\Enums\OrderCategoryType.cs" Link="Api\Shared\Enums\OrderCategoryType.cs" />
@@ -66,11 +66,11 @@
     <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.250402" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.10" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251003001" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
     <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />

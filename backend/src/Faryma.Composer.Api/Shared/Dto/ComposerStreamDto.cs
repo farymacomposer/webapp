@@ -38,7 +38,7 @@ namespace Faryma.Composer.Api.Shared.Dto
         /// </summary>
         public required DateTime? CompletedAt { get; init; }
 
-        public static ComposerStreamDto Map(ComposerStream item)
+        public static ComposerStreamDto Map(ComposerStreamEntity item)
         {
             return new()
             {

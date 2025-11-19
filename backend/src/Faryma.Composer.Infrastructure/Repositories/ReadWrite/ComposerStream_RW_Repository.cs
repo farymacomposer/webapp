@@ -7,9 +7,9 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
 {
     public sealed class ComposerStream_RW_Repository(AppDbContext context)
     {
-        public ComposerStream Create(DateOnly eventDate, ComposerStreamType type)
+        public ComposerStreamEntity Create(DateOnly eventDate, ComposerStreamType type)
         {
-            return context.Add(new ComposerStream
+            return context.Add(new ComposerStreamEntity
             {
                 EventDate = eventDate,
                 Status = ComposerStreamStatus.Planned,
@@ -17,12 +17,12 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
             }).Entity;
         }
 
-        public async Task<ComposerStream> Get(long id) => await context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id)
+        public async Task<ComposerStreamEntity> Get(long id) => await context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id)
             ?? throw new NotFoundException("Стрим не существует", id);
 
-        public Task<ComposerStream?> FindLive() => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
+        public Task<ComposerStreamEntity?> FindLive() => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
 
-        public Task<ComposerStream?> FindNearest(DateOnly date)
+        public Task<ComposerStreamEntity?> FindNearest(DateOnly date)
         {
             return context.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live
@@ -31,7 +31,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
                 .FirstOrDefaultAsync();
         }
 
-        public Task<ComposerStream?> FindNearest(DateOnly date, ComposerStreamType type)
+        public Task<ComposerStreamEntity?> FindNearest(DateOnly date, ComposerStreamType type)
         {
             return context.ComposerStreams
                 .Where(x => x.Type == type

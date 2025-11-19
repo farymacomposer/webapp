@@ -2,9 +2,9 @@
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
-using Faryma.Composer.Core.DependencyInjection;
-using Faryma.Composer.Core.Features.AppSettings;
-using Faryma.Composer.Core.Features.OrderQueueFeature;
+using Faryma.Composer.Application.DependencyInjection;
+using Faryma.Composer.Application.Features.AppSettings;
+using Faryma.Composer.Application.Features.OrderQueueFeature;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
