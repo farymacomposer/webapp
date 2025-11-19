@@ -18,7 +18,7 @@ import type { RequestArgs } from "./base";
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import { RequiredError } from "./base";
 
-export const DUMMY_BASE_URL = 'http://farymacomposer-webapp-ebdd.twc1.net:8080'
+export const DUMMY_BASE_URL = 'localhost:8080'
 
 /**
  *
