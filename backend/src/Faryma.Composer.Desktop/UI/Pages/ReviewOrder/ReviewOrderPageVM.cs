@@ -13,6 +13,9 @@ namespace Faryma.Composer.Desktop.UI
 
         public ObservableCollection<ReviewOrderGroup> ActivityGroups { get; } = [];
 
+        [ObservableProperty]
+        public partial ReviewOrderVM? SelectedReviewOrder { get; set; }
+
         public ReviewOrderPageVM(OrderQueueService orderQueueService, DialogService dialogService)
         {
             _dialogService = dialogService;
@@ -44,5 +47,8 @@ namespace Faryma.Composer.Desktop.UI
 
         [RelayCommand]
         private Task OpenCreateReviewOrder() => _dialogService.ShowDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
+
+        [RelayCommand]
+        private void SelectReviewOrder(ReviewOrderVM reviewOrder) => SelectedReviewOrder = reviewOrder;
     }
 }

@@ -99,7 +99,7 @@ namespace Faryma.Composer.Desktop.ViewModels
         public int CategoryDebtIndex { get; } = currentPosition.CategoryDebtIndex;
 
         /// <summary>
-        /// Id стрима
+        /// Id стрима где создан заказ
         /// </summary>
         public long StreamId { get; } = dto.CreationStream.Id;
 
