@@ -43,7 +43,7 @@ namespace Faryma.Composer.Desktop.UI
         [NotifyCanExecuteChangedFor(nameof(CancelStreamCommand))]
         public partial ComposerStreamVM? SelectedStream { get; set; }
 
-        public bool CanCreateStream => SelectedStream is null && SelectedDate >= DateOnly.FromDateTime(DateTime.UtcNow);
+        public bool CanCreateStream => SelectedStream is null && SelectedDate >= DateOnly.FromDateTime(DateTime.Now);
         public bool CanStartStream => SelectedStream?.Status == ComposerStreamStatus.Planned;
         public bool CanCompleteStream => SelectedStream?.Status == ComposerStreamStatus.Live;
         public bool CanCancelStream => SelectedStream?.Status == ComposerStreamStatus.Planned;
@@ -116,6 +116,7 @@ namespace Faryma.Composer.Desktop.UI
         {
             ComposerStreamDto dto = await task;
             SelectedStream = new ComposerStreamVM(dto);
+
             if (Days.FirstOrDefault(x => x.Date == dto.EventDate) is ComposerStreamDaySlotVM daySlot)
             {
                 daySlot.Stream = SelectedStream;

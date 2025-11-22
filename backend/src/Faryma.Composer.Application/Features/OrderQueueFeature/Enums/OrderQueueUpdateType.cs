@@ -11,7 +11,7 @@
         Unspecified = 0,
 
         /// <summary>
-        /// Заказ был добавлен
+        /// Был создан заказ
         /// </summary>
         OrderCreated = 1,
 
