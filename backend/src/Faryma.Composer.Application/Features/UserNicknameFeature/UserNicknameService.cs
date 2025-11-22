@@ -7,12 +7,12 @@ namespace Faryma.Composer.Application.Features.UserNicknameFeature
     {
         public async Task<UserNicknameEntity> GetOrCreate(string nickname)
         {
-            UserNicknameEntity? result = await uow.UserNickname_RW.Find(nickname);
+            UserNicknameEntity? result = await uow.UserNicknameWrite.Find(nickname);
 
             if (result is null)
             {
-                result = uow.UserNickname_RW.Create(nickname);
-                uow.UserAccount_RW.Create(result);
+                result = uow.UserNicknameWrite.Create(nickname);
+                uow.UserAccountWrite.Create(result);
                 await uow.SaveChangesAsync();
             }
 

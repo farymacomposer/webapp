@@ -46,7 +46,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
         /// <summary>
         /// Обновляет заказы
         /// </summary>
-        public OrderPosition[] UpdateOrders(ReviewOrderEntity[] orders)
+        public OrderPosition[] UpdateOrders(IEnumerable<ReviewOrderEntity> orders)
         {
             SaveCurrentPositionsToPrevious();
 

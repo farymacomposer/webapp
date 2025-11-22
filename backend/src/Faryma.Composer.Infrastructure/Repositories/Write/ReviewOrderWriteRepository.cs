@@ -3,9 +3,9 @@ using Faryma.Composer.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
+namespace Faryma.Composer.Infrastructure.Repositories.Write
 {
-    public sealed class ReviewOrder_RW_Repository(AppDbContext context)
+    public sealed class ReviewOrderWriteRepository(AppDbContext context)
     {
         public async Task<ReviewOrderEntity> Get(long id) => await Find(id)
             ?? throw new NotFoundException("Заказ разбора трека не существует", id);

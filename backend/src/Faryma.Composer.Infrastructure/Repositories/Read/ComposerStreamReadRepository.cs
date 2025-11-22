@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Repositories.Read
 {
-    public sealed class ComposerStream_R_Repository(AppDbContext context)
+    public sealed class ComposerStreamReadRepository(AppDbContext context)
     {
-        public Task<ComposerStreamEntity[]> Find(DateOnly dateFrom, DateOnly dateTo)
+        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo)
         {
             return context.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.EventDate >= dateFrom && x.EventDate <= dateTo)
-                .ToArrayAsync();
+                .ToListAsync();
         }
 
         public Task<ComposerStreamEntity?> FindLive()
@@ -31,7 +31,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                 .FirstOrDefaultAsync();
         }
 
-        public Task<ComposerStreamEntity[]> FindLiveAndPlanned()
+        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned()
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
@@ -39,7 +39,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                 .AsNoTracking()
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
-                .ToArrayAsync();
+                .ToListAsync();
         }
 
         public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate()

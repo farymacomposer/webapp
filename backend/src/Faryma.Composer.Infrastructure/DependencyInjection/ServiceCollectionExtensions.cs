@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Infrastructure.QueryServices;
 using Faryma.Composer.Infrastructure.Repositories.Read;
-using Faryma.Composer.Infrastructure.Repositories.ReadWrite;
+using Faryma.Composer.Infrastructure.Repositories.Write;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,16 +23,16 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
             services
                 .AddScoped<UnitOfWork>()
 
-                .AddScoped<ComposerStream_R_Repository>()
-                .AddScoped<ReviewOrder_R_Repository>()
-                .AddScoped<UserNickname_R_Repository>()
+                .AddScoped<ComposerStreamReadRepository>()
+                .AddScoped<ReviewOrderReadRepository>()
+                .AddScoped<UserNicknameReadRepository>()
 
-                .AddScoped<ComposerStream_RW_Repository>()
-                .AddScoped<Review_RW_Repository>()
-                .AddScoped<ReviewOrder_RW_Repository>()
-                .AddScoped<Transaction_RW_Repository>()
-                .AddScoped<UserAccount_RW_Repository>()
-                .AddScoped<UserNickname_RW_Repository>();
+                .AddScoped<ComposerStreamWriteRepository>()
+                .AddScoped<ReviewWriteRepository>()
+                .AddScoped<ReviewOrderWriteRepository>()
+                .AddScoped<TransactionWriteRepository>()
+                .AddScoped<UserAccountWriteRepository>()
+                .AddScoped<UserNicknameWriteRepository>();
 
             services
                 .AddScoped<TrackQueryService>();

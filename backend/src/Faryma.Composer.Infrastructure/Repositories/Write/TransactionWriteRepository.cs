@@ -1,9 +1,9 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Enums;
 
-namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
+namespace Faryma.Composer.Infrastructure.Repositories.Write
 {
-    public sealed class Transaction_RW_Repository(AppDbContext context)
+    public sealed class TransactionWriteRepository(AppDbContext context)
     {
         public TransactionEntity CreateDeposit(UserAccountEntity account, decimal amount)
         {

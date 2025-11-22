@@ -26,7 +26,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [HttpGet(nameof(FindStreams))]
         public async Task<ActionResult<FindStreamsResponse>> FindStreams([FromQuery] FindStreamsRequest request)
         {
-            ComposerStreamEntity[] streams = await composerStreamService.Find(request.DateFrom, request.DateTo);
+            List<ComposerStreamEntity> streams = await composerStreamService.Find(request.DateFrom, request.DateTo);
 
             return Ok(new FindStreamsResponse
             {
@@ -40,7 +40,7 @@ namespace Faryma.Composer.Api.Features.ComposerStreamFeature
         [HttpGet(nameof(FindLiveAndPlanned))]
         public async Task<ActionResult<FindLiveAndPlannedStreamsResponse>> FindLiveAndPlanned()
         {
-            ComposerStreamEntity[] streams = await composerStreamService.FindLiveAndPlanned();
+            List<ComposerStreamEntity> streams = await composerStreamService.FindLiveAndPlanned();
 
             return Ok(new FindLiveAndPlannedStreamsResponse
             {

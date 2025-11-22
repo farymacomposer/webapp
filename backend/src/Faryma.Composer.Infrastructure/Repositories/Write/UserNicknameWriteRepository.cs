@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
+namespace Faryma.Composer.Infrastructure.Repositories.Write
 {
-    public sealed class UserNickname_RW_Repository(AppDbContext context, ILookupNormalizer normalizer)
+    public sealed class UserNicknameWriteRepository(AppDbContext context, ILookupNormalizer normalizer)
     {
         public UserNicknameEntity Create(string nickname)
         {

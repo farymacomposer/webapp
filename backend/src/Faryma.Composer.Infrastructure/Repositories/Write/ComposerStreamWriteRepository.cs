@@ -3,9 +3,9 @@ using Faryma.Composer.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
+namespace Faryma.Composer.Infrastructure.Repositories.Write
 {
-    public sealed class ComposerStream_RW_Repository(AppDbContext context)
+    public sealed class ComposerStreamWriteRepository(AppDbContext context)
     {
         public ComposerStreamEntity Create(DateOnly eventDate, ComposerStreamType type)
         {
