@@ -52,7 +52,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
             _outOfQueueCategory.SetLastIssuedNickname(state.LastOutOfQueueNickname);
             _outOfQueueCategory.UpdateOrdersCategory(queueManager, OrderCategoryType.OutOfQueue);
 
-            List<(DateOnly StreamDate, OrderCategory Category)> categories = queueManager.OrderPositionsById
+            List<(DateOnly StreamDate, OrderCategory Category)> activeOrderCategories = queueManager.OrderPositionsById
                 .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen
                     && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
@@ -63,9 +63,9 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
                 .OrderBy(x => x.Key)
                 .ToList();
 
-            if (categories.Count > 0)
+            if (activeOrderCategories.Count > 0)
             {
-                foreach ((DateOnly streamDate, OrderCategory category) in categories)
+                foreach ((DateOnly streamDate, OrderCategory category) in activeOrderCategories)
                 {
                     if (state.LastNicknamesByStreamDate.TryGetValue(streamDate, out string? nickname))
                     {
@@ -73,16 +73,16 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorit
                     }
                 }
 
-                (DateOnly StreamDate, OrderCategory Category) item = categories.Last();
+                (DateOnly StreamDate, OrderCategory Category) item = activeOrderCategories.Last();
                 if (item.StreamDate == queueManager.NearestStreamDate)
                 {
-                    categories.Remove(item);
+                    activeOrderCategories.Remove(item);
                     _donationCategory = item.Category;
                     _donationCategory.UpdateOrdersCategory(queueManager, OrderCategoryType.Donation);
                 }
             }
 
-            _debtCategories = new DebtOrderCategories(queueManager, categories);
+            _debtCategories = new DebtOrderCategories(queueManager, activeOrderCategories);
         }
 
         /// <summary>

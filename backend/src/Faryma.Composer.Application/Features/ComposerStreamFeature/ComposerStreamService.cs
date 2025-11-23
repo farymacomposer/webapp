@@ -20,6 +20,8 @@ namespace Faryma.Composer.Application.Features.ComposerStreamFeature
                 ComposerStreamEntity stream = uow.ComposerStreamWrite.Create(command.EventDate, command.Type);
                 await uow.SaveChangesAsync();
 
+                await orderQueueService.CreateStream(stream);
+
                 return stream;
             }
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
@@ -31,6 +33,7 @@ namespace Faryma.Composer.Application.Features.ComposerStreamFeature
         public async Task<ComposerStreamEntity> Start(long composerStreamId)
         {
             // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
+
             ComposerStreamEntity stream = await uow.ComposerStreamWrite.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Live)
             {
@@ -89,6 +92,8 @@ namespace Faryma.Composer.Application.Features.ComposerStreamFeature
 
         public async Task<ComposerStreamEntity> Cancel(long composerStreamId)
         {
+            // TODO: отмена только если нет заказов на этот стрим
+
             ComposerStreamEntity stream = await uow.ComposerStreamWrite.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Canceled)
             {
@@ -103,6 +108,8 @@ namespace Faryma.Composer.Application.Features.ComposerStreamFeature
             stream.Status = ComposerStreamStatus.Canceled;
 
             await uow.SaveChangesAsync();
+
+            await orderQueueService.CancelStream();
 
             return stream;
         }

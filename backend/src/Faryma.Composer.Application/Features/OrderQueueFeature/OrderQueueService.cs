@@ -27,9 +27,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
             ReviewOrderReadRepository reviewOrderRead = new(context);
             ComposerStreamReadRepository composerStreamRead = new(context);
 
-            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
-
-            ComposerStreamEntity? nearestStream = await composerStreamRead.FindNearest(today);
+            ComposerStreamEntity? nearestStream = await composerStreamRead.FindNearest();
             ReviewOrderEntity? lastTakenOrder = await reviewOrderRead.FindLastTaken();
             ReviewOrderEntity? lastTakenDebt = await reviewOrderRead.FindLastTakenDebt();
             ReviewOrderEntity? lastTakenOutOfQueue = await reviewOrderRead.FindLastTakenOutOfQueue();
@@ -38,7 +36,7 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
 
             _queueManager = new OrderQueueManager
             {
-                NearestStreamDate = nearestStream?.EventDate ?? today,
+                NearestStreamDate = nearestStream?.EventDate ?? DateOnly.MinValue,
                 OrderPositionsById = orders.ToDictionary(k => k.Id, OrderPosition.Create),
                 PriorityManagerState = new OrderPriorityManagerState
                 {
@@ -107,6 +105,22 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
             await notificationService.NotifyQueueUpdated(snapshot);
         });
 
+        public Task CreateStream(ComposerStreamEntity stream) => _locker.Lock(async () =>
+        {
+            _syncVersion++;
+
+            _queueManager.NearestStreamDate = stream.EventDate;
+
+            OrderQueueSnapshot snapshot = new()
+            {
+                SyncVersion = _syncVersion,
+                OrderQueueUpdateType = OrderQueueUpdateType.StreamCreated,
+                Positions = _queueManager.UpdateOrders(),
+            };
+
+            await notificationService.NotifyQueueUpdated(snapshot);
+        });
+
         public Task StartStream(ComposerStreamEntity stream) => _locker.Lock(async () =>
         {
             _syncVersion++;
@@ -133,11 +147,8 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
 
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
             ComposerStreamReadRepository composerStreamRead = new(context);
-            ComposerStreamEntity? nearestStream = await composerStreamRead.FindNearest(stream.EventDate);
-            if (nearestStream is not null)
-            {
-                _queueManager.NearestStreamDate = nearestStream.EventDate;
-            }
+            ComposerStreamEntity? nearestStream = await composerStreamRead.FindNearest();
+            _queueManager.NearestStreamDate = nearestStream?.EventDate ?? DateOnly.MinValue;
 
             ReviewOrderReadRepository reviewOrderRead = new(context);
             List<ReviewOrderEntity> orders = await reviewOrderRead.GetOrdersToCompleteStream(stream.Id);
@@ -147,6 +158,25 @@ namespace Faryma.Composer.Application.Features.OrderQueueFeature
                 SyncVersion = _syncVersion,
                 OrderQueueUpdateType = OrderQueueUpdateType.StreamCompleted,
                 Positions = _queueManager.UpdateOrders(orders),
+            };
+
+            await notificationService.NotifyQueueUpdated(snapshot);
+        });
+
+        public Task CancelStream() => _locker.Lock(async () =>
+        {
+            _syncVersion++;
+
+            await using AppDbContext context = await contextFactory.CreateDbContextAsync();
+            ComposerStreamReadRepository composerStreamRead = new(context);
+            ComposerStreamEntity? nearestStream = await composerStreamRead.FindNearest();
+            _queueManager.NearestStreamDate = nearestStream?.EventDate ?? DateOnly.MinValue;
+
+            OrderQueueSnapshot snapshot = new()
+            {
+                SyncVersion = _syncVersion,
+                OrderQueueUpdateType = OrderQueueUpdateType.StreamCanceled,
+                Positions = _queueManager.UpdateOrders(),
             };
 
             await notificationService.NotifyQueueUpdated(snapshot);

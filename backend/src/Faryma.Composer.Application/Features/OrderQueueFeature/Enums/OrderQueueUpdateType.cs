@@ -51,13 +51,23 @@
         OrderCanceled = 8,
 
         /// <summary>
+        /// Был создан стрим
+        /// </summary>
+        StreamCreated = 9,
+
+        /// <summary>
         /// Стрим был запущен
         /// </summary>
-        StreamStarted = 9,
+        StreamStarted = 10,
 
         /// <summary>
         /// Стрим был завершен
         /// </summary>
-        StreamCompleted = 10,
+        StreamCompleted = 11,
+
+        /// <summary>
+        /// Стрим был отменен
+        /// </summary>
+        StreamCanceled = 12,
     }
 }

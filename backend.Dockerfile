@@ -15,8 +15,9 @@ RUN dotnet publish "Faryma.Composer.Api.csproj" -c Release -o /app/publish /p:Us
 # Migration bundle stage
 FROM build AS migrations
 WORKDIR "/src/src/Faryma.Composer.MigrationsBundle"
-RUN dotnet new tool-manifest && \
-    dotnet tool install dotnet-ef -v d --version 9.0.* && \
+RUN dotnet restore "Faryma.Composer.MigrationsBundle.csproj" && \
+    dotnet new tool-manifest && \
+    dotnet tool install dotnet-ef -v d --version 10.0.* && \
     dotnet ef migrations bundle -v --self-contained -r linux-x64 -o /app/migrations-bundle && \
     chmod +x /app/migrations-bundle
 

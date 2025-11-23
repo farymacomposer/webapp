@@ -21,12 +21,14 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                 .FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
         }
 
-        public Task<ComposerStreamEntity?> FindNearest(DateOnly date)
+        public Task<ComposerStreamEntity?> FindNearest()
         {
+            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+
             return context.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.Status == ComposerStreamStatus.Live
-                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= date))
+                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
                 .OrderBy(x => x.EventDate)
                 .FirstOrDefaultAsync();
         }
