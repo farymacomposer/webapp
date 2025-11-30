@@ -6,12 +6,16 @@ export const metadata = {
   description: "Composer & Streamer site",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body className="bg-black text-white min-h-screen flex flex-col">
+      <body>
         <Header />
-        <main className="flex-1 w-full">{children}</main>
+        <main>{children}</main>
       </body>
     </html>
   );

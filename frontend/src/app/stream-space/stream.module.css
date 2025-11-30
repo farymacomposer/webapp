@@ -1,35 +1,129 @@
-.page {
-  position: relative;
+body {
   display: flex;
-  flex-direction: row;
-  width: 100%;
-  height: calc(100vh - 64px);
-  background: #000;
+  flex-direction: column;
+  height: 100dvh;
   overflow: hidden;
 }
 
-.videoContainer {
-  flex: 1;
-  height: 100%;
-  background: #000;
-  margin-right: 8px; 
+body>header {
+  flex-shrink: 0;
 }
 
-.videoContainer iframe {
+body>main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.page {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+}
+
+.layout {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.videoSection {
+  flex: 1;
+  position: relative;
+  background: #000;
+  height: 100%;
+  overflow: hidden;
+}
+
+.videoSection iframe {
+  width: 100%;
+  height: calc(100% - 70px);
+  width: calc(100% - 40px);
   border: none;
+  display: block;
+}
+
+.queue {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  z-index: 3;
+  background: transparent;
 }
 
 .chatContainer {
-  width: 400px;
+  flex-shrink: 0;
+  width: 300px;
   height: 100%;
-  background: #0f0f10;
-  border-left: 1px solid #222;
+  display: flex;
+  overflow: hidden;
 }
 
 .chatContainer iframe {
   width: 100%;
   height: 100%;
   border: none;
+  display: block;
+}
+
+
+.queueWrapper {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  width: 90%;
+  z-index: 3;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s ease;
+  opacity: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+
+.queueVisible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+  margin-bottom: 70px;
+}
+
+.queueHidden {
+  transform: translateX(-50%) translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggleQueueBtn {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 5;
+}
+
+.toggleQueueBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.toggleQueueBtn:active {
+  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.35);
 }

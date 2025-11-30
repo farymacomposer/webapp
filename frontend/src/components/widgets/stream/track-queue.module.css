@@ -1,0 +1,124 @@
+.activeTrack {
+    background: #a6a6a6;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    position: relative;
+    transform: scale(1.05);
+}
+
+.cover {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.coverWrapper {
+    height: 70%;
+    position: relative;
+    width: 100%;
+}
+
+.info {
+    align-items: center;
+    background: #2a2a2a;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 30%;
+    justify-content: center;
+    overflow: hidden;
+    padding: 4px;
+    text-align: center;
+    width: 100%;
+}
+
+.nickname {
+    color: #aaa;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.platformIcon {
+    align-items: center;
+    background: none;
+    border: none;
+    bottom: 6px;
+    box-shadow: none;
+    display: flex;
+    height: 28px;
+    justify-content: center;
+    position: absolute;
+    right: 6px;
+    transition: transform 0.2s ease;
+    width: 28px;
+}
+
+.platformIcon:hover {
+    transform: scale(1.15);
+}
+
+.platformImage {
+    filter: none;
+    height: 24px;
+    object-fit: contain;
+    width: 24px;
+}
+
+.queue {
+    align-items: flex-end;
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+}
+
+.queue .trackCard:first-child {
+    margin-right: 40px;
+    /* регулируй значение по вкусу */
+}
+
+.title {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+/* верхняя подпись */
+.topLabel {
+    background: rgba(85, 85, 85, 0.9);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    width: 100%;
+}
+
+.trackCard {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    background: #8f8f8f;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    transform-origin: center bottom;
+    z-index: 1;
+}
+
+.trackCard:hover {
+    background: #333;
+    transform: translateY(-4px);
+}

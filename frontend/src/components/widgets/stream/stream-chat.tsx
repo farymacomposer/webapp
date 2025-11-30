@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 interface StreamChatProps {
   channel: string;
@@ -12,7 +12,7 @@ export const StreamChat: React.FC<StreamChatProps> = ({ channel }) => {
   useEffect(() => {
     if (!iframeRef.current) return;
 
-    iframeRef.current.src = `https://www.twitch.tv/embed/${channel}/chat?parent=${window.location.hostname}`;
+    iframeRef.current.src = `https://www.twitch.tv/embed/${channel}/chat?parent=${window.location.hostname}&theme=dark`;
   }, [channel]);
 
   return (
