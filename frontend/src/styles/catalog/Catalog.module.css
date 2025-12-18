@@ -1,0 +1,140 @@
+.modalOverlay {
+    position: fixed;
+    z-index: 50;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.modalContainer {
+    background: #18181B;
+    width: 100%;
+    max-width: 50vw;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    overflow: hidden;
+}
+
+.tracksContainer {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #333 #1a1a1a;
+    padding-right: 20px;
+}
+
+.tracksContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tracksContainer::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.tracksContainer::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+.statusSection {
+    padding: 0;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 45px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sectionTitle {
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    min-width: 6rem;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: default;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status colors */
+.sectionTitle.distributed {
+    background: var(--color-category-new);
+}
+
+.sectionTitle.on_air {
+    background: var(--color-category-next-up);
+}
+
+.sectionTitle.delivered {
+    background: var(--color-category-finished);
+}
+
+.sectionTitle.upcoming {
+    background: var(--color-category-future);
+}
+
+.sectionTitle.frozen {
+    background: var(--color-category-frozen);
+}
+
+/* Wave colors */
+.sectionTitle.new {
+    background: var(--color-category-new);
+}
+
+.sectionTitle.wave_blue {
+    background: var(--color-category-finished);
+}
+
+.sectionTitle.wave_purple {
+    background: var(--color-category-future);
+}
+
+.sectionTitle.wave_pink {
+    background: var(--color-wave-2);
+}
+
+.moreCount {
+    color: #888;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 4px 8px;
+}
+
+.moreCount:hover {
+    color: #aaa;
+}
+
+.moreCount svg {
+    width: 16px;
+    height: 16px;
+}
+
+.tracksList {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0 20px 0 0;
+}

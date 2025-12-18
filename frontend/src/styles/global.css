@@ -14,6 +14,25 @@
     --color-header: #FFF5EB;
     /* Colors */
     --color-secondary: #FFA448;
+    --color-secondary-2: #7700FF;
+    --color-primary: #18181B;
+    /* waves */
+    --color-wave-1: #EB7003;
+    --color-wave-2: #E10741;
+    --color-wave-3: #C9006E;
+    --color-wave-4: #B000B9;
+    --color-wave-5: #8801BC;
+    --color-wave-6: #6500BE;
+    --color-wave-7: #3900BE;
+    --color-wave-8: #1C2ACD;
+    --color-wave-9: #0151DB;
+    --color-wave-10: #0171DB;
+    /* categories */
+    --color-category-new: var(--color-wave-2);
+    --color-category-next-up: var(--color-wave-1);
+    --color-category-finished: var(--color-wave-9);
+    --color-category-future: var(--color-wave-5);
+    --color-category-frozen: #4E4C55;
 }
 
 body {

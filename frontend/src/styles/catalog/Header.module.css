@@ -1,0 +1,147 @@
+.modalHeader {
+    padding: 16px 40px;
+    background: #0B0B0B;
+}
+
+.headerTop {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.trackCount {
+    color: #fff;
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+.statusTabs {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    gap: 8px;
+    padding-left: 25px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+}
+
+.statusTabs::-webkit-scrollbar {
+    display: none;
+}
+
+.statusTab {
+    width: 100%;
+    background: #333;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Inactive state */
+.statusTab.inactive {
+    background: #2a2a2a;
+    color: #888;
+}
+
+/* Active status colors */
+.statusTab.distributed.active {
+    background: var(--color-category-new);
+}
+
+.statusTab.on_air.active {
+    background: var(--color-category-next-up);
+}
+
+.statusTab.delivered.active {
+    background: var(--color-category-finished);
+}
+
+.statusTab.upcoming.active {
+    background: var(--color-category-future);
+}
+
+.statusTab.frozen.active {
+    background: var(--color-category-frozen);
+}
+
+/* Active wave colors */
+.statusTab.new.active {
+    background: var(--color-wave-1);
+}
+
+.statusTab.wave_blue.active {
+    background: var(--color-wave-9);
+}
+
+.statusTab.wave_purple.active {
+    background: var(--color-wave-5);
+}
+
+.statusTab.wave_pink.active {
+    background: var(--color-wave-2);
+}
+
+.statusTab:hover {
+    opacity: 0.85;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 40px 16px 40px;
+    background: #0B0B0B;
+    align-items: center;
+}
+
+.viewTabs {
+    display: flex;
+    gap: 0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.viewTab {
+    background: transparent;
+    padding: 4px 14px;
+    color: #888;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    border-radius: 6px;
+    border: 1px solid transparent;
+}
+
+.viewTab.active {
+    border: 1px solid var(--color-wave-1);
+    color: #fff;
+}
+
+.searchInput {
+    height: 16px;
+    min-width: 100px;
+    width: 23%;
+    background: #212126;
+    padding: 3px 11px 3px 14px;
+    border-radius: 8px;
+    border-color: transparent;
+    color: #fff;
+    font-size: 13px;
+}
+
+.searchInput:focus {
+    outline: none;
+    color: #fff;
+    background: #333;
+}
