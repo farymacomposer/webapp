@@ -95,24 +95,39 @@
 
 /* Wave colors */
 .sectionTitle.new {
-    background: var(--color-category-new);
+    background: var(--color-wave-1);
 }
-
-.sectionTitle.wave_blue {
-    background: var(--color-category-finished);
-}
-
-.sectionTitle.wave_purple {
-    background: var(--color-category-future);
-}
-
-.sectionTitle.wave_pink {
+.sectionTitle.wave2 {
     background: var(--color-wave-2);
+}
+.sectionTitle.wave3 {
+    background: var(--color-wave-3);
+}
+.sectionTitle.wave4 {
+    background: var(--color-wave-4);
+}
+.sectionTitle.wave5 {
+    background: var(--color-wave-5);
+}
+.sectionTitle.wave6 {
+    background: var(--color-wave-6);
+}
+.sectionTitle.wave7 {
+    background: var(--color-wave-7);
+}
+.sectionTitle.wave8 {
+    background: var(--color-wave-8);
+}
+.sectionTitle.wave9 {
+    background: var(--color-wave-9);
+}
+.sectionTitle.wave10 {
+    background: var(--color-wave-10);
 }
 
 .moreCount {
-    color: #888;
-    font-size: 12px;
+    color: #fff;
+    font-size: 14px;
     display: flex;
     align-items: center;
     gap: 6px;

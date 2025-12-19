@@ -30,22 +30,24 @@ const OrderQueue: React.FC<{hideWindow: (arg: boolean) => void}> = ( {hideWindow
     const containerRef = useRef<HTMLDivElement>(null);
 
     const tracks: Track[] = [
-        { id: 1, title: 'Queen - Bohemian Rhapsody', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/1a1a1a/ffffff?text=Q', status: 'distributed', wave: 'new', time: 'вне очереди' },
-        { id: 2, title: 'әt ək ON táɪtn', artist: 'TakaoYamataki', source: 'https://via.placeholder.com/80x80/4a90e2/ffffff?text=AT', status: 'on-air', wave: 'new', price: '2600₽', time: '~30 минут', isFavorite: true },
-        { id: 3, title: 'Imagine Dragons', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/1a1a1a/ffffff?text=ID', status: 'on-air', wave: 'wave10', price: '1900₽', time: '~10 минут' },
-        { id: 4, title: 'Genshin Theme', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/f4a460/ffffff?text=ST', status: 'on-air', wave: 'wave10', price: '1666₽', time: '~10 минут', isFavorite: true, isNotified: true },
-        { id: 5, title: 'Bad Romance', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=BR', status: 'delivered', wave: 'wave10', price: '1200₽', time: '~10 минут', isFavorite: true, hasVideo: true },
-        { id: 6, title: 'Track 6', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=6', status: 'delivered', wave: 'wave9', price: '1111₽', time: '~10 минут', hasVideo: true },
-        { id: 7, title: 'Track 7', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=7', status: 'delivered', wave: 'wave9', price: '1111₽', time: '~10 минут', hasVideo: true },
-        { id: 8, title: 'Track 8', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=8', status: 'delivered', wave: 'wave8', price: '1111₽', time: '~10 минут', hasVideo: true },
-        { id: 9, title: 'Track 9', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=9', status: 'delivered', wave: 'wave8', price: '1111₽', time: '~10 минут', hasVideo: true },
-        { id: 10, title: 'Track 10', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=10', status: 'upcoming', wave: 'wave7', price: '1100₽', time: '~10 минут', isFavorite: true, hasVideo: true },
-        { id: 14, title: 'Frozen Song', artist: 'Ice Queen', source: 'https://via.placeholder.com/80x80/404040/ffffff?text=F', status: 'frozen', wave: 'wave5', price: '800₽', time: 'заморожено', hasVideo: false },
-        { id: 15, title: 'Cold as Ice', artist: 'Winter Soul', source: 'https://via.placeholder.com/80x80/404040/ffffff?text=C', status: 'frozen', wave: 'wave4', price: '900₽', time: 'заморожено', isFavorite: true }
+        { id: 1, title: 'Queen - Bohemian Rhapsody', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/1a1a1a/ffffff?text=Q', status: 'distributed', wave: 'new', price: '2000₽', time: 'вне очереди' },
+        { id: 2, title: 'Cold as Ice', artist: 'Winter Soul', source: 'https://via.placeholder.com/80x80/404040/ffffff?text=C', status: 'on-air', wave: 'wave3', price: '900₽', time: '~5 минут', isFavorite: true },
+        { id: 3, title: 'әt ək ON táɪtn', artist: 'TakaoYamataki', source: 'https://via.placeholder.com/80x80/4a90e2/ffffff?text=AT', status: 'on-air', wave: 'new', price: 'вне очереди', time: 'вне очереди', isFavorite: true },
+        { id: 4, title: 'Imagine Dragons', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/1a1a1a/ffffff?text=ID', status: 'on-air', wave: 'wave10', price: '1900₽', time: '~10 минут' },
+        { id: 5, title: 'Genshin Theme', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/f4a460/ffffff?text=ST', status: 'on-air', wave: 'wave10', price: '1666₽', time: '~10 минут', isFavorite: true, isNotified: true },
+        { id: 6, title: 'Bad Romance', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=BR', status: 'delivered', wave: 'wave10', price: '1200₽', time: '~10 минут', isFavorite: true, hasVideo: true },
+        { id: 7, title: 'Track 6', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=6', status: 'delivered', wave: 'wave9', price: '1111₽', time: '~10 минут', hasVideo: true },
+        { id: 8, title: 'Track 7', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=7', status: 'delivered', wave: 'wave9', price: '1111₽', time: '~10 минут', hasVideo: true },
+        { id: 9, title: 'Track 8', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=8', status: 'delivered', wave: 'wave8', price: '1111₽', time: '~10 минут', hasVideo: true },
+        { id: 10, title: 'Track 9', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=9', status: 'delivered', wave: 'wave8', price: '1111₽', time: '~10 минут', hasVideo: true },
+        { id: 11, title: 'Track 10', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=10', status: 'upcoming', wave: 'wave7', price: '1100₽', time: '~10 минут', isFavorite: true, hasVideo: true },
+        { id: 12, title: 'Track 9', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/9b59b6/ffffff?text=9', status: 'delivered', wave: 'wave6', price: '12111₽', time: '~25 минут', hasVideo: true },
+        { id: 13, title: 'Frozen Song', artist: 'Ice Queen', source: 'https://via.placeholder.com/80x80/404040/ffffff?text=F', status: 'frozen', wave: 'wave5', price: '800₽', time: 'заморожено', hasVideo: false },
+        { id: 14, title: 'Genshin Theme', artist: 'Static Stream', source: 'https://via.placeholder.com/80x80/f4a460/ffffff?text=ST', status: 'on-air', wave: 'wave4', price: '1696₽', time: '~5 минут', isFavorite: true, isNotified: true },
     ];
 
     const statusOrder = ['distributed', 'on-air', 'delivered', 'upcoming', 'frozen'];
-    const waveOrder = ['new', 'wave10', 'wave9', 'wave8', 'wave7', 'wave6', 'wave5', 'wave4', 'wave3', 'wave2'];
+    const waveOrder = ['new', 'wave10', 'wave9', 'wave8', 'wave7', 'wave6', 'wave5', 'wave4', 'wave3', 'wave2', 'wave1'];
 
     const getGroupLabel = (key: string, type: 'status' | 'wave') => {
         if (type === 'status') {
@@ -82,10 +84,7 @@ const OrderQueue: React.FC<{hideWindow: (arg: boolean) => void}> = ( {hideWindow
         if (activeTab === 'order') {
             return key.replace('-', '_'); // distributed, on_air, etc.
         } else {
-            if (key === 'new') return 'new';
-            if (['wave10', 'wave9', 'wave8'].includes(key)) return 'wave_blue';
-            if (['wave7', 'wave6', 'wave5', 'wave4'].includes(key)) return 'wave_purple';
-            return 'wave_pink';
+            return key;
         }
     };
 
@@ -207,7 +206,11 @@ const OrderQueue: React.FC<{hideWindow: (arg: boolean) => void}> = ( {hideWindow
                             <div
                                 key={key}
                                 className={catalog.statusSection}
-                                ref={el => sectionRefs.current[key] = el}
+                                ref={el => {
+                                    if (el) {
+                                        sectionRefs.current[key] = el
+                                    }
+                                }}
                             >
                                 <div className={catalog.sectionHeader}>
                                     <button className={`${catalog.sectionTitle} ${catalog[getColorClass(key)]}`}>
@@ -219,7 +222,7 @@ const OrderQueue: React.FC<{hideWindow: (arg: boolean) => void}> = ( {hideWindow
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                                 <path d="M7 10l5 5 5-5z"/>
                                             </svg>
-                                            ещё {hiddenCount}
+                                            ещё {hiddenCount} треков
                                         </button>
                                     )}
                                     {isExpanded && hiddenCount > 0 && (

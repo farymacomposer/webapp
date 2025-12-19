@@ -78,16 +78,32 @@
     background: var(--color-wave-1);
 }
 
-.statusTab.wave_blue.active {
-    background: var(--color-wave-9);
+.statusTab.wave2.active {
+    background: var(--color-wave-2);
 }
-
-.statusTab.wave_purple.active {
+.statusTab.wave3.active {
+    background: var(--color-wave-3);
+}
+.statusTab.wave4.active {
+    background: var(--color-wave-4);
+}
+.statusTab.wave5.active {
     background: var(--color-wave-5);
 }
-
-.statusTab.wave_pink.active {
-    background: var(--color-wave-2);
+.statusTab.wave6.active {
+    background: var(--color-wave-6);
+}
+.statusTab.wave7.active {
+    background: var(--color-wave-7);
+}
+.statusTab.wave8.active {
+    background: var(--color-wave-8);
+}
+.statusTab.wave9.active {
+    background: var(--color-wave-9);
+}
+.statusTab.wave10.active {
+    background: var(--color-wave-10);
 }
 
 .statusTab:hover {
