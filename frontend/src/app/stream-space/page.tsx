@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { StreamVideo } from "@/components/widgets/stream/stream-video";
 import { StreamChat } from "@/components/widgets/stream/stream-chat";
 import { Queue, QueueItem } from "@/components/widgets/stream/track-queue";
@@ -8,7 +8,6 @@ import styles from "./stream.module.css";
 
 export default function StreamPage() {
   const channel = "farymacomposer";
-  const [showQueue, setShowQueue] = useState(false);
 
   const initial: QueueItem[] = [
     {
@@ -26,7 +25,7 @@ export default function StreamPage() {
     {
       id: "3",
       label: "W2",
-      labelColor: "#9b59b6",
+      labelColor: "#7e3ff2",
       title: "Queen - Bohemian Rhapsody",
     },
     {
@@ -44,35 +43,51 @@ export default function StreamPage() {
     },
   ];
 
-  const [activeId, setActiveId] = useState<string | undefined>("1");
+  const [queueItems, setQueueItems] = useState<QueueItem[]>(initial);
+  const [activeId, setActiveId] = useState<string | undefined>(initial[0]?.id);
+
+  useEffect(() => {
+    if (!queueItems.length) {
+      setActiveId(undefined);
+      return;
+    }
+
+    if (activeId && !queueItems.some((item) => item.id === activeId)) {
+      setActiveId(queueItems[0].id);
+    }
+  }, [activeId, queueItems]);
+
+  const displayItems = useMemo(() => {
+    return queueItems.map((item, index) =>
+      index === 0
+        ? {
+            ...item,
+            label: "NOW",
+            labelColor: "#ff2d6f",
+          }
+        : item
+    );
+  }, [queueItems]);
 
   return (
     <main className={styles.page}>
       <div className={styles.layout}>
-        <div className={styles.videoSection}>
-          <StreamVideo channel={channel} />
-          <div
-            className={`${styles.queueWrapper} ${
-              showQueue ? styles.queueVisible : styles.queueHidden
-            }`}
-          >
+        <section className={styles.mainColumn}>
+          <div className={styles.videoSection}>
+            <StreamVideo channel={channel} />
+          </div>
+
+          <div className={styles.queueSection}>
             <Queue
-              items={initial}
+              items={displayItems}
               activeId={activeId}
-              onSelect={(id) => {
-                setActiveId(id);
-                // здесь потом легко дернуть SignalR:
-                // hubConnection.invoke("SelectTrack", id);
-              }}
+              onSelect={(id) =>
+                setActiveId((prev) => (prev === id ? undefined : id))
+              }
             />
           </div>
-          <button
-            className={styles.toggleQueueBtn}
-            onClick={() => setShowQueue(!showQueue)}
-          >
-            {showQueue ? "Скрыть очередь" : "Показать очередь"}
-          </button>
-        </div>
+        </section>
+
         <aside className={styles.chatContainer}>
           <StreamChat channel={channel} />
         </aside>

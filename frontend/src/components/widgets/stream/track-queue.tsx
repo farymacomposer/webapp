@@ -5,8 +5,8 @@ import styles from "./track-queue.module.css";
 
 export type QueueItem = {
   id: string;
-  label: string;      // NOW / NEW / W2 / W3
-  labelColor: string; // пока используем только для превью и первой полоски
+  label: string;
+  labelColor: string;
   title: string;
 
   previewCoverUrl?: string;
@@ -19,6 +19,7 @@ type QueueProps = {
   items: QueueItem[];
   activeId?: string;
   onSelect?: (id: string) => void;
+  onAdd?: () => void;
   className?: string;
 };
 
@@ -26,94 +27,112 @@ export const Queue: React.FC<QueueProps> = ({
   items,
   activeId,
   onSelect,
+  onAdd,
   className,
 }) => {
   return (
-    <div className={`${styles.root} ${className ?? ""}`}>
-      <div className={styles.list}>
+    <div
+      className={[styles.root, className ?? ""].filter(Boolean).join(" ")}
+    >
+      {activeId && <div className={styles.backdrop} aria-hidden="true" />}
+      <button
+        type="button"
+        className={styles.addCard}
+        onClick={onAdd}
+        aria-label="Добавить трек"
+      >
+        +
+      </button>
+      <div className={styles.list} role="listbox" aria-label="Очередь треков">
         {items.map((item, index) => {
           const isFirst = index === 0;
           const isActive = item.id === activeId;
 
           const accentStyle: CSSProperties = {
-            // пригодится для первой полоски и превью
             ["--accent-color" as any]: item.labelColor,
           };
 
           return (
-            <button
-              key={item.id}
-              type="button"
-              className={[
-                styles.card,
-                isFirst ? styles.cardFirst : "",
-                isActive ? styles.cardActive : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              onClick={() => onSelect?.(item.id)}
-              style={accentStyle}
-            >
-              {/* таб NOW / NEW / W2 / W3 — фон берём из CSS (чёрный) */}
-              <div className={styles.tab}>
-                <div className={styles.colorTop}></div>
-                <div className={styles.colorLeft}></div>
-                <div className={styles.tabInner}>{item.label}</div>
-              </div>
-
-              <div className={styles.pointer} />
-
-              <div className={styles.body}>
-                <span className={styles.title}>{item.title}</span>
-              </div>
-
-              {(item.previewCoverUrl || item.previewActions) && (
-                <div className={styles.preview}>
-                  <div className={styles.previewHeader}>
-                    <div className={styles.previewActions}>
-                      {item.previewActions}
-                    </div>
-
-                    {(item.label || item.previewPrice) && (
-                      <div className={styles.previewMeta}>
-                        {item.label && (
-                          <span
-                            className={styles.previewTag}
-                            style={{ backgroundColor: item.labelColor }}
-                          >
-                            {item.label}
-                          </span>
-                        )}
-                        {item.previewPrice && (
-                          <span className={styles.previewPrice}>
-                            {item.previewPrice}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {item.previewCoverUrl && (
-                    <div className={styles.previewImageWrapper}>
-                      <img
-                        src={item.previewCoverUrl}
-                        alt={item.title}
-                        className={styles.previewImage}
-                      />
-                    </div>
-                  )}
-
-                  <div className={styles.previewInfo}>
-                    <div className={styles.previewTitle}>{item.title}</div>
-                    {item.previewArtist && (
-                      <div className={styles.previewArtist}>
-                        от {item.previewArtist}
-                      </div>
-                    )}
-                  </div>
+            <React.Fragment key={item.id}>
+              {!isFirst && (
+                <div className={styles.separator} aria-hidden="true">
+                  <span className={styles.chevron} />
                 </div>
               )}
-            </button>
+              <div
+                className={[
+                  styles.card,
+                  isFirst ? styles.cardFirst : "",
+                  isActive ? styles.cardActive : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                style={accentStyle}
+                role="option"
+                aria-selected={isActive}
+                tabIndex={0}
+                onClick={() => onSelect?.(item.id)}
+              >
+                <div className={styles.cardInner}>
+                  <div className={styles.headerRow}>
+                    <div className={styles.tags}>
+                      <span className={styles.tag}>{item.label}</span>
+                    </div>
+
+                    <div className={styles.body}>
+                      <span className={styles.title}>{item.title}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {isActive && (
+                  <div
+                    className={styles.preview}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className={styles.previewHeader}>
+                      <div className={styles.previewActions}>
+                        {item.previewActions ?? (
+                          <>
+                            <span className={styles.actionDot} />
+                            <span className={styles.actionDot} />
+                            <span className={styles.actionDot} />
+                            <span className={styles.actionDot} />
+                          </>
+                        )}
+                      </div>
+                      {item.previewPrice && (
+                        <span className={styles.previewPrice}>
+                          {item.previewPrice}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className={styles.previewBody}>
+                      <div className={styles.previewCover}>
+                        {item.previewCoverUrl && (
+                          <img
+                            src={item.previewCoverUrl}
+                            alt={item.title}
+                            className={styles.previewCoverImg}
+                          />
+                        )}
+                      </div>
+                      <div className={styles.previewMeta}>
+                        <span className={styles.previewTitle}>
+                          {item.title}
+                        </span>
+                        {item.previewArtist && (
+                          <span className={styles.previewArtist}>
+                            {item.previewArtist}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </React.Fragment>
           );
         })}
       </div>
