@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
 using Faryma.Composer.Api.Features.OrderQueue;
-using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Api.Features.Track;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Infrastructure.Entities;

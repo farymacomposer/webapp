@@ -2,7 +2,6 @@
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueue;
-using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
