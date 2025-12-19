@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Application.Features.OrderQueueFeature;
+﻿using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.ComposerStream;
 using Faryma.Composer.Contracts.Application.Features.ComposerStream.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;

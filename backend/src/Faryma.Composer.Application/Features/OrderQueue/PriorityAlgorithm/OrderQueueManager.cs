@@ -4,7 +4,7 @@ using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
-namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorithm
+namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
 {
     /// <summary>
     /// Управляет очередью заказов

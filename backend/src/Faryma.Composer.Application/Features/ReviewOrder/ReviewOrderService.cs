@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Application.Features.AppSettings;
-using Faryma.Composer.Application.Features.OrderQueueFeature;
-using Faryma.Composer.Application.Features.UserNicknameFeature;
+using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Application.Features.UserNickname;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder;
@@ -9,7 +9,7 @@ using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure;
 
-namespace Faryma.Composer.Application.Features.ReviewOrderFeature
+namespace Faryma.Composer.Application.Features.ReviewOrder
 {
     public sealed class ReviewOrderService(
         UnitOfWork uow,

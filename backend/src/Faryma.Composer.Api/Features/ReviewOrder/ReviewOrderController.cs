@@ -1,5 +1,5 @@
 ﻿using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Application.Features.ReviewOrderFeature;
+using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.AddTrackUrl;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Cancel;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Complete;
@@ -15,7 +15,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Faryma.Composer.Api.Features.ReviewOrderFeature
+namespace Faryma.Composer.Api.Features.ReviewOrder
 {
     /// <summary>
     /// Управление заказами разборов треков

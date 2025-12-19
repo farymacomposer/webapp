@@ -1,7 +1,7 @@
 ﻿# nullable disable
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 
-namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorithm
+namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
 {
     /// <summary>
     /// Базовая приоритезация для заказов, по сумме и по дате

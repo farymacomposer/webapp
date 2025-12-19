@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure;
 
-namespace Faryma.Composer.Application.Features.UserNicknameFeature
+namespace Faryma.Composer.Application.Features.UserNickname
 {
     public sealed class UserNicknameService(UnitOfWork uow)
     {

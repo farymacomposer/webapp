@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Application.Features.OrderQueueFeature;
+﻿using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Microsoft.AspNetCore.SignalR;

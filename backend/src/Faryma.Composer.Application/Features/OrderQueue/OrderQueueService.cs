@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorithm;
+﻿using Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm;
 using Faryma.Composer.Application.Utils;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
@@ -9,7 +9,7 @@ using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Repositories.Read;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Application.Features.OrderQueueFeature
+namespace Faryma.Composer.Application.Features.OrderQueue
 {
     public sealed class OrderQueueService(IDbContextFactory<AppDbContext> contextFactory, IOrderQueueNotificationService notificationService)
     {

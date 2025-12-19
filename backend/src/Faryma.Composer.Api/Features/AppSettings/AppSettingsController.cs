@@ -5,7 +5,7 @@ using Faryma.Composer.Contracts.Application.Features.AppSettings;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Faryma.Composer.Api.Features.AppSettingsFeature
+namespace Faryma.Composer.Api.Features.AppSettings
 {
     /// <summary>
     /// Управление настройками приложения

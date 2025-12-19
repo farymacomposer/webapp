@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Application.Features.OrderQueueFeature.Enums;
+﻿using Faryma.Composer.Application.Features.OrderQueue.Enums;
 
 namespace Faryma.Composer.Desktop.Api.OrderQueue.Dto
 {

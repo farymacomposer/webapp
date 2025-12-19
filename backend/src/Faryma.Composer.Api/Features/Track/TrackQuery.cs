@@ -2,7 +2,8 @@
 using Faryma.Composer.Infrastructure.QueryServices;
 using HotChocolate.Data;
 
-namespace Faryma.Composer.Api.Features.TrackFeature
+namespace Faryma.Composer.Api.Features.Track
+
 {
     public sealed class TrackQuery
     {
