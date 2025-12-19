@@ -1,20 +1,17 @@
 ﻿using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
-using Saunter.Attributes;
 
 namespace Faryma.Composer.Contracts.Api.Features.OrderQueue
 {
     public interface IOrderQueueNotificationClient
     {
-        [Channel(nameof(ReceiveSnapshot), Servers = new[] { IOrderQueueNotificationServer.HubServerName })]
-        [PublishOperation(
-            typeof(OrderQueueSnapshotMessage),
-            Description = "Передача полного снимка очереди")]
+        /// <summary>
+        /// Передача полного снимка очереди
+        /// </summary>
         Task ReceiveSnapshot(OrderQueueSnapshotMessage message);
 
-        [Channel(nameof(ReceiveUpdated), Servers = new[] { IOrderQueueNotificationServer.HubServerName })]
-        [PublishOperation(
-            typeof(OrderQueueUpdatedEvent),
-            Description = "Инкрементальные обновления очереди")]
+        /// <summary>
+        /// Инкрементальные обновления очереди
+        /// </summary>
         Task ReceiveUpdated(OrderQueueUpdatedEvent @event);
     }
 }

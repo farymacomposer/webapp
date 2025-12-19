@@ -1,11 +1,11 @@
 ﻿using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
-using Faryma.Composer.Api.Features.OrderQueueFeature;
+using Faryma.Composer.Api.Features.OrderQueue;
+using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueueFeature;
-using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
@@ -59,7 +59,7 @@ namespace Faryma.Composer.Api
 
             app.MapControllers();
             app.MapGraphQL();
-            app.MapHub<OrderQueueNotificationHub>(IOrderQueueNotificationServer.RoutePattern);
+            app.MapHub<OrderQueueNotificationHub>(IServer.RoutePattern);
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();

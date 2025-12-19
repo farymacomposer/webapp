@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-    <PackageReference Include="Saunter" Version="0.13.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.1" />
   </ItemGroup>
 
 </Project>

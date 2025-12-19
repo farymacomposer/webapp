@@ -1,14 +1,13 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueueFeature;
-using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Microsoft.AspNetCore.SignalR;
 using Saunter.Attributes;
 
-namespace Faryma.Composer.Api.Features.OrderQueueFeature
+namespace Faryma.Composer.Api.Features.OrderQueue
 {
     [AsyncApi]
-    public sealed class OrderQueueNotificationHub(OrderQueueService orderQueueService) : Hub<IOrderQueueNotificationClient>, IOrderQueueNotificationServer
+    public sealed class OrderQueueNotificationHub(OrderQueueService orderQueueService) : Hub<IClient>, IServer
     {
         public override Task OnConnectedAsync() => GetSnapshot();
 
