@@ -14,7 +14,7 @@ using Serilog.Events;
 
 namespace Faryma.Composer.Desktop
 {
-    public partial class App : Microsoft.UI.Xaml.Application
+    public partial class App : Application
     {
         public const string BaseAddress = "https://localhost:7166";
 

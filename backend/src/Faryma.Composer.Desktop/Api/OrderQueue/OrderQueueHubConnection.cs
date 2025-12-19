@@ -9,7 +9,7 @@ namespace Faryma.Composer.Desktop.Api.OrderQueue
     public sealed class OrderQueueHubConnection : IOrderQueueNotificationServer
     {
         private readonly HubConnection _signalrClient = new HubConnectionBuilder()
-            .WithUrl($"{App.BaseAddress}/api/OrderQueueNotificationHub")
+            .WithUrl(App.BaseAddress + IOrderQueueNotificationServer.RoutePattern)
             .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
             .WithAutomaticReconnect()
             .Build();
