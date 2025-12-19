@@ -19,13 +19,13 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Тип стрима
         /// </summary>
-        [Column(TypeName = DbEnumHelper.ComposerStreamTypeEnum)]
+        [Column(TypeName = DbEnumConst.ComposerStreamTypeEnum)]
         public required ComposerStreamType Type { get; set; }
 
         /// <summary>
         /// Статус стрима
         /// </summary>
-        [Column(TypeName = DbEnumHelper.ComposerStreamStatusEnum)]
+        [Column(TypeName = DbEnumConst.ComposerStreamStatusEnum)]
         public required ComposerStreamStatus Status { get; set; }
 
         /// <summary>

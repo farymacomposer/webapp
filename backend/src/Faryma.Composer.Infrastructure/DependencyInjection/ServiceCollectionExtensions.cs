@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure;
-using Faryma.Composer.Infrastructure.QueryServices;
+﻿using Faryma.Composer.Infrastructure.QueryServices;
 using Faryma.Composer.Infrastructure.Repositories.Read;
 using Faryma.Composer.Infrastructure.Repositories.Write;
 using Microsoft.AspNetCore.DataProtection;

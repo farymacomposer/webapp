@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -78,7 +77,7 @@ namespace Faryma.Composer.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.HasDefaultSchema(DbEnumHelper.SchemaName);
+            builder.HasDefaultSchema(DbContextHelper.SchemaName);
             base.OnModelCreating(builder);
 
             builder.HasPostgresEnum();

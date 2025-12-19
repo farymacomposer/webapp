@@ -39,19 +39,19 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Тип заказа
         /// </summary>
-        [Column(TypeName = DbEnumHelper.ReviewOrderTypeEnum)]
+        [Column(TypeName = DbEnumConst.ReviewOrderTypeEnum)]
         public required ReviewOrderType Type { get; set; }
 
         /// <summary>
         /// Статус заказа
         /// </summary>
-        [Column(TypeName = DbEnumHelper.ReviewOrderStatusEnum)]
+        [Column(TypeName = DbEnumConst.ReviewOrderStatusEnum)]
         public required ReviewOrderStatus Status { get; set; }
 
         /// <summary>
         /// Тип категории заказа
         /// </summary>
-        [Column(TypeName = DbEnumHelper.OrderCategoryTypeEnum)]
+        [Column(TypeName = DbEnumConst.OrderCategoryTypeEnum)]
         public required OrderCategoryType CategoryType { get; set; }
 
         /// <summary>

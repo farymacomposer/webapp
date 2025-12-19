@@ -17,7 +17,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Тип операции
         /// </summary>
-        [Column(TypeName = DbEnumHelper.TransactionTypeEnum)]
+        [Column(TypeName = DbEnumConst.TransactionTypeEnum)]
         public required TransactionType Type { get; set; }
 
         /// <summary>
