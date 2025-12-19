@@ -1,13 +1,14 @@
 ﻿using Bogus;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.MoveUp;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Desktop.Api.ComposerStream;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
-using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
-using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.Services;
 using Faryma.Composer.Desktop.ViewModels;
-using Faryma.Composer.Contracts.Enums;
 
 namespace Faryma.Composer.Desktop.UI
 {

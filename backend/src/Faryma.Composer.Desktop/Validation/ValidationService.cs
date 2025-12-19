@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
+﻿using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Desktop.Navigation;
-using Faryma.Composer.Contracts.Enums;
 
 namespace Faryma.Composer.Desktop.Validation
 {

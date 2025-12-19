@@ -21,7 +21,7 @@ namespace Faryma.Composer.Api
                 ResultObject resultObject = appException.GetResultObject();
                 context.Result = new JsonResult(resultObject, _jsonOptions)
                 {
-                    StatusCode = 666
+                    StatusCode = AppException.StatusCode
                 };
             }
         }

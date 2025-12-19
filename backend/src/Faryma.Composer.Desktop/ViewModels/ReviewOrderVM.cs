@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Faryma.Composer.Application.Features.OrderQueue.Enums;
-using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
-using Faryma.Composer.Desktop.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Desktop.UI;
-using Faryma.Composer.Contracts.Enums;
 
 namespace Faryma.Composer.Desktop.ViewModels
 {

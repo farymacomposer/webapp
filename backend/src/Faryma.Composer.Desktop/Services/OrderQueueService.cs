@@ -1,16 +1,18 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
-using Faryma.Composer.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Desktop.Api.OrderQueue;
-using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
-using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.ViewModels;
 using Microsoft.UI.Dispatching;
 
 namespace Faryma.Composer.Desktop.Services
 {
-    public sealed partial class OrderQueueService : ObservableObject
+    public sealed partial class OrderQueueService : ObservableObject, IOrderQueueNotificationClient
     {
         private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         private readonly OrderQueueHubConnection _orderQueueHub = new();
@@ -56,7 +58,7 @@ namespace Faryma.Composer.Desktop.Services
 
         public Task UpdateOrderQueue() => _orderQueueHub.GetSnapshot();
 
-        private void ReceiveSnapshot(OrderQueueSnapshotMessage message)
+        public Task ReceiveSnapshot(OrderQueueSnapshotMessage message)
         {
             SyncVersion = message.SyncVersion;
 
@@ -70,6 +72,8 @@ namespace Faryma.Composer.Desktop.Services
             Update(ScheduledOrders, message.ScheduledOrders);
             Update(FrozenOrders, message.FrozenOrders);
 
+            return Task.CompletedTask;
+
             void Update(ObservableCollection<ReviewOrderVM> target, IEnumerable<OrderPositionDto> source)
             {
                 target.Clear();
@@ -81,7 +85,7 @@ namespace Faryma.Composer.Desktop.Services
             }
         }
 
-        private async Task ReceiveUpdated(OrderQueueUpdatedEvent @event)
+        public async Task ReceiveUpdated(OrderQueueUpdatedEvent @event)
         {
             if (@event.SyncVersion - SyncVersion == 1)
             {

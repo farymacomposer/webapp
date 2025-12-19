@@ -1,11 +1,12 @@
 ﻿using System.Text.Json.Serialization;
-using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Faryma.Composer.Desktop.Api.OrderQueue
 {
-    public sealed class OrderQueueHubConnection
+    public sealed class OrderQueueHubConnection : IOrderQueueNotificationServer
     {
         private readonly HubConnection _signalrClient = new HubConnectionBuilder()
             .WithUrl($"{App.BaseAddress}/api/OrderQueueNotificationHub")

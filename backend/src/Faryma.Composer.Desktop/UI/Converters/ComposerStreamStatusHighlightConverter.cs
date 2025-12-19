@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Enums;
+﻿using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;

@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Desktop.Api.ComposerStream;
-using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.Navigation;
 using Faryma.Composer.Desktop.Utils;
 using Faryma.Composer.Desktop.ViewModels;
-using Faryma.Composer.Contracts.Enums;
 
 namespace Faryma.Composer.Desktop.UI
 {

@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Desktop.Api.Shared.Dto;
+﻿using Faryma.Composer.Contracts.Api.Shared.Dto;
 
 namespace Faryma.Composer.Desktop.Api.ComposerStream.Responses
 {
