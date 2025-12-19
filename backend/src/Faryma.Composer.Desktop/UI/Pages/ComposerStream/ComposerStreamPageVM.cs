@@ -6,7 +6,7 @@ using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.Navigation;
 using Faryma.Composer.Desktop.Utils;
 using Faryma.Composer.Desktop.ViewModels;
-using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Enums;
 
 namespace Faryma.Composer.Desktop.UI
 {

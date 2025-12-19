@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Api.Features.OrderQueueFeature.AsyncContracts;
 using Faryma.Composer.Application.Features.OrderQueueFeature;
 using Faryma.Composer.Application.Features.OrderQueueFeature.Models;
+using Faryma.Composer.Contracts.Api.Features.OrderQueueFeature;
 using Microsoft.AspNetCore.SignalR;
 using Saunter.Attributes;
 

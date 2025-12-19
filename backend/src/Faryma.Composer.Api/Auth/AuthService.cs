@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Faryma.Composer.Api.Auth.Options;
-using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

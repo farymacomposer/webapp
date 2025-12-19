@@ -16,4 +16,8 @@
     <PackageReference Include="HotChocolate.Data.EntityFramework" Version="15.1.11" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Faryma.Composer.Contracts\Faryma.Composer.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

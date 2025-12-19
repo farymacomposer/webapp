@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Infrastructure.Entities;
-using Faryma.Composer.Infrastructure.Enums;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Infrastructure.Repositories.Write
 {

@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Infrastructure.Models;
+﻿using Faryma.Composer.Contracts.Infrastructure.Models;
 
 namespace Faryma.Composer.Infrastructure.QueryModels
 {

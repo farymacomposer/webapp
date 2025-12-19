@@ -5,10 +5,10 @@ using Faryma.Composer.Api.Features.ComposerStreamFeature.Create;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Find;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.FindLiveAndPlanned;
 using Faryma.Composer.Api.Features.ComposerStreamFeature.Start;
-using Faryma.Composer.Api.Shared.Dto;
-using Faryma.Composer.Application.Features.ComposerStreamFeature;
-using Faryma.Composer.Application.Features.ComposerStreamFeature.Commands;
-using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Application.Features.ComposerStream;
+using Faryma.Composer.Application.Features.ComposerStream.Commands;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Faryma.Composer.Api.Features.ComposerStreamFeature

@@ -4,7 +4,7 @@ using Faryma.Composer.Application.Features.OrderQueueFeature.Enums;
 using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
 using Faryma.Composer.Desktop.Api.Shared.Dto;
 using Faryma.Composer.Desktop.UI;
-using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Enums;
 
 namespace Faryma.Composer.Desktop.ViewModels
 {

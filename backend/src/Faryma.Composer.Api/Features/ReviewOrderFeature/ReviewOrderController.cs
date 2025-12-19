@@ -7,13 +7,13 @@ using Faryma.Composer.Api.Features.ReviewOrderFeature.Freeze;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.MoveUp;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.TakeInProgress;
 using Faryma.Composer.Api.Features.ReviewOrderFeature.Unfreeze;
-using Faryma.Composer.Api.Shared.Dto;
 using Faryma.Composer.Application.Features.ReviewOrderFeature;
 using Faryma.Composer.Application.Features.ReviewOrderFeature.Commands;
-using Faryma.Composer.Infrastructure.Entities;
-using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature
 {

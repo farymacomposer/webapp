@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Infrastructure;
+﻿using Faryma.Composer.Contracts;
+using Faryma.Composer.Contracts.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.MoveUp
 {

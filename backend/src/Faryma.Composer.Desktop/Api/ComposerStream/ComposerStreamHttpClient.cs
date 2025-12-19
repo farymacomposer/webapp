@@ -3,7 +3,7 @@ using System.Text.Json;
 using Faryma.Composer.Desktop.Api.ComposerStream.Responses;
 using Faryma.Composer.Desktop.Api.Exceptions;
 using Faryma.Composer.Desktop.Api.Shared.Dto;
-using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Enums;
 using Microsoft.AspNetCore.Http;
 
 namespace Faryma.Composer.Desktop.Api.ComposerStream

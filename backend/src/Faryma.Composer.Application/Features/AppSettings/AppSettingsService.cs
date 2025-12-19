@@ -1,5 +1,6 @@
-﻿using Faryma.Composer.Infrastructure;
-using Faryma.Composer.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Application.Features.AppSettings;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Application.Features.AppSettings

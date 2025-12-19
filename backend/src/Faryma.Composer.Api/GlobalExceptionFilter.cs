@@ -1,6 +1,6 @@
 ﻿using System.Text.Encodings.Web;
 using System.Text.Json;
-using Faryma.Composer.Infrastructure.Exceptions;
+using Faryma.Composer.Contracts.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Api.Features.ReviewOrderFeature.Create
 {

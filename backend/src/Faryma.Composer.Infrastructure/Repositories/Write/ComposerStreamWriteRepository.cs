@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Infrastructure.Entities;
-using Faryma.Composer.Infrastructure.Enums;
-using Faryma.Composer.Infrastructure.Exceptions;
+﻿using Faryma.Composer.Contracts.Exceptions;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Repositories.Write

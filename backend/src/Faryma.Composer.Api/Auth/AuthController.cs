@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Api.Auth.Login;
 using Faryma.Composer.Api.Auth.Register;
-using Faryma.Composer.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,5 +1,5 @@
 ﻿using Faryma.Composer.Application.Features.AppSettings;
-using Faryma.Composer.Application.Features.ComposerStreamFeature;
+using Faryma.Composer.Application.Features.ComposerStream;
 using Faryma.Composer.Application.Features.OrderQueueFeature;
 using Faryma.Composer.Application.Features.ReviewFeature;
 using Faryma.Composer.Application.Features.ReviewOrderFeature;

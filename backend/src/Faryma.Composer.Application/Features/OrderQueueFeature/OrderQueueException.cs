@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using Faryma.Composer.Infrastructure.Exceptions;
+using Faryma.Composer.Contracts.Exceptions;
 
 namespace Faryma.Composer.Application.Features.OrderQueueFeature
 {

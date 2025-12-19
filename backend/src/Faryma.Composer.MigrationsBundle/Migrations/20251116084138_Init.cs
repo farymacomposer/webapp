@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 

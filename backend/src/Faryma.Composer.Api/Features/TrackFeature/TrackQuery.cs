@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Infrastructure.QueryModels;
-using Faryma.Composer.Infrastructure.QueryServices;
+﻿using Faryma.Composer.Contracts.QueryModels;
+using Faryma.Composer.Contracts.QueryServices;
 using HotChocolate.Data;
 
 namespace Faryma.Composer.Api.Features.TrackFeature

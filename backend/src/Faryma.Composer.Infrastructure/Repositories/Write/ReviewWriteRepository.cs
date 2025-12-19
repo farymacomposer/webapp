@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 
 namespace Faryma.Composer.Infrastructure.Repositories.Write
 {
