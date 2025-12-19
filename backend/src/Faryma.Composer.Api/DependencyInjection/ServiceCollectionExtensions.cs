@@ -5,6 +5,7 @@ using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Api.Features.Track;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure;
@@ -131,7 +132,7 @@ namespace Faryma.Composer.Api.DependencyInjection
                     Info = new Info(environment.ApplicationName, "v1"),
                     Servers =
                     {
-                        [IServer.HubServerName] = new Server(IServer.RoutePattern, "signalr")
+                        [IOrderQueueNotificationServer.HubServerName] = new Server(IOrderQueueNotificationServer.RoutePattern, "signalr")
                         {
                             Description = "Очередь заказов"
                         }
