@@ -5,11 +5,12 @@ using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
 using Faryma.Composer.Api.Features.TrackFeature;
-using Faryma.Composer.Application.Features.OrderQueueFeature.Contracts;
-using Faryma.Composer.Contracts;
-using Faryma.Composer.Contracts.DependencyInjection;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Options;
+using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.DependencyInjection;
+using Faryma.Composer.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -131,7 +132,7 @@ namespace Faryma.Composer.Api.DependencyInjection
                     Info = new Info(environment.ApplicationName, "v1"),
                     Servers =
                     {
-                        [OrderQueueNotificationHub.HubServerName] = new Server(OrderQueueNotificationHub.RoutePattern, "signalr")
+                        [IOrderQueueNotificationServer.HubServerName] = new Server(IOrderQueueNotificationServer.RoutePattern, "signalr")
                         {
                             Description = "Очередь заказов"
                         }

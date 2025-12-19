@@ -1,0 +1,230 @@
+﻿using Faryma.Composer.Api.Auth;
+using Faryma.Composer.Application.Features.ReviewOrderFeature;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.AddTrackUrl;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Cancel;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Complete;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Freeze;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.MoveUp;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.TakeInProgress;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Unfreeze;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+
+namespace Faryma.Composer.Api.Features.ReviewOrderFeature
+{
+    /// <summary>
+    /// Управление заказами разборов треков
+    /// </summary>
+    [Route("api/[controller]")]
+    [ApiController]
+    public sealed class ReviewOrderController(ReviewOrderService reviewOrderService, IMemoryCache cache) : ControllerBase
+    {
+        private static readonly TimeSpan _idempotencyKeyExpiration = TimeSpan.FromMinutes(10);
+
+        /// <summary>
+        /// Создает заказ
+        /// </summary>
+        /// <param name="idempotencyKey">Ключ идемпотентности</param>
+        /// <param name="request">Запрос создания заказа</param>
+        [HttpPost(nameof(CreateReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
+            [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
+            [FromBody] CreateReviewOrderRequest request)
+        {
+            if (idempotencyKey == Guid.Empty)
+            {
+                return BadRequest("Требуется заголовок Idempotency-Key");
+            }
+
+            string key = $"CreateReviewOrder:{idempotencyKey}";
+            if (cache.TryGetValue(key, out CreateReviewOrderResponse? response))
+            {
+                return Ok(response);
+            }
+
+            ReviewOrderEntity order = request.OrderType switch
+            {
+                ReviewOrderType.OutOfQueue => await reviewOrderService.CreateOutOfQueue(new CreateOutOfQueueOrderCommand
+                {
+                    Nickname = request.Nickname,
+                    TrackUrl = request.TrackUrl,
+                    UserComment = request.UserComment,
+                }),
+                ReviewOrderType.Donation => await reviewOrderService.CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = request.Nickname,
+                    TrackUrl = request.TrackUrl,
+                    UserComment = request.UserComment,
+                    PaymentAmount = request.PaymentAmount!.Value,
+                }),
+                ReviewOrderType.Free => await reviewOrderService.CreateFree(new CreateFreeOrderCommand
+                {
+                    Nickname = request.Nickname,
+                    TrackUrl = request.TrackUrl,
+                    UserComment = request.UserComment,
+                }),
+                ReviewOrderType.Charity => await reviewOrderService.CreateCharity(new CreateCharityOrderCommand
+                {
+                    Nickname = request.Nickname,
+                    TrackUrl = request.TrackUrl,
+                    UserComment = request.UserComment,
+                }),
+                _ => throw new InvalidOperationException(),
+            };
+
+            response = new CreateReviewOrderResponse
+            {
+                ReviewOrder = ReviewOrderDto.Map(order)
+            };
+
+            cache.Set(key, response, _idempotencyKeyExpiration);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Поднимает заказ в очереди
+        /// </summary>
+        /// <param name="idempotencyKey">Ключ идемпотентности</param>
+        /// <param name="request">Запрос поднятия заказа в очереди</param>
+        [HttpPost(nameof(MoveUpReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<MoveUpReviewOrderResponse>> MoveUpReviewOrder(
+            [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
+            [FromBody] MoveUpReviewOrderRequest request)
+        {
+            if (idempotencyKey == Guid.Empty)
+            {
+                return BadRequest("Требуется заголовок Idempotency-Key");
+            }
+
+            string key = $"MoveUpReviewOrder:{idempotencyKey}";
+            if (cache.TryGetValue(key, out MoveUpReviewOrderResponse? response))
+            {
+                return Ok(response);
+            }
+
+            TransactionEntity transaction = await reviewOrderService.MoveUp(new MoveUpCommand
+            {
+                ReviewOrderId = request.ReviewOrderId,
+                Nickname = request.Nickname.Trim(),
+                PaymentAmount = request.PaymentAmount,
+            });
+
+            response = new MoveUpReviewOrderResponse
+            {
+                ReviewOrder = ReviewOrderDto.Map(transaction.ReviewOrder!),
+                PaymentTransactionId = transaction.Id
+            };
+
+            cache.Set(key, response, _idempotencyKeyExpiration);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Добавляет или изменяет ссылку на трек
+        /// </summary>
+        [HttpPost(nameof(AddTrackUrl))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl(AddTrackUrlRequest request)
+        {
+            ReviewOrderEntity order = await reviewOrderService.AddTrackUrl(new AddTrackUrlCommand
+            {
+                ReviewOrderId = request.ReviewOrderId,
+                TrackUrl = request.TrackUrl,
+            });
+
+            return Ok(new AddTrackUrlResponse
+            {
+                ReviewOrder = ReviewOrderDto.Map(order)
+            });
+        }
+
+        /// <summary>
+        /// Взятие заказа в работу
+        /// </summary>
+        [HttpPost(nameof(TakeOrderInProgress))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request)
+        {
+            ReviewOrderEntity order = await reviewOrderService.TakeInProgress(request.ReviewOrderId);
+
+            return Ok(new TakeOrderInProgressResponse
+            {
+                ReviewOrder = ReviewOrderDto.Map(order)
+            });
+        }
+
+        /// <summary>
+        /// Выполнение заказа
+        /// </summary>
+        [HttpPost(nameof(CompleteReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder(CompleteReviewOrderRequest request)
+        {
+            ReviewOrderEntity order = await reviewOrderService.Complete(new CompleteCommand
+            {
+                ReviewOrderId = request.ReviewOrderId,
+                Rating = request.Rating,
+            });
+
+            return Ok(new CompleteReviewOrderResponse
+            {
+                ReviewOrder = ReviewOrderDto.Map(order),
+                ReviewId = order.Review!.Id,
+            });
+        }
+
+        /// <summary>
+        /// Замораживает заказ
+        /// </summary>
+        [HttpPost(nameof(FreezeReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(FreezeReviewOrderRequest request)
+        {
+            ReviewOrderEntity order = await reviewOrderService.Freeze(request.ReviewOrderId);
+
+            return Ok(new FreezeReviewOrderResponse
+            {
+                ReviewOrder = ReviewOrderDto.Map(order)
+            });
+        }
+
+        /// <summary>
+        /// Размораживает заказ
+        /// </summary>
+        [HttpPost(nameof(UnfreezeReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(UnfreezeReviewOrderRequest request)
+        {
+            ReviewOrderEntity order = await reviewOrderService.Unfreeze(request.ReviewOrderId);
+
+            return Ok(new UnfreezeReviewOrderResponse
+            {
+                ReviewOrder = ReviewOrderDto.Map(order)
+            });
+        }
+
+        /// <summary>
+        /// Отменяет заказ
+        /// </summary>
+        [HttpPost(nameof(CancelReviewOrder))]
+        [AuthorizeAdmins]
+        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request)
+        {
+            ReviewOrderEntity order = await reviewOrderService.Cancel(request.ReviewOrderId);
+
+            return Ok(new CancelReviewOrderResponse
+            {
+                ReviewOrder = ReviewOrderDto.Map(order)
+            });
+        }
+    }
+}

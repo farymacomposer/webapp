@@ -1,13 +1,13 @@
-﻿using Faryma.Composer.Application.Features.OrderQueueFeature.Contracts;
-using Faryma.Composer.Application.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Application.Features.OrderQueueFeature.Models;
-using Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorithm;
+﻿using Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorithm;
 using Faryma.Composer.Application.Utils;
-using Faryma.Composer.Contracts;
-using Faryma.Composer.Contracts.Repositories.Read;
-using Microsoft.EntityFrameworkCore;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.Repositories.Read;
+using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Application.Features.OrderQueueFeature
 {

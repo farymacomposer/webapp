@@ -12,10 +12,4 @@
     <PackageReference Include="Saunter" Version="0.13.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Application\Features\OrderQueue\" />
-    <Folder Include="Application\Features\Review\" />
-    <Folder Include="Application\Features\UserNickname\" />
-  </ItemGroup>
-
 </Project>

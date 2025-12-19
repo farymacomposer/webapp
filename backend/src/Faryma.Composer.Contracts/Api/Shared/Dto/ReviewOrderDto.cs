@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Contracts.Api.Shared.Dto

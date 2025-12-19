@@ -1,12 +1,13 @@
 ﻿using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueueFeature;
-using Faryma.Composer.Application.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Application.Features.OrderQueueFeature.Models;
-using Faryma.Composer.Application.Features.ReviewOrderFeature.Commands;
 using Faryma.Composer.Application.Features.UserNicknameFeature;
-using Faryma.Composer.Contracts;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
+using Faryma.Composer.Contracts.Application.Features.ReviewOrder;
+using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Infrastructure;
 
 namespace Faryma.Composer.Application.Features.ReviewOrderFeature
 {

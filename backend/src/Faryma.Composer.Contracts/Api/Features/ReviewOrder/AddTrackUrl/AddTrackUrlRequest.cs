@@ -1,0 +1,22 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.AddTrackUrl
+{
+    /// <summary>
+    /// Запрос добавления в заказ ссылки на трек
+    /// </summary>
+    public sealed record AddTrackUrlRequest
+    {
+        /// <summary>
+        /// Id заказа разбора трека
+        /// </summary>
+        public required long ReviewOrderId { get; init; }
+
+        /// <summary>
+        /// Ссылка на трек
+        /// </summary>
+        [Required]
+        [Url(ErrorMessage = "Некорректная ссылка на трек")]
+        public required string TrackUrl { get; init; }
+    }
+}

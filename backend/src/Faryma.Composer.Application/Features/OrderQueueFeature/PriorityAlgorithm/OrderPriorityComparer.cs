@@ -1,5 +1,4 @@
 ﻿# nullable disable
-using Faryma.Composer.Contracts.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 
 namespace Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorithm
