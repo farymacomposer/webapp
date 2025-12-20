@@ -12,6 +12,7 @@ namespace Faryma.Composer.Api.Features.AppSettings
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public sealed class AppSettingsController(AppSettingsService appSettingsService) : ControllerBase
     {
         /// <summary>

@@ -16,8 +16,9 @@ namespace Faryma.Composer.Api.Features.ComposerStream
     /// <summary>
     /// Управление стримами
     /// </summary>
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
     public sealed class ComposerStreamController(ComposerStreamService composerStreamService) : ControllerBase
     {
         /// <summary>

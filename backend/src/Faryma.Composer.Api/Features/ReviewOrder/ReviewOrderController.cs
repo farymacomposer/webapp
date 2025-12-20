@@ -20,8 +20,9 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
     /// <summary>
     /// Управление заказами разборов треков
     /// </summary>
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
     public sealed class ReviewOrderController(ReviewOrderService reviewOrderService, IMemoryCache cache) : ControllerBase
     {
         private static readonly TimeSpan _idempotencyKeyExpiration = TimeSpan.FromMinutes(10);
