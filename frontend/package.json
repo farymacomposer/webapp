@@ -11,7 +11,7 @@
   "dependencies": {
     "@microsoft/signalr": "^9.0.6",
     "axios": "^1.12.2",
-    "next": "15.4.7",
+    "next": "16.1.0-canary.19",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
