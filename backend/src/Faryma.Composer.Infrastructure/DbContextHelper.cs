@@ -17,6 +17,7 @@ namespace Faryma.Composer.Infrastructure
             return options?.GetConnectionString();
         }
 
+        // Основной способ добавления enum в БД
         public static NpgsqlDbContextOptionsBuilder MapEnum(this NpgsqlDbContextOptionsBuilder builder)
         {
             return builder
@@ -28,6 +29,7 @@ namespace Faryma.Composer.Infrastructure
                 .MapEnum<TransactionType>("transaction_type", SchemaName);
         }
 
+        // Вспомогательный метод для выравнивания enum в БД по номеру, а не по названию
         public static void HasPostgresEnum(this ModelBuilder builder)
         {
             builder
