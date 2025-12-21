@@ -5,6 +5,8 @@ import { StreamVideo } from "@/components/widgets/stream/stream-video";
 import { StreamChat } from "@/components/widgets/stream/stream-chat";
 import { Queue, QueueItem } from "@/components/widgets/stream/track-queue";
 import styles from "./stream.module.css";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function StreamPage() {
   const channel = "farymacomposer";
@@ -15,9 +17,9 @@ export default function StreamPage() {
       label: "NOW",
       labelColor: "#ff2d6f",
       title: "YOASOBI 『アイドル』 Official Music Video",
-      price: "100",
+      price: "3500₽",
       coverUrl:
-        "https://sfae.blob.core.windows.net/media/ecommercesite/media/sfae/sfae.artwork/342_1.jpg",
+        "https://asset.watch.impress.co.jp/img/gmw/docs/1492/924/main_l.jpg",
     },
     {
       id: "2",
@@ -32,6 +34,8 @@ export default function StreamPage() {
       labelColor: "#7e3ff2",
       price: "100",
       title: "Queen - Bohemian Rhapsody",
+      coverUrl:
+        "https://sfae.blob.core.windows.net/media/ecommercesite/media/sfae/sfae.artwork/342_1.jpg",
     },
     {
       id: "4",
@@ -72,6 +76,26 @@ export default function StreamPage() {
         </section>
 
         <aside className={styles.chatContainer}>
+          <div className={styles.chatHeader}>
+            <div className={styles.chatNav}>
+              <Link className={styles.chatNavItem} href="/stream">
+                <span className={styles.brand}>стрим-space</span>
+              </Link>
+
+              <Link className={styles.chatNavItem} href="/tracks">
+                база треков
+              </Link>
+
+              <Link className={styles.chatNavItem} href="/faq">
+                FAQ
+              </Link>
+            </div>
+
+            <button className={styles.primaryCta} type="button">
+              закинуть трек на разнос
+            </button>
+          </div>
+
           <StreamChat channel={channel} />
         </aside>
       </div>

@@ -2,6 +2,8 @@
 
 import React, { ReactNode, CSSProperties, useState } from "react";
 import styles from "./track-queue.module.css";
+import { SiReact, SiSpotify, SiYoutube } from "@icons-pack/react-simple-icons";
+import { BellRing, MessageCircle } from "lucide-react";
 
 export type QueueItem = {
   id: string;
@@ -86,10 +88,18 @@ export const Queue: React.FC<QueueProps> = ({ items, onAdd, className }) => {
                       <div className={styles.previewActions}>
                         {item.previewActions ?? (
                           <>
-                            <span className={styles.actionDot} />
-                            <span className={styles.actionDot} />
-                            <span className={styles.actionDot} />
-                            <span className={styles.actionDot} />
+                            <SiSpotify color="#1DB954" size={24} />
+                            <SiYoutube color="#FF0000" size={24} />
+                            <MessageCircle
+                              color="#4C4C4C"
+                              size={24}
+                              fill="#4C4C4C"
+                            />
+                            <BellRing
+                              color="#FF9100FF"
+                              size={24}
+                              fill="#FF9100FF"
+                            />
                           </>
                         )}
                       </div>

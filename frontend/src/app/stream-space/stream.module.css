@@ -81,3 +81,105 @@ body>main {
   border: none;
   display: block;
 }
+
+
+.chatHeader {
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(10, 10, 16, 0.92) 0%, rgba(10, 10, 16, 0.78) 100%);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chatNav {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.chatNavItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 34px;
+
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 18px;
+  letter-spacing: 0.01em;
+}
+
+.brand {
+  color: #ff8c1a;
+  font-weight: 700;
+}
+
+.primaryCta {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: 12px;
+
+  background: #7700ff;
+  color: #fff;
+
+  font-size: 20px;
+  font-weight: 400;
+
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+
+  transition: filter 160ms ease, transform 120ms ease;
+}
+
+.primaryCta:hover {
+  filter: brightness(1.08);
+}
+
+.primaryCta:active {
+  transform: translateY(1px);
+}
+
+.secondaryCta {
+  margin-top: 12px;
+  width: 100%;
+  height: 64px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.secondaryCta:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.secondaryIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.secondaryText {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 22px;
+  font-weight: 500;
+}
