@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@icons-pack/react-simple-icons": "^13.8.0",
     "axios": "^1.12.2",
     "next": "15.4.7",
     "react": "19.1.0",

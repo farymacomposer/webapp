@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode, CSSProperties } from "react";
+import React, { ReactNode, CSSProperties, useState } from "react";
 import styles from "./track-queue.module.css";
 
 export type QueueItem = {
@@ -8,33 +8,26 @@ export type QueueItem = {
   label: string;
   labelColor: string;
   title: string;
+  price: string;
+  coverUrl?: string;
 
-  previewCoverUrl?: string;
   previewArtist?: string;
-  previewPrice?: string;
   previewActions?: ReactNode;
 };
 
 type QueueProps = {
   items: QueueItem[];
-  activeId?: string;
-  onSelect?: (id: string) => void;
   onAdd?: () => void;
   className?: string;
 };
 
-export const Queue: React.FC<QueueProps> = ({
-  items,
-  activeId,
-  onSelect,
-  onAdd,
-  className,
-}) => {
+export const Queue: React.FC<QueueProps> = ({ items, onAdd, className }) => {
+  const [activeId, setActiveId] = useState<string | null>(null);
+
   return (
-    <div
-      className={[styles.root, className ?? ""].filter(Boolean).join(" ")}
-    >
+    <div className={[styles.root, className ?? ""].filter(Boolean).join(" ")}>
       {activeId && <div className={styles.backdrop} aria-hidden="true" />}
+
       <button
         type="button"
         className={styles.addCard}
@@ -43,6 +36,7 @@ export const Queue: React.FC<QueueProps> = ({
       >
         +
       </button>
+
       <div className={styles.list} role="listbox" aria-label="Очередь треков">
         {items.map((item, index) => {
           const isFirst = index === 0;
@@ -59,29 +53,26 @@ export const Queue: React.FC<QueueProps> = ({
                   <span className={styles.chevron} />
                 </div>
               )}
+
               <div
                 className={[
                   styles.card,
-                  isFirst ? styles.cardFirst : "",
                   isActive ? styles.cardActive : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
+                ].join(" ")}
                 style={accentStyle}
                 role="option"
                 aria-selected={isActive}
                 tabIndex={0}
-                onClick={() => onSelect?.(item.id)}
+                onClick={() =>
+                  setActiveId((prev) => (prev === item.id ? null : item.id))
+                }
               >
-                <div className={styles.cardInner}>
-                  <div className={styles.headerRow}>
-                    <div className={styles.tags}>
-                      <span className={styles.tag}>{item.label}</span>
-                    </div>
-
-                    <div className={styles.body}>
-                      <span className={styles.title}>{item.title}</span>
-                    </div>
+                <div className={styles.headerRow}>
+                  <div className={styles.tags}>
+                    <span className={styles.tag}>{item.label}</span>
+                  </div>
+                  <div className={styles.body}>
+                    <span className={styles.title}>{item.title}</span>
                   </div>
                 </div>
 
@@ -90,7 +81,8 @@ export const Queue: React.FC<QueueProps> = ({
                     className={styles.preview}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className={styles.previewHeader}>
+                    {/* Top bar */}
+                    <div className={styles.previewTop}>
                       <div className={styles.previewActions}>
                         {item.previewActions ?? (
                           <>
@@ -101,33 +93,23 @@ export const Queue: React.FC<QueueProps> = ({
                           </>
                         )}
                       </div>
-                      {item.previewPrice && (
+
+                      {item.price && (
                         <span className={styles.previewPrice}>
-                          {item.previewPrice}
+                          {item.price}
                         </span>
                       )}
                     </div>
 
-                    <div className={styles.previewBody}>
-                      <div className={styles.previewCover}>
-                        {item.previewCoverUrl && (
-                          <img
-                            src={item.previewCoverUrl}
-                            alt={item.title}
-                            className={styles.previewCoverImg}
-                          />
-                        )}
-                      </div>
-                      <div className={styles.previewMeta}>
-                        <span className={styles.previewTitle}>
-                          {item.title}
-                        </span>
-                        {item.previewArtist && (
-                          <span className={styles.previewArtist}>
-                            {item.previewArtist}
-                          </span>
-                        )}
-                      </div>
+                    {/* Big square cover */}
+                    <div className={styles.previewCover}>
+                      {item.coverUrl && (
+                        <img
+                          src={item.coverUrl}
+                          alt={item.title}
+                          className={styles.previewCoverImg}
+                        />
+                      )}
                     </div>
                   </div>
                 )}

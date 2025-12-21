@@ -15,23 +15,29 @@ export default function StreamPage() {
       label: "NOW",
       labelColor: "#ff2d6f",
       title: "YOASOBI 『アイドル』 Official Music Video",
+      price: "100",
+      coverUrl:
+        "https://sfae.blob.core.windows.net/media/ecommercesite/media/sfae/sfae.artwork/342_1.jpg",
     },
     {
       id: "2",
       label: "NEW",
       labelColor: "#ff8c1a",
+      price: "100",
       title: "HOLLOW KNIGHT SILKSONG - Official Soundtrack",
     },
     {
       id: "3",
       label: "W2",
       labelColor: "#7e3ff2",
+      price: "100",
       title: "Queen - Bohemian Rhapsody",
     },
     {
       id: "4",
       label: "NEW",
       labelColor: "#ff8c1a",
+      price: "100",
       title: "Lady Gaga - Bad Romance (Official Music Video)",
     },
     {
@@ -40,32 +46,15 @@ export default function StreamPage() {
       labelColor: "#7e3ff2",
       title:
         "HOLLOW KNIGHT SILKSONG - Official Soundtrack HOLLOW KNIGHT SILKSONG...",
+      price: "100",
     },
   ];
 
   const [queueItems, setQueueItems] = useState<QueueItem[]>(initial);
-  const [activeId, setActiveId] = useState<string | undefined>(initial[0]?.id);
-
-  useEffect(() => {
-    if (!queueItems.length) {
-      setActiveId(undefined);
-      return;
-    }
-
-    if (activeId && !queueItems.some((item) => item.id === activeId)) {
-      setActiveId(queueItems[0].id);
-    }
-  }, [activeId, queueItems]);
 
   const displayItems = useMemo(() => {
     return queueItems.map((item, index) =>
-      index === 0
-        ? {
-            ...item,
-            label: "NOW",
-            labelColor: "#ff2d6f",
-          }
-        : item
+      index === 0 ? { ...item, label: "NOW", labelColor: "#ff2d6f" } : item
     );
   }, [queueItems]);
 
@@ -78,13 +67,7 @@ export default function StreamPage() {
           </div>
 
           <div className={styles.queueSection}>
-            <Queue
-              items={displayItems}
-              activeId={activeId}
-              onSelect={(id) =>
-                setActiveId((prev) => (prev === id ? undefined : id))
-              }
-            />
+            <Queue items={displayItems} />
           </div>
         </section>
 
