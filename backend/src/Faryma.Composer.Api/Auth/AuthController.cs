@@ -9,8 +9,9 @@ namespace Faryma.Composer.Api.Auth
     /// <summary>
     /// Регистрация и аутентификация пользователей
     /// </summary>
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [Produces("application/json")]
     public sealed class AuthController(AuthService authService, UserManager<UserEntity> userManager) : ControllerBase
     {
         /// <summary>
