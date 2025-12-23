@@ -93,6 +93,7 @@
     .tags {
         display: flex;
         gap: 6px;
+
         align-items: center;
         margin-bottom: 10px;
     }
@@ -106,7 +107,7 @@
         height: 14px;
         border-radius: 6px;
         background: var(--accent-color);
-        color: #ffffff;
+        color: var(--text-color);
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.02em;
@@ -166,7 +167,7 @@
         animation: preview-rise 180ms ease;
     }
 
-    /* top bar like on screenshot */
+
     .previewTop {
         display: flex;
         align-items: center;
@@ -199,7 +200,7 @@
         color: rgba(255, 255, 255, 0.92);
     }
 
-    /* big square cover */
+
     .previewCover {
         width: 100%;
         aspect-ratio: 1 / 1;
@@ -214,7 +215,7 @@
         display: block;
     }
 
-    /* bottom area */
+
     .previewMeta {
         padding: 14px 14px 16px;
         display: flex;
@@ -243,7 +244,7 @@
         border-radius: 10px;
 
         background: var(--accent-color);
-        color: #fff;
+        color: var(--text-color);
         font-size: 12px;
         font-weight: 800;
         letter-spacing: 0.02em;
@@ -271,4 +272,44 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .iconBtn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: none;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        background: transparent;
+        color: rgba(255, 255, 255, 0.45);
+
+        cursor: pointer;
+        transition:
+            color 160ms ease,
+            background 160ms ease,
+            transform 120ms ease;
+    }
+
+    .spotify:hover {
+        color: #1db954;
+    }
+
+    .youtube:hover {
+        color: #ff0000;
+    }
+
+    .comment:hover {
+        color: #ffffff;
+    }
+
+    .notify:hover {
+        color: #ff9100;
+    }
+
+    .iconBtn:active {
+        transform: scale(0.96);
     }

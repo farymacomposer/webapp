@@ -9,6 +9,7 @@ export type QueueItem = {
   id: string;
   label: string;
   labelColor: string;
+  textColor?: string;
   title: string;
   price: string;
   coverUrl?: string;
@@ -46,6 +47,7 @@ export const Queue: React.FC<QueueProps> = ({ items, onAdd, className }) => {
 
           const accentStyle: CSSProperties = {
             ["--accent-color" as any]: item.labelColor,
+            ["--text-color" as any]: item.textColor,
           };
 
           return (
@@ -88,18 +90,33 @@ export const Queue: React.FC<QueueProps> = ({ items, onAdd, className }) => {
                       <div className={styles.previewActions}>
                         {item.previewActions ?? (
                           <>
-                            <SiSpotify color="#1DB954" size={24} />
-                            <SiYoutube color="#FF0000" size={24} />
-                            <MessageCircle
-                              color="#4C4C4C"
-                              size={24}
-                              fill="#4C4C4C"
-                            />
-                            <BellRing
-                              color="#FF9100FF"
-                              size={24}
-                              fill="#FF9100FF"
-                            />
+                            <button
+                              className={`${styles.iconBtn} ${styles.spotify}`}
+                            >
+                              <SiSpotify size={24} />
+                            </button>
+
+                            <button
+                              className={`${styles.iconBtn} ${styles.youtube}`}
+                            >
+                              <SiYoutube size={24} />
+                            </button>
+
+                            <button
+                              className={`${styles.iconBtn} ${styles.comment}`}
+                            >
+                              <MessageCircle size={24} />
+                            </button>
+
+                            <button
+                              className={`${styles.iconBtn} ${styles.notify}`}
+                            >
+                              <BellRing
+                                color="#FF9100FF"
+                                size={24}
+                                fill="#FF9100FF"
+                              />
+                            </button>
                           </>
                         )}
                       </div>

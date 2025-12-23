@@ -15,9 +15,10 @@ export default function StreamPage() {
     {
       id: "1",
       label: "NOW",
-      labelColor: "#ff2d6f",
+      labelColor: "#ffffff",
       title: "YOASOBI 『アイドル』 Official Music Video",
       price: "3500₽",
+      textColor: "#000000",
       coverUrl:
         "https://asset.watch.impress.co.jp/img/gmw/docs/1492/924/main_l.jpg",
     },
@@ -25,14 +26,14 @@ export default function StreamPage() {
       id: "2",
       label: "NEW",
       labelColor: "#ff8c1a",
-      price: "100",
+      price: "3500₽",
       title: "HOLLOW KNIGHT SILKSONG - Official Soundtrack",
     },
     {
       id: "3",
       label: "W2",
-      labelColor: "#7e3ff2",
-      price: "100",
+      labelColor: "#E10741",
+      price: "3500₽",
       title: "Queen - Bohemian Rhapsody",
       coverUrl:
         "https://sfae.blob.core.windows.net/media/ecommercesite/media/sfae/sfae.artwork/342_1.jpg",
@@ -41,16 +42,16 @@ export default function StreamPage() {
       id: "4",
       label: "NEW",
       labelColor: "#ff8c1a",
-      price: "100",
+      price: "3500₽",
       title: "Lady Gaga - Bad Romance (Official Music Video)",
     },
     {
       id: "5",
       label: "W3",
-      labelColor: "#7e3ff2",
+      labelColor: "#C9006E",
       title:
         "HOLLOW KNIGHT SILKSONG - Official Soundtrack HOLLOW KNIGHT SILKSONG...",
-      price: "100",
+      price: "3500₽",
     },
   ];
 
@@ -58,7 +59,7 @@ export default function StreamPage() {
 
   const displayItems = useMemo(() => {
     return queueItems.map((item, index) =>
-      index === 0 ? { ...item, label: "NOW", labelColor: "#ff2d6f" } : item
+      index === 0 ? { ...item, label: "NOW", labelColor: "#FFFFFF" } : item
     );
   }, [queueItems]);
 
