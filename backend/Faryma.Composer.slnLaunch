@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Desktop",
+    "Projects": [
+      {
+        "Path": "src\\Faryma.Composer.Api\\Faryma.Composer.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "src\\Faryma.Composer.Desktop\\Faryma.Composer.Desktop.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

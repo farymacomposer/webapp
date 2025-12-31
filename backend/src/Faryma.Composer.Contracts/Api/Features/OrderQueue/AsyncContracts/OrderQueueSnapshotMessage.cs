@@ -20,7 +20,7 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts
         /// Активные заказы
         /// </summary>
         [Required]
-        public List<OrderPositionDto> ActiveOrders { get; } = [];
+        public required List<OrderPositionDto> ActiveOrders { get; init; }
 
         /// <summary>
         /// Заказ в работе
@@ -31,25 +31,29 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts
         /// Выполненные заказы
         /// </summary>
         [Required]
-        public List<OrderPositionDto> CompletedOrders { get; } = [];
+        public required List<OrderPositionDto> CompletedOrders { get; init; }
 
         /// <summary>
         /// Запланированные заказы
         /// </summary>
         [Required]
-        public List<OrderPositionDto> ScheduledOrders { get; } = [];
+        public required List<OrderPositionDto> ScheduledOrders { get; init; }
 
         /// <summary>
         /// Замороженные заказы
         /// </summary>
         [Required]
-        public List<OrderPositionDto> FrozenOrders { get; } = [];
+        public required List<OrderPositionDto> FrozenOrders { get; init; }
 
         public static OrderQueueSnapshotMessage Map(OrderQueueSnapshot snapshot)
         {
             OrderQueueSnapshotMessage result = new()
             {
                 SyncVersion = snapshot.SyncVersion,
+                ActiveOrders = new List<OrderPositionDto>(),
+                CompletedOrders = new List<OrderPositionDto>(),
+                ScheduledOrders = new List<OrderPositionDto>(),
+                FrozenOrders = new List<OrderPositionDto>(),
             };
 
             foreach (OrderPosition position in snapshot.Positions.OrderBy(x => x.PositionHistory.Current.QueueIndex))

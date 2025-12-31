@@ -48,7 +48,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
                 }
             };
 
-            if (orders.Count > 0)
+            if (_queueManager.OrderPositionsById.Count > 0)
             {
                 _queueManager.UpdateAllPositions();
             }

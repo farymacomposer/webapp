@@ -24,10 +24,10 @@ namespace Faryma.Composer.Api.DependencyInjection
     {
         public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            services
-                .AddOptionsWithValidateOnStart<JwtOptions>()
-                .Bind(configuration.GetRequiredSection("JWT"))
-                .ValidateDataAnnotations();
+            //services
+            //    .AddOptionsWithValidateOnStart<JwtOptions>()
+            //    .Bind(configuration.GetRequiredSection("JWT"))
+            //    .ValidateDataAnnotations();
 
             services
                 .AddOptionsWithValidateOnStart<PostgreOptions>()

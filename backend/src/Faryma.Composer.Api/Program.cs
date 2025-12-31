@@ -31,7 +31,7 @@ namespace Faryma.Composer.Api
                     services
                         .AddConfiguration(context.Configuration)
                         .AddPersistenceAndIdentity(context.Configuration)
-                        .AddJwtAuthentication(context.Configuration)
+                        //.AddJwtAuthentication(context.Configuration)
                         .AddAuthorization()
                         .AddCoreServices();
 
