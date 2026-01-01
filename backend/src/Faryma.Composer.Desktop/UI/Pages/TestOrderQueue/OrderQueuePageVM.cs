@@ -135,6 +135,7 @@ namespace Faryma.Composer.Desktop.UI
                 OrderType = OrderType,
                 TrackUrl = TrackUrl,
                 PaymentAmount = paymentAmount,
+                TopUpProvider = AccountTopUpProvider.Manual,
                 UserComment = UserComment,
             });
         }

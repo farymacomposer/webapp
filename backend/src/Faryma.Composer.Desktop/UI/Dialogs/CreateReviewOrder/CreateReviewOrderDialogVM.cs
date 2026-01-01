@@ -82,6 +82,7 @@ namespace Faryma.Composer.Desktop.UI
                 OrderType = OrderType,
                 TrackUrl = string.IsNullOrWhiteSpace(TrackUrl) ? null : TrackUrl,
                 PaymentAmount = paymentAmount,
+                TopUpProvider = AccountTopUpProvider.Manual,
                 UserComment = string.IsNullOrWhiteSpace(UserComment) ? null : UserComment,
             };
 

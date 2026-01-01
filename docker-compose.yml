@@ -41,7 +41,7 @@ services:
     restart: no
 
   db:
-    image: postgres:17
+    image: postgres:18
     container_name: composer-db
     environment:
       POSTGRES_DB: ${POSTGRES__DATABASE}
