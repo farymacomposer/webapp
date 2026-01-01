@@ -28,7 +28,7 @@ namespace Faryma.Composer.Infrastructure
                 .MapEnum<ReviewOrderType>("review_order_type", SchemaName)
                 .MapEnum<TransactionDirection>("transaction_direction", SchemaName)
                 .MapEnum<TransactionKind>("transaction_kind", SchemaName)
-                .MapEnum<TopUpProvider>("top_up_provider", SchemaName);
+                .MapEnum<AccountTopUpProvider>("account_top_up_provider", SchemaName);
         }
 
         // Вспомогательный метод для выравнивания enum в БД по номеру, а не по названию
@@ -42,7 +42,7 @@ namespace Faryma.Composer.Infrastructure
                 .HasPostgresEnum<ReviewOrderType>(SchemaName, "review_order_type")
                 .HasPostgresEnum<TransactionDirection>(SchemaName, "transaction_direction")
                 .HasPostgresEnum<TransactionKind>(SchemaName, "transaction_kind")
-                .HasPostgresEnum<TopUpProvider>(SchemaName, "top_up_provider");
+                .HasPostgresEnum<AccountTopUpProvider>(SchemaName, "account_top_up_provider");
         }
     }
 }

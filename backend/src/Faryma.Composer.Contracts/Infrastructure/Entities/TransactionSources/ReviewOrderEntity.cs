@@ -72,11 +72,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         public required decimal PayableAmount { get; set; }
 
         /// <summary>
-        /// Причина скидки
-        /// </summary>
-        public string? DiscountReason { get; set; }
-
-        /// <summary>
         /// Комментарий пользователя
         /// </summary>
         public string? UserComment { get; set; }

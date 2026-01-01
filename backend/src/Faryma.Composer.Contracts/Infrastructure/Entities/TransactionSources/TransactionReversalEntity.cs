@@ -38,6 +38,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// Транзакция отмены
         /// </summary>
         [ForeignKey(nameof(ReversalTransactionId))]
-        public required TransactionEntity ReversalTransaction { get; set; }
+        public TransactionEntity ReversalTransaction { get; set; } = null!;
     }
 }

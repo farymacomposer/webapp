@@ -4,15 +4,15 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
 {
     /// <summary>
-    /// Пополнение счета
+    /// Пополнение счета пользователя
     /// </summary>
     [Table("account_top_ups")]
     public sealed class AccountTopUpEntity : TransactionSourceEntity
     {
         /// <summary>
-        /// Провайдер/канал пополнения
+        /// Провайдер/канал пополнения счета пользователя
         /// </summary>
-        [Column(TypeName = DbEnumConst.TopUpProviderEnum)]
-        public required TopUpProvider Provider { get; set; }
+        [Column(TypeName = DbEnumConst.AccountTopUpProviderEnum)]
+        public required AccountTopUpProvider Provider { get; set; }
     }
 }

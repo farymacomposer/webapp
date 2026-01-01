@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.MoveUp
 {
@@ -24,11 +25,26 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.MoveUp
         /// </summary>
         public required decimal PaymentAmount { get; init; }
 
+        /// <summary>
+        /// Провайдер/канал пополнения счета пользователя
+        /// </summary>
+        [EnumDataType(typeof(AccountTopUpProvider), ErrorMessage = "Недопустимый провайдер/канал пополнения счета пользователя")]
+        public required AccountTopUpProvider TopUpProvider { get; init; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (PaymentAmount <= 0)
             {
                 yield return new ValidationResult("Сумма платежа должна быть больше нуля");
+            }
+
+            if (TopUpProvider is not (
+                AccountTopUpProvider.Donationalerts
+                or AccountTopUpProvider.Donatty
+                or AccountTopUpProvider.TwitchChannelPoints
+                or AccountTopUpProvider.Manual))
+            {
+                yield return new ValidationResult($"Пополнения счета через '{TopUpProvider}' не поддерживается");
             }
         }
     }

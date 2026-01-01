@@ -64,6 +64,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
                     PaymentAmount = request.PaymentAmount!.Value,
+                    TopUpProvider = request.TopUpProvider!.Value,
                 }),
                 ReviewOrderType.Free => await reviewOrderService.CreateFree(new CreateFreeOrderCommand
                 {
@@ -117,11 +118,12 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 ReviewOrderId = request.ReviewOrderId,
                 Nickname = request.Nickname.Trim(),
                 PaymentAmount = request.PaymentAmount,
+                TopUpProvider = request.TopUpProvider,
             });
 
             response = new MoveUpReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map(transaction.Source!),
+                ReviewOrder = ReviewOrderDto.Map((ReviewOrderEntity)transaction.Source),
                 PaymentTransactionId = transaction.Id
             };
 

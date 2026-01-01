@@ -21,53 +21,31 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public ReviewOrderEntity CreateDonation(
-            ComposerStreamEntity stream,
-            TransactionEntity transaction,
+        public ReviewOrderEntity Create(
+            DateTime createdAt,
             int nominalAmount,
-            string? trackUrl,
-            string? userComment)
-        {
-            return context.Add(new ReviewOrderEntity
-            {
-                CreatedAt = DateTime.UtcNow,
-                IsFrozen = false,
-                Type = ReviewOrderType.Donation,
-                CategoryType = OrderCategoryType.Unspecified,
-                Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
-                MainNickname = transaction.Account.UserNickname.Nickname,
-                MainNormalizedNickname = transaction.Account.UserNickname.NormalizedNickname,
-                TrackUrl = trackUrl,
-                UserComment = userComment,
-                CreationStream = stream,
-                UserNicknames = { transaction.Account.UserNickname },
-                NominalAmount = nominalAmount,
-                Transactions = { transaction },
-            }).Entity;
-        }
-
-        public ReviewOrderEntity CreateFree(
-            ComposerStreamEntity stream,
-            UserNicknameEntity userNickname,
-            int nominalAmount,
+            int payableAmount,
             string? trackUrl,
             string? userComment,
-            ReviewOrderType type)
+            ReviewOrderType type,
+            ComposerStreamEntity stream,
+            UserNicknameEntity userNickname)
         {
             return context.Add(new ReviewOrderEntity
             {
-                CreatedAt = DateTime.UtcNow,
-                IsFrozen = false,
-                Type = type,
-                CategoryType = OrderCategoryType.Unspecified,
-                Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
+                CreatedAt = createdAt,
                 MainNickname = userNickname.Nickname,
                 MainNormalizedNickname = userNickname.NormalizedNickname,
+                Type = type,
+                Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
+                CategoryType = OrderCategoryType.Unspecified,
+                IsFrozen = false,
                 TrackUrl = trackUrl,
+                NominalAmount = nominalAmount,
+                PayableAmount = payableAmount,
                 UserComment = userComment,
                 CreationStream = stream,
                 UserNicknames = { userNickname },
-                NominalAmount = nominalAmount,
             }).Entity;
         }
     }

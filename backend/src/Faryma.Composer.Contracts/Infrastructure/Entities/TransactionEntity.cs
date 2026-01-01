@@ -17,16 +17,16 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         public required DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// Направление транзакции (увеличение или уменьшение баланса счета)
-        /// </summary>
-        [Column(TypeName = DbEnumConst.TransactionDirectionEnum)]
-        public required TransactionDirection Direction { get; set; }
-
-        /// <summary>
         /// Тип транзакции
         /// </summary>
         [Column(TypeName = DbEnumConst.TransactionKindEnum)]
         public required TransactionKind Kind { get; set; }
+
+        /// <summary>
+        /// Направление транзакции (увеличение или уменьшение баланса счета)
+        /// </summary>
+        [Column(TypeName = DbEnumConst.TransactionDirectionEnum)]
+        public required TransactionDirection Direction { get; set; }
 
         /// <summary>
         /// Сумма операции

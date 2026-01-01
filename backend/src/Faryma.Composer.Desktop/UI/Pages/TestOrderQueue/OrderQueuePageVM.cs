@@ -149,6 +149,7 @@ namespace Faryma.Composer.Desktop.UI
                 ReviewOrderId = SelectedOrder?.Id ?? 0,
                 Nickname = Nickname,
                 PaymentAmount = paymentAmount,
+                TopUpProvider = AccountTopUpProvider.Manual,
             });
         }
 

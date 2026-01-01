@@ -33,6 +33,12 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create
         public decimal? PaymentAmount { get; init; }
 
         /// <summary>
+        /// Провайдер/канал пополнения счета пользователя
+        /// </summary>
+        [EnumDataType(typeof(AccountTopUpProvider), ErrorMessage = "Недопустимый провайдер/канал пополнения счета пользователя")]
+        public AccountTopUpProvider? TopUpProvider { get; init; }
+
+        /// <summary>
         /// Комментарий пользователя
         /// </summary>
         [StringLength(200, ErrorMessage = "Максимальная длина комментария - 200 символов")]
@@ -54,9 +60,21 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create
                 yield return new ValidationResult("Сумма платежа не может быть отрицательной");
             }
 
-            if (OrderType == ReviewOrderType.Donation && PaymentAmount == 0)
+            if (OrderType == ReviewOrderType.Donation)
             {
-                yield return new ValidationResult("Для донатных заказов сумма платежа не может быть равна нулю");
+                if (PaymentAmount == 0)
+                {
+                    yield return new ValidationResult("Для донатных заказов сумма платежа не может быть равна нулю");
+                }
+
+                if (TopUpProvider is not (
+                    AccountTopUpProvider.Donationalerts
+                    or AccountTopUpProvider.Donatty
+                    or AccountTopUpProvider.TwitchChannelPoints
+                    or AccountTopUpProvider.Manual))
+                {
+                    yield return new ValidationResult($"Для донатных заказов пополнения счета через '{TopUpProvider}' не поддерживается");
+                }
             }
 
             if (OrderType

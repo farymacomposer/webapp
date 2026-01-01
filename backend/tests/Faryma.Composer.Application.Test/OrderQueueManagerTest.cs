@@ -991,6 +991,7 @@ namespace Faryma.Composer.Application.Test
                 Type = ReviewOrderType.Donation,
                 CategoryType = OrderCategoryType.Unspecified,
                 NominalAmount = amount,
+                PayableAmount = amount,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreationStream = new ComposerStreamEntity
@@ -1013,6 +1014,7 @@ namespace Faryma.Composer.Application.Test
                 Type = ReviewOrderType.OutOfQueue,
                 CategoryType = OrderCategoryType.Unspecified,
                 NominalAmount = 0,
+                PayableAmount = 0,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreationStream = new ComposerStreamEntity

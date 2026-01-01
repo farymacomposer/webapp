@@ -1,9 +1,9 @@
 ﻿namespace Faryma.Composer.Contracts.Infrastructure.Enums
 {
     /// <summary>
-    /// Провайдер/канал пополнения
+    /// Провайдер/канал пополнения счета пользователя
     /// </summary>
-    public enum TopUpProvider
+    public enum AccountTopUpProvider
     {
         /// <summary>
         /// Не задан
@@ -12,6 +12,7 @@
 
         Donationalerts = 1,
         Donatty = 2,
+        TwitchChannelPoints = 3,
 
         /// <summary>
         /// Вручную, админом или модератором
