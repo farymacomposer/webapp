@@ -84,17 +84,18 @@ namespace Faryma.Composer.Infrastructure
             builder.HasPostgresEnum();
             builder.Entity<TransactionSourceEntity>().UseTptMappingStrategy();
 
-            builder.Entity<ComposerStreamEntity>()
-                .HasMany(cs => cs.CreatedReviewOrders)
-                .WithOne(ro => ro.CreationStream)
-                .HasForeignKey(ro => ro.CreationStreamId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ReviewOrderEntity>(b =>
+            {
+                b.HasOne(x => x.CreationStream)
+                 .WithMany(x => x.CreatedReviewOrders)
+                 .HasForeignKey(x => x.CreationStreamId)
+                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<ComposerStreamEntity>()
-                .HasMany(cs => cs.ProcessedReviewOrders)
-                .WithOne(ro => ro.ProcessingStream)
-                .HasForeignKey(ro => ro.ProcessingStreamId)
-                .OnDelete(DeleteBehavior.Restrict);
+                b.HasOne(x => x.ProcessingStream)
+                 .WithMany(x => x.ProcessedReviewOrders)
+                 .HasForeignKey(x => x.ProcessingStreamId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
 
             builder.Entity<TrackEntity>()
                 .OwnsMany(x => x.Tags, x => x.ToJson());
