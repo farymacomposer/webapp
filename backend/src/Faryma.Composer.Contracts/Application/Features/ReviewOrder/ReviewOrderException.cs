@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using Faryma.Composer.Contracts.Exceptions;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
 namespace Faryma.Composer.Contracts.Application.Features.ReviewOrder
 {

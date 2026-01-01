@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -8,6 +9,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// Псевдоним пользователя
     /// </summary>
     [Index(nameof(NormalizedNickname), IsUnique = true)]
+    [Table("user_nicknames")]
     public sealed class UserNicknameEntity : PersonalEntity
     {
         /// <summary>

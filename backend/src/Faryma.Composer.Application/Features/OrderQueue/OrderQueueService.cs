@@ -4,6 +4,7 @@ using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Repositories.Read;

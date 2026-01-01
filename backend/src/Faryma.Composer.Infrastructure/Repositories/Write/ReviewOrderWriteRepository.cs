@@ -1,5 +1,6 @@
 ﻿using Faryma.Composer.Contracts.Exceptions;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
             return context.ReviewOrders
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
-                .Include(x => x.Payments)
+                .Include(x => x.Transactions)
                 .Include(x => x.Review)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
@@ -41,7 +42,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
                 CreationStream = stream,
                 UserNicknames = { transaction.Account.UserNickname },
                 NominalAmount = nominalAmount,
-                Payments = { transaction },
+                Transactions = { transaction },
             }).Entity;
         }
 

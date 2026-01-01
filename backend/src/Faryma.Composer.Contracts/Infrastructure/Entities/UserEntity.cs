@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
 {
     /// <summary>
     /// Пользователь системы
     /// </summary>
+    [Table("users")]
     public sealed class UserEntity : IdentityUser<Guid>
     {
         /// <summary>

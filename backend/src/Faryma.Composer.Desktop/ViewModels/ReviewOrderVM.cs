@@ -39,11 +39,6 @@ namespace Faryma.Composer.Desktop.ViewModels
         public ReviewOrderType Type { get; } = dto.Type;
 
         /// <summary>
-        /// Тип категории заказа
-        /// </summary>
-        public OrderCategoryType CategoryType { get; } = dto.CategoryType;
-
-        /// <summary>
         /// Статус заказа
         /// </summary>
         public ReviewOrderStatus Status { get; } = dto.Status;
@@ -117,6 +112,12 @@ namespace Faryma.Composer.Desktop.ViewModels
         /// Тип стрима
         /// </summary>
         public ComposerStreamType StreamType { get; } = dto.CreationStream.Type;
+
+        /// <summary>
+        /// Выбран
+        /// </summary>
+        [ObservableProperty]
+        public partial bool IsSelected { get; set; }
 
         [RelayCommand]
         private void Select() => App.GetService<OrderQueuePageVM>().SelectedOrder = this;

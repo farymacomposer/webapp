@@ -6,6 +6,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// <summary>
     /// Пользовательская оценка трека
     /// </summary>
+    [Table("user_track_ratings")]
     public sealed class UserTrackRatingEntity : BaseEntity
     {
         /// <summary>

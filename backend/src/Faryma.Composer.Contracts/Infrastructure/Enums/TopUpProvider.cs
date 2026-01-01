@@ -1,23 +1,21 @@
 ﻿namespace Faryma.Composer.Contracts.Infrastructure.Enums
 {
     /// <summary>
-    /// Тип операции
+    /// Провайдер/канал пополнения
     /// </summary>
-    public enum TransactionType
+    public enum TopUpProvider
     {
         /// <summary>
         /// Не задан
         /// </summary>
         Unspecified = 0,
 
-        /// <summary>
-        /// Пополнение
-        /// </summary>
-        Deposit = 1,
+        Donationalerts = 1,
+        Donatty = 2,
 
         /// <summary>
-        /// Оплата
+        /// Вручную, админом или модератором
         /// </summary>
-        Payment = 2
+        Manual = 100
     }
 }

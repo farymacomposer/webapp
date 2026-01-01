@@ -1,10 +1,12 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
 {
     /// <summary>
     /// Музыкальный жанр трека
     /// </summary>
+    [Table("track_genres")]
     public sealed class TrackGenreEntity : BaseEntity
     {
         /// <summary>

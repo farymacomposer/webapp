@@ -1,15 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
-using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
-namespace Faryma.Composer.Contracts.Infrastructure.Entities
+namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
 {
     /// <summary>
     /// Заказ разбора трека
     /// </summary>
     [DebuggerDisplay("MainNickname = {MainNickname}")]
-    public sealed class ReviewOrderEntity : BaseEntity
+    [Table("review_orders")]
+    public sealed class ReviewOrderEntity : TransactionSourceEntity
     {
         /// <summary>
         /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
@@ -18,11 +18,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         public required string MainNormalizedNickname { get; set; }
 
         public long CreationStreamId { get; set; }
-
-        /// <summary>
-        /// Дата и время создания заказа
-        /// </summary>
-        public required DateTime CreatedAt { get; set; }
 
         public long? ProcessingStreamId { get; set; }
 
@@ -49,7 +44,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         public required ReviewOrderStatus Status { get; set; }
 
         /// <summary>
-        /// Тип категории заказа
+        /// Тип категории заказа (записывается при взятии заказа в работу)
         /// </summary>
         [Column(TypeName = DbEnumConst.OrderCategoryTypeEnum)]
         public required OrderCategoryType CategoryType { get; set; }
@@ -70,6 +65,16 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// Номинальная стоимость заказа
         /// </summary>
         public required decimal NominalAmount { get; set; }
+
+        /// <summary>
+        /// Сумма к оплате
+        /// </summary>
+        public required decimal PayableAmount { get; set; }
+
+        /// <summary>
+        /// Причина скидки
+        /// </summary>
+        public string? DiscountReason { get; set; }
 
         /// <summary>
         /// Комментарий пользователя
@@ -107,11 +112,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         public ICollection<UserNicknameEntity> UserNicknames { get; set; } = [];
 
         /// <summary>
-        /// Платежи
-        /// </summary>
-        public ICollection<TransactionEntity> Payments { get; set; } = [];
-
-        /// <summary>
         /// Возвращает общую стоимость заказа
         /// </summary>
         public decimal GetTotalAmount()
@@ -119,8 +119,8 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
             return Type switch
             {
                 ReviewOrderType.OutOfQueue => 0,
-                ReviewOrderType.Donation => Payments.Sum(x => x.Amount),
-                ReviewOrderType.Free => NominalAmount + Payments.Sum(x => x.Amount),
+                ReviewOrderType.Donation => Transactions.Sum(x => x.Amount),
+                ReviewOrderType.Free => NominalAmount + Transactions.Sum(x => x.Amount),
                 ReviewOrderType.Charity => 0,
                 _ => throw new InvalidOperationException(),
             };

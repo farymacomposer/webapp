@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// Стрим композитора
     /// </summary>
     [Index(nameof(EventDate), IsUnique = true)]
+    [Table("composer_streams")]
     public sealed class ComposerStreamEntity : BaseEntity
     {
         /// <summary>

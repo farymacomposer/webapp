@@ -11,6 +11,7 @@ using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Unfreeze;
 using Faryma.Composer.Contracts.Api.Shared.Dto;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -120,7 +121,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             response = new MoveUpReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map(transaction.ReviewOrder!),
+                ReviewOrder = ReviewOrderDto.Map(transaction.Source!),
                 PaymentTransactionId = transaction.Id
             };
 

@@ -49,6 +49,11 @@ namespace Faryma.Composer.Desktop.UI
         private Task OpenCreateReviewOrder() => _dialogService.ShowDialog<CreateReviewOrderDialog, CreateReviewOrderDialogVM>();
 
         [RelayCommand]
-        private void SelectReviewOrder(ReviewOrderVM reviewOrder) => SelectedReviewOrder = reviewOrder;
+        private void SelectReviewOrder(ReviewOrderVM reviewOrder)
+        {
+            SelectedReviewOrder?.IsSelected = false;
+            SelectedReviewOrder = reviewOrder;
+            SelectedReviewOrder.IsSelected = true;
+        }
     }
 }

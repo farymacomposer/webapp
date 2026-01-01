@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -81,6 +82,7 @@ namespace Faryma.Composer.Infrastructure
             base.OnModelCreating(builder);
 
             builder.HasPostgresEnum();
+            builder.Entity<TransactionSourceEntity>().UseTptMappingStrategy();
 
             builder.Entity<ComposerStreamEntity>()
                 .HasMany(cs => cs.CreatedReviewOrders)

@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
 {
     /// <summary>
     /// Результат разбора трека композитором
     /// </summary>
+    [Table("reviews")]
     public sealed class ReviewEntity : BaseEntity
     {
         /// <summary>

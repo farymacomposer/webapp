@@ -31,29 +31,38 @@
                 Command="{Binding ViewModel.SelectReviewOrderCommand, Source={StaticResource BindingProxy}, Mode=OneTime}"
                 CommandParameter="{x:Bind}"
                 Style="{StaticResource ButtonFlatStyle}">
-                <Grid Style="{StaticResource GridCardStyle}">
+                <Grid>
 
-                    <StackPanel HorizontalAlignment="Left" Spacing="8">
+                    <Grid Style="{StaticResource GridCardStyle}">
 
-                        <Grid Width="200">
-                            <Border
-                                Background="{x:Bind MainNickname, Converter={StaticResource StringHashHighlightConverter}}"
-                                CornerRadius="4"
-                                Opacity="0.2" />
-                            <TextBox IsReadOnly="True" Text="{x:Bind MainNickname}" />
-                        </Grid>
+                        <StackPanel HorizontalAlignment="Left" Spacing="8">
 
-                        <HyperlinkButton
-                            x:Name="TrackUrl"
-                            x:Load="{x:Bind HasTrackUrl}"
-                            Content="{x:Bind TrackUrl}"
-                            NavigateUri="{Binding TrackUrl, Mode=OneTime}" />
-                    </StackPanel>
+                            <Grid Width="200">
+                                <Border
+                                    Background="{x:Bind MainNickname, Converter={StaticResource StringHashHighlightConverter}}"
+                                    CornerRadius="4"
+                                    Opacity="0.2" />
+                                <TextBox IsReadOnly="True" Text="{x:Bind MainNickname}" />
+                            </Grid>
 
-                    <TextBlock
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Text="{x:Bind Id}" />
+                            <HyperlinkButton
+                                x:Name="TrackUrl"
+                                x:Load="{x:Bind HasTrackUrl}"
+                                Content="{x:Bind TrackUrl}"
+                                NavigateUri="{Binding TrackUrl, Mode=OneTime}" />
+                        </StackPanel>
+
+                        <TextBlock
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Text="{x:Bind Id}" />
+                    </Grid>
+
+                    <Border
+                        BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+                        BorderThickness="2"
+                        CornerRadius="4"
+                        Visibility="{x:Bind IsSelected, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </Grid>
             </Button>
         </DataTemplate>
@@ -137,10 +146,6 @@
 
                 <local:TitledContentRow Title="Тип заказа">
                     <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.Type, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
-                </local:TitledContentRow>
-
-                <local:TitledContentRow Title="Тип категории заказа">
-                    <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.CategoryType, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
                 </local:TitledContentRow>
 
                 <local:TitledContentRow Title="Статус заказа">

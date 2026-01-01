@@ -6,6 +6,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// <summary>
     /// Счет пользователя
     /// </summary>
+    [Table("user_accounts")]
     public sealed class UserAccountEntity : PersonalEntity
     {
         /// <summary>

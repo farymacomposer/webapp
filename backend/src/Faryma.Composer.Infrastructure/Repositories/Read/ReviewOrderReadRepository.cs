@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,7 +56,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
             return context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
-                .Include(x => x.Payments)
+                .Include(x => x.Transactions)
                 .Where(x => x.CreationStreamId == streamId
                     && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
                 .ToListAsync();
@@ -68,7 +68,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
-                .Include(x => x.Payments)
+                .Include(x => x.Transactions)
                 .Where(x => (x.CreationStreamId == streamId
                     && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
                     || (x.ProcessingStreamId == streamId && x.Status == ReviewOrderStatus.Completed))
@@ -81,7 +81,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
-                .Include(x => x.Payments)
+                .Include(x => x.Transactions)
                 .Where(x => x.Status == ReviewOrderStatus.Preorder
                     || x.Status == ReviewOrderStatus.Pending
                     || x.Status == ReviewOrderStatus.InProgress

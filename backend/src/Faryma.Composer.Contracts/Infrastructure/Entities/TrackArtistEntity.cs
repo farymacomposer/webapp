@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -7,6 +8,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// Исполнитель музыкального трека
     /// </summary>
     [Index(nameof(NormalizedName), IsUnique = true)]
+    [Table("track_artists")]
     public sealed class TrackArtistEntity : BaseEntity
     {
         /// <summary>

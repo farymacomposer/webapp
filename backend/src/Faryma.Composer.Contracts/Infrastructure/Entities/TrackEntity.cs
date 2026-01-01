@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Models;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -7,6 +8,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// <summary>
     /// Музыкальный трек
     /// </summary>
+    [Table("tracks")]
     public sealed class TrackEntity : BaseEntity
     {
         /// <summary>

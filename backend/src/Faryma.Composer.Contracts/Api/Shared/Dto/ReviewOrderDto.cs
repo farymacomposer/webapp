@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Contracts.Api.Shared.Dto
@@ -33,11 +33,6 @@ namespace Faryma.Composer.Contracts.Api.Shared.Dto
         /// Тип заказа
         /// </summary>
         public required ReviewOrderType Type { get; init; }
-
-        /// <summary>
-        /// Тип категории заказа
-        /// </summary>
-        public required OrderCategoryType CategoryType { get; init; }
 
         /// <summary>
         /// Статус заказа
@@ -86,7 +81,6 @@ namespace Faryma.Composer.Contracts.Api.Shared.Dto
                 InProgressAt = item.InProgressAt,
                 CompletedAt = item.CompletedAt,
                 Type = item.Type,
-                CategoryType = item.CategoryType,
                 Status = item.Status,
                 IsFrozen = item.IsFrozen,
                 TrackUrl = item.TrackUrl,

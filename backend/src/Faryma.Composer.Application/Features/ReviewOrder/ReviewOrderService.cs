@@ -6,6 +6,7 @@ using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure;
 
@@ -121,7 +122,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname);
             TransactionEntity deposit = uow.TransactionWrite.CreateDeposit(userNickname.Account, command.PaymentAmount);
             TransactionEntity payment = uow.TransactionWrite.CreatePayment(userNickname.Account, command.PaymentAmount);
-            order.Payments.Add(payment);
+            order.Transactions.Add(payment);
 
             await uow.SaveChangesAsync();
 
