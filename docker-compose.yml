@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   frontend:
@@ -15,7 +13,7 @@ services:
       - composer-net
     depends_on:
       - webapi
-    restart: no
+    restart: unless-stopped
 
   webapi:
     build:
@@ -40,7 +38,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    restart: no
+    restart: unless-stopped
 
   db:
     image: postgres:17
