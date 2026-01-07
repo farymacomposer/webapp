@@ -1,8 +1,12 @@
-﻿using Faryma.Composer.Desktop.Services.ComposerStreamFeature;
-using Faryma.Composer.Desktop.Services.OrderQueueFeature;
-using Faryma.Composer.Desktop.Services.ReviewOrderFeature;
-using Faryma.Composer.Desktop.UI.OrderQueueFeature;
-using Faryma.Composer.Desktop.UI.ReviewOrderFeature;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using CommunityToolkit.Mvvm.Messaging;
+using Faryma.Composer.Desktop.Api.ComposerStream;
+using Faryma.Composer.Desktop.Api.ReviewOrder;
+using Faryma.Composer.Desktop.Navigation;
+using Faryma.Composer.Desktop.Services;
+using Faryma.Composer.Desktop.UI;
+using Faryma.Composer.Desktop.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Serilog;
@@ -10,7 +14,7 @@ using Serilog.Events;
 
 namespace Faryma.Composer.Desktop
 {
-    public partial class App : Application
+    public partial class App : Microsoft.UI.Xaml.Application
     {
         public const string BaseAddress = "https://localhost:7166";
 
@@ -27,14 +31,16 @@ namespace Faryma.Composer.Desktop
                 .Console(LogEventLevel.Verbose, applyThemeToRedirectedOutput: true)
                 .CreateLogger()));
 
-            services.AddHttpClient("Faryma.Composer.Api", client => client.BaseAddress = new Uri(BaseAddress));
+            services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
+            services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
+            services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.Web)
+            {
+                Converters = { new JsonStringEnumConverter() }
+            });
 
-            services.AddSingleton<OrderQueueService>();
-            services.AddSingleton<ReviewOrderService>();
-            services.AddSingleton<ComposerStreamService>();
-
-            services.AddSingleton<OrderQueuePageVM>();
-            services.AddSingleton<ReviewOrderPageVM>();
+            services.AddSingleton<IMessenger, StrongReferenceMessenger>();
+            services.AddNavigation();
+            services.AddServices();
 
             _services = services.BuildServiceProvider();
         }
@@ -45,15 +51,22 @@ namespace Faryma.Composer.Desktop
         }
 
         public static T GetService<T>() where T : notnull => _services.GetRequiredService<T>();
-        public static Task ShowDialog(string message) => GetService<OrderQueuePageVM>().ShowDialog(message);
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
-            await GetService<OrderQueueService>().Initialize();
-            await GetService<OrderQueuePageVM>().Initialize();
+#if DEBUG
+            await Task.Delay(2000);
+#endif
 
-            MainWindow window = new();
+            MainWindow window = GetService<MainWindow>();
             window.Activate();
+
+            await GetService<MessageService>().HandleException(async () =>
+            {
+                await GetService<OrderQueueService>().Initialize();
+                await GetService<OrderQueuePageVM>().Initialize();
+                await GetService<ComposerStreamPageVM>().Initialize();
+            }, "Приложение не инициализировано");
         }
     }
 }

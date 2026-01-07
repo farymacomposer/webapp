@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <RootNamespace>Faryma.Composer.Desktop</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -30,21 +30,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml" />
-    <None Remove="UI\OrderQueueFeature\OrderQueuePage.xaml" />
-    <None Remove="UI\ReviewOrderFeature\ReviewOrderPage.xaml" />
+    <Compile Include="..\Faryma.Composer.Application\Features\OrderQueueFeature\Enums\CategoryState.cs" Link="Api\OrderQueue\Enums\CategoryState.cs" />
+    <Compile Include="..\Faryma.Composer.Application\Features\OrderQueueFeature\Enums\OrderActivityStatus.cs" Link="Api\OrderQueue\Enums\OrderActivityStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Application\Features\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" Link="Api\OrderQueue\Enums\OrderQueueUpdateType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamStatus.cs" Link="Api\Shared\Enums\ComposerStreamStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamType.cs" Link="Api\Shared\Enums\ComposerStreamType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\OrderCategoryType.cs" Link="Api\Shared\Enums\OrderCategoryType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderStatus.cs" Link="Api\Shared\Enums\ReviewOrderStatus.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderType.cs" Link="Api\Shared\Enums\ReviewOrderType.cs" />
+    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\TransactionType.cs" Link="Api\Shared\Enums\TransactionType.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\CategoryState.cs" Link="Services\OrderQueueFeature\Enums\CategoryState.cs" />
-    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderActivityStatus.cs" Link="Services\OrderQueueFeature\Enums\OrderActivityStatus.cs" />
-    <Compile Include="..\Faryma.Composer.Core\Features\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" Link="Services\OrderQueueFeature\Enums\OrderQueueUpdateType.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamStatus.cs" Link="Shared\Enums\ComposerStreamStatus.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ComposerStreamType.cs" Link="Shared\Enums\ComposerStreamType.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\OrderCategoryType.cs" Link="Shared\Enums\OrderCategoryType.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderStatus.cs" Link="Shared\Enums\ReviewOrderStatus.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\ReviewOrderType.cs" Link="Shared\Enums\ReviewOrderType.cs" />
-    <Compile Include="..\Faryma.Composer.Infrastructure\Enums\TransactionType.cs" Link="Shared\Enums\TransactionType.cs" />
+    <Folder Include="Api\OrderQueue\Enums\" />
+    <Folder Include="Api\Shared\Enums\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,41 +60,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.6.4" />
+    <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
+    <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
     <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.250402" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251106002" />
     <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="UI\OrderQueue\OrderQueuePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\OrderQueueFeature\Enums\" />
-    <Folder Include="Shared\Enums\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="UI\ReviewOrderFeature\ReviewOrderPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="UI\OrderQueueFeature\Controls\ReviewOrderControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
   </ItemGroup>
 
   <!--
@@ -114,4 +92,5 @@
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
   </PropertyGroup>
+
 </Project>

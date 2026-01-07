@@ -1,12 +1,12 @@
 ﻿using Faryma.Composer.Infrastructure.Entities;
-using Faryma.Composer.Infrastructure.Enums;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure
 {
-    public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User, IdentityRole<Guid>, Guid>(options)
+    public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<UserEntity, IdentityRole<Guid>, Guid>(options), IDataProtectionKeyContext
     {
         /// <summary>
         /// Настройки приложения
@@ -16,88 +16,85 @@ namespace Faryma.Composer.Infrastructure
         /// <summary>
         /// Стримы композитора
         /// </summary>
-        public DbSet<ComposerStream> ComposerStreams { get; set; }
+        public DbSet<ComposerStreamEntity> ComposerStreams { get; set; }
 
         /// <summary>
         /// Результаты разборов треков
         /// </summary>
-        public DbSet<Review> Reviews { get; set; }
+        public DbSet<ReviewEntity> Reviews { get; set; }
 
         /// <summary>
         /// Заказы разборов треков
         /// </summary>
-        public DbSet<ReviewOrder> ReviewOrders { get; set; }
+        public DbSet<ReviewOrderEntity> ReviewOrders { get; set; }
 
         /// <summary>
         /// Музыкальные треки
         /// </summary>
-        public DbSet<Track> Tracks { get; set; }
+        public DbSet<TrackEntity> Tracks { get; set; }
 
         /// <summary>
         /// Исполнители музыкальных треков
         /// </summary>
-        public DbSet<TrackArtist> TrackArtists { get; set; }
+        public DbSet<TrackArtistEntity> TrackArtists { get; set; }
 
         /// <summary>
         /// Страны производства треков
         /// </summary>
-        public DbSet<TrackCountry> TrackCountries { get; set; }
+        public DbSet<TrackCountryEntity> TrackCountries { get; set; }
 
         /// <summary>
         /// Музыкальные жанры
         /// </summary>
-        public DbSet<TrackGenre> TrackGenres { get; set; }
+        public DbSet<TrackGenreEntity> TrackGenres { get; set; }
 
         /// <summary>
         /// Операции по счетам
         /// </summary>
-        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<TransactionEntity> Transactions { get; set; }
 
         /// <summary>
         /// Пользователи
         /// </summary>
-        public DbSet<User> User { get; set; }
+        public DbSet<UserEntity> User { get; set; }
 
         /// <summary>
         /// Счета пользователей
         /// </summary>
-        public DbSet<UserAccount> UserAccounts { get; set; }
+        public DbSet<UserAccountEntity> UserAccounts { get; set; }
 
         /// <summary>
         /// Псевдонимы пользователей
         /// </summary>
-        public DbSet<UserNickname> UserNicknames { get; set; }
+        public DbSet<UserNicknameEntity> UserNicknames { get; set; }
 
         /// <summary>
         /// Оценки пользователей
         /// </summary>
-        public DbSet<UserTrackRating> UserTrackRatings { get; set; }
+        public DbSet<UserTrackRatingEntity> UserTrackRatings { get; set; }
+
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.HasDefaultSchema("app");
+            builder.HasDefaultSchema(DbContextHelper.SchemaName);
             base.OnModelCreating(builder);
 
-            builder.HasPostgresEnum<ComposerStreamStatus>();
-            builder.HasPostgresEnum<ComposerStreamType>();
-            builder.HasPostgresEnum<OrderCategoryType>();
-            builder.HasPostgresEnum<ReviewOrderStatus>();
-            builder.HasPostgresEnum<ReviewOrderType>();
-            builder.HasPostgresEnum<TransactionType>();
+            builder.HasPostgresEnum();
 
-            builder.Entity<ComposerStream>()
+            builder.Entity<ComposerStreamEntity>()
                 .HasMany(cs => cs.CreatedReviewOrders)
                 .WithOne(ro => ro.CreationStream)
                 .HasForeignKey(ro => ro.CreationStreamId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<ComposerStream>()
+            builder.Entity<ComposerStreamEntity>()
                 .HasMany(cs => cs.ProcessedReviewOrders)
                 .WithOne(ro => ro.ProcessingStream)
                 .HasForeignKey(ro => ro.ProcessingStreamId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<Track>()
+            builder.Entity<TrackEntity>()
                 .OwnsMany(x => x.Tags, x => x.ToJson());
 
             builder.Entity<IdentityRole<Guid>>().HasData(
@@ -130,25 +127,25 @@ namespace Faryma.Composer.Infrastructure
                 ReviewOrderNominalAmount = 750,
             });
 
-            builder.Entity<TrackGenre>().HasData(
-                new TrackGenre { Id = 1, Name = "электронное" },
-                new TrackGenre { Id = 2, Name = "фолк" },
-                new TrackGenre { Id = 3, Name = "рок" },
-                new TrackGenre { Id = 4, Name = "разное" },
-                new TrackGenre { Id = 5, Name = "джаз" },
-                new TrackGenre { Id = 6, Name = "метал" },
-                new TrackGenre { Id = 7, Name = "рэп" },
-                new TrackGenre { Id = 8, Name = "поп" },
-                new TrackGenre { Id = 9, Name = "оркестровый" },
-                new TrackGenre { Id = 10, Name = "фанк" },
-                new TrackGenre { Id = 11, Name = "мюзикл/опера" },
-                new TrackGenre { Id = 12, Name = "инди" },
-                new TrackGenre { Id = 13, Name = "поп-рок" },
-                new TrackGenre { Id = 14, Name = "шансон" },
-                new TrackGenre { Id = 15, Name = "специфическое" },
-                new TrackGenre { Id = 16, Name = "баллада" },
-                new TrackGenre { Id = 17, Name = "фортепиано" },
-                new TrackGenre { Id = 18, Name = "инструментал" }
+            builder.Entity<TrackGenreEntity>().HasData(
+                new TrackGenreEntity { Id = 1, Name = "электронное" },
+                new TrackGenreEntity { Id = 2, Name = "фолк" },
+                new TrackGenreEntity { Id = 3, Name = "рок" },
+                new TrackGenreEntity { Id = 4, Name = "разное" },
+                new TrackGenreEntity { Id = 5, Name = "джаз" },
+                new TrackGenreEntity { Id = 6, Name = "метал" },
+                new TrackGenreEntity { Id = 7, Name = "рэп" },
+                new TrackGenreEntity { Id = 8, Name = "поп" },
+                new TrackGenreEntity { Id = 9, Name = "оркестровый" },
+                new TrackGenreEntity { Id = 10, Name = "фанк" },
+                new TrackGenreEntity { Id = 11, Name = "мюзикл/опера" },
+                new TrackGenreEntity { Id = 12, Name = "инди" },
+                new TrackGenreEntity { Id = 13, Name = "поп-рок" },
+                new TrackGenreEntity { Id = 14, Name = "шансон" },
+                new TrackGenreEntity { Id = 15, Name = "специфическое" },
+                new TrackGenreEntity { Id = 16, Name = "баллада" },
+                new TrackGenreEntity { Id = 17, Name = "фортепиано" },
+                new TrackGenreEntity { Id = 18, Name = "инструментал" }
             );
         }
     }

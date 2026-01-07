@@ -1,10 +1,11 @@
 ﻿using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
 using Faryma.Composer.Api.Features.TrackFeature;
-using Faryma.Composer.Core.Features.OrderQueueFeature.Contracts;
+using Faryma.Composer.Application.Features.OrderQueueFeature.Contracts;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
 using Faryma.Composer.Infrastructure.Entities;
@@ -12,7 +13,7 @@ using Faryma.Composer.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Saunter;
 using Saunter.AsyncApiSchema.v2;
 
@@ -24,12 +25,12 @@ namespace Faryma.Composer.Api.DependencyInjection
         {
             services
                 .AddOptionsWithValidateOnStart<JwtOptions>()
-                .Bind(configuration.GetSection("JWT"))
+                .Bind(configuration.GetRequiredSection("JWT"))
                 .ValidateDataAnnotations();
 
             services
                 .AddOptionsWithValidateOnStart<PostgreOptions>()
-                .Bind(configuration.GetSection("POSTGRES"))
+                .Bind(configuration.GetRequiredSection("POSTGRES"))
                 .ValidateDataAnnotations();
 
             return services;
@@ -39,7 +40,7 @@ namespace Faryma.Composer.Api.DependencyInjection
         {
             services
                 .AddPersistence(configuration)
-                .AddIdentityCore<User>(options => options.Password.RequiredLength = 12)
+                .AddIdentityCore<UserEntity>(options => options.Password.RequiredLength = 12)
                 .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
@@ -47,14 +48,14 @@ namespace Faryma.Composer.Api.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services
                 .AddScoped<AuthService>()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    JwtOptions jwtOptions = configuration.GetSection("JWT").Get<JwtOptions>()!;
+                    JwtOptions jwtOptions = configuration.GetRequiredSection("JWT").Get<JwtOptions>()!;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -70,21 +71,24 @@ namespace Faryma.Composer.Api.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IWebHostEnvironment environment)
+        public static IServiceCollection AddPresentationLayer(this IServiceCollection services, IWebHostEnvironment environment)
         {
             services
                 .AddProblemDetails()
                 .AddMemoryCache()
                 .ConfigureSwagger(environment)
-                .AddAsyncApiSpecification(environment)
+                .AddAsyncApiSpecification(environment);
+
+            services
+                .AddSingleton<GlobalExceptionFilter>()
+                .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>())
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+            services
                 .AddSingleton<IOrderQueueNotificationService, OrderQueueNotificationService>()
-                .AddSignalR();
+                .AddSignalR()
+                .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            return services;
-        }
-
-        public static IServiceCollection AddGraphQL(this IServiceCollection services)
-        {
             services
                 .AddGraphQLServer()
                 .AddQueryType<TrackQuery>()
@@ -113,22 +117,7 @@ namespace Faryma.Composer.Api.DependencyInjection
                     }
                 }
 
-                options.CustomSchemaIds(x => x.FullName);
                 options.UseAllOfToExtendReferenceSchemas();
-
-                OpenApiSecurityScheme scheme = new()
-                {
-                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-                    Scheme = JwtBearerDefaults.AuthenticationScheme,
-                    Reference = new OpenApiReference
-                    {
-                        Id = JwtBearerDefaults.AuthenticationScheme,
-                        Type = ReferenceType.SecurityScheme
-                    }
-                };
-
-                options.AddSecurityDefinition(scheme.Reference.Id, scheme);
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement { { scheme, Array.Empty<string>() } });
             });
         }
 
@@ -142,9 +131,9 @@ namespace Faryma.Composer.Api.DependencyInjection
                     Info = new Info(environment.ApplicationName, "v1"),
                     Servers =
                     {
-                        [OrderQueueNotificationService.HubServerName] = new Server(OrderQueueNotificationHub.RoutePattern, "signalr")
+                        [OrderQueueNotificationHub.HubServerName] = new Server(OrderQueueNotificationHub.RoutePattern, "signalr")
                         {
-                            Description = "События очереди заказов"
+                            Description = "Очередь заказов"
                         }
                     }
                 };

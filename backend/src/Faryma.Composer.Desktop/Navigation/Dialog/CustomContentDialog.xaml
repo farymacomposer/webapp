@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="Faryma.Composer.Desktop.Navigation.CustomContentDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Name="Root">
+
+    <Grid Background="{ThemeResource ContentDialogSmokeFill}">
+        <Grid
+            HorizontalAlignment="{Binding HorizontalContentAlignment, ElementName=Root}"
+            VerticalAlignment="{Binding VerticalContentAlignment, ElementName=Root}"
+            Style="{StaticResource GridOverlayDialogStyle}"
+            Translation="0 0 64">
+            <Grid.Shadow>
+                <ThemeShadow />
+            </Grid.Shadow>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid Padding="24,24,24,0" Background="{ThemeResource ContentDialogTopOverlay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="{x:Bind Title, Mode=OneWay}" />
+
+                <Button
+                    Grid.Column="1"
+                    Margin="24,-6,-6,0"
+                    Padding="6"
+                    Command="{x:Bind CloseButtonCommand}"
+                    Style="{StaticResource ButtonFlatStyle}">
+                    <SymbolIcon Symbol="Cancel" />
+                </Button>
+            </Grid>
+
+            <ContentPresenter Grid.Row="1" Content="{x:Bind DialogContent}" />
+        </Grid>
+    </Grid>
+</UserControl>

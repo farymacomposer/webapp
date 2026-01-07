@@ -1,0 +1,23 @@
+﻿namespace Faryma.Composer.Desktop.Api.ReviewOrder.Requests
+{
+    /// <summary>
+    /// Запрос поднятия заказа в очереди
+    /// </summary>
+    public sealed record MoveUpReviewOrderRequest
+    {
+        /// <summary>
+        /// Псевдоним пользователя
+        /// </summary>
+        public required string Nickname { get; init; }
+
+        /// <summary>
+        /// Id заказа разбора трека
+        /// </summary>
+        public required long ReviewOrderId { get; init; }
+
+        /// <summary>
+        /// Сумма платежа
+        /// </summary>
+        public required decimal PaymentAmount { get; init; }
+    }
+}

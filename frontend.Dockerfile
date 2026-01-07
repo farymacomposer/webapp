@@ -1,7 +1,7 @@
 # Base stage
 FROM node:jod-alpine AS base
-WORKDIR /app
-COPY frontend/package.json frontend/pnpm-lock.yaml ./
+WORKDIR /src
+COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
 RUN apk add --no-cache libc6-compat && \
     corepack enable pnpm && \
     pnpm install --frozen-lockfile
@@ -18,8 +18,8 @@ EXPOSE 3000
 
 USER node
 
-COPY --from=build /app/public ./public
-COPY --from=build --chown=node:node /app/.next/standalone ./
-COPY --from=build --chown=node:node /app/.next/static ./.next/static
+COPY --from=build /src/public ./public
+COPY --from=build --chown=node:node /src/.next/standalone ./
+COPY --from=build --chown=node:node /src/.next/static ./.next/static
 
 CMD ["node", "server.js"]

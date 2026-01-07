@@ -1,4 +1,6 @@
-﻿namespace Faryma.Composer.Infrastructure.Enums
+﻿using System.ComponentModel;
+
+namespace Faryma.Composer.Infrastructure.Enums
 {
     /// <summary>
     /// Тип стрима
@@ -8,21 +10,25 @@
         /// <summary>
         /// Не задан
         /// </summary>
+        [Description("Не задан")]
         Unspecified = 0,
 
         /// <summary>
         /// Донатный
         /// </summary>
+        [Description("Донатный")]
         Donation = 1,
 
         /// <summary>
         /// Долговой
         /// </summary>
+        [Description("Долговой")]
         Debt = 2,
 
         /// <summary>
         /// Благотворительный
         /// </summary>
+        [Description("Благотворительный")]
         Charity = 3
     }
 }

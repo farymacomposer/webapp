@@ -2,9 +2,9 @@
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueueFeature;
-using Faryma.Composer.Core.DependencyInjection;
-using Faryma.Composer.Core.Features.AppSettings;
-using Faryma.Composer.Core.Features.OrderQueueFeature;
+using Faryma.Composer.Application.DependencyInjection;
+using Faryma.Composer.Application.Features.AppSettings;
+using Faryma.Composer.Application.Features.OrderQueueFeature;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
@@ -16,7 +16,7 @@ namespace Faryma.Composer.Api
         {
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             {
-                Console.WriteLine("Критическая ошибка" + (e.ExceptionObject as Exception)?.ToString());
+                Console.WriteLine("Критическая ошибка" + (e.ExceptionObject as Exception));
                 Environment.Exit(1);
             };
 
@@ -30,21 +30,16 @@ namespace Faryma.Composer.Api
                     services
                         .AddConfiguration(context.Configuration)
                         .AddPersistenceAndIdentity(context.Configuration)
-                        .AddAuthentication(context.Configuration)
+                        .AddJwtAuthentication(context.Configuration)
                         .AddAuthorization()
-                        .AddCoreServices()
-                        .AddGraphQL();
+                        .AddCoreServices();
 
                     if (builder.Environment.IsDevelopment())
                     {
                         services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
                     }
 
-                    services
-                        .AddSingleton<GlobalExceptionFilter>()
-                        .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>());
-
-                    services.AddInfrastructure(builder.Environment);
+                    services.AddPresentationLayer(builder.Environment);
                 });
 
             WebApplication app = builder.Build();
@@ -54,7 +49,7 @@ namespace Faryma.Composer.Api
 
             app.UseCors(config => config
                 .AllowAnyOrigin()
-                .AllowAnyMethod()
+                .WithMethods("GET", "POST")
                 .AllowAnyHeader());
 
             app.UseHttpsRedirection();

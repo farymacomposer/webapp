@@ -77,7 +77,7 @@ namespace Faryma.Composer.Api.Shared.Dto
         [Required]
         public required ComposerStreamDto CreationStream { get; init; }
 
-        public static ReviewOrderDto Map(ReviewOrder item)
+        public static ReviewOrderDto Map(ReviewOrderEntity item)
         {
             return new()
             {

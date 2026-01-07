@@ -7,10 +7,10 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
 {
     public sealed class ReviewOrder_RW_Repository(AppDbContext context)
     {
-        public async Task<ReviewOrder> Get(long id) => await Find(id)
+        public async Task<ReviewOrderEntity> Get(long id) => await Find(id)
             ?? throw new NotFoundException("Заказ разбора трека не существует", id);
 
-        public Task<ReviewOrder?> Find(long id)
+        public Task<ReviewOrderEntity?> Find(long id)
         {
             return context.ReviewOrders
                 .Include(x => x.CreationStream)
@@ -20,14 +20,14 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public ReviewOrder CreateDonation(
-            ComposerStream stream,
-            Transaction transaction,
+        public ReviewOrderEntity CreateDonation(
+            ComposerStreamEntity stream,
+            TransactionEntity transaction,
             int nominalAmount,
             string? trackUrl,
             string? userComment)
         {
-            return context.Add(new ReviewOrder
+            return context.Add(new ReviewOrderEntity
             {
                 CreatedAt = DateTime.UtcNow,
                 IsFrozen = false,
@@ -45,15 +45,15 @@ namespace Faryma.Composer.Infrastructure.Repositories.ReadWrite
             }).Entity;
         }
 
-        public ReviewOrder CreateFree(
-            ComposerStream stream,
-            UserNickname userNickname,
+        public ReviewOrderEntity CreateFree(
+            ComposerStreamEntity stream,
+            UserNicknameEntity userNickname,
             int nominalAmount,
             string? trackUrl,
             string? userComment,
             ReviewOrderType type)
         {
-            return context.Add(new ReviewOrder
+            return context.Add(new ReviewOrderEntity
             {
                 CreatedAt = DateTime.UtcNow,
                 IsFrozen = false,

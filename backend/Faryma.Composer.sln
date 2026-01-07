@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11205.157 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Api", "src\Faryma.Composer.Api\Faryma.Composer.Api.csproj", "{3D869AF8-5502-A32E-F794-B487CE4696E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Core", "src\Faryma.Composer.Core\Faryma.Composer.Core.csproj", "{4EB1C40A-C953-14F3-3330-70F5816814CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Application", "src\Faryma.Composer.Application\Faryma.Composer.Application.csproj", "{4EB1C40A-C953-14F3-3330-70F5816814CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Infrastructure", "src\Faryma.Composer.Infrastructure\Faryma.Composer.Infrastructure.csproj", "{6FD4945A-2232-0D0D-0BDC-DDC583E464A1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Core.Test", "src\Faryma.Composer.Core.Test\Faryma.Composer.Core.Test.csproj", "{C7B206A0-3BF3-4BB0-A42C-7381982FE487}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
 EndProject
@@ -19,9 +17,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{5B9664
 	ProjectSection(SolutionItems) = preProject
 		..\.env = ..\.env
 		..\backend.Dockerfile = ..\backend.Dockerfile
+		..\.github\workflows\backend.yml = ..\.github\workflows\backend.yml
 		..\docker-compose.yml = ..\docker-compose.yml
 		entrypoint.sh = entrypoint.sh
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.MigrationsBundle", "src\Faryma.Composer.MigrationsBundle\Faryma.Composer.MigrationsBundle.csproj", "{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faryma.Composer.Application.Test", "tests\Faryma.Composer.Application.Test\Faryma.Composer.Application.Test.csproj", "{DB9CF67E-F89E-9A61-42DD-209CF635B670}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,23 +44,26 @@ Global
 		{6FD4945A-2232-0D0D-0BDC-DDC583E464A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FD4945A-2232-0D0D-0BDC-DDC583E464A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FD4945A-2232-0D0D-0BDC-DDC583E464A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C7B206A0-3BF3-4BB0-A42C-7381982FE487}.Release|Any CPU.Build.0 = Release|Any CPU
 		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}.Debug|Any CPU.Build.0 = Debug|x64
 		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}.Debug|Any CPU.Deploy.0 = Debug|x64
 		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}.Release|Any CPU.ActiveCfg = Release|x64
 		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}.Release|Any CPU.Build.0 = Release|x64
 		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB}.Release|Any CPU.Deploy.0 = Release|x64
+		{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D123DDF5-3356-42AC-ADC0-9D80F828DAB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB9CF67E-F89E-9A61-42DD-209CF635B670}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB9CF67E-F89E-9A61-42DD-209CF635B670}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB9CF67E-F89E-9A61-42DD-209CF635B670}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB9CF67E-F89E-9A61-42DD-209CF635B670}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{C7B206A0-3BF3-4BB0-A42C-7381982FE487} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
-		{929315D6-0FE0-7FCD-2FCA-37B588E4D1DB} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
+		{DB9CF67E-F89E-9A61-42DD-209CF635B670} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77438F6B-80F8-4E04-9DCC-EF884A25AADE}
