@@ -30,7 +30,7 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create
         /// <summary>
         /// Сумма платежа
         /// </summary>
-        public decimal? PaymentAmount { get; init; }
+        public long? PaymentAmount { get; init; }
 
         /// <summary>
         /// Провайдер/канал пополнения счета пользователя

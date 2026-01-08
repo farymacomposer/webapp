@@ -71,7 +71,7 @@ namespace Faryma.Composer.Desktop.ViewModels
         /// <summary>
         /// Общая стоимость заказа (номинал + платежи)
         /// </summary>
-        public decimal TotalAmount { get; } = dto.TotalAmount;
+        public long TotalAmount { get; } = dto.TotalAmount;
 
         /// <summary>
         /// Позиция заказа в очереди

@@ -20,7 +20,7 @@ namespace Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands
         /// <summary>
         /// Сумма платежа
         /// </summary>
-        public required decimal PaymentAmount { get; init; }
+        public required long PaymentAmount { get; init; }
 
         /// <summary>
         /// Провайдер/канал пополнения счета пользователя

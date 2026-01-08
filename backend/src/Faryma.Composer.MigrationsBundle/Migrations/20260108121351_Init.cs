@@ -26,7 +26,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 .Annotation("Npgsql:Enum:app.order_category_type", "unspecified,out_of_queue,donation,debt")
                 .Annotation("Npgsql:Enum:app.review_order_status", "unspecified,preorder,pending,in_progress,completed,canceled")
                 .Annotation("Npgsql:Enum:app.review_order_type", "unspecified,out_of_queue,donation,free,charity,custom")
-                .Annotation("Npgsql:Enum:app.transaction_direction", "unspecified,credit,debit")
                 .Annotation("Npgsql:Enum:app.transaction_kind", "unspecified,account_top_up,payment,reversal");
 
             migrationBuilder.CreateTable(
@@ -381,7 +380,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Balance = table.Column<decimal>(type: "numeric", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
+                    Balance = table.Column<long>(type: "bigint", nullable: false),
                     UserNicknameId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -414,8 +414,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
-                    NominalAmount = table.Column<decimal>(type: "numeric", nullable: false),
-                    PayableAmount = table.Column<decimal>(type: "numeric", nullable: false),
+                    NominalAmount = table.Column<long>(type: "bigint", nullable: false),
+                    PayableAmount = table.Column<long>(type: "bigint", nullable: false),
                     UserComment = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -546,8 +546,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Kind = table.Column<TransactionKind>(type: "app.transaction_kind", nullable: false),
-                    Direction = table.Column<TransactionDirection>(type: "app.transaction_direction", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Credit = table.Column<long>(type: "bigint", nullable: false),
+                    Debit = table.Column<long>(type: "bigint", nullable: false),
                     UserAccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     SourceId = table.Column<long>(type: "bigint", nullable: false)
                 },

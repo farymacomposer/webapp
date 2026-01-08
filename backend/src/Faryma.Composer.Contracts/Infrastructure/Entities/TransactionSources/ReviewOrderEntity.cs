@@ -64,12 +64,12 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Номинальная стоимость заказа
         /// </summary>
-        public required decimal NominalAmount { get; set; }
+        public required long NominalAmount { get; set; }
 
         /// <summary>
         /// Сумма к оплате
         /// </summary>
-        public required decimal PayableAmount { get; set; }
+        public required long PayableAmount { get; set; }
 
         /// <summary>
         /// Комментарий пользователя
@@ -109,13 +109,13 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Возвращает общую стоимость заказа
         /// </summary>
-        public decimal GetTotalAmount()
+        public long GetTotalAmount()
         {
             return Type switch
             {
                 ReviewOrderType.OutOfQueue => 0,
-                ReviewOrderType.Donation => Transactions.Sum(x => x.Amount),
-                ReviewOrderType.Free => NominalAmount + Transactions.Sum(x => x.Amount),
+                ReviewOrderType.Donation => Transactions.Where(x => x.Kind == TransactionKind.Payment).Sum(x => x.Debit),
+                ReviewOrderType.Free => NominalAmount + Transactions.Where(x => x.Kind == TransactionKind.Payment).Sum(x => x.Debit),
                 ReviewOrderType.Charity => 0,
                 _ => throw new InvalidOperationException(),
             };

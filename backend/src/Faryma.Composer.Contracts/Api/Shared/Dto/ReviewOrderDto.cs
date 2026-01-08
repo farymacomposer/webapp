@@ -64,7 +64,7 @@ namespace Faryma.Composer.Contracts.Api.Shared.Dto
         /// <summary>
         /// Общая стоимость заказа (номинал + платежи)
         /// </summary>
-        public required decimal TotalAmount { get; init; }
+        public required long TotalAmount { get; init; }
 
         /// <summary>
         /// Связанный cтрим композитора, где создан заказ

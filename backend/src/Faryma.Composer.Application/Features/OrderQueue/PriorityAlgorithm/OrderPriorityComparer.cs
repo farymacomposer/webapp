@@ -1,5 +1,4 @@
 ﻿# nullable disable
-using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
 namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
@@ -13,8 +12,8 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
 
         public int Compare(ReviewOrderEntity x, ReviewOrderEntity y)
         {
-            decimal xAmount = x.GetTotalAmount();
-            decimal yAmount = y.GetTotalAmount();
+            long xAmount = x.GetTotalAmount();
+            long yAmount = y.GetTotalAmount();
 
             int result = decimal.Compare(xAmount, yAmount) * -1;
             if (result != 0)

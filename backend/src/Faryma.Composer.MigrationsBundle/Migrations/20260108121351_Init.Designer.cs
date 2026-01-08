@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260101162406_Init")]
+    [Migration("20260108121351_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -32,7 +32,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "order_category_type", new[] { "unspecified", "out_of_queue", "donation", "debt" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "review_order_status", new[] { "unspecified", "preorder", "pending", "in_progress", "completed", "canceled" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "review_order_type", new[] { "unspecified", "out_of_queue", "donation", "free", "charity", "custom" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "transaction_direction", new[] { "unspecified", "credit", "debit" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "transaction_kind", new[] { "unspecified", "account_top_up", "payment", "reversal" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
@@ -325,14 +324,14 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<TransactionDirection>("Direction")
-                        .HasColumnType("app.transaction_direction");
+                    b.Property<long>("Credit")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Debit")
+                        .HasColumnType("bigint");
 
                     b.Property<TransactionKind>("Kind")
                         .HasColumnType("app.transaction_kind");
@@ -376,11 +375,17 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
+                    b.Property<long>("Balance")
+                        .HasColumnType("bigint");
 
                     b.Property<Guid>("UserNicknameId")
                         .HasColumnType("uuid");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -780,11 +785,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("NominalAmount")
-                        .HasColumnType("numeric");
+                    b.Property<long>("NominalAmount")
+                        .HasColumnType("bigint");
 
-                    b.Property<decimal>("PayableAmount")
-                        .HasColumnType("numeric");
+                    b.Property<long>("PayableAmount")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("ProcessingStreamId")
                         .HasColumnType("bigint");

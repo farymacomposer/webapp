@@ -26,7 +26,6 @@ namespace Faryma.Composer.Infrastructure
                 .MapEnum<OrderCategoryType>("order_category_type", SchemaName)
                 .MapEnum<ReviewOrderStatus>("review_order_status", SchemaName)
                 .MapEnum<ReviewOrderType>("review_order_type", SchemaName)
-                .MapEnum<TransactionDirection>("transaction_direction", SchemaName)
                 .MapEnum<TransactionKind>("transaction_kind", SchemaName)
                 .MapEnum<AccountTopUpProvider>("account_top_up_provider", SchemaName);
         }
@@ -40,7 +39,6 @@ namespace Faryma.Composer.Infrastructure
                 .HasPostgresEnum<OrderCategoryType>(SchemaName, "order_category_type")
                 .HasPostgresEnum<ReviewOrderStatus>(SchemaName, "review_order_status")
                 .HasPostgresEnum<ReviewOrderType>(SchemaName, "review_order_type")
-                .HasPostgresEnum<TransactionDirection>(SchemaName, "transaction_direction")
                 .HasPostgresEnum<TransactionKind>(SchemaName, "transaction_kind")
                 .HasPostgresEnum<AccountTopUpProvider>(SchemaName, "account_top_up_provider");
         }

@@ -9,9 +9,11 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
         public TransactionEntity CreateAccountTopUp(
             DateTime createdAt,
             AccountTopUpProvider topUpProvider,
-            decimal amount,
+            long amount,
             UserAccountEntity account)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
+
             AccountTopUpEntity topUp = new()
             {
                 CreatedAt = createdAt,
@@ -24,19 +26,21 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
             {
                 CreatedAt = createdAt,
                 Kind = TransactionKind.AccountTopUp,
-                Direction = TransactionDirection.Credit,
                 Account = account,
-                Amount = amount,
+                Credit = amount,
+                Debit = 0,
                 Source = topUp,
             }).Entity;
         }
 
         public TransactionEntity CreatePayment(
             DateTime createdAt,
-            decimal amount,
+            long amount,
             UserAccountEntity account,
             TransactionSourceEntity source)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
+
             if (source is not ReviewOrderEntity)
             {
                 throw new InvalidOperationException("Недопустимый источник платежа");
@@ -46,15 +50,20 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
             {
                 CreatedAt = createdAt,
                 Kind = TransactionKind.Payment,
-                Direction = TransactionDirection.Debit,
                 Account = account,
-                Amount = amount,
+                Credit = 0,
+                Debit = amount,
                 Source = source,
             }).Entity;
         }
 
         public TransactionEntity CreateReversal(DateTime createdAt, UserEntity reversedByUser, TransactionEntity reversedTransaction)
         {
+            if (reversedTransaction.Kind == TransactionKind.Reversal)
+            {
+                throw new InvalidOperationException("Невозможно отменить транзакцию отмены");
+            }
+
             TransactionReversalEntity reversal = new()
             {
                 CreatedAt = createdAt,
@@ -68,10 +77,8 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
             {
                 CreatedAt = createdAt,
                 Kind = TransactionKind.Reversal,
-                Direction = reversedTransaction.Direction == TransactionDirection.Debit
-                    ? TransactionDirection.Credit
-                    : TransactionDirection.Debit,
-                Amount = reversedTransaction.Amount,
+                Credit = reversedTransaction.Debit,
+                Debit = reversedTransaction.Credit,
                 Account = reversedTransaction.Account,
                 Source = reversal
             };

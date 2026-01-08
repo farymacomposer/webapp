@@ -23,21 +23,20 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         public required TransactionKind Kind { get; set; }
 
         /// <summary>
-        /// Направление транзакции (увеличение или уменьшение баланса счета)
+        /// Зачисление (увеличивает баланс счета пользователя)
         /// </summary>
-        [Column(TypeName = DbEnumConst.TransactionDirectionEnum)]
-        public required TransactionDirection Direction { get; set; }
+        public required long Credit { get; set; }
 
         /// <summary>
-        /// Сумма операции
+        /// Списание (уменьшает баланс счета пользователя)
         /// </summary>
-        public required decimal Amount { get; set; }
+        public required long Debit { get; set; }
 
         /// <summary>
         /// Сумма операции в зависимости от направления
         /// </summary>
         [NotMapped]
-        public decimal SignedAmount => Direction == TransactionDirection.Debit ? -Amount : Amount;
+        public long SignedAmount => Credit - Debit;
 
         public Guid UserAccountId { get; set; }
         public long SourceId { get; set; }

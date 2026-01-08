@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -9,10 +10,13 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     [Table("user_accounts")]
     public sealed class UserAccountEntity : PersonalEntity
     {
+        [Timestamp]
+        public uint Version { get; set; }
+
         /// <summary>
         /// Текущий баланс
         /// </summary>
-        public decimal Balance { get; set; }
+        public long Balance { get; set; }
 
         public Guid UserNicknameId { get; set; }
 
