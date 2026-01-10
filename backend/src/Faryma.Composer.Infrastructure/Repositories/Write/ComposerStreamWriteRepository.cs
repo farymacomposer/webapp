@@ -9,6 +9,11 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
     {
         public ComposerStreamEntity Create(DateOnly eventDate, ComposerStreamType type)
         {
+            if (type == ComposerStreamType.Unspecified)
+            {
+                throw new InvalidOperationException($"Недопустимый тип стрима '{type}'");
+            }
+
             return context.Add(new ComposerStreamEntity
             {
                 EventDate = eventDate,

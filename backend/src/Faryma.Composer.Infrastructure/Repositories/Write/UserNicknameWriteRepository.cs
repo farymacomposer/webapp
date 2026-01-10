@@ -8,11 +8,19 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
     {
         public UserNicknameEntity Create(string nickname)
         {
-            return context.Add(new UserNicknameEntity
+            UserNicknameEntity result = new()
             {
                 Nickname = nickname,
                 NormalizedNickname = normalizer.NormalizeName(nickname),
-            }).Entity;
+            };
+
+            context.Add(result);
+            context.Add(new UserAccountEntity
+            {
+                UserNickname = result
+            });
+
+            return result;
         }
 
         public Task<UserNicknameEntity?> Find(string nickname)

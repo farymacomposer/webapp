@@ -14,14 +14,19 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
 
-            AccountTopUpEntity topUp = new()
+            if (topUpProvider == AccountTopUpProvider.Unspecified)
+            {
+                throw new InvalidOperationException($"Недопустимый провайдер пополнения счета '{topUpProvider}'");
+            }
+
+            AccountTopUpEntity source = new()
             {
                 CreatedAt = createdAt,
                 Provider = topUpProvider,
                 Account = account,
             };
 
-            context.Add(topUp);
+            context.Add(source);
 
             return context.Add(new TransactionEntity
             {
@@ -30,7 +35,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
                 Account = account,
                 Credit = amount,
                 Debit = 0,
-                Source = topUp,
+                Source = source,
             }).Entity;
         }
 
@@ -44,7 +49,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
 
             if (source is not ReviewOrderEntity)
             {
-                throw new InvalidOperationException("Недопустимый источник платежа");
+                throw new InvalidOperationException($"Недопустимый источник платежа '{source.GetType().Name}'");
             }
 
             return context.Add(new TransactionEntity
@@ -65,29 +70,29 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
                 throw new InvalidOperationException("Невозможно отменить транзакцию отмены");
             }
 
-            TransactionReversalEntity reversal = new()
+            TransactionReversalEntity source = new()
             {
                 CreatedAt = createdAt,
                 ReversedByUser = reversedByUser,
                 ReversedTransaction = reversedTransaction,
             };
 
-            context.Add(reversal);
+            context.Add(source);
 
-            TransactionEntity reversalTransaction = new()
+            TransactionEntity result = new()
             {
                 CreatedAt = createdAt,
                 Kind = TransactionKind.Reversal,
                 Credit = reversedTransaction.Debit,
                 Debit = reversedTransaction.Credit,
                 Account = reversedTransaction.Account,
-                Source = reversal
+                Source = source
             };
 
-            context.Add(reversalTransaction);
-            reversal.ReversalTransaction = reversalTransaction;
+            context.Add(result);
+            source.ReversalTransaction = result;
 
-            return reversalTransaction;
+            return result;
         }
     }
 }

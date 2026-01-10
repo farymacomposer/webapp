@@ -15,7 +15,6 @@ namespace Faryma.Composer.Infrastructure
         ReviewWriteRepository reviewWrite,
         ReviewOrderWriteRepository reviewOrderWrite,
         TransactionWriteRepository transactionWrite,
-        UserAccountWriteRepository userAccountWrite,
         UserNicknameWriteRepository userNicknameWrite
         )
     {
@@ -27,7 +26,6 @@ namespace Faryma.Composer.Infrastructure
         public ReviewWriteRepository ReviewWrite { get; } = reviewWrite;
         public ReviewOrderWriteRepository ReviewOrderWrite { get; } = reviewOrderWrite;
         public TransactionWriteRepository TransactionWrite { get; } = transactionWrite;
-        public UserAccountWriteRepository UserAccountWrite { get; } = userAccountWrite;
         public UserNicknameWriteRepository UserNicknameWrite { get; } = userNicknameWrite;
 
         public Task<IDbContextTransaction> BeginTransaction() => context.Database.BeginTransactionAsync();

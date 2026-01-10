@@ -31,6 +31,13 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
             ComposerStreamEntity stream,
             UserNicknameEntity userNickname)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(nominalAmount);
+
+            if (type == ReviewOrderType.Unspecified)
+            {
+                throw new InvalidOperationException($"Недопустимый тип заказа разбора трека '{type}'");
+            }
+
             return context.Add(new ReviewOrderEntity
             {
                 CreatedAt = createdAt,

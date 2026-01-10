@@ -12,7 +12,6 @@ namespace Faryma.Composer.Application.Features.UserNickname
             if (result is null)
             {
                 result = uow.UserNicknameWrite.Create(nickname);
-                uow.UserAccountWrite.Create(result);
                 await uow.SaveChangesAsync();
             }
 

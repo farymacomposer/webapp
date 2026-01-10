@@ -31,7 +31,6 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
                 .AddScoped<ReviewWriteRepository>()
                 .AddScoped<ReviewOrderWriteRepository>()
                 .AddScoped<TransactionWriteRepository>()
-                .AddScoped<UserAccountWriteRepository>()
                 .AddScoped<UserNicknameWriteRepository>();
 
             services

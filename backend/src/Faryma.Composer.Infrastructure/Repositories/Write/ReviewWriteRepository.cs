@@ -10,6 +10,8 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
             int rating,
             DateTime createdAt)
         {
+            ArgumentOutOfRangeException.ThrowIfNegative(rating);
+
             return context.Reviews.Add(new ReviewEntity
             {
                 ReviewOrder = inProgressOrder,
