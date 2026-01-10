@@ -2,9 +2,9 @@
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Repositories.Read
+namespace Faryma.Composer.Infrastructure.Persistence.Queries
 {
-    public sealed class ReviewOrderReadRepository(AppDbContext context)
+    public sealed class ReviewOrderQueries(AppDbContext context)
     {
         public Task<ReviewOrderEntity?> FindInProgress()
         {

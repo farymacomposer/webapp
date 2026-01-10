@@ -7,7 +7,7 @@ using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure;
-using Faryma.Composer.Infrastructure.Repositories.Read;
+using Faryma.Composer.Infrastructure.Persistence.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Application.Features.OrderQueue
@@ -25,15 +25,15 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         public async Task Initialize()
         {
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ReviewOrderReadRepository reviewOrderRead = new(context);
-            ComposerStreamReadRepository composerStreamRead = new(context);
+            ReviewOrderQueries reviewOrderQueries = new(context);
+            ComposerStreamQueries composerStreamQueries = new(context);
 
-            ComposerStreamEntity? nearestStream = await composerStreamRead.FindNearest();
-            ReviewOrderEntity? lastTakenOrder = await reviewOrderRead.FindLastTaken();
-            ReviewOrderEntity? lastTakenDebt = await reviewOrderRead.FindLastTakenDebt();
-            ReviewOrderEntity? lastTakenOutOfQueue = await reviewOrderRead.FindLastTakenOutOfQueue();
-            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await composerStreamRead.GetLastNicknamesByStreamDate();
-            List<ReviewOrderEntity> orders = await reviewOrderRead.GetOrdersInQueue();
+            ComposerStreamEntity? nearestStream = await composerStreamQueries.FindNearest();
+            ReviewOrderEntity? lastTakenOrder = await reviewOrderQueries.FindLastTaken();
+            ReviewOrderEntity? lastTakenDebt = await reviewOrderQueries.FindLastTakenDebt();
+            ReviewOrderEntity? lastTakenOutOfQueue = await reviewOrderQueries.FindLastTakenOutOfQueue();
+            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await composerStreamQueries.GetLastNicknamesByStreamDate();
+            List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersInQueue();
 
             _queueManager = new OrderQueueManager
             {
@@ -88,8 +88,8 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             if (previousStatus == ReviewOrderStatus.InProgress)
             {
                 await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-                ReviewOrderReadRepository reviewOrderRead = new(context);
-                ReviewOrderEntity? lastTakenOrder = await reviewOrderRead.FindLastTaken();
+                ReviewOrderQueries reviewOrderQueries = new(context);
+                ReviewOrderEntity? lastTakenOrder = await reviewOrderQueries.FindLastTaken();
                 if (lastTakenOrder is not null)
                 {
                     _queueManager.PriorityManagerState.UpdateFromOrder(lastTakenOrder);
@@ -129,8 +129,8 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             _queueManager.NearestStreamDate = stream.EventDate;
 
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ReviewOrderReadRepository reviewOrderRead = new(context);
-            List<ReviewOrderEntity> orders = await reviewOrderRead.GetOrdersToStartStream(stream.Id);
+            ReviewOrderQueries reviewOrderQueries = new(context);
+            List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToStartStream(stream.Id);
 
             OrderQueueSnapshot snapshot = new()
             {
@@ -147,12 +147,12 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             _syncVersion++;
 
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ComposerStreamReadRepository composerStreamRead = new(context);
-            ComposerStreamEntity? nearestStream = await composerStreamRead.FindNearest();
+            ComposerStreamQueries composerStreamQueries = new(context);
+            ComposerStreamEntity? nearestStream = await composerStreamQueries.FindNearest();
             _queueManager.NearestStreamDate = nearestStream?.EventDate ?? DateOnly.MinValue;
 
-            ReviewOrderReadRepository reviewOrderRead = new(context);
-            List<ReviewOrderEntity> orders = await reviewOrderRead.GetOrdersToCompleteStream(stream.Id);
+            ReviewOrderQueries reviewOrderQueries = new(context);
+            List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToCompleteStream(stream.Id);
 
             OrderQueueSnapshot snapshot = new()
             {
@@ -169,8 +169,8 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             _syncVersion++;
 
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ComposerStreamReadRepository composerStreamRead = new(context);
-            ComposerStreamEntity? nearestStream = await composerStreamRead.FindNearest();
+            ComposerStreamQueries composerStreamQueries = new(context);
+            ComposerStreamEntity? nearestStream = await composerStreamQueries.FindNearest();
             _queueManager.NearestStreamDate = nearestStream?.EventDate ?? DateOnly.MinValue;
 
             OrderQueueSnapshot snapshot = new()

@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Infrastructure.Repositories.Read;
-using Faryma.Composer.Infrastructure.Repositories.Write;
+﻿using Faryma.Composer.Infrastructure.Persistence.Queries;
+using Faryma.Composer.Infrastructure.Persistence.Stores;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Faryma.Composer.Infrastructure
@@ -7,29 +7,29 @@ namespace Faryma.Composer.Infrastructure
     public sealed class UnitOfWork(
         AppDbContext context,
 
-        ComposerStreamReadRepository composerStreamRead,
-        ReviewOrderReadRepository reviewOrderRead,
-        UserNicknameReadRepository userNicknameRead,
+        ComposerStreamQueries composerStreamQueries,
+        ReviewOrderQueries reviewOrderQueries,
+        UserNicknameQueries userNicknameQueries,
 
-        ComposerStreamWriteRepository composerStreamWrite,
-        ReviewWriteRepository reviewWrite,
-        ReviewOrderWriteRepository reviewOrderWrite,
-        TransactionWriteRepository transactionWrite,
-        UserNicknameWriteRepository userNicknameWrite
+        ComposerStreamStore composerStreamStore,
+        ReviewStore reviewStore,
+        ReviewOrderStore reviewOrderStore,
+        TransactionStore transactionStore,
+        UserNicknameStore userNicknameStore
         )
     {
-        public ComposerStreamReadRepository ComposerStreamRead { get; } = composerStreamRead;
-        public ReviewOrderReadRepository ReviewOrderRead { get; } = reviewOrderRead;
-        public UserNicknameReadRepository UserNicknameRead { get; } = userNicknameRead;
+        public ComposerStreamQueries ComposerStreamQueries { get; } = composerStreamQueries;
+        public ReviewOrderQueries ReviewOrderQueries { get; } = reviewOrderQueries;
+        public UserNicknameQueries UserNicknameQueries { get; } = userNicknameQueries;
 
-        public ComposerStreamWriteRepository ComposerStreamWrite { get; } = composerStreamWrite;
-        public ReviewWriteRepository ReviewWrite { get; } = reviewWrite;
-        public ReviewOrderWriteRepository ReviewOrderWrite { get; } = reviewOrderWrite;
-        public TransactionWriteRepository TransactionWrite { get; } = transactionWrite;
-        public UserNicknameWriteRepository UserNicknameWrite { get; } = userNicknameWrite;
+        public ComposerStreamStore ComposerStreamStore { get; } = composerStreamStore;
+        public ReviewStore ReviewStore { get; } = reviewStore;
+        public ReviewOrderStore ReviewOrderStore { get; } = reviewOrderStore;
+        public TransactionStore TransactionStore { get; } = transactionStore;
+        public UserNicknameStore UserNicknameStore { get; } = userNicknameStore;
 
-        public Task<IDbContextTransaction> BeginTransaction() => context.Database.BeginTransactionAsync();
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) => context.SaveChangesAsync(cancellationToken);
+        public Task<IDbContextTransaction> BeginTransaction(CancellationToken cancellationToken = default) => context.Database.BeginTransactionAsync(cancellationToken);
+        public Task<int> SaveChanges(CancellationToken cancellationToken = default) => context.SaveChangesAsync(cancellationToken);
         public void Remove<TEntity>(TEntity entity) where TEntity : class => context.Remove(entity);
     }
 }

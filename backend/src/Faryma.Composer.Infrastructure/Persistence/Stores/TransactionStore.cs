@@ -2,9 +2,9 @@
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
-namespace Faryma.Composer.Infrastructure.Repositories.Write
+namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
-    public sealed class TransactionWriteRepository(AppDbContext context)
+    public sealed class TransactionStore(AppDbContext context)
     {
         public TransactionEntity CreateAccountTopUp(
             DateTime createdAt,

@@ -1,9 +1,9 @@
 ﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
-namespace Faryma.Composer.Infrastructure.Repositories.Write
+namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
-    public sealed class ReviewWriteRepository(AppDbContext context)
+    public sealed class ReviewStore(AppDbContext context)
     {
         public ReviewEntity Create(
             ReviewOrderEntity inProgressOrder,

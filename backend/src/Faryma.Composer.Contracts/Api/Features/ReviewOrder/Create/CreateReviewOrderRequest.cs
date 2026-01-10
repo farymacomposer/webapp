@@ -55,16 +55,26 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create
                 yield return new ValidationResult($"Тип заказа '{OrderType}' не поддерживается");
             }
 
-            if (PaymentAmount < 0)
+            if (PaymentAmount is < 0)
             {
                 yield return new ValidationResult("Сумма платежа не может быть отрицательной");
             }
 
             if (OrderType == ReviewOrderType.Donation)
             {
-                if (PaymentAmount == 0)
+                if (PaymentAmount is null)
                 {
-                    yield return new ValidationResult("Для донатных заказов сумма платежа не может быть равна нулю");
+                    yield return new ValidationResult("Для донатных заказов требуется сумма платежа");
+                }
+
+                if (PaymentAmount is <= 0)
+                {
+                    yield return new ValidationResult("Для донатных заказов сумма платежа должна быть больше нуля");
+                }
+
+                if (TopUpProvider is null)
+                {
+                    yield return new ValidationResult("Для донатных заказов требуется провайдер пополнения");
                 }
 
                 if (TopUpProvider is not (
@@ -81,7 +91,7 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create
                 is ReviewOrderType.Free
                 or ReviewOrderType.OutOfQueue
                 or ReviewOrderType.Charity
-                && PaymentAmount > 0)
+                && (PaymentAmount ?? 0) != 0)
             {
                 yield return new ValidationResult("Для бесплатных, внеочередных и благотворительных заказов сумма платежа должна быть равна нулю");
             }

@@ -2,9 +2,9 @@
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Repositories.Read
+namespace Faryma.Composer.Infrastructure.Persistence.Queries
 {
-    public sealed class ComposerStreamReadRepository(AppDbContext context)
+    public sealed class ComposerStreamQueries(AppDbContext context)
     {
         public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo)
         {
@@ -47,6 +47,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Read
         public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate()
         {
             return context.ComposerStreams
+                .AsNoTracking()
                 .Where(x => x.ProcessedReviewOrders.Any(x => x.Type != ReviewOrderType.OutOfQueue)
                     && x.CreatedReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
                 .Select(x => new

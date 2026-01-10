@@ -12,15 +12,15 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 {
     public sealed class ComposerStreamService(UnitOfWork uow, OrderQueueService orderQueueService)
     {
-        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo) => uow.ComposerStreamRead.Find(dateFrom, dateTo);
-        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned() => uow.ComposerStreamRead.FindLiveAndPlanned();
+        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo) => uow.ComposerStreamQueries.Find(dateFrom, dateTo);
+        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned() => uow.ComposerStreamQueries.FindLiveAndPlanned();
 
         public async Task<ComposerStreamEntity> Create(CreateCommand command)
         {
             try
             {
-                ComposerStreamEntity stream = uow.ComposerStreamWrite.Create(command.EventDate, command.Type);
-                await uow.SaveChangesAsync();
+                ComposerStreamEntity stream = uow.ComposerStreamStore.Create(command.EventDate, command.Type);
+                await uow.SaveChanges();
 
                 await orderQueueService.CreateStream(stream);
 
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
         {
             // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
 
-            ComposerStreamEntity stream = await uow.ComposerStreamWrite.Get(composerStreamId);
+            ComposerStreamEntity stream = await uow.ComposerStreamStore.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Live)
             {
                 return stream;
@@ -47,7 +47,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 throw new ComposerStreamException($"Невозможно начать стрим в статусе '{stream.Status}'", stream);
             }
 
-            ComposerStreamEntity? live = await uow.ComposerStreamRead.FindLive();
+            ComposerStreamEntity? live = await uow.ComposerStreamQueries.FindLive();
             if (live is not null && live.Id != composerStreamId)
             {
                 throw new ComposerStreamException($"Невозможно начать стрим, пока стрим на дату: {live.EventDate} запущен", stream);
@@ -56,7 +56,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             stream.Status = ComposerStreamStatus.Live;
             stream.StartedAt = DateTime.UtcNow;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.StartStream(stream);
 
@@ -65,7 +65,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
         public async Task<ComposerStreamEntity> Complete(long composerStreamId)
         {
-            ComposerStreamEntity stream = await uow.ComposerStreamWrite.Get(composerStreamId);
+            ComposerStreamEntity stream = await uow.ComposerStreamStore.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Completed)
             {
                 return stream;
@@ -76,7 +76,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{stream.Status}'", stream);
             }
 
-            ReviewOrderEntity? inProgress = await uow.ReviewOrderRead.FindInProgress();
+            ReviewOrderEntity? inProgress = await uow.ReviewOrderQueries.FindInProgress();
             if (inProgress is not null)
             {
                 throw new ComposerStreamException($"Невозможно завершить стрим, пока заказ Id: {inProgress.Id} находится в работе", stream);
@@ -85,7 +85,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             stream.Status = ComposerStreamStatus.Completed;
             stream.CompletedAt = DateTime.UtcNow;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.CompleteStream(stream);
 
@@ -96,7 +96,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
         {
             // TODO: отмена только если нет заказов на этот стрим
 
-            ComposerStreamEntity stream = await uow.ComposerStreamWrite.Get(composerStreamId);
+            ComposerStreamEntity stream = await uow.ComposerStreamStore.Get(composerStreamId);
             if (stream.Status == ComposerStreamStatus.Canceled)
             {
                 return stream;
@@ -109,7 +109,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             stream.Status = ComposerStreamStatus.Canceled;
 
-            await uow.SaveChangesAsync();
+            await uow.SaveChanges();
 
             await orderQueueService.CancelStream();
 

@@ -3,9 +3,9 @@ using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Repositories.Write
+namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
-    public sealed class ComposerStreamWriteRepository(AppDbContext context)
+    public sealed class ComposerStreamStore(AppDbContext context)
     {
         public ComposerStreamEntity Create(DateOnly eventDate, ComposerStreamType type)
         {
@@ -18,7 +18,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
             {
                 EventDate = eventDate,
                 Status = ComposerStreamStatus.Planned,
-                Type = type
+                Type = type,
             }).Entity;
         }
 
