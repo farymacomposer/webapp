@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -12,6 +13,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Имя пользователя
         /// </summary>
+        [MaxLength(40)]
         public override required string UserName { get; set; }
 
         /// <summary>

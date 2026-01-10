@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -17,6 +18,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Комментарий
         /// </summary>
+        [MaxLength(200)]
         public string? Comment { get; set; }
 
         /// <summary>

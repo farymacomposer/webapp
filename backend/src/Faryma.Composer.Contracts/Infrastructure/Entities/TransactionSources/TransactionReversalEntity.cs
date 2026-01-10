@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
@@ -14,6 +15,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Причина отмены
         /// </summary>
+        [MaxLength(100)]
         public string? Reason { get; set; }
 
         public Guid ReversedByUserId { get; set; }

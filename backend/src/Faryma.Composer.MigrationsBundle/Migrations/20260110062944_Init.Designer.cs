@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260110060730_Init")]
+    [Migration("20260110062944_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -472,11 +472,13 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     b.Property<string>("Nickname")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
 
                     b.Property<string>("NormalizedNickname")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
@@ -500,7 +502,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Comment")
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -794,11 +797,13 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     b.Property<string>("MainNickname")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
 
                     b.Property<string>("MainNormalizedNickname")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
 
                     b.Property<long>("NominalAmount")
                         .HasColumnType("bigint");
@@ -822,7 +827,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .HasColumnType("app.review_order_type");
 
                     b.Property<string>("UserComment")
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.HasIndex("CreationStreamId");
 
@@ -838,7 +844,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<long?>("ReversalTransactionId")
                         .HasColumnType("bigint");

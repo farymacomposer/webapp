@@ -297,8 +297,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Nickname = table.Column<string>(type: "text", nullable: false),
-                    NormalizedNickname = table.Column<string>(type: "text", nullable: false),
+                    Nickname = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    NormalizedNickname = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -402,8 +402,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false),
-                    MainNickname = table.Column<string>(type: "text", nullable: false),
-                    MainNormalizedNickname = table.Column<string>(type: "text", nullable: false),
+                    MainNickname = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    MainNormalizedNickname = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
                     CreationStreamId = table.Column<long>(type: "bigint", nullable: false),
                     ProcessingStreamId = table.Column<long>(type: "bigint", nullable: true),
                     InProgressAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -416,7 +416,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
                     NominalAmount = table.Column<long>(type: "bigint", nullable: false),
                     PayableAmount = table.Column<long>(type: "bigint", nullable: false),
-                    UserComment = table.Column<string>(type: "text", nullable: true)
+                    UserComment = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -512,7 +512,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     RatingValue = table.Column<int>(type: "integer", nullable: false),
-                    Comment = table.Column<string>(type: "text", nullable: true),
+                    Comment = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     TrackId = table.Column<long>(type: "bigint", nullable: false),
@@ -661,7 +661,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false),
-                    Reason = table.Column<string>(type: "text", nullable: true),
+                    Reason = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     ReversedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReversedTransactionId = table.Column<long>(type: "bigint", nullable: false),
                     ReversalTransactionId = table.Column<long>(type: "bigint", nullable: true)

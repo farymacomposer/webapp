@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
@@ -14,7 +15,10 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
         /// </summary>
+        [MaxLength(40)]
         public required string MainNickname { get; set; }
+
+        [MaxLength(40)]
         public required string MainNormalizedNickname { get; set; }
 
         public long CreationStreamId { get; set; }
@@ -74,6 +78,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Комментарий пользователя
         /// </summary>
+        [MaxLength(200)]
         public string? UserComment { get; set; }
 
         // Навигационные свойства
