@@ -538,6 +538,34 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "account_top_ups",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    Provider = table.Column<AccountTopUpProvider>(type: "app.account_top_up_provider", nullable: false),
+                    UserAccountId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_account_top_ups", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_account_top_ups_transaction_sources_Id",
+                        column: x => x.Id,
+                        principalSchema: "app",
+                        principalTable: "transaction_sources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_account_top_ups_user_accounts_UserAccountId",
+                        column: x => x.UserAccountId,
+                        principalSchema: "app",
+                        principalTable: "user_accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "transactions",
                 schema: "app",
                 columns: table => new
@@ -627,6 +655,49 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "transaction_reversals",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    Reason = table.Column<string>(type: "text", nullable: true),
+                    ReversedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReversedTransactionId = table.Column<long>(type: "bigint", nullable: false),
+                    ReversalTransactionId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_transaction_reversals", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_transaction_reversals_AspNetUsers_ReversedByUserId",
+                        column: x => x.ReversedByUserId,
+                        principalSchema: "app",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_transaction_reversals_transaction_sources_Id",
+                        column: x => x.Id,
+                        principalSchema: "app",
+                        principalTable: "transaction_sources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_transaction_reversals_transactions_ReversalTransactionId",
+                        column: x => x.ReversalTransactionId,
+                        principalSchema: "app",
+                        principalTable: "transactions",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_transaction_reversals_transactions_ReversedTransactionId",
+                        column: x => x.ReversedTransactionId,
+                        principalSchema: "app",
+                        principalTable: "transactions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 schema: "app",
                 table: "AspNetRoles",
@@ -669,6 +740,12 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     { 17L, "фортепиано" },
                     { 18L, "инструментал" }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_account_top_ups_UserAccountId",
+                schema: "app",
+                table: "account_top_ups",
+                column: "UserAccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -796,6 +873,26 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_transaction_reversals_ReversalTransactionId",
+                schema: "app",
+                table: "transaction_reversals",
+                column: "ReversalTransactionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_transaction_reversals_ReversedByUserId",
+                schema: "app",
+                table: "transaction_reversals",
+                column: "ReversedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_transaction_reversals_ReversedTransactionId",
+                schema: "app",
+                table: "transaction_reversals",
+                column: "ReversedTransactionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_transactions_SourceId",
                 schema: "app",
                 table: "transactions",
@@ -843,6 +940,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "account_top_ups",
+                schema: "app");
+
             migrationBuilder.DropTable(
                 name: "app_settings",
                 schema: "app");
@@ -892,7 +993,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 schema: "app");
 
             migrationBuilder.DropTable(
-                name: "transactions",
+                name: "transaction_reversals",
                 schema: "app");
 
             migrationBuilder.DropTable(
@@ -916,7 +1017,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 schema: "app");
 
             migrationBuilder.DropTable(
-                name: "user_accounts",
+                name: "transactions",
                 schema: "app");
 
             migrationBuilder.DropTable(
@@ -929,6 +1030,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
             migrationBuilder.DropTable(
                 name: "transaction_sources",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "user_accounts",
                 schema: "app");
 
             migrationBuilder.DropTable(

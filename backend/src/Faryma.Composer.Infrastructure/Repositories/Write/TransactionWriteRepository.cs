@@ -18,6 +18,7 @@ namespace Faryma.Composer.Infrastructure.Repositories.Write
             {
                 CreatedAt = createdAt,
                 Provider = topUpProvider,
+                Account = account,
             };
 
             context.Add(topUp);

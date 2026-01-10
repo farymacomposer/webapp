@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260108121351_Init")]
+    [Migration("20260110060730_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -758,6 +758,21 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("TrackEntityTrackGenreEntity", "app");
                 });
 
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.AccountTopUpEntity", b =>
+                {
+                    b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
+
+                    b.Property<AccountTopUpProvider>("Provider")
+                        .HasColumnType("app.account_top_up_provider");
+
+                    b.Property<Guid>("UserAccountId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("UserAccountId");
+
+                    b.ToTable("account_top_ups", "app");
+                });
+
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderEntity", b =>
                 {
                     b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
@@ -816,6 +831,33 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasIndex("TrackId");
 
                     b.ToTable("review_orders", "app");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionReversalEntity", b =>
+                {
+                    b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("text");
+
+                    b.Property<long?>("ReversalTransactionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("ReversedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("ReversedTransactionId")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("ReversalTransactionId")
+                        .IsUnique();
+
+                    b.HasIndex("ReversedByUserId");
+
+                    b.HasIndex("ReversedTransactionId")
+                        .IsUnique();
+
+                    b.ToTable("transaction_reversals", "app");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.ReviewEntity", b =>
@@ -1043,6 +1085,23 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.AccountTopUpEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity", null)
+                        .WithOne()
+                        .HasForeignKey("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.AccountTopUpEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserAccountEntity", "Account")
+                        .WithMany()
+                        .HasForeignKey("UserAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderEntity", b =>
                 {
                     b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.ComposerStreamEntity", "CreationStream")
@@ -1071,6 +1130,37 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("ProcessingStream");
 
                     b.Navigation("Track");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionReversalEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity", null)
+                        .WithOne()
+                        .HasForeignKey("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionReversalEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionEntity", "ReversalTransaction")
+                        .WithMany()
+                        .HasForeignKey("ReversalTransactionId");
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "ReversedByUser")
+                        .WithMany()
+                        .HasForeignKey("ReversedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionEntity", "ReversedTransaction")
+                        .WithMany()
+                        .HasForeignKey("ReversedTransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReversalTransaction");
+
+                    b.Navigation("ReversedByUser");
+
+                    b.Navigation("ReversedTransaction");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.ComposerStreamEntity", b =>

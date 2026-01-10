@@ -25,11 +25,6 @@ namespace Faryma.Composer.Infrastructure
         public DbSet<ReviewEntity> Reviews { get; set; }
 
         /// <summary>
-        /// Заказы разборов треков
-        /// </summary>
-        public DbSet<ReviewOrderEntity> ReviewOrders { get; set; }
-
-        /// <summary>
         /// Музыкальные треки
         /// </summary>
         public DbSet<TrackEntity> Tracks { get; set; }
@@ -55,11 +50,6 @@ namespace Faryma.Composer.Infrastructure
         public DbSet<TransactionEntity> Transactions { get; set; }
 
         /// <summary>
-        /// Пользователи
-        /// </summary>
-        public DbSet<UserEntity> User { get; set; }
-
-        /// <summary>
         /// Счета пользователей
         /// </summary>
         public DbSet<UserAccountEntity> UserAccounts { get; set; }
@@ -73,6 +63,23 @@ namespace Faryma.Composer.Infrastructure
         /// Оценки пользователей
         /// </summary>
         public DbSet<UserTrackRatingEntity> UserTrackRatings { get; set; }
+
+        // TransactionSources
+
+        /// <summary>
+        /// Пополнения счетов пользователей
+        /// </summary>
+        public DbSet<AccountTopUpEntity> AccountTopUps { get; set; }
+
+        /// <summary>
+        /// Заказы разборов треков
+        /// </summary>
+        public DbSet<ReviewOrderEntity> ReviewOrders { get; set; }
+
+        /// <summary>
+        /// Отмены транзакций
+        /// </summary>
+        public DbSet<TransactionReversalEntity> TransactionReversals { get; set; }
 
         public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
