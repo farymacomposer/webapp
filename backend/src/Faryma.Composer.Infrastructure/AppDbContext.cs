@@ -9,6 +9,8 @@ namespace Faryma.Composer.Infrastructure
 {
     public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<UserEntity, IdentityRole<Guid>, Guid>(options), IDataProtectionKeyContext
     {
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+
         /// <summary>
         /// Настройки приложения
         /// </summary>
@@ -81,8 +83,6 @@ namespace Faryma.Composer.Infrastructure
         /// </summary>
         public DbSet<TransactionReversalEntity> TransactionReversals { get; set; }
 
-        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.HasDefaultSchema(DbContextHelper.SchemaName);
@@ -94,14 +94,14 @@ namespace Faryma.Composer.Infrastructure
             builder.Entity<ReviewOrderEntity>(b =>
             {
                 b.HasOne(x => x.CreationStream)
-                 .WithMany(x => x.CreatedReviewOrders)
-                 .HasForeignKey(x => x.CreationStreamId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany(x => x.CreatedReviewOrders)
+                    .HasForeignKey(x => x.CreationStreamId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 b.HasOne(x => x.ProcessingStream)
-                 .WithMany(x => x.ProcessedReviewOrders)
-                 .HasForeignKey(x => x.ProcessingStreamId)
-                 .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany(x => x.ProcessedReviewOrders)
+                    .HasForeignKey(x => x.ProcessingStreamId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<TrackEntity>()
