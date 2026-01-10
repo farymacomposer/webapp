@@ -4,11 +4,13 @@
     "Projects": [
       {
         "Path": "src\\Faryma.Composer.Api\\Faryma.Composer.Api.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "swagger"
       },
       {
         "Path": "src\\Faryma.Composer.Desktop\\Faryma.Composer.Desktop.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "Faryma.Composer.Desktop (Package)"
       }
     ]
   }
