@@ -116,7 +116,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// </summary>
         public long GetTotalAmount()
         {
-            return Type switch
+            long result = Type switch
             {
                 ReviewOrderType.OutOfQueue => 0,
                 ReviewOrderType.Donation => Transactions.Where(x => x.Kind == TransactionKind.Payment).Sum(x => x.Debit),
@@ -124,6 +124,8 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
                 ReviewOrderType.Charity => 0,
                 _ => throw new InvalidOperationException(),
             };
+
+            return result;
         }
     }
 }

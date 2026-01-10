@@ -53,31 +53,33 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
 
         public Task<List<ReviewOrderEntity>> GetOrdersToStartStream(long streamId)
         {
-            return context.ReviewOrders
+            IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Include(x => x.Transactions)
                 .Where(x => x.CreationStreamId == streamId
-                    && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
-                .ToListAsync();
+                    && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending));
+
+            return query.ToListAsync();
         }
 
         public Task<List<ReviewOrderEntity>> GetOrdersToCompleteStream(long streamId)
         {
-            return context.ReviewOrders
+            IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
                 .Include(x => x.Transactions)
                 .Where(x => (x.CreationStreamId == streamId
                     && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
-                    || (x.ProcessingStreamId == streamId && x.Status == ReviewOrderStatus.Completed))
-                .ToListAsync();
+                    || (x.ProcessingStreamId == streamId && x.Status == ReviewOrderStatus.Completed));
+
+            return query.ToListAsync();
         }
 
         public Task<List<ReviewOrderEntity>> GetOrdersInQueue()
         {
-            return context.ReviewOrders
+            IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
@@ -87,8 +89,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                     || x.Status == ReviewOrderStatus.InProgress
                     || (x.ProcessingStream != null
                         && x.ProcessingStream.Status == ComposerStreamStatus.Live
-                        && x.Status == ReviewOrderStatus.Completed))
-                .ToListAsync();
+                        && x.Status == ReviewOrderStatus.Completed));
+
+            return query.ToListAsync();
         }
     }
 }

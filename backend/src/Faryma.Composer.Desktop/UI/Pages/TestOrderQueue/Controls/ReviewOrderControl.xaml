@@ -55,7 +55,6 @@
 
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="{Binding Type}" />
-                <TextBlock Text="{Binding CategoryType}" />
                 <TextBlock Text="{Binding Status}" />
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <TextBlock Foreground="{ThemeResource TextFillColorTertiaryBrush}" Text="IsFrozen:" />

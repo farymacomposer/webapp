@@ -37,7 +37,7 @@
 
                         <StackPanel HorizontalAlignment="Left" Spacing="8">
 
-                            <Grid Width="200">
+                            <Grid Width="200" HorizontalAlignment="Left">
                                 <Border
                                     Background="{x:Bind MainNickname, Converter={StaticResource StringHashHighlightConverter}}"
                                     CornerRadius="4"

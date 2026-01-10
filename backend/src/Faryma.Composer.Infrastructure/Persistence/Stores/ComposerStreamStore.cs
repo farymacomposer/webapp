@@ -29,21 +29,23 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
         public Task<ComposerStreamEntity?> FindNearest(DateOnly date)
         {
-            return context.ComposerStreams
+            IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= date))
-                .OrderBy(x => x.EventDate)
-                .FirstOrDefaultAsync();
+                .OrderBy(x => x.EventDate);
+
+            return query.FirstOrDefaultAsync();
         }
 
         public Task<ComposerStreamEntity?> FindNearest(DateOnly date, ComposerStreamType type)
         {
-            return context.ComposerStreams
+            IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .Where(x => x.Type == type
                     && x.EventDate >= date
                     && (x.Status == ComposerStreamStatus.Planned || x.Status == ComposerStreamStatus.Live))
-                .OrderBy(x => x.EventDate)
-                .FirstOrDefaultAsync();
+                .OrderBy(x => x.EventDate);
+
+            return query.FirstOrDefaultAsync();
         }
     }
 }
