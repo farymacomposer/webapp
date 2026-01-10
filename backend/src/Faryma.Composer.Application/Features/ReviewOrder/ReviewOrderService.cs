@@ -155,8 +155,6 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
                 userNickname.Account,
                 order);
 
-            order.Transactions.Add(payment);
-
             await uow.SaveChanges();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderMovedUp);
@@ -307,7 +305,11 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             }
 
             ReviewOrderStatus previousStatus = order.Status;
+
+            order.CategoryType = OrderCategoryType.Unspecified;
+            order.ProcessingStream = null;
             order.Status = ReviewOrderStatus.Canceled;
+            order.InProgressAt = null;
 
             await uow.SaveChanges();
 

@@ -28,7 +28,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             string? trackUrl,
             string? userComment,
             ReviewOrderType type,
-            ComposerStreamEntity stream,
+            ComposerStreamEntity creationStream,
             UserNicknameEntity userNickname)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(nominalAmount);
@@ -51,7 +51,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 NominalAmount = nominalAmount,
                 PayableAmount = payableAmount,
                 UserComment = userComment,
-                CreationStream = stream,
+                CreationStream = creationStream,
                 UserNicknames = { userNickname },
             }).Entity;
         }
