@@ -73,8 +73,6 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
                 userNickname.Account,
                 order);
 
-            order.Transactions.Add(payment);
-
             await uow.SaveChanges();
 
             await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
