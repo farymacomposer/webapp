@@ -1,5 +1,6 @@
 ﻿using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Application.Features.ReviewOrder;
+using Faryma.Composer.Contracts.Api;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.AddTrackUrl;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Cancel;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Complete;
@@ -14,7 +15,6 @@ using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Faryma.Composer.Api.Features.ReviewOrder
 {
@@ -24,10 +24,8 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public sealed class ReviewOrderController(ReviewOrderService reviewOrderService, IMemoryCache cache) : ControllerBase
+    public sealed class ReviewOrderController(ReviewOrderService reviewOrderService) : ControllerBase
     {
-        private static readonly TimeSpan _idempotencyKeyExpiration = TimeSpan.FromMinutes(10);
-
         /// <summary>
         /// Создает заказ
         /// </summary>
@@ -35,21 +33,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <param name="request">Запрос создания заказа</param>
         [HttpPost(nameof(CreateReviewOrder))]
         [AuthorizeAdmins]
+        [Idempotent]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
-            [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
+            [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] CreateReviewOrderRequest request)
         {
-            if (idempotencyKey == Guid.Empty)
-            {
-                return BadRequest("Требуется заголовок Idempotency-Key");
-            }
-
-            string key = $"CreateReviewOrder:{idempotencyKey}";
-            if (cache.TryGetValue(key, out CreateReviewOrderResponse? response))
-            {
-                return Ok(response);
-            }
-
             ReviewOrderEntity order = request.OrderType switch
             {
                 ReviewOrderType.OutOfQueue => await reviewOrderService.CreateOutOfQueue(new CreateOutOfQueueOrderCommand
@@ -81,14 +69,10 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 _ => throw new InvalidOperationException(),
             };
 
-            response = new CreateReviewOrderResponse
+            return Ok(new CreateReviewOrderResponse
             {
                 ReviewOrder = ReviewOrderDto.Map(order)
-            };
-
-            cache.Set(key, response, _idempotencyKeyExpiration);
-
-            return Ok(response);
+            });
         }
 
         /// <summary>
@@ -98,21 +82,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <param name="request">Запрос поднятия заказа в очереди</param>
         [HttpPost(nameof(MoveUpReviewOrder))]
         [AuthorizeAdmins]
+        [Idempotent]
         public async Task<ActionResult<MoveUpReviewOrderResponse>> MoveUpReviewOrder(
-            [FromHeader(Name = "Idempotency-Key")] Guid idempotencyKey,
+            [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] MoveUpReviewOrderRequest request)
         {
-            if (idempotencyKey == Guid.Empty)
-            {
-                return BadRequest("Требуется заголовок Idempotency-Key");
-            }
-
-            string key = $"MoveUpReviewOrder:{idempotencyKey}";
-            if (cache.TryGetValue(key, out MoveUpReviewOrderResponse? response))
-            {
-                return Ok(response);
-            }
-
             TransactionEntity transaction = await reviewOrderService.MoveUp(new MoveUpCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
@@ -121,15 +95,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 TopUpProvider = request.TopUpProvider,
             });
 
-            response = new MoveUpReviewOrderResponse
+            return Ok(new MoveUpReviewOrderResponse
             {
                 ReviewOrder = ReviewOrderDto.Map((ReviewOrderEntity)transaction.Source),
                 PaymentTransactionId = transaction.Id
-            };
-
-            cache.Set(key, response, _idempotencyKeyExpiration);
-
-            return Ok(response);
+            });
         }
 
         /// <summary>

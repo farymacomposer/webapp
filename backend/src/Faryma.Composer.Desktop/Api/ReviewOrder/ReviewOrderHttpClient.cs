@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
+using Faryma.Composer.Contracts.Api;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.MoveUp;
 using Faryma.Composer.Contracts.Api.Shared.Dto;
@@ -60,7 +61,7 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder
         private async Task<ReviewOrderDto> Post<T>(string requestUri, Guid idempotencyKey, T request)
         {
             HttpRequestMessage requestMessage = new(HttpMethod.Post, requestUri);
-            requestMessage.Headers.Add("Idempotency-Key", idempotencyKey.ToString("D"));
+            requestMessage.Headers.Add(Globals.IdempotencyKey, idempotencyKey.ToString("D"));
             requestMessage.Content = JsonContent.Create(request, options: serializerOptions);
 
             HttpResponseMessage responseMessage = await httpClient.SendAsync(requestMessage);
