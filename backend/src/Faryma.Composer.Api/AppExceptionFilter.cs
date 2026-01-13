@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Faryma.Composer.Api
 {
-    public sealed class GlobalExceptionFilter : ExceptionFilterAttribute
+    public sealed class AppExceptionFilter : ExceptionFilterAttribute
     {
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {

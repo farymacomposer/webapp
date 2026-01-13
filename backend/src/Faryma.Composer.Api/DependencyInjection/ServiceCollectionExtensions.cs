@@ -80,8 +80,8 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .AddAsyncApiSpecification(environment);
 
             services
-                .AddSingleton<GlobalExceptionFilter>()
-                .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>())
+                .AddSingleton<AppExceptionFilter>()
+                .AddControllers(options => options.Filters.AddService<AppExceptionFilter>())
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             services
