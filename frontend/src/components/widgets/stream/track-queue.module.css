@@ -1,43 +1,56 @@
     .root {
         width: 100%;
         overflow-y: visible;
-
-        padding-top: 18px;
+        overflow-x: clip;
+        container-type: inline-size;
+        --tile-h: clamp(96px, 10cqi, 130px);
+        padding-top: 0px;
         display: flex;
         align-items: flex-start;
         gap: 0px;
         position: relative;
         z-index: 0;
+        min-width: 0;
+        animation: queue-fade-in 420ms ease;
+
     }
 
     .list {
         display: flex;
         flex: 1 1 auto;
-        width: auto;
-        gap: 0px;
-        justify-content: flex-start;
+        width: 100%;
         min-width: 0;
         align-items: stretch;
+        flex-wrap: nowrap;
         padding: 18px 24px 0px;
         box-sizing: border-box;
-
-        overflow: visible;
+        overflow-x: clip;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
     }
 
     .backdrop {
         position: fixed;
         inset: 0;
-        backdrop-filter: blur(6px);
-        background: rgba(0, 0, 0, 0.25);
-        z-index: 2;
-        pointer-events: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        z-index: 0;
+        pointer-events: auto;
     }
 
     .addCard {
-        min-width: 50px;
-        height: 150px;
+        flex: 0 0 auto;
+        width: 70px;
+        height: 130px;
+        margin-top: 18px;
         border: none;
-        border-radius: 10px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        z-index: 1;
         background: linear-gradient(180deg, #9f67ff 0%, #000 100%);
         color: #ffffff;
         font-size: 24px;
@@ -47,6 +60,8 @@
         justify-content: center;
         cursor: pointer;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+        animation: card-rise 420ms ease both;
+        animation-delay: 40ms;
     }
 
     .addCard:focus-visible {
@@ -57,22 +72,28 @@
     .card {
         position: relative;
         cursor: pointer;
-        width: clamp(260px, 22vw, 500px);
 
-        height: 150px;
-        height: 150px;
+        flex: 1 1 0;
+        width: auto;
+        min-width: clamp(90px, 14cqi, 140px);
+        max-width: clamp(200px, 22cqi, 300px);
 
-        background: #181818;
-        border: none;
+        min-height: clamp(90px, 11cqi, 140px);
+        height: auto;
 
-        padding: 20px 16px 16px;
-        color: #fff;
-        border-radius: 10px;
-        overflow: visible;
+        background: #26262c;
+        padding: clamp(10px, 1.6cqi, 20px) clamp(10px, 1.4cqi, 16px) clamp(10px, 1.4cqi, 16px);
+       border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
         box-sizing: border-box;
-        z-index: 1;
 
-        transition: box-shadow 160ms ease;
+        overflow: visible;
+        z-index: 1;
+        transition: filter 180ms ease, box-shadow 180ms ease;
+        animation: card-rise 420ms ease both;
+        animation-delay: 80ms;
     }
 
     .card:focus-visible {
@@ -86,29 +107,34 @@
         z-index: 5;
     }
 
+    .card:hover {
+        filter: brightness(1.16);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.5);
+    }
+
     .cardActive .body {
         opacity: 1;
     }
 
     .tags {
         display: flex;
-        gap: 6px;
+        gap: clamp(4px, 0.8cqi, 6px);
 
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: clamp(6px, 1cqi, 10px);
     }
 
     .tag {
         display: inline-flex;
         align-items: center;
-        padding: 14px;
+        padding: clamp(8px, 1.2cqi, 14px);
         justify-content: center;
-        width: 14px;
-        height: 14px;
+        width: clamp(12px, 1.2cqi, 14px);
+        height: clamp(12px, 1.2cqi, 14px);
         border-radius: 6px;
         background: var(--accent-color);
         color: var(--text-color);
-        font-size: 11px;
+        font-size: clamp(9px, 1cqi, 11px);
         font-weight: 700;
         letter-spacing: 0.02em;
         text-transform: uppercase;
@@ -118,7 +144,7 @@
     .headerRow {
         display: flex;
         align-items: flex-start;
-        gap: 8px;
+        gap: clamp(6px, 1cqi, 8px);
     }
 
     .body {
@@ -126,20 +152,27 @@
     }
 
     .title {
-        display: block;
+        display: -webkit-box;
         overflow: hidden;
         white-space: normal;
+        text-overflow: ellipsis;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        font-size: clamp(10px, 1.2cqi, 16px);
+        line-height: clamp(1.1, 1.2, 1.3);
     }
 
     .separator {
+        flex: 0 0 24px;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
-        flex: 0 0 24px;
-        min-width: 24px;
-        margin: 0 4px;
         z-index: 2;
+        min-width: 14px;
+        margin: 0 2px;
+        transform: translateY(-35px);
     }
 
     .chevron {
@@ -153,28 +186,35 @@
 
     .preview {
         position: absolute;
-        left: 0;
-        right: 0;
+        left: 50%;
         bottom: 100%;
+        transform: translateX(-50%);
+        transform-origin: top center;
 
-        z-index: 2000;
-        overflow: hidden;
+        z-index: 10;
+        overflow: visible;
+        container-type: inline-size;
 
         background: rgba(20, 22, 26, 0.86);
-        backdrop-filter: blur(10px);
+        backdrop-filter: none;
         box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
 
-        animation: preview-rise 180ms ease;
+        animation: preview-rise 240ms ease;
+        width: min(100%, clamp(180px, 28cqi, 320px));
+        max-width: 100%;
+        box-sizing: border-box;
+        border-radius: 12px;
     }
 
 
     .previewTop {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
 
-        padding: 12px 14px;
+        gap: clamp(8px, 1.2cqi, 12px);
+        flex-wrap: nowrap;
+
+        padding: clamp(8px, 1.4cqi, 12px) clamp(10px, 1.6cqi, 14px);
 
         background: rgba(255, 255, 255, 0.06);
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -182,22 +222,35 @@
 
     .previewActions {
         display: flex;
+
+        scrollbar-width: none;
         align-items: center;
-        gap: 10px;
+        gap: clamp(6px, 1cqi, 10px);
+        min-width: 0;
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: clip;
+
+
     }
 
     .actionDot {
-        width: 18px;
-        height: 18px;
+        width: clamp(12px, 1.8cqi, 18px);
+        height: clamp(12px, 1.8cqi, 18px);
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.14);
         display: inline-block;
     }
 
     .previewPrice {
-        font-size: 14px;
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        font-size: clamp(10px, 6cqi, 14px);
         font-weight: 700;
         color: rgba(255, 255, 255, 0.92);
+        white-space: nowrap;
+        line-height: 1;
     }
 
 
@@ -217,17 +270,17 @@
 
 
     .previewMeta {
-        padding: 14px 14px 16px;
+        padding: clamp(10px, 1.6cqi, 14px) clamp(10px, 1.6cqi, 14px) clamp(12px, 1.8cqi, 16px);
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: clamp(4px, 0.8cqi, 6px);
         min-width: 0;
     }
 
     .previewTitleRow {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: clamp(6px, 1.2cqi, 10px);
         min-width: 0;
     }
 
@@ -238,14 +291,14 @@
         align-items: center;
         justify-content: center;
 
-        height: 32px;
-        min-width: 42px;
-        padding: 0 10px;
+        height: clamp(22px, 3cqi, 32px);
+        min-width: clamp(32px, 5cqi, 42px);
+        padding: 0 clamp(6px, 1.4cqi, 10px);
         border-radius: 10px;
 
         background: var(--accent-color);
         color: var(--text-color);
-        font-size: 12px;
+        font-size: clamp(9px, 1.3cqi, 12px);
         font-weight: 800;
         letter-spacing: 0.02em;
         text-transform: uppercase;
@@ -255,7 +308,7 @@
     .previewTitle {
         min-width: 0;
 
-        font-size: 16px;
+        font-size: clamp(12px, 1.8cqi, 16px);
         font-weight: 700;
         color: #fff;
 
@@ -265,7 +318,7 @@
     }
 
     .previewArtist {
-        font-size: 13px;
+        font-size: clamp(10px, 1.5cqi, 13px);
         color: rgba(255, 255, 255, 0.72);
         font-style: italic;
 
@@ -277,6 +330,7 @@
     .iconBtn {
         width: 36px;
         height: 36px;
+        flex: 0 0 auto;
         border-radius: 10px;
         border: none;
 
@@ -292,6 +346,12 @@
             color 160ms ease,
             background 160ms ease,
             transform 120ms ease;
+    }
+
+    .iconBtn svg {
+        width: 100%;
+        height: 100%;
+        display: block;
     }
 
     .spotify:hover {
@@ -312,4 +372,181 @@
 
     .iconBtn:active {
         transform: scale(0.96);
+    }
+
+    @keyframes card-rise {
+        from {
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes queue-fade-in {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @media (min-resolution: 1.1dppx) and (max-resolution: 1.24dppx) {
+        .preview {
+            width: min(100%, clamp(175px, 25cqi, 310px));
+            transform: translateX(-50%) scale(0.98);
+        }
+
+        .previewTop {
+            gap: clamp(7px, 1.1cqi, 11px);
+            padding: clamp(7px, 1.2cqi, 11px) clamp(9px, 1.4cqi, 13px);
+        }
+
+        .iconBtn {
+            width: clamp(32px, 3.4cqi, 36px);
+            height: clamp(32px, 3.4cqi, 36px);
+        }
+    }
+
+    @media (min-resolution: 1.5dppx) {
+        .preview {
+            width: min(100%, clamp(170px, 23cqi, 290px));
+            transform: translateX(-50%) scale(0.98);
+        }
+
+        .previewTop {
+            gap: clamp(4px, 0.8cqi, 8px);
+            padding: clamp(4px, 0.9cqi, 8px) clamp(6px, 1.1cqi, 10px);
+        }
+
+        .previewActions {
+            gap: clamp(2px, 0.6cqi, 6px);
+        }
+
+        .addCard {
+            min-width: clamp(48px, 8cqi, 88px);
+            max-width: clamp(100px, 12cqi, 140px);
+            height: clamp(84px, 10cqi, 130px);
+            font-size: clamp(16px, 2cqi, 20px);
+        }
+
+        .card {
+            min-width: clamp(80px, 12cqi, 120px);
+            max-width: clamp(180px, 20cqi, 260px);
+            min-height: clamp(84px, 10cqi, 130px);
+            padding: clamp(8px, 1.2cqi, 16px) clamp(8px, 1.1cqi, 14px) clamp(8px, 1.1cqi, 14px);
+        }
+
+        .tag {
+            padding: clamp(6px, 1cqi, 10px);
+            width: clamp(10px, 1cqi, 12px);
+            height: clamp(10px, 1cqi, 12px);
+            font-size: clamp(8px, 0.9cqi, 10px);
+        }
+
+        .title {
+            font-size: clamp(9px, 1cqi, 14px);
+        }
+
+        .iconBtn {
+            width: clamp(22px, 2.6cqi, 28px);
+            height: clamp(22px, 2.6cqi, 28px);
+        }
+    }
+
+    @media (min-resolution: 1.25dppx) and (max-resolution: 1.49dppx) {
+        .preview {
+            width: min(100%, clamp(170px, 24cqi, 300px));
+            transform: translateX(-50%) scale(0.96);
+        }
+
+        .previewTop {
+            gap: clamp(6px, 1cqi, 10px);
+            padding: clamp(6px, 1.1cqi, 10px) clamp(8px, 1.3cqi, 12px);
+        }
+
+        .addCard {
+            min-width: clamp(52px, 9cqi, 92px);
+            max-width: clamp(106px, 13cqi, 150px);
+            height: clamp(88px, 10.5cqi, 135px);
+            font-size: clamp(17px, 2.1cqi, 21px);
+        }
+
+        .card {
+            min-width: clamp(86px, 13cqi, 126px);
+            max-width: clamp(190px, 21cqi, 270px);
+            min-height: clamp(88px, 10.5cqi, 135px);
+            padding: clamp(9px, 1.3cqi, 17px) clamp(9px, 1.2cqi, 15px) clamp(9px, 1.2cqi, 15px);
+        }
+
+        .tag {
+            padding: clamp(6px, 1cqi, 11px);
+            width: clamp(11px, 1.1cqi, 12px);
+            height: clamp(11px, 1.1cqi, 12px);
+            font-size: clamp(8px, 0.95cqi, 10px);
+        }
+
+        .title {
+            font-size: clamp(9.5px, 1.05cqi, 14.5px);
+        }
+
+        .iconBtn {
+            width: clamp(30px, 3.3cqi, 34px);
+            height: clamp(30px, 3.3cqi, 34px);
+        }
+    }
+
+    @media (min-resolution: 1.75dppx) {
+        .preview {
+            width: min(100%, clamp(150px, 20cqi, 260px));
+            transform: translateX(-50%) scale(0.88);
+        }
+
+        .previewTop {
+            gap: clamp(3px, 0.7cqi, 6px);
+            padding: clamp(4px, 0.9cqi, 7px) clamp(5px, 1cqi, 9px);
+        }
+
+        .previewActions {
+            gap: clamp(3px, 0.7cqi, 6px);
+        }
+
+        .previewPrice {
+            font-size: clamp(9px, 1.15cqi, 11px);
+        }
+
+        .addCard {
+            min-width: clamp(44px, 7cqi, 80px);
+            max-width: clamp(92px, 11cqi, 130px);
+            height: clamp(78px, 9cqi, 120px);
+            font-size: clamp(14px, 1.8cqi, 18px);
+        }
+
+        .card {
+            min-width: clamp(72px, 11cqi, 110px);
+            max-width: clamp(170px, 18cqi, 240px);
+            min-height: clamp(78px, 9cqi, 120px);
+            padding: clamp(7px, 1.1cqi, 14px) clamp(7px, 1cqi, 12px) clamp(7px, 1cqi, 12px);
+        }
+
+        .tag {
+            padding: clamp(5px, 0.9cqi, 9px);
+            width: clamp(9px, 0.9cqi, 11px);
+            height: clamp(9px, 0.9cqi, 11px);
+            font-size: clamp(7px, 0.8cqi, 9px);
+        }
+
+        .title {
+            font-size: clamp(8px, 0.9cqi, 13px);
+        }
+
+        .iconBtn {
+            width: clamp(20px, 2.4cqi, 26px);
+            height: clamp(20px, 2.4cqi, 26px);
+        }
     }

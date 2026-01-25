@@ -56,6 +56,7 @@ export default function StreamPage() {
   ];
 
   const [queueItems, setQueueItems] = useState<QueueItem[]>(initial);
+  const [isQueueOpen, setIsQueueOpen] = useState(false);
 
   const displayItems = useMemo(() => {
     return queueItems.map((item, index) =>
@@ -65,14 +66,21 @@ export default function StreamPage() {
 
   return (
     <main className={styles.page}>
-      <div className={styles.layout}>
+      <div
+        className={[
+          styles.layout,
+          isQueueOpen ? styles.queueOpen : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <section className={styles.mainColumn}>
           <div className={styles.videoSection}>
             <StreamVideo channel={channel} />
           </div>
 
           <div className={styles.queueSection}>
-            <Queue items={displayItems} />
+            <Queue items={displayItems} onOpenChange={setIsQueueOpen} />
           </div>
         </section>
 

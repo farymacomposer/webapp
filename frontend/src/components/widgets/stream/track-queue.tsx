@@ -1,9 +1,16 @@
 "use client";
 
-import React, { ReactNode, CSSProperties, useState } from "react";
+import React, {
+  ReactNode,
+  CSSProperties,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styles from "./track-queue.module.css";
-import { SiReact, SiSpotify, SiYoutube } from "@icons-pack/react-simple-icons";
+import { SiSpotify, SiYoutube } from "@icons-pack/react-simple-icons";
 import { BellRing, MessageCircle } from "lucide-react";
+import { useClickAway } from "react-use";
 
 export type QueueItem = {
   id: string;
@@ -21,15 +28,53 @@ export type QueueItem = {
 type QueueProps = {
   items: QueueItem[];
   onAdd?: () => void;
+  onOpenChange?: (isOpen: boolean) => void;
   className?: string;
 };
 
-export const Queue: React.FC<QueueProps> = ({ items, onAdd, className }) => {
+export const Queue: React.FC<QueueProps> = ({
+  items,
+  onAdd,
+  onOpenChange,
+  className,
+}) => {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    onOpenChange?.(Boolean(activeId));
+  }, [activeId, onOpenChange]);
+
+  useClickAway(rootRef, () => {
+    if (activeId) {
+      setActiveId(null);
+    }
+  });
 
   return (
-    <div className={[styles.root, className ?? ""].filter(Boolean).join(" ")}>
-      {activeId && <div className={styles.backdrop} aria-hidden="true" />}
+    <div
+      ref={rootRef}
+      className={[styles.root, className ?? ""].filter(Boolean).join(" ")}
+      onClickCapture={(event) => {
+        if (!activeId) {
+          return;
+        }
+
+        const target = event.target as HTMLElement | null;
+        if (!target?.closest('[data-queue-card="true"]')) {
+          setActiveId(null);
+        }
+      }}
+    >
+      {activeId && (
+        <button
+          type="button"
+          className={styles.backdrop}
+          aria-label="Закрыть карточку"
+          onClick={() => setActiveId(null)}
+        />
+      )}
 
       <button
         type="button"
@@ -40,7 +85,12 @@ export const Queue: React.FC<QueueProps> = ({ items, onAdd, className }) => {
         +
       </button>
 
-      <div className={styles.list} role="listbox" aria-label="Очередь треков">
+      <div
+        ref={listRef}
+        className={styles.list}
+        role="listbox"
+        aria-label="Очередь треков"
+      >
         {items.map((item, index) => {
           const isFirst = index === 0;
           const isActive = item.id === activeId;
@@ -63,6 +113,7 @@ export const Queue: React.FC<QueueProps> = ({ items, onAdd, className }) => {
                   styles.card,
                   isActive ? styles.cardActive : "",
                 ].join(" ")}
+                data-queue-card="true"
                 style={accentStyle}
                 role="option"
                 aria-selected={isActive}
@@ -93,19 +144,19 @@ export const Queue: React.FC<QueueProps> = ({ items, onAdd, className }) => {
                             <button
                               className={`${styles.iconBtn} ${styles.spotify}`}
                             >
-                              <SiSpotify size={24} />
+                              <SiSpotify />
                             </button>
 
                             <button
                               className={`${styles.iconBtn} ${styles.youtube}`}
                             >
-                              <SiYoutube size={24} />
+                              <SiYoutube />
                             </button>
 
                             <button
                               className={`${styles.iconBtn} ${styles.comment}`}
                             >
-                              <MessageCircle size={24} />
+                              <MessageCircle />
                             </button>
 
                             <button
@@ -113,7 +164,6 @@ export const Queue: React.FC<QueueProps> = ({ items, onAdd, className }) => {
                             >
                               <BellRing
                                 color="#FF9100FF"
-                                size={24}
                                 fill="#FF9100FF"
                               />
                             </button>
