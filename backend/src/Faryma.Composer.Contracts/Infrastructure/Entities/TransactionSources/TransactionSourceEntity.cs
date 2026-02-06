@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
 {
@@ -14,7 +15,15 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// </summary>
         public required DateTime CreatedAt { get; set; }
 
+        public Guid CreatedByUserId { get; set; }
+
         // Навигационные свойства
+
+        /// <summary>
+        /// Пользователь, создавший источник транзакции
+        /// </summary>
+        [ForeignKey(nameof(CreatedByUserId))]
+        public required UserEntity CreatedByUser { get; set; }
 
         /// <summary>
         /// Транзакции, относящиеся к этому источнику

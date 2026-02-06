@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
 {
@@ -33,5 +34,25 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// Оценки треков
         /// </summary>
         public ICollection<UserTrackRatingEntity> TrackRatings { get; set; } = [];
+
+        /// <summary>
+        /// Стримы, созданные композитором
+        /// </summary>
+        public ICollection<ComposerStreamEntity> CreatedComposerStreams { get; set; } = [];
+
+        /// <summary>
+        /// Разборы треков, созданные композитором
+        /// </summary>
+        public ICollection<ReviewEntity> CreatedReviews { get; set; } = [];
+
+        /// <summary>
+        /// Треки, созданные пользователем
+        /// </summary>
+        public ICollection<TrackEntity> CreatedTracks { get; set; } = [];
+
+        /// <summary>
+        /// Источники транзакций, созданные пользователем
+        /// </summary>
+        public ICollection<TransactionSourceEntity> CreatedTransactionSources { get; set; } = [];
     }
 }

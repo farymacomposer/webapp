@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
@@ -27,8 +27,15 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
 
         public long? ReviewOrderId { get; set; }
         public long? TrackId { get; set; }
+        public Guid CreatedByUserId { get; set; }
 
         // Навигационные свойства
+
+        /// <summary>
+        /// Пользователь, создавший разбор
+        /// </summary>
+        [ForeignKey(nameof(CreatedByUserId))]
+        public required UserEntity CreatedByUser { get; set; }
 
         /// <summary>
         /// Связанный заказ

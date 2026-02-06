@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
@@ -40,7 +40,15 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// </summary>
         public DateTime? CompletedAt { get; set; }
 
+        public Guid CreatedByUserId { get; set; }
+
         // Навигационные свойства
+
+        /// <summary>
+        /// Пользователь, создавший стрим
+        /// </summary>
+        [ForeignKey(nameof(CreatedByUserId))]
+        public required UserEntity CreatedByUser { get; set; }
 
         /// <summary>
         /// Заказы, созданные в этом стриме

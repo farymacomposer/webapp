@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Models;
@@ -48,8 +48,15 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
 
         public Guid AddedByUserNicknameId { get; set; }
         public long? CountryId { get; set; }
+        public Guid CreatedByUserId { get; set; }
 
         // Навигационные свойства
+
+        /// <summary>
+        /// Пользователь, создавший трек
+        /// </summary>
+        [ForeignKey(nameof(CreatedByUserId))]
+        public required UserEntity CreatedByUser { get; set; }
 
         /// <summary>
         /// Пользователь, загрузивший трек

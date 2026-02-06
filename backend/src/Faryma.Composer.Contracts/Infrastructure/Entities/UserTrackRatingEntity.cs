@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 
@@ -32,7 +32,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         public required DateTime UpdatedAt { get; set; }
 
         public long TrackId { get; set; }
-        public Guid UserId { get; set; }
+        public Guid CreatedByUserId { get; set; }
 
         // Навигационные свойства
 
@@ -43,9 +43,9 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         public required TrackEntity Track { get; set; }
 
         /// <summary>
-        /// Пользователь, оставивший оценку
+        /// Пользователь, создавший оценку
         /// </summary>
-        [ForeignKey(nameof(UserId))]
-        public required UserEntity User { get; set; }
+        [ForeignKey(nameof(CreatedByUserId))]
+        public required UserEntity CreatedByUser { get; set; }
     }
 }
