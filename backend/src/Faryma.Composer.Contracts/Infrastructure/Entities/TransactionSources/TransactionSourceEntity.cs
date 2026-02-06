@@ -1,6 +1,5 @@
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
 {

@@ -17,7 +17,7 @@ FROM build AS migrations
 WORKDIR "/src/src/Faryma.Composer.MigrationsBundle"
 RUN dotnet restore "Faryma.Composer.MigrationsBundle.csproj" && \
     dotnet new tool-manifest && \
-    dotnet tool install dotnet-ef -v d --version 10.0.* && \
+    dotnet tool install dotnet-ef -v d --version 10.0.1 && \
     dotnet ef migrations bundle -v --self-contained -r linux-x64 -o /app/migrations-bundle && \
     chmod +x /app/migrations-bundle
 

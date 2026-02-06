@@ -18,17 +18,10 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         [MaxLength(100)]
         public string? Reason { get; set; }
 
-        public Guid ReversedByUserId { get; set; }
         public long ReversedTransactionId { get; set; }
         public long? ReversalTransactionId { get; set; }
 
         // Навигационные свойства
-
-        /// <summary>
-        /// Пользователь, который сделал отмену
-        /// </summary>
-        [ForeignKey(nameof(ReversedByUserId))]
-        public required UserEntity ReversedByUser { get; set; }
 
         /// <summary>
         /// Транзакция, которую отменили
