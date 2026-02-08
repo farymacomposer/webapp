@@ -8,5 +8,10 @@ namespace Faryma.Composer.Contracts.Exceptions
         {
             Data.Add("Id", id);
         }
+
+        public NotFoundException(string? message, Guid id, [CallerMemberName] string callerMemberName = null!) : base(message, callerMemberName)
+        {
+            Data.Add("Id", id);
+        }
     }
 }
