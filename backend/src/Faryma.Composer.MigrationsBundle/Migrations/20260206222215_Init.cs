@@ -85,24 +85,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "composer_streams",
-                schema: "app",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    EventDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Type = table.Column<ComposerStreamType>(type: "app.composer_stream_type", nullable: false),
-                    Status = table.Column<ComposerStreamStatus>(type: "app.composer_stream_status", nullable: false),
-                    StartedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_composer_streams", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "DataProtectionKeys",
                 schema: "app",
                 columns: table => new
@@ -158,20 +140,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_track_genres", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "transaction_sources",
-                schema: "app",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_transaction_sources", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -292,6 +260,54 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "composer_streams",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EventDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    Type = table.Column<ComposerStreamType>(type: "app.composer_stream_type", nullable: false),
+                    Status = table.Column<ComposerStreamStatus>(type: "app.composer_stream_status", nullable: false),
+                    StartedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_composer_streams", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_composer_streams_AspNetUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalSchema: "app",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "transaction_sources",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_transaction_sources", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_transaction_sources_AspNetUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalSchema: "app",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "user_nicknames",
                 schema: "app",
                 columns: table => new
@@ -354,11 +370,19 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     ExtendedGenres = table.Column<List<string>>(type: "text[]", nullable: false),
                     AddedByUserNicknameId = table.Column<Guid>(type: "uuid", nullable: false),
                     CountryId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Tags = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_tracks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_tracks_AspNetUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalSchema: "app",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_tracks_track_countries_CountryId",
                         column: x => x.CountryId,
@@ -516,14 +540,14 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     TrackId = table.Column<long>(type: "bigint", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_user_track_ratings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_user_track_ratings_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_user_track_ratings_AspNetUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
                         principalSchema: "app",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -636,11 +660,19 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: true),
-                    TrackId = table.Column<long>(type: "bigint", nullable: true)
+                    TrackId = table.Column<long>(type: "bigint", nullable: true),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_reviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_reviews_AspNetUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalSchema: "app",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_reviews_review_orders_ReviewOrderId",
                         column: x => x.ReviewOrderId,
@@ -662,20 +694,12 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false),
                     Reason = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    ReversedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReversedTransactionId = table.Column<long>(type: "bigint", nullable: false),
                     ReversalTransactionId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_transaction_reversals", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_transaction_reversals_AspNetUsers_ReversedByUserId",
-                        column: x => x.ReversedByUserId,
-                        principalSchema: "app",
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_transaction_reversals_transaction_sources_Id",
                         column: x => x.Id,
@@ -792,6 +816,12 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_composer_streams_CreatedByUserId",
+                schema: "app",
+                table: "composer_streams",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_composer_streams_EventDate",
                 schema: "app",
                 table: "composer_streams",
@@ -821,6 +851,12 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 schema: "app",
                 table: "ReviewOrderEntityUserNicknameEntity",
                 column: "UserNicknamesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_reviews_CreatedByUserId",
+                schema: "app",
+                table: "reviews",
+                column: "CreatedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_reviews_ReviewOrderId",
@@ -873,6 +909,12 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_tracks_CreatedByUserId",
+                schema: "app",
+                table: "tracks",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_transaction_reversals_ReversalTransactionId",
                 schema: "app",
                 table: "transaction_reversals",
@@ -880,17 +922,17 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_transaction_reversals_ReversedByUserId",
-                schema: "app",
-                table: "transaction_reversals",
-                column: "ReversedByUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_transaction_reversals_ReversedTransactionId",
                 schema: "app",
                 table: "transaction_reversals",
                 column: "ReversedTransactionId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_transaction_sources_CreatedByUserId",
+                schema: "app",
+                table: "transaction_sources",
+                column: "CreatedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_transactions_SourceId",
@@ -925,16 +967,16 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_user_track_ratings_CreatedByUserId",
+                schema: "app",
+                table: "user_track_ratings",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_user_track_ratings_TrackId",
                 schema: "app",
                 table: "user_track_ratings",
                 column: "TrackId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_user_track_ratings_UserId",
-                schema: "app",
-                table: "user_track_ratings",
-                column: "UserId");
         }
 
         /// <inheritdoc />

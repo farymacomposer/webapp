@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.ComposerStream;
 using Faryma.Composer.Contracts.Application.Features.ComposerStream.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
@@ -19,7 +19,8 @@ namespace Faryma.Composer.Application.Features.ComposerStream
         {
             try
             {
-                ComposerStreamEntity stream = uow.ComposerStreamStore.Create(command.EventDate, command.Type);
+                UserEntity createdByUser = uow.UserStore.Get(command.CreatedByUserId);
+                ComposerStreamEntity stream = uow.ComposerStreamStore.Create(command.EventDate, command.Type, createdByUser);
                 await uow.SaveChanges();
 
                 await orderQueueService.CreateStream(stream);

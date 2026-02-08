@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Exceptions;
+using Faryma.Composer.Contracts.Exceptions;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +7,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
     public sealed class ComposerStreamStore(AppDbContext context)
     {
-        public ComposerStreamEntity Create(DateOnly eventDate, ComposerStreamType type)
+        public ComposerStreamEntity Create(DateOnly eventDate, ComposerStreamType type, UserEntity createdByUser)
         {
             if (type == ComposerStreamType.Unspecified)
             {
@@ -19,6 +19,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 EventDate = eventDate,
                 Status = ComposerStreamStatus.Planned,
                 Type = type,
+                CreatedByUser = createdByUser,
             }).Entity;
         }
 

@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Contracts.Application.Features.ComposerStream.Commands
 {
@@ -16,5 +16,10 @@ namespace Faryma.Composer.Contracts.Application.Features.ComposerStream.Commands
         /// Тип стрима
         /// </summary>
         public required ComposerStreamType Type { get; init; }
+
+        /// <summary>
+        /// Id пользователя, создавшего стрим
+        /// </summary>
+        public required Guid CreatedByUserId { get; init; }
     }
 }

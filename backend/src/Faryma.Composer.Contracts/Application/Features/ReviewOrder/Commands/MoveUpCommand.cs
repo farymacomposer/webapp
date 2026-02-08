@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands
 {
@@ -26,5 +26,10 @@ namespace Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands
         /// Провайдер/канал пополнения счета пользователя
         /// </summary>
         public required AccountTopUpProvider TopUpProvider { get; init; }
+
+        /// <summary>
+        /// Id пользователя, поднявшего заказ
+        /// </summary>
+        public required Guid CreatedByUserId { get; init; }
     }
 }

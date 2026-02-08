@@ -15,14 +15,14 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         [Column(TypeName = DbEnumConst.AccountTopUpProviderEnum)]
         public required AccountTopUpProvider Provider { get; set; }
 
-        public Guid UserAccountId { get; set; }
+        public Guid UserNicknameAccountId { get; set; }
 
         // Навигационные свойства
 
         /// <summary>
-        /// Счет пользователя
+        /// Счет псевдонима пользователя
         /// </summary>
-        [ForeignKey(nameof(UserAccountId))]
-        public required UserAccountEntity Account { get; set; }
+        [ForeignKey(nameof(UserNicknameAccountId))]
+        public required UserNicknameAccountEntity UserNicknameAccount { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Infrastructure.Persistence.Queries;
+using Faryma.Composer.Infrastructure.Persistence.Queries;
 using Faryma.Composer.Infrastructure.Persistence.Stores;
 using Faryma.Composer.Infrastructure.QueryServices;
 using Microsoft.AspNetCore.DataProtection;
@@ -31,7 +31,8 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
                 .AddScoped<ReviewStore>()
                 .AddScoped<ReviewOrderStore>()
                 .AddScoped<TransactionStore>()
-                .AddScoped<UserNicknameStore>();
+                .AddScoped<UserNicknameStore>()
+                .AddScoped<UserStore>();
 
             services
                 .AddScoped<TrackQueryService>();

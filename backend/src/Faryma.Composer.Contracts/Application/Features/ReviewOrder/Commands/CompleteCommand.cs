@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands
+namespace Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands
 {
     /// <summary>
     /// Команда выполнения заказа
@@ -14,5 +14,10 @@
         /// Оценка трека (0-26)
         /// </summary>
         public required int Rating { get; init; }
+
+        /// <summary>
+        /// Id пользователя, создавшего разбор
+        /// </summary>
+        public required Guid CreatedByUserId { get; init; }
     }
 }

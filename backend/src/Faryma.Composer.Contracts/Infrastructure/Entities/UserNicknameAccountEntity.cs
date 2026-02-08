@@ -5,10 +5,10 @@ using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
 {
     /// <summary>
-    /// Счет пользователя
+    /// Счет псевдонима пользователя
     /// </summary>
-    [Table("user_accounts")]
-    public sealed class UserAccountEntity : PersonalEntity
+    [Table("user_nickname_accounts")]
+    public sealed class UserNicknameAccountEntity : PersonalEntity
     {
         [Timestamp]
         public uint Version { get; set; }

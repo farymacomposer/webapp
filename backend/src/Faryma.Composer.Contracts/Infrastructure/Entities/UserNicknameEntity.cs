@@ -35,7 +35,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Счет пользователя
         /// </summary>
-        public UserAccountEntity Account { get; set; } = null!;
+        public UserNicknameAccountEntity Account { get; set; } = null!;
 
         /// <summary>
         /// Загруженные треки

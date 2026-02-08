@@ -10,7 +10,8 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             DateTime createdAt,
             AccountTopUpProvider topUpProvider,
             long amount,
-            UserAccountEntity account)
+            UserNicknameAccountEntity account,
+            UserEntity createdByUser)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
 
@@ -23,7 +24,8 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             {
                 CreatedAt = createdAt,
                 Provider = topUpProvider,
-                Account = account,
+                UserNicknameAccount = account,
+                CreatedByUser = createdByUser,
             };
 
             context.Add(source);
@@ -32,17 +34,17 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             {
                 CreatedAt = createdAt,
                 Kind = TransactionKind.AccountTopUp,
-                Account = account,
+                UserNicknameAccount = account,
                 Credit = amount,
                 Debit = 0,
-                Source = source,
+                TransactionSource = source,
             }).Entity;
         }
 
         public TransactionEntity CreatePayment(
             DateTime createdAt,
             long amount,
-            UserAccountEntity account,
+            UserNicknameAccountEntity account,
             TransactionSourceEntity source)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
@@ -56,14 +58,14 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             {
                 CreatedAt = createdAt,
                 Kind = TransactionKind.Payment,
-                Account = account,
+                UserNicknameAccount = account,
                 Credit = 0,
                 Debit = amount,
-                Source = source,
+                TransactionSource = source,
             }).Entity;
         }
 
-        public TransactionEntity CreateReversal(DateTime createdAt, UserEntity reversedByUser, TransactionEntity reversedTransaction)
+        public TransactionEntity CreateReversal(DateTime createdAt, UserEntity createdByUser, TransactionEntity reversedTransaction)
         {
             if (reversedTransaction.Kind == TransactionKind.Reversal)
             {
@@ -73,7 +75,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             TransactionReversalEntity source = new()
             {
                 CreatedAt = createdAt,
-                ReversedByUser = reversedByUser,
+                CreatedByUser = createdByUser,
                 ReversedTransaction = reversedTransaction,
             };
 
@@ -85,8 +87,8 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 Kind = TransactionKind.Reversal,
                 Credit = reversedTransaction.Debit,
                 Debit = reversedTransaction.Credit,
-                Account = reversedTransaction.Account,
-                Source = source
+                UserNicknameAccount = reversedTransaction.UserNicknameAccount,
+                TransactionSource = source
             };
 
             context.Add(result);

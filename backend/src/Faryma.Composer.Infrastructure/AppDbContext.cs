@@ -54,7 +54,7 @@ namespace Faryma.Composer.Infrastructure
         /// <summary>
         /// Счета пользователей
         /// </summary>
-        public DbSet<UserAccountEntity> UserAccounts { get; set; }
+        public DbSet<UserNicknameAccountEntity> UserAccounts { get; set; }
 
         /// <summary>
         /// Псевдонимы пользователей

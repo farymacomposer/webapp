@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands
+namespace Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands
 {
     /// <summary>
     /// Команда создания заказа
@@ -19,5 +19,10 @@
         /// Комментарий пользователя
         /// </summary>
         public required string? UserComment { get; init; }
+
+        /// <summary>
+        /// Id пользователя, создавшего заказ
+        /// </summary>
+        public required Guid CreatedByUserId { get; init; }
     }
 }

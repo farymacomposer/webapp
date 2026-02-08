@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Api.Auth;
+using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Application.Features.ComposerStream;
 using Faryma.Composer.Contracts.Api.Features.ComposerStream.Cancel;
 using Faryma.Composer.Contracts.Api.Features.ComposerStream.Complete;
@@ -19,7 +20,8 @@ namespace Faryma.Composer.Api.Features.ComposerStream
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public sealed class ComposerStreamController(ComposerStreamService composerStreamService) : ControllerBase
+    public sealed class ComposerStreamController(
+        ComposerStreamService composerStreamService) : ControllerBase
     {
         /// <summary>
         /// Возвращает список стримов
@@ -56,10 +58,13 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [AuthorizeComposer]
         public async Task<ActionResult<CreateStreamResponse>> CreateStream(CreateStreamRequest request)
         {
+            Guid userId = User.GetUserId();
+
             ComposerStreamEntity stream = await composerStreamService.Create(new CreateCommand
             {
                 EventDate = request.EventDate,
-                Type = request.Type
+                Type = request.Type,
+                CreatedByUserId = userId
             });
 
             return Ok(new CreateStreamResponse

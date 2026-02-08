@@ -23,12 +23,12 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         public required TransactionKind Kind { get; set; }
 
         /// <summary>
-        /// Зачисление (увеличивает баланс счета пользователя)
+        /// Зачисление
         /// </summary>
         public required long Credit { get; set; }
 
         /// <summary>
-        /// Списание (уменьшает баланс счета пользователя)
+        /// Списание
         /// </summary>
         public required long Debit { get; set; }
 
@@ -38,21 +38,21 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         [NotMapped]
         public long SignedAmount => Credit - Debit;
 
-        public Guid UserAccountId { get; set; }
-        public long SourceId { get; set; }
+        public Guid UserNicknameAccountId { get; set; }
+        public long TransactionSourceId { get; set; }
 
         // Навигационные свойства
 
         /// <summary>
-        /// Счет пользователя
+        /// Счет псевдонима пользователя
         /// </summary>
-        [ForeignKey(nameof(UserAccountId))]
-        public required UserAccountEntity Account { get; set; }
+        [ForeignKey(nameof(UserNicknameAccountId))]
+        public required UserNicknameAccountEntity UserNicknameAccount { get; set; }
 
         /// <summary>
         /// Источник транзакции
         /// </summary>
-        [ForeignKey(nameof(SourceId))]
-        public required TransactionSourceEntity Source { get; set; }
+        [ForeignKey(nameof(TransactionSourceId))]
+        public required TransactionSourceEntity TransactionSource { get; set; }
     }
 }

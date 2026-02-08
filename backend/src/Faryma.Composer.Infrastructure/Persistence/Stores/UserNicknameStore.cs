@@ -15,7 +15,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             };
 
             context.Add(result);
-            context.Add(new UserAccountEntity
+            context.Add(new UserNicknameAccountEntity
             {
                 UserNickname = result
             });

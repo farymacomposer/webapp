@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Api.Auth;
+using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Contracts.Api;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.AddTrackUrl;
@@ -24,7 +25,8 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public sealed class ReviewOrderController(ReviewOrderService reviewOrderService) : ControllerBase
+    public sealed class ReviewOrderController(
+        ReviewOrderService reviewOrderService) : ControllerBase
     {
         /// <summary>
         /// Создает заказ
@@ -38,6 +40,8 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] CreateReviewOrderRequest request)
         {
+            Guid userId = User.GetUserId();
+
             ReviewOrderEntity order = request.OrderType switch
             {
                 ReviewOrderType.OutOfQueue => await reviewOrderService.CreateOutOfQueue(new CreateOutOfQueueOrderCommand
@@ -45,6 +49,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
+                    CreatedByUserId = userId,
                 }),
                 ReviewOrderType.Donation => await reviewOrderService.CreateDonation(new CreateDonationOrderCommand
                 {
@@ -53,18 +58,21 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                     UserComment = request.UserComment,
                     PaymentAmount = request.PaymentAmount!.Value,
                     TopUpProvider = request.TopUpProvider!.Value,
+                    CreatedByUserId = userId,
                 }),
                 ReviewOrderType.Free => await reviewOrderService.CreateFree(new CreateFreeOrderCommand
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
+                    CreatedByUserId = userId,
                 }),
                 ReviewOrderType.Charity => await reviewOrderService.CreateCharity(new CreateCharityOrderCommand
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
+                    CreatedByUserId = userId,
                 }),
                 _ => throw new InvalidOperationException(),
             };
@@ -87,17 +95,20 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] MoveUpReviewOrderRequest request)
         {
+            Guid userId = User.GetUserId();
+
             TransactionEntity transaction = await reviewOrderService.MoveUp(new MoveUpCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Nickname = request.Nickname.Trim(),
                 PaymentAmount = request.PaymentAmount,
                 TopUpProvider = request.TopUpProvider,
+                CreatedByUserId = userId,
             });
 
             return Ok(new MoveUpReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map((ReviewOrderEntity)transaction.Source),
+                ReviewOrder = ReviewOrderDto.Map((ReviewOrderEntity)transaction.TransactionSource),
                 PaymentTransactionId = transaction.Id
             });
         }
@@ -143,10 +154,13 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [AuthorizeAdmins]
         public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder(CompleteReviewOrderRequest request)
         {
+            Guid userId = User.GetUserId();
+
             ReviewOrderEntity order = await reviewOrderService.Complete(new CompleteCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Rating = request.Rating,
+                CreatedByUserId = userId,
             });
 
             return Ok(new CompleteReviewOrderResponse

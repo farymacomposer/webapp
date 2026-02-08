@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Exceptions;
+using Faryma.Composer.Contracts.Exceptions;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
@@ -29,7 +29,8 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             string? userComment,
             ReviewOrderType type,
             ComposerStreamEntity creationStream,
-            UserNicknameEntity userNickname)
+            UserNicknameEntity userNickname,
+            UserEntity createdByUser)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(nominalAmount);
 
@@ -53,6 +54,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 UserComment = userComment,
                 CreationStream = creationStream,
                 UserNicknames = { userNickname },
+                CreatedByUser = createdByUser,
             }).Entity;
         }
     }

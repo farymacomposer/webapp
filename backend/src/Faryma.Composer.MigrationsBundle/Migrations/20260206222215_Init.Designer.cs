@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260110121605_Init")]
+    [Migration("20260206222215_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -23,7 +23,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("app")
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "account_top_up_provider", new[] { "unspecified", "donationalerts", "donatty", "twitch_channel_points", "manual" });
@@ -69,6 +69,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateOnly>("EventDate")
                         .HasColumnType("date");
 
@@ -82,6 +85,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .HasColumnType("app.composer_stream_type");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("EventDate")
                         .IsUnique();
@@ -100,6 +105,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("RatingValue")
                         .HasColumnType("integer");
 
@@ -113,6 +121,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("ReviewOrderId")
                         .IsUnique();
@@ -183,6 +193,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<string>("CoverUrl")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.PrimitiveCollection<List<string>>("ExtendedGenres")
                         .IsRequired()
                         .HasColumnType("text[]");
@@ -203,6 +216,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasIndex("AddedByUserNicknameId");
 
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("CreatedByUserId");
 
                     b.ToTable("tracks", "app");
                 });
@@ -362,7 +377,12 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
 
                     b.ToTable("transaction_sources", "app");
 
@@ -508,6 +528,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("RatingValue")
                         .HasColumnType("integer");
 
@@ -517,14 +540,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("TrackId");
+                    b.HasIndex("CreatedByUserId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("TrackId");
 
                     b.ToTable("user_track_ratings", "app");
                 });
@@ -850,16 +870,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<long?>("ReversalTransactionId")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("ReversedByUserId")
-                        .HasColumnType("uuid");
-
                     b.Property<long>("ReversedTransactionId")
                         .HasColumnType("bigint");
 
                     b.HasIndex("ReversalTransactionId")
                         .IsUnique();
-
-                    b.HasIndex("ReversedByUserId");
 
                     b.HasIndex("ReversedTransactionId")
                         .IsUnique();
@@ -867,8 +882,25 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("transaction_reversals", "app");
                 });
 
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.ComposerStreamEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "CreatedByUser")
+                        .WithMany("CreatedComposerStreams")
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+                });
+
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.ReviewEntity", b =>
                 {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "CreatedByUser")
+                        .WithMany("CreatedReviews")
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderEntity", "ReviewOrder")
                         .WithOne("Review")
                         .HasForeignKey("Faryma.Composer.Contracts.Infrastructure.Entities.ReviewEntity", "ReviewOrderId");
@@ -876,6 +908,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TrackEntity", "Track")
                         .WithMany("Reviews")
                         .HasForeignKey("TrackId");
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("ReviewOrder");
 
@@ -894,6 +928,12 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .WithMany("Tracks")
                         .HasForeignKey("CountryId");
 
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "CreatedByUser")
+                        .WithMany("CreatedTracks")
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsMany("Faryma.Composer.Contracts.Infrastructure.Models.TrackTag", "Tags", b1 =>
                         {
                             b1.Property<long>("TrackEntityId");
@@ -910,7 +950,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                             b1.ToTable("tracks", "app");
 
-                            b1.ToJson("Tags");
+                            b1
+                                .ToJson("Tags")
+                                .HasColumnType("jsonb");
 
                             b1.WithOwner()
                                 .HasForeignKey("TrackEntityId");
@@ -919,6 +961,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("AddedBy");
 
                     b.Navigation("Country");
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Tags");
                 });
@@ -940,6 +984,17 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("Source");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "CreatedByUser")
+                        .WithMany("CreatedTransactionSources")
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserAccountEntity", b =>
@@ -964,21 +1019,21 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserTrackRatingEntity", b =>
                 {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "CreatedByUser")
+                        .WithMany("TrackRatings")
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TrackEntity", "Track")
                         .WithMany("UserRatings")
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "User")
-                        .WithMany("TrackRatings")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Track");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1151,12 +1206,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .WithMany()
                         .HasForeignKey("ReversalTransactionId");
 
-                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "ReversedByUser")
-                        .WithMany()
-                        .HasForeignKey("ReversedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionEntity", "ReversedTransaction")
                         .WithMany()
                         .HasForeignKey("ReversedTransactionId")
@@ -1164,8 +1213,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .IsRequired();
 
                     b.Navigation("ReversalTransaction");
-
-                    b.Navigation("ReversedByUser");
 
                     b.Navigation("ReversedTransaction");
                 });
@@ -1203,6 +1250,14 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", b =>
                 {
+                    b.Navigation("CreatedComposerStreams");
+
+                    b.Navigation("CreatedReviews");
+
+                    b.Navigation("CreatedTracks");
+
+                    b.Navigation("CreatedTransactionSources");
+
                     b.Navigation("TrackRatings");
 
                     b.Navigation("UserNicknames");

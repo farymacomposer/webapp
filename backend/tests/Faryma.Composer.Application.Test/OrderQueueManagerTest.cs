@@ -982,7 +982,13 @@ namespace Faryma.Composer.Application.Test
 
         private ReviewOrderEntity GetDonation(string eventDate, long id, string name, int amount, bool isFrozen = false)
         {
-            return new()
+            UserEntity user = new()
+            {
+                UserName = name,
+                CreatedAt = DateTime.Now,
+            };
+
+            return new ReviewOrderEntity
             {
                 Id = id,
                 CreatedAt = DateTime.Now,
@@ -994,18 +1000,26 @@ namespace Faryma.Composer.Application.Test
                 PayableAmount = amount,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
+                CreatedByUser = user,
                 CreationStream = new ComposerStreamEntity
                 {
                     EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,
                     Status = ComposerStreamStatus.Live,
+                    CreatedByUser = user,
                 }
             };
         }
 
         private ReviewOrderEntity GetOutOfQueue(string eventDate, long id, string name)
         {
-            return new()
+            UserEntity user = new()
+            {
+                UserName = name,
+                CreatedAt = DateTime.Now,
+            };
+
+            return new ReviewOrderEntity
             {
                 Id = id,
                 CreatedAt = DateTime.Now,
@@ -1017,11 +1031,13 @@ namespace Faryma.Composer.Application.Test
                 PayableAmount = 0,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
+                CreatedByUser = user,
                 CreationStream = new ComposerStreamEntity
                 {
                     EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,
                     Status = ComposerStreamStatus.Live,
+                    CreatedByUser = user,
                 }
             };
         }

@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Infrastructure.Persistence.Queries;
+using Faryma.Composer.Infrastructure.Persistence.Queries;
 using Faryma.Composer.Infrastructure.Persistence.Stores;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -15,7 +15,8 @@ namespace Faryma.Composer.Infrastructure
         ReviewStore reviewStore,
         ReviewOrderStore reviewOrderStore,
         TransactionStore transactionStore,
-        UserNicknameStore userNicknameStore
+        UserNicknameStore userNicknameStore,
+        UserStore userStore
         )
     {
         public ComposerStreamQueries ComposerStreamQueries { get; } = composerStreamQueries;
@@ -27,6 +28,7 @@ namespace Faryma.Composer.Infrastructure
         public ReviewOrderStore ReviewOrderStore { get; } = reviewOrderStore;
         public TransactionStore TransactionStore { get; } = transactionStore;
         public UserNicknameStore UserNicknameStore { get; } = userNicknameStore;
+        public UserStore UserStore { get; } = userStore;
 
         public Task<IDbContextTransaction> BeginTransaction(CancellationToken cancellationToken = default) => context.Database.BeginTransactionAsync(cancellationToken);
         public Task<int> SaveChanges(CancellationToken cancellationToken = default) => context.SaveChangesAsync(cancellationToken);

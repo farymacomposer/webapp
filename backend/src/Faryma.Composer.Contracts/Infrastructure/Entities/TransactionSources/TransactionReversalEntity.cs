@@ -19,7 +19,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         public string? Reason { get; set; }
 
         public long ReversedTransactionId { get; set; }
-        public long? ReversalTransactionId { get; set; }
+        public long ReversalTransactionId { get; set; }
 
         // Навигационные свойства
 

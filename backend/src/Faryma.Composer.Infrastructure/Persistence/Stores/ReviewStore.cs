@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Stores
@@ -8,7 +8,8 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
         public ReviewEntity Create(
             ReviewOrderEntity inProgressOrder,
             int rating,
-            DateTime createdAt)
+            DateTime createdAt,
+            UserEntity createdByUser)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(rating);
 
@@ -18,6 +19,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 RatingValue = rating,
                 CreatedAt = createdAt,
                 UpdatedAt = createdAt,
+                CreatedByUser = createdByUser,
             }).Entity;
         }
     }
