@@ -39,6 +39,7 @@ export const Queue: React.FC<QueueProps> = ({
   className,
 }) => {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(true);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
 
@@ -47,7 +48,8 @@ export const Queue: React.FC<QueueProps> = ({
   }, [activeId, onOpenChange]);
 
   useClickAway(rootRef, () => {
-    if (activeId) {
+    if (isOpen) {
+      setIsOpen(false);
       setActiveId(null);
     }
   });
@@ -57,12 +59,17 @@ export const Queue: React.FC<QueueProps> = ({
       ref={rootRef}
       className={[styles.root, className ?? ""].filter(Boolean).join(" ")}
       onClickCapture={(event) => {
-        if (!activeId) {
+        if (!isOpen) {
           return;
         }
 
         const target = event.target as HTMLElement | null;
-        if (!target?.closest('[data-queue-card="true"]')) {
+        if (
+          !target?.closest(
+            '[data-queue-card="true"], [data-queue-add="true"]'
+          )
+        ) {
+          setIsOpen(false);
           setActiveId(null);
         }
       }}
@@ -79,15 +86,25 @@ export const Queue: React.FC<QueueProps> = ({
       <button
         type="button"
         className={styles.addCard}
-        onClick={onAdd}
-        aria-label="Добавить трек"
+        data-queue-add="true"
+        onClick={() => {
+          setIsOpen((prev) => !prev);
+          setActiveId(null);
+          onAdd?.();
+        }}
+        aria-label="Открыть очередь"
       >
         +
       </button>
 
       <div
         ref={listRef}
-        className={styles.list}
+        className={[
+          styles.list,
+          isOpen ? "" : styles.listHidden,
+        ]
+          .filter(Boolean)
+          .join(" ")}
         role="listbox"
         aria-label="Очередь треков"
       >
@@ -98,6 +115,7 @@ export const Queue: React.FC<QueueProps> = ({
           const accentStyle: CSSProperties = {
             ["--accent-color" as any]: item.labelColor,
             ["--text-color" as any]: item.textColor,
+            ["--queue-delay" as any]: `${120 + index * 80}ms`,
           };
 
           return (
@@ -118,9 +136,10 @@ export const Queue: React.FC<QueueProps> = ({
                 role="option"
                 aria-selected={isActive}
                 tabIndex={0}
-                onClick={() =>
-                  setActiveId((prev) => (prev === item.id ? null : item.id))
-                }
+                onClick={() => {
+                  setIsOpen(true);
+                  setActiveId((prev) => (prev === item.id ? null : item.id));
+                }}
               >
                 <div className={styles.headerRow}>
                   <div className={styles.tags}>
@@ -162,10 +181,7 @@ export const Queue: React.FC<QueueProps> = ({
                             <button
                               className={`${styles.iconBtn} ${styles.notify}`}
                             >
-                              <BellRing
-                                color="#FF9100FF"
-                                fill="#FF9100FF"
-                              />
+                              <BellRing color="#FF9100FF" fill="#FF9100FF" />
                             </button>
                           </>
                         )}
