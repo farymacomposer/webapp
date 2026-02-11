@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -7,7 +5,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// <summary>
     /// Пользовательская оценка трека
     /// </summary>
-    [Table("user_track_ratings")]
     public sealed class UserTrackRatingEntity : BaseEntity
     {
         /// <summary>
@@ -18,7 +15,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Комментарий
         /// </summary>
-        [MaxLength(200)]
         public string? Comment { get; set; }
 
         /// <summary>
@@ -39,13 +35,11 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Оцениваемый трек
         /// </summary>
-        [ForeignKey(nameof(TrackId))]
         public required TrackEntity Track { get; set; }
 
         /// <summary>
         /// Пользователь, создавший оценку
         /// </summary>
-        [ForeignKey(nameof(CreatedByUserId))]
         public required UserEntity CreatedByUser { get; set; }
     }
 }

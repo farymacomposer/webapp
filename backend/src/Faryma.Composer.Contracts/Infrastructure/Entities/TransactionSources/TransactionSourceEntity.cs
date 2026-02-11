@@ -1,4 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
@@ -6,7 +5,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
     /// <summary>
     /// Базовый источник транзакции (TPT стратегия)
     /// </summary>
-    [Table("transaction_sources")]
     public abstract class TransactionSourceEntity : BaseEntity
     {
         /// <summary>
@@ -21,7 +19,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Пользователь, создавший источник транзакции
         /// </summary>
-        [ForeignKey(nameof(CreatedByUserId))]
         public required UserEntity CreatedByUser { get; set; }
 
         /// <summary>

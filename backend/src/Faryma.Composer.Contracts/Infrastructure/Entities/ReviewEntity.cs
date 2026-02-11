@@ -1,4 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
@@ -7,7 +6,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// <summary>
     /// Результат разбора трека композитором
     /// </summary>
-    [Table("reviews")]
     public sealed class ReviewEntity : BaseEntity
     {
         /// <summary>
@@ -34,19 +32,16 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Пользователь, создавший разбор
         /// </summary>
-        [ForeignKey(nameof(CreatedByUserId))]
         public required UserEntity CreatedByUser { get; set; }
 
         /// <summary>
         /// Связанный заказ
         /// </summary>
-        [ForeignKey(nameof(ReviewOrderId))]
         public ReviewOrderEntity? ReviewOrder { get; set; }
 
         /// <summary>
         /// Связанный музыкальный трек
         /// </summary>
-        [ForeignKey(nameof(TrackId))]
         public TrackEntity? Track { get; set; }
     }
 }

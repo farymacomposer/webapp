@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
@@ -9,16 +7,13 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
     /// Заказ разбора трека
     /// </summary>
     [DebuggerDisplay("MainNickname = {MainNickname}")]
-    [Table("review_orders")]
     public sealed class ReviewOrderEntity : TransactionSourceEntity
     {
         /// <summary>
         /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
         /// </summary>
-        [MaxLength(40)]
         public required string MainNickname { get; set; }
 
-        [MaxLength(40)]
         public required string MainNormalizedNickname { get; set; }
 
         public long CreationStreamId { get; set; }
@@ -38,19 +33,16 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Тип заказа
         /// </summary>
-        [Column(TypeName = DbEnumConst.ReviewOrderTypeEnum)]
         public required ReviewOrderType Type { get; set; }
 
         /// <summary>
         /// Статус заказа
         /// </summary>
-        [Column(TypeName = DbEnumConst.ReviewOrderStatusEnum)]
         public required ReviewOrderStatus Status { get; set; }
 
         /// <summary>
         /// Тип категории заказа (записывается при взятии заказа в работу)
         /// </summary>
-        [Column(TypeName = DbEnumConst.OrderCategoryTypeEnum)]
         public required OrderCategoryType CategoryType { get; set; }
 
         /// <summary>
@@ -78,7 +70,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Комментарий пользователя
         /// </summary>
-        [MaxLength(200)]
         public string? UserComment { get; set; }
 
         // Навигационные свойства
@@ -91,19 +82,16 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Связанный музыкальный трек
         /// </summary>
-        [ForeignKey(nameof(TrackId))]
         public TrackEntity? Track { get; set; }
 
         /// <summary>
         /// Связанный cтрим, где создан заказ
         /// </summary>
-        [ForeignKey(nameof(CreationStreamId))]
         public required ComposerStreamEntity CreationStream { get; set; }
 
         /// <summary>
         /// Связанный cтрим, где заказ взят в работу
         /// </summary>
-        [ForeignKey(nameof(ProcessingStreamId))]
         public ComposerStreamEntity? ProcessingStream { get; set; }
 
         /// <summary>

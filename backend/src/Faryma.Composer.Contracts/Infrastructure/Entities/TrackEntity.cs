@@ -1,4 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Models;
@@ -8,7 +7,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// <summary>
     /// Музыкальный трек
     /// </summary>
-    [Table("tracks")]
     public sealed class TrackEntity : BaseEntity
     {
         /// <summary>
@@ -55,19 +53,16 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Пользователь, создавший трек
         /// </summary>
-        [ForeignKey(nameof(CreatedByUserId))]
         public required UserEntity CreatedByUser { get; set; }
 
         /// <summary>
         /// Пользователь, загрузивший трек
         /// </summary>
-        [ForeignKey(nameof(AddedByUserNicknameId))]
         public required UserNicknameEntity AddedBy { get; set; }
 
         /// <summary>
         /// Страна производства
         /// </summary>
-        [ForeignKey(nameof(CountryId))]
         public TrackCountryEntity? Country { get; set; }
 
         /// <summary>

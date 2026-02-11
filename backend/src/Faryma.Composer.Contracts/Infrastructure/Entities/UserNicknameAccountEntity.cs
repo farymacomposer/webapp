@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -7,10 +5,8 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     /// <summary>
     /// Счет псевдонима пользователя
     /// </summary>
-    [Table("user_nickname_accounts")]
     public sealed class UserNicknameAccountEntity : PersonalEntity
     {
-        [Timestamp]
         public uint Version { get; set; }
 
         /// <summary>
@@ -25,7 +21,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Псевдоним пользователя
         /// </summary>
-        [ForeignKey(nameof(UserNicknameId))]
         public required UserNicknameEntity UserNickname { get; set; }
 
         /// <summary>

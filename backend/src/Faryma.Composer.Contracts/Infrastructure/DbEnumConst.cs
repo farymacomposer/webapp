@@ -1,6 +1,6 @@
-﻿namespace Faryma.Composer.Contracts.Infrastructure
+namespace Faryma.Composer.Contracts.Infrastructure
 {
-    static class DbEnumConst
+    public static class DbEnumConst
     {
         public const string ComposerStreamStatusEnum = "app.composer_stream_status";
         public const string ComposerStreamTypeEnum = "app.composer_stream_type";

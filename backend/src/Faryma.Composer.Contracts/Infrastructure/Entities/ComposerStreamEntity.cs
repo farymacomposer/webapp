@@ -1,16 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
 using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
-using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
 {
     /// <summary>
     /// Стрим композитора
     /// </summary>
-    [Index(nameof(EventDate), IsUnique = true)]
-    [Table("composer_streams")]
     public sealed class ComposerStreamEntity : BaseEntity
     {
         /// <summary>
@@ -21,13 +17,11 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Тип стрима
         /// </summary>
-        [Column(TypeName = DbEnumConst.ComposerStreamTypeEnum)]
         public required ComposerStreamType Type { get; set; }
 
         /// <summary>
         /// Статус стрима
         /// </summary>
-        [Column(TypeName = DbEnumConst.ComposerStreamStatusEnum)]
         public required ComposerStreamStatus Status { get; set; }
 
         /// <summary>
@@ -47,7 +41,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// <summary>
         /// Пользователь, создавший стрим
         /// </summary>
-        [ForeignKey(nameof(CreatedByUserId))]
         public required UserEntity CreatedByUser { get; set; }
 
         /// <summary>
