@@ -42,6 +42,17 @@ body {
   color: #fca5a5;
 }
 
+.result {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  background: #111827;
+  color: #e5e7eb;
+  padding: 12px;
+}
+
 button,
 .button-link {
   width: fit-content;

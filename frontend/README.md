@@ -26,3 +26,6 @@ npm run dev
 - Callback-страница `/auth/twitch/callback`.
 - Обмен `code` на JWT через `POST /api/Auth/TwitchLogin`.
 - Сохранение JWT в `localStorage`.
+- Проверка защищенного API через `createApiConfiguration()`:
+  - запрос `GET /api/AppSettings/GetAppSettings`
+  - `Authorization: Bearer ...` формируется из сохраненного JWT.
