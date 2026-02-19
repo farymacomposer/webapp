@@ -64,6 +64,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    TwitchUserId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    TwitchLogin = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -808,6 +810,14 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 schema: "app",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_TwitchUserId",
+                schema: "app",
+                table: "AspNetUsers",
+                column: "TwitchUserId",
+                unique: true,
+                filter: "\"TwitchUserId\" IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",

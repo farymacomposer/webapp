@@ -1,34 +1,56 @@
 :root {
-    /* Бэкграунд градиент */
-    --main-gradient: linear-gradient(180deg,
-            #1B0C3B 0%,
-            #270E59 10%,
-            #381186 20%,
-            #791FB4 40%,
-            #BC26A0 60%,
-            #C01A57 75%,
-            #921C4B 90%,
-            #20084A 100%);
-    /* Header */
-    --color-header-bg: #0D0719;
-    --color-header: #FFF5EB;
-    /* Colors */
-    --color-secondary: #FFA448;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
-    color: #ffff;
-    margin: 0;
-    min-height: 100vh;
-    background: var(--main-gradient);
-    background-attachment: fixed;
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background: #111827;
+  color: #f3f4f6;
 }
 
 .container {
-    max-width: 1200px;
-    /* ширина сайта */
-    margin: 0 auto;
-    /* центрируем по горизонтали */
-    padding: 20px;
-    /* внутренние отступы */
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid #374151;
+  border-radius: 10px;
+  background: #1f2937;
+}
+
+.muted {
+  color: #d1d5db;
+}
+
+.ok {
+  color: #86efac;
+}
+
+.error {
+  color: #fca5a5;
+}
+
+button,
+.button-link {
+  width: fit-content;
+  border: 0;
+  border-radius: 8px;
+  background: #a855f7;
+  color: #ffffff;
+  padding: 10px 14px;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
 }

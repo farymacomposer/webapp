@@ -20,7 +20,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("app")
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "account_top_up_provider", new[] { "unspecified", "donationalerts", "donatty", "twitch_channel_points", "manual" });
@@ -435,6 +435,14 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
+                    b.Property<string>("TwitchLogin")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("TwitchUserId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -451,6 +459,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("TwitchUserId")
+                        .IsUnique()
+                        .HasFilter("\"TwitchUserId\" IS NOT NULL");
 
                     b.ToTable("AspNetUsers", "app");
                 });
