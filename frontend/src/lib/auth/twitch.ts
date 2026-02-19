@@ -4,21 +4,21 @@ import { setPkceVerifier, setTwitchAuthState } from "@/lib/auth/storage";
 const TWITCH_AUTHORIZE_URL = "https://id.twitch.tv/oauth2/authorize";
 const TWITCH_SCOPE = "user:read:email";
 
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing required env variable: ${name}`);
+export function getTwitchRedirectUri(): string {
+  const redirectUri = process.env.NEXT_PUBLIC_TWITCH_REDIRECT_URI;
+  if (!redirectUri) {
+    throw new Error("Missing required env variable: NEXT_PUBLIC_TWITCH_REDIRECT_URI");
   }
 
-  return value;
-}
-
-export function getTwitchRedirectUri(): string {
-  return getRequiredEnv("NEXT_PUBLIC_TWITCH_REDIRECT_URI");
+  return redirectUri;
 }
 
 export async function startTwitchLogin(): Promise<void> {
-  const clientId = getRequiredEnv("NEXT_PUBLIC_TWITCH_CLIENT_ID");
+  const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  if (!clientId) {
+    throw new Error("Missing required env variable: NEXT_PUBLIC_TWITCH_CLIENT_ID");
+  }
+
   const redirectUri = getTwitchRedirectUri();
   const { verifier, challenge } = await generatePkcePair();
   const state = generateOAuthState();

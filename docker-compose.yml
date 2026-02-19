@@ -3,12 +3,18 @@ services:
   frontend:
     build:
       dockerfile: frontend.Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_TWITCH_CLIENT_ID: ${NEXT_PUBLIC_TWITCH_CLIENT_ID}
+        NEXT_PUBLIC_TWITCH_REDIRECT_URI: ${NEXT_PUBLIC_TWITCH_REDIRECT_URI}
     container_name: composer-frontend
     environment:
       NODE_ENV: ${NODE_ENV}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-    ports:
-      - "3000:3000"
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+      NEXT_PUBLIC_TWITCH_CLIENT_ID: ${NEXT_PUBLIC_TWITCH_CLIENT_ID}
+      NEXT_PUBLIC_TWITCH_REDIRECT_URI: ${NEXT_PUBLIC_TWITCH_REDIRECT_URI}
+    expose:
+      - "3000"
     networks:
       - composer-net
     depends_on:
@@ -43,6 +49,22 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  proxy:
+    image: caddy:2-alpine
+    container_name: composer-proxy
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - composer-net
+    depends_on:
+      - frontend
+      - webapi
+    restart: unless-stopped
+
   db:
     image: postgres:18
     container_name: composer-db
@@ -64,3 +86,7 @@ services:
 networks:
   composer-net:
     driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:
