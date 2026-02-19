@@ -19,14 +19,14 @@ namespace Faryma.Composer.Api.Features.AppSettings
         /// Возвращает текущие настройки
         /// </summary>
         [HttpGet(nameof(GetAppSettings))]
-        [AuthorizeComposer]
+        [AuthorizeUser]
         public ActionResult<AppSettingsDto> GetAppSettings() => Ok(AppSettingsDto.Map(appSettingsService.Settings));
 
         /// <summary>
         /// Обновляет настройки
         /// </summary>
         [HttpPost(nameof(UpdateAppSettings))]
-        [AuthorizeComposer]
+        [AuthorizeUser]
         public async Task<ActionResult<AppSettingsDto>> UpdateAppSettings(AppSettingsDto dto)
         {
             AppSettingsEntity settings = await appSettingsService.Update(new AppSettingsModel
