@@ -1,12 +1,10 @@
-﻿using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Api.DependencyInjection;
+﻿using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
-using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
 namespace Faryma.Composer.Api
@@ -31,14 +29,14 @@ namespace Faryma.Composer.Api
                     services
                         .AddConfiguration(context.Configuration)
                         .AddPersistenceAndIdentity(context.Configuration)
-                        //.AddJwtAuthentication(context.Configuration)
+                        .AddJwtAuthentication(context.Configuration)
                         .AddAuthorization()
                         .AddCoreServices();
 
-                    if (builder.Environment.IsDevelopment())
-                    {
-                        services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
-                    }
+                    //if (false && builder.Environment.IsDevelopment())
+                    //{
+                    //    services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
+                    //}
 
                     services.AddPresentationLayer(builder.Environment);
                 });
@@ -58,7 +56,6 @@ namespace Faryma.Composer.Api
             app.UseAuthorization();
 
             app.MapControllers();
-            app.MapGraphQL();
             app.MapHub<OrderQueueNotificationHub>(IOrderQueueNotificationServer.RoutePattern);
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();

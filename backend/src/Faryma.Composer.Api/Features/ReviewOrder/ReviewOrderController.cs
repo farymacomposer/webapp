@@ -40,6 +40,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] CreateReviewOrderRequest request)
         {
+            _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
             ReviewOrderEntity order = request.OrderType switch
@@ -95,6 +96,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] MoveUpReviewOrderRequest request)
         {
+            _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
             TransactionEntity transaction = await reviewOrderService.MoveUp(new MoveUpCommand

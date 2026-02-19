@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -12,6 +12,16 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// Имя пользователя
         /// </summary>
         public override required string UserName { get; set; }
+
+        /// <summary>
+        /// Идентификатор пользователя в Twitch
+        /// </summary>
+        public string? TwitchUserId { get; set; }
+
+        /// <summary>
+        /// Логин пользователя в Twitch
+        /// </summary>
+        public string? TwitchLogin { get; set; }
 
         /// <summary>
         /// Дата и время регистрации

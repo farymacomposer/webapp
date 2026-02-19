@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
 using Faryma.Composer.Api.Features.OrderQueue;
-using Faryma.Composer.Api.Features.Track;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
@@ -24,10 +23,15 @@ namespace Faryma.Composer.Api.DependencyInjection
     {
         public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-            //services
-            //    .AddOptionsWithValidateOnStart<JwtOptions>()
-            //    .Bind(configuration.GetRequiredSection("JWT"))
-            //    .ValidateDataAnnotations();
+            services
+                .AddOptionsWithValidateOnStart<JwtOptions>()
+                .Bind(configuration.GetRequiredSection("JWT"))
+                .ValidateDataAnnotations();
+
+            services
+                .AddOptionsWithValidateOnStart<TwitchOptions>()
+                .Bind(configuration.GetRequiredSection("TWITCH"))
+                .ValidateDataAnnotations();
 
             services
                 .AddOptionsWithValidateOnStart<PostgreOptions>()
@@ -51,7 +55,10 @@ namespace Faryma.Composer.Api.DependencyInjection
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services
+                .AddHttpClient<TwitchOAuthClient>()
+                .Services
                 .AddScoped<AuthService>()
+                .AddScoped<TwitchAuthService>()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -89,12 +96,6 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .AddSignalR()
                 .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            services
-                .AddGraphQLServer()
-                .AddQueryType<TrackQuery>()
-                .AddFiltering()
-                .AddSorting();
-
             return services;
         }
 
@@ -110,7 +111,7 @@ namespace Faryma.Composer.Api.DependencyInjection
 
                 foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    string xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
+                    string xmlPath = Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
                     if (File.Exists(xmlPath))
                     {
                         options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
