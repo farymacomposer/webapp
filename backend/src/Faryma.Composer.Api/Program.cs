@@ -21,25 +21,21 @@ namespace Faryma.Composer.Api
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
-            builder.Host
-                .UseSerilog((context, config) =>
-                    config.ReadFrom.Configuration(context.Configuration))
-                .ConfigureServices((context, services) =>
-                {
-                    services
-                        .AddConfiguration(context.Configuration)
-                        .AddPersistenceAndIdentity(context.Configuration)
-                        .AddJwtAuthentication(context.Configuration)
-                        .AddAuthorization()
-                        .AddCoreServices();
+            builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration));
 
-                    //if (false && builder.Environment.IsDevelopment())
-                    //{
-                    //    services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
-                    //}
+            builder.Services
+                .AddConfiguration(builder.Configuration)
+                .AddPersistenceAndIdentity(builder.Configuration)
+                .AddJwtAuthentication(builder.Configuration)
+                .AddAuthorization()
+                .AddCoreServices();
 
-                    services.AddPresentationLayer(builder.Environment);
-                });
+            //if (false && builder.Environment.IsDevelopment())
+            //{
+            //    builder.Services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
+            //}
+
+            builder.Services.AddPresentationLayer(builder.Environment);
 
             WebApplication app = builder.Build();
 

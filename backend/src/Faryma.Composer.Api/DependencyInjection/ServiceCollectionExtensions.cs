@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
@@ -13,7 +12,6 @@ using Faryma.Composer.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using Saunter;
 using Saunter.AsyncApiSchema.v2;
 
@@ -83,7 +81,7 @@ namespace Faryma.Composer.Api.DependencyInjection
             services
                 .AddProblemDetails()
                 .AddMemoryCache()
-                .ConfigureSwagger(environment)
+                .AddOpenApi()
                 .AddAsyncApiSpecification(environment);
 
             services
@@ -97,29 +95,6 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             return services;
-        }
-
-        private static IServiceCollection ConfigureSwagger(this IServiceCollection services, IWebHostEnvironment environment)
-        {
-            return services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = environment.ApplicationName,
-                    Version = "v1",
-                });
-
-                foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    string xmlPath = Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
-                    if (File.Exists(xmlPath))
-                    {
-                        options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
-                    }
-                }
-
-                options.UseAllOfToExtendReferenceSchemas();
-            });
         }
 
         private static IServiceCollection AddAsyncApiSpecification(this IServiceCollection services, IWebHostEnvironment environment)

@@ -13,8 +13,8 @@
     <PackageReference Include="Saunter" Version="0.13.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="10.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.12.46" />
     <PackageReference Include="TwitchLib.Api" Version="3.10.2" />
   </ItemGroup>
 
