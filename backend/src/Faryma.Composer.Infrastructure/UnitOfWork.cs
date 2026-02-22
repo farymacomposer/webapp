@@ -1,4 +1,4 @@
-using Faryma.Composer.Infrastructure.Persistence.Queries;
+﻿using Faryma.Composer.Infrastructure.Persistence.Queries;
 using Faryma.Composer.Infrastructure.Persistence.Stores;
 using Microsoft.EntityFrameworkCore.Storage;
 

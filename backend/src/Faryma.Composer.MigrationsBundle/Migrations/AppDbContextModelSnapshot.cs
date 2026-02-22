@@ -91,6 +91,48 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("composer_streams", "app");
                 });
 
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.RefreshTokenEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ReplacedByTokenHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FamilyId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("refresh_tokens", "app");
+                });
+
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.ReviewEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -902,6 +944,17 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("CreatedByUser");
                 });
 
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.RefreshTokenEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.ReviewEntity", b =>
                 {
                     b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "CreatedByUser")
@@ -1263,6 +1316,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("CreatedTracks");
 
                     b.Navigation("CreatedTransactionSources");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("TrackRatings");
 

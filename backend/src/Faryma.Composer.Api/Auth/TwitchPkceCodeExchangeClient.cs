@@ -1,6 +1,7 @@
 ﻿using System.Security.Authentication;
 using System.Text.Json.Serialization;
-using Faryma.Composer.Api.Auth.Options;
+using Faryma.Composer.Contracts.Api.Auth.Contracts;
+using Faryma.Composer.Contracts.Api.Auth.Options;
 using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Api.Auth

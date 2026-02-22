@@ -1,6 +1,12 @@
-using Faryma.Composer.Api.Auth.Login;
-using Faryma.Composer.Api.Auth.TwitchLogin;
+﻿using Faryma.Composer.Api.Auth.Services;
+using Faryma.Composer.Api.Extensions;
+using Faryma.Composer.Contracts.Api.Auth.Features.Login;
+using Faryma.Composer.Contracts.Api.Auth.Features.Logout;
+using Faryma.Composer.Contracts.Api.Auth.Features.RefreshToken;
+using Faryma.Composer.Contracts.Api.Auth.Features.TwitchLogin;
+using Faryma.Composer.Contracts.Api.Auth.Features.TwitchLoginState;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -14,9 +20,9 @@ namespace Faryma.Composer.Api.Auth
     [Route("api/[controller]")]
     [Produces("application/json")]
     public sealed class AuthController(
-        AuthService authService,
+        AuthTokenService authTokenService,
         TwitchAuthService twitchAuthService,
-        TwitchOAuthStateService twitchOAuthStateService,
+        TwitchAuthStateService twitchOAuthStateService,
         UserManager<UserEntity> userManager) : ControllerBase
     {
         /// <summary>
@@ -24,7 +30,7 @@ namespace Faryma.Composer.Api.Auth
         /// </summary>
         [HttpPost(nameof(Login))]
         [EnableRateLimiting("auth-login")]
-        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request, CancellationToken cancellationToken)
         {
             UserEntity? user = await userManager.FindByNameAsync(request.UserName);
             if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
@@ -34,21 +40,34 @@ namespace Faryma.Composer.Api.Auth
                 return Unauthorized();
             }
 
-            string token = await authService.GenerateJwtToken(user);
+            (string accessToken, string refreshToken) = await authTokenService.IssueForUser(user, DateTime.UtcNow, cancellationToken);
 
-            return Ok(new LoginResponse { Token = token });
+            return Ok(new LoginResponse { Token = accessToken, RefreshToken = refreshToken });
         }
 
         /// <summary>
-        /// Выполняет вход пользователя через Twitch OAuth и возвращает JWT токен
+        /// Выдает state и nonce для Twitch OAuth
         /// </summary>
         [HttpGet(nameof(TwitchLoginState))]
         [EnableRateLimiting("auth-login")]
         public ActionResult<TwitchLoginStateResponse> TwitchLoginState()
         {
-            string state = twitchOAuthStateService.IssueState();
+            (string state, string browserNonce) = twitchOAuthStateService.IssueState();
 
-            return Ok(new TwitchLoginStateResponse(state));
+            Response.Cookies.Append(
+                TwitchAuthStateService.BrowserNonceCookieName,
+                browserNonce,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Lax,
+                    IsEssential = true,
+                    MaxAge = TwitchAuthStateService.StateLifetime,
+                    Path = "/api/Auth/TwitchLogin"
+                });
+
+            return Ok(new TwitchLoginStateResponse { State = state });
         }
 
         /// <summary>
@@ -56,11 +75,63 @@ namespace Faryma.Composer.Api.Auth
         /// </summary>
         [HttpPost(nameof(TwitchLogin))]
         [EnableRateLimiting("auth-login")]
-        public async Task<ActionResult<LoginResponse>> TwitchLogin(TwitchLoginRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<TwitchLoginResponse>> TwitchLogin(TwitchLoginRequest request, CancellationToken cancellationToken)
         {
-            string token = await twitchAuthService.Login(request.Code, request.CodeVerifier, request.State, cancellationToken);
+            Request.Cookies.TryGetValue(TwitchAuthStateService.BrowserNonceCookieName, out string? browserNonce);
+            Response.Cookies.Delete(TwitchAuthStateService.BrowserNonceCookieName, new CookieOptions
+            {
+                Path = "/api/Auth/TwitchLogin"
+            });
 
-            return Ok(new LoginResponse { Token = token });
+            (string accessToken, string refreshToken) = await twitchAuthService.Login(
+                request.Code,
+                request.CodeVerifier,
+                request.State,
+                browserNonce,
+                DateTime.UtcNow,
+                cancellationToken);
+
+            return Ok(new LoginResponse { Token = accessToken, RefreshToken = refreshToken });
+        }
+
+        /// <summary>
+        /// Обновляет access token
+        /// </summary>
+        [HttpPost(nameof(RefreshToken))]
+        [EnableRateLimiting("auth-login")]
+        public async Task<ActionResult<LoginResponse>> RefreshToken(RefreshTokenRequest request, CancellationToken cancellationToken)
+        {
+            (string accessToken, string refreshToken) = await authTokenService.Refresh(request.RefreshToken, DateTime.UtcNow, cancellationToken);
+
+            return Ok(new LoginResponse { Token = accessToken, RefreshToken = refreshToken });
+        }
+
+        /// <summary>
+        /// Выполняет выход пользователя из системы
+        /// </summary>
+        [HttpPost(nameof(Logout))]
+        [Authorize]
+        [EnableRateLimiting("auth-login")]
+        public async Task<IActionResult> Logout(LogoutRequest request, CancellationToken cancellationToken)
+        {
+            Guid userId = User.GetUserId();
+            await authTokenService.RevokeSession(userId, request.RefreshToken, DateTime.UtcNow, cancellationToken);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Выполняет выход пользователя из всех сессий
+        /// </summary>
+        [HttpPost(nameof(LogoutAll))]
+        [Authorize]
+        [EnableRateLimiting("auth-login")]
+        public async Task<IActionResult> LogoutAll(CancellationToken cancellationToken)
+        {
+            Guid userId = User.GetUserId();
+            await authTokenService.RevokeAll(userId, DateTime.UtcNow, cancellationToken);
+
+            return NoContent();
         }
     }
 }

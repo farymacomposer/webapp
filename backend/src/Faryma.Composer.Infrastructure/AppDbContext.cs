@@ -1,4 +1,4 @@
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -65,6 +65,11 @@ namespace Faryma.Composer.Infrastructure
         /// Оценки пользователей
         /// </summary>
         public DbSet<UserTrackRatingEntity> UserTrackRatings { get; set; }
+
+        /// <summary>
+        /// Refresh токены пользователей
+        /// </summary>
+        public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
 
         // TransactionSources
 

@@ -1,8 +1,11 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Api.Auth.Options;
+using Faryma.Composer.Api.Auth.Services;
 using Faryma.Composer.Api.Features.OrderQueue;
+using Faryma.Composer.Contracts.Api.Auth.Contracts;
+using Faryma.Composer.Contracts.Api.Auth.Options;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
@@ -14,7 +17,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Saunter;
 using Saunter.AsyncApiSchema.v2;
-using System.Threading.RateLimiting;
 
 namespace Faryma.Composer.Api.DependencyInjection
 {
@@ -56,11 +58,12 @@ namespace Faryma.Composer.Api.DependencyInjection
             services
                 .AddHttpClient<TwitchPkceCodeExchangeClient>()
                 .Services
-                .AddScoped<TwitchOAuthClient>()
+                .AddScoped<TwitchAuthClient>()
                 .AddScoped<ITwitchPkceCodeExchangeClient, TwitchPkceCodeExchangeClient>()
                 .AddScoped<ITwitchTokenValidationClient, TwitchTokenValidationClient>()
                 .AddScoped<AuthService>()
-                .AddScoped<TwitchOAuthStateService>()
+                .AddScoped<AuthTokenService>()
+                .AddScoped<TwitchAuthStateService>()
                 .AddScoped<TwitchAuthService>()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { logoutAllSessions, logoutSession } from "@/lib/api/auth";
 import { startTwitchLogin } from "@/lib/auth/twitch";
-import { clearAuthToken, getAuthToken } from "@/lib/auth/storage";
+import { clearAuthToken, getAuthToken, getRefreshToken } from "@/lib/auth/storage";
 import { getProtectedAppSettings } from "@/lib/api/app-settings";
 
 export default function HomePage() {
@@ -22,12 +23,41 @@ export default function HomePage() {
           {apiResult ? <pre className="result">{apiResult}</pre> : null}
           <button
             type="button"
-            onClick={() => {
-              clearAuthToken();
-              window.location.reload();
+            onClick={async () => {
+              const accessToken = getAuthToken();
+              const refreshToken = getRefreshToken();
+
+              try {
+                if (accessToken && refreshToken) {
+                  await logoutSession(refreshToken, accessToken);
+                }
+              } finally {
+                clearAuthToken();
+                window.location.reload();
+              }
             }}
           >
             Выйти
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              const accessToken = getAuthToken();
+              if (!accessToken) {
+                clearAuthToken();
+                window.location.reload();
+                return;
+              }
+
+              try {
+                await logoutAllSessions(accessToken);
+              } finally {
+                clearAuthToken();
+                window.location.reload();
+              }
+            }}
+          >
+            Выйти со всех устройств
           </button>
           <button
             type="button"

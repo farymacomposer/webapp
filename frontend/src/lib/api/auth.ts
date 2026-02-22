@@ -1,24 +1,14 @@
 export type TwitchLoginResponse = {
   token: string;
+  refreshToken: string;
 };
 
 type TwitchLoginStateResponse = {
   state: string;
 };
 
-function getApiBaseUrl(): string {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-  if (!baseUrl) {
-    throw new Error("Missing NEXT_PUBLIC_API_BASE_URL");
-  }
-
-  return baseUrl;
-}
-
 export async function getTwitchLoginState(): Promise<string> {
-  const baseUrl = getApiBaseUrl();
-  const response = await fetch(`${baseUrl}/api/Auth/TwitchLoginState`, {
+  const response = await fetch("/api/Auth/TwitchLoginState", {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -37,9 +27,8 @@ export async function getTwitchLoginState(): Promise<string> {
   return payload.state;
 }
 
-export async function exchangeTwitchCodeForJwt(code: string, codeVerifier: string, state: string): Promise<string> {
-  const baseUrl = getApiBaseUrl();
-  const response = await fetch(`${baseUrl}/api/Auth/TwitchLogin`, {
+export async function exchangeTwitchCodeForJwt(code: string, codeVerifier: string, state: string): Promise<TwitchLoginResponse> {
+  const response = await fetch("/api/Auth/TwitchLogin", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -55,6 +44,45 @@ export async function exchangeTwitchCodeForJwt(code: string, codeVerifier: strin
     throw new Error(`Auth request failed with status ${response.status}`);
   }
 
-  const payload = (await response.json()) as TwitchLoginResponse;
-  return payload.token;
+  return (await response.json()) as TwitchLoginResponse;
+}
+
+export async function refreshAccessToken(refreshToken: string): Promise<TwitchLoginResponse> {
+  const response = await fetch("/api/Auth/Refresh", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      refreshToken,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Refresh request failed with status ${response.status}`);
+  }
+
+  return (await response.json()) as TwitchLoginResponse;
+}
+
+export async function logoutSession(refreshToken: string, accessToken: string): Promise<void> {
+  await fetch("/api/Auth/Logout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      refreshToken,
+    }),
+  });
+}
+
+export async function logoutAllSessions(accessToken: string): Promise<void> {
+  await fetch("/api/Auth/LogoutAll", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 }

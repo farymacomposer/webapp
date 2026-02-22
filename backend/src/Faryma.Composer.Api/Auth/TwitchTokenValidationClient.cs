@@ -1,5 +1,6 @@
-using System.Security.Authentication;
-using Faryma.Composer.Api.Auth.Options;
+﻿using System.Security.Authentication;
+using Faryma.Composer.Contracts.Api.Auth.Contracts;
+using Faryma.Composer.Contracts.Api.Auth.Options;
 using Microsoft.Extensions.Options;
 using TwitchLib.Api;
 using TwitchLib.Api.Auth;
@@ -12,7 +13,10 @@ namespace Faryma.Composer.Api.Auth
         {
             try
             {
-                TwitchAPI twitchApi = CreateTwitchApi();
+                TwitchAPI twitchApi = new();
+                twitchApi.Settings.ClientId = options.Value.ClientId;
+
+                // TODO: Разобраться с WaitAsync
                 ValidateAccessTokenResponse? validation = await twitchApi.Auth.ValidateAccessTokenAsync(accessToken).WaitAsync(cancellationToken)
                     ?? throw new AuthenticationException("Пустой ответ валидации Twitch");
 
@@ -26,14 +30,6 @@ namespace Faryma.Composer.Api.Auth
             {
                 throw new AuthenticationException("Не удалось валидировать access token Twitch", exception);
             }
-        }
-
-        private TwitchAPI CreateTwitchApi()
-        {
-            TwitchAPI twitchApi = new();
-            twitchApi.Settings.ClientId = options.Value.ClientId;
-
-            return twitchApi;
         }
     }
 }

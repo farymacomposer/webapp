@@ -1,19 +1,26 @@
+﻿using System.Security.Authentication;
+using Faryma.Composer.Contracts.Api.Auth.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Authentication;
 
-namespace Faryma.Composer.Api.Auth
+namespace Faryma.Composer.Api.Auth.Services
 {
     public sealed class TwitchAuthService(
-        TwitchOAuthClient twitchOAuthClient,
-        AuthService authService,
-        TwitchOAuthStateService twitchOAuthStateService,
+        TwitchAuthClient twitchOAuthClient,
+        AuthTokenService authTokenService,
+        TwitchAuthStateService twitchOAuthStateService,
         UserManager<UserEntity> userManager)
     {
-        public async Task<string> Login(string code, string codeVerifier, string state, CancellationToken cancellationToken)
+        public async Task<(string AccessToken, string RefreshToken)> Login(
+            string code,
+            string codeVerifier,
+            string state,
+            string? browserNonce,
+            DateTime now,
+            CancellationToken cancellationToken)
         {
-            if (!twitchOAuthStateService.TryConsumeState(state))
+            if (!twitchOAuthStateService.TryConsumeState(state, browserNonce))
             {
                 throw new AuthenticationException("Некорректный OAuth state");
             }
@@ -29,7 +36,7 @@ namespace Faryma.Composer.Api.Auth
                 {
                     Id = Guid.NewGuid(),
                     UserName = $"twitch_{twitchUser.UserId}",
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = now,
                     TwitchUserId = twitchUser.UserId,
                     TwitchLogin = twitchUser.Login
                 };
@@ -69,7 +76,7 @@ namespace Faryma.Composer.Api.Auth
                 }
             }
 
-            return await authService.GenerateJwtToken(user);
+            return await authTokenService.IssueForUser(user, now, cancellationToken);
         }
     }
 }

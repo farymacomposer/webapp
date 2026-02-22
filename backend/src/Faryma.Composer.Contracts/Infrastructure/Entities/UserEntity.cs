@@ -64,5 +64,10 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// Источники транзакций, созданные пользователем
         /// </summary>
         public ICollection<TransactionSourceEntity> CreatedTransactionSources { get; set; } = [];
+
+        /// <summary>
+        /// Refresh токены пользователя
+        /// </summary>
+        public ICollection<RefreshTokenEntity> RefreshTokens { get; set; } = [];
     }
 }

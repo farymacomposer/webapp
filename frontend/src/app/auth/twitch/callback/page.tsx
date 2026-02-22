@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { exchangeTwitchCodeForJwt } from "@/lib/api/auth";
-import { clearTwitchAuthArtifacts, getPkceVerifier, getTwitchAuthState, setAuthToken } from "@/lib/auth/storage";
+import { clearTwitchAuthArtifacts, getPkceVerifier, getTwitchAuthState, setAuthSession } from "@/lib/auth/storage";
 
 function TwitchCallbackContent() {
   const router = useRouter();
@@ -32,8 +32,8 @@ function TwitchCallbackContent() {
       }
 
       try {
-        const token = await exchangeTwitchCodeForJwt(code, codeVerifier, state);
-        setAuthToken(token);
+        const tokens = await exchangeTwitchCodeForJwt(code, codeVerifier, state);
+        setAuthSession(tokens.token, tokens.refreshToken);
         setMessage("Успешный вход. Перенаправляем...");
         router.replace("/");
       } catch {

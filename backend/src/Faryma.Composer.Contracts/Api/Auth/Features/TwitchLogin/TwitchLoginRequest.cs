@@ -1,9 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Auth.TwitchLogin
+namespace Faryma.Composer.Contracts.Api.Auth.Features.TwitchLogin
 {
     /// <summary>
-    /// Запрос входа через Twitch OAuth
+    /// Запрос входа в систему через Twitch OAuth
     /// </summary>
     public sealed record TwitchLoginRequest
     {
@@ -11,14 +11,14 @@ namespace Faryma.Composer.Api.Auth.TwitchLogin
         /// Authorization code, полученный от Twitch OAuth
         /// </summary>
         [Required]
-        [StringLength(4000, MinimumLength = 1)]
+        [StringLength(30, MinimumLength = 30)]
         public required string Code { get; init; }
 
         /// <summary>
         /// PKCE code_verifier
         /// </summary>
         [Required]
-        [StringLength(512, MinimumLength = 1)]
+        [StringLength(256, MinimumLength = 64)]
         public required string CodeVerifier { get; init; }
 
         /// <summary>

@@ -1,9 +1,7 @@
-﻿namespace Faryma.Composer.Api.Auth
+﻿namespace Faryma.Composer.Contracts.Api.Auth.Contracts
 {
     public interface ITwitchTokenValidationClient
     {
         Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken cancellationToken);
     }
-
-    public sealed record TwitchValidateData(string ClientId, string Login, string UserId);
 }

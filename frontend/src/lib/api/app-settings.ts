@@ -1,4 +1,5 @@
-import { createApiConfiguration } from "@/lib/api/client";
+import { authorizedFetch, createApiConfiguration } from "@/lib/api/client";
+import { getAuthToken } from "@/lib/auth/storage";
 
 export async function getProtectedAppSettings(): Promise<{
   data: unknown;
@@ -10,11 +11,8 @@ export async function getProtectedAppSettings(): Promise<{
     throw new Error("JWT не найден. Выполните вход через Twitch.");
   }
 
-  const response = await fetch(`${api.baseUrl}/api/AppSettings/GetAppSettings`, {
+  const response = await authorizedFetch("/api/AppSettings/GetAppSettings", {
     method: "GET",
-    headers: {
-      Authorization: api.authorizationHeader,
-    },
   });
 
   if (!response.ok) {
@@ -22,9 +20,11 @@ export async function getProtectedAppSettings(): Promise<{
   }
 
   const data = (await response.json()) as unknown;
-  const tokenPreview = api.authorizationHeader.length > 28
-    ? `${api.authorizationHeader.slice(0, 20)}...`
-    : api.authorizationHeader;
+  const latestToken = getAuthToken();
+  const latestAuthorizationHeader = latestToken ? `Bearer ${latestToken}` : api.authorizationHeader;
+  const tokenPreview = latestAuthorizationHeader.length > 28
+    ? `${latestAuthorizationHeader.slice(0, 20)}...`
+    : latestAuthorizationHeader;
 
   return {
     data,

@@ -1,10 +1,12 @@
-using System.Security.Authentication;
-using Faryma.Composer.Api.Auth.Options;
+﻿using System.Security.Authentication;
+using Faryma.Composer.Contracts.Api.Auth.Contracts;
+using Faryma.Composer.Contracts.Api.Auth.Models;
+using Faryma.Composer.Contracts.Api.Auth.Options;
 using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Api.Auth
 {
-    public sealed class TwitchOAuthClient(
+    public sealed class TwitchAuthClient(
         ITwitchTokenValidationClient twitchTokenValidationClient,
         ITwitchPkceCodeExchangeClient twitchPkceCodeExchangeClient,
         IOptions<TwitchOptions> options)
@@ -28,6 +30,31 @@ namespace Faryma.Composer.Api.Auth
 
             return new TwitchUserData(validation.UserId, validation.Login);
         }
+
+        private static void ValidateInput(string code, string codeVerifier)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                throw new AuthenticationException("Параметр code обязателен");
+            }
+
+            if (string.IsNullOrWhiteSpace(codeVerifier))
+            {
+                throw new AuthenticationException("Параметр code_verifier обязателен");
+            }
+
+            if (codeVerifier.Length is < 43 or > 128)
+            {
+                throw new AuthenticationException("Некорректная длина code_verifier");
+            }
+
+            if (codeVerifier.Any(static symbol => !IsPkceUnreserved(symbol)))
+            {
+                throw new AuthenticationException("code_verifier содержит недопустимые символы");
+            }
+        }
+
+        private static bool IsPkceUnreserved(char symbol) => char.IsAsciiLetterOrDigit(symbol) || symbol is '-' or '.' or '_' or '~';
 
         private async Task<string> ExchangeCode(string code, string codeVerifier, CancellationToken cancellationToken)
         {
@@ -60,33 +87,5 @@ namespace Faryma.Composer.Api.Auth
                 throw new AuthenticationException("Не удалось валидировать access token Twitch", exception);
             }
         }
-
-        private static void ValidateInput(string code, string codeVerifier)
-        {
-            if (string.IsNullOrWhiteSpace(code))
-            {
-                throw new AuthenticationException("Параметр code обязателен");
-            }
-
-            if (string.IsNullOrWhiteSpace(codeVerifier))
-            {
-                throw new AuthenticationException("Параметр code_verifier обязателен");
-            }
-
-            if (codeVerifier.Length is < 43 or > 128)
-            {
-                throw new AuthenticationException("Некорректная длина code_verifier");
-            }
-
-            if (codeVerifier.Any(static symbol => !IsPkceUnreserved(symbol)))
-            {
-                throw new AuthenticationException("code_verifier содержит недопустимые символы");
-            }
-        }
-
-        private static bool IsPkceUnreserved(char symbol) =>
-            char.IsAsciiLetterOrDigit(symbol) || symbol is '-' or '.' or '_' or '~';
     }
-
-    public sealed record TwitchUserData(string UserId, string Login);
 }

@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Api.Auth
+﻿namespace Faryma.Composer.Contracts.Api.Auth.Contracts
 {
     public interface ITwitchPkceCodeExchangeClient
     {

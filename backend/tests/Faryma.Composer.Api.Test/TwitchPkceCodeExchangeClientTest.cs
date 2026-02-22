@@ -2,7 +2,7 @@
 using System.Security.Authentication;
 using System.Text;
 using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Api.Auth.Options;
+using Faryma.Composer.Contracts.Api.Auth.Options;
 using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Api.Test

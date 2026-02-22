@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -37,10 +35,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ReviewOrderNominalAmount = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_app_settings", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_app_settings", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
@@ -52,10 +47,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_AspNetRoles", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
@@ -81,10 +73,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_AspNetUsers", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "DataProtectionKeys",
@@ -96,10 +85,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     FriendlyName = table.Column<string>(type: "text", nullable: true),
                     Xml = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DataProtectionKeys", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_DataProtectionKeys", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "track_artists",
@@ -111,10 +97,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     NormalizedName = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_track_artists", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_track_artists", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "track_countries",
@@ -125,10 +108,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_track_countries", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_track_countries", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "track_genres",
@@ -139,10 +119,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_track_genres", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_track_genres", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -281,6 +258,32 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     table.ForeignKey(
                         name: "FK_composer_streams_AspNetUsers_CreatedByUserId",
                         column: x => x.CreatedByUserId,
+                        principalSchema: "app",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "refresh_tokens",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TokenHash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    FamilyId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RevokedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ReplacedByTokenHash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_refresh_tokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_refresh_tokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalSchema: "app",
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -840,6 +843,25 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_refresh_tokens_FamilyId",
+                schema: "app",
+                table: "refresh_tokens",
+                column: "FamilyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_refresh_tokens_TokenHash",
+                schema: "app",
+                table: "refresh_tokens",
+                column: "TokenHash",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_refresh_tokens_UserId",
+                schema: "app",
+                table: "refresh_tokens",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_review_orders_CreationStreamId",
                 schema: "app",
                 table: "review_orders",
@@ -1023,6 +1045,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
             migrationBuilder.DropTable(
                 name: "DataProtectionKeys",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "refresh_tokens",
                 schema: "app");
 
             migrationBuilder.DropTable(

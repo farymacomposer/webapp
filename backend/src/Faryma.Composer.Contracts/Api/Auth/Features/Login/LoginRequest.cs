@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Auth.Login
+namespace Faryma.Composer.Contracts.Api.Auth.Features.Login
 {
     /// <summary>
     /// Запрос входа в систему

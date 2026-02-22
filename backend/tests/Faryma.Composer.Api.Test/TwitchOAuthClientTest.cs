@@ -1,6 +1,8 @@
-using System.Security.Authentication;
+﻿using System.Security.Authentication;
 using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Api.Auth.Options;
+using Faryma.Composer.Contracts.Api.Auth.Contracts;
+using Faryma.Composer.Contracts.Api.Auth.Models;
+using Faryma.Composer.Contracts.Api.Auth.Options;
 using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Api.Test
@@ -46,7 +48,7 @@ namespace Faryma.Composer.Api.Test
             FakeTwitchTokenValidationClient twitchTokenValidationClient = new();
             FakeTwitchPkceCodeExchangeClient twitchPkceCodeExchangeClient = new();
 
-            TwitchOAuthClient sut = CreateSut(twitchTokenValidationClient, twitchPkceCodeExchangeClient);
+            TwitchAuthClient sut = CreateSut(twitchTokenValidationClient, twitchPkceCodeExchangeClient);
 
             await Assert.ThrowsAsync<AuthenticationException>(() => sut.AuthenticateUser("oauth-code", "short-verifier", CancellationToken.None));
             Assert.False(twitchPkceCodeExchangeClient.ExchangeCodeWithPkceCalled);
@@ -65,7 +67,7 @@ namespace Faryma.Composer.Api.Test
             };
             string codeVerifier = new('a', 43);
 
-            TwitchOAuthClient sut = CreateSut(twitchTokenValidationClient, twitchPkceCodeExchangeClient);
+            TwitchAuthClient sut = CreateSut(twitchTokenValidationClient, twitchPkceCodeExchangeClient);
 
             TwitchUserData result = await sut.AuthenticateUser("oauth-code", codeVerifier, CancellationToken.None);
 
@@ -90,12 +92,12 @@ namespace Faryma.Composer.Api.Test
             };
             string codeVerifier = new('b', 43);
 
-            TwitchOAuthClient sut = CreateSut(twitchTokenValidationClient, twitchPkceCodeExchangeClient);
+            TwitchAuthClient sut = CreateSut(twitchTokenValidationClient, twitchPkceCodeExchangeClient);
 
             await Assert.ThrowsAsync<AuthenticationException>(() => sut.AuthenticateUser("oauth-code", codeVerifier, CancellationToken.None));
         }
 
-        private static TwitchOAuthClient CreateSut(
+        private static TwitchAuthClient CreateSut(
             ITwitchTokenValidationClient twitchTokenValidationClient,
             ITwitchPkceCodeExchangeClient twitchPkceCodeExchangeClient)
         {
@@ -106,7 +108,7 @@ namespace Faryma.Composer.Api.Test
                 RedirectUri = "https://example.com/auth/twitch/callback"
             });
 
-            return new TwitchOAuthClient(twitchTokenValidationClient, twitchPkceCodeExchangeClient, options);
+            return new TwitchAuthClient(twitchTokenValidationClient, twitchPkceCodeExchangeClient, options);
         }
     }
 }

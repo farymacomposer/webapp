@@ -7,10 +7,13 @@
 Создай `.env.local` на основе `.env.example`:
 
 ```bash
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+API_PROXY_TARGET=http://localhost:8080
 NEXT_PUBLIC_TWITCH_CLIENT_ID=your_twitch_client_id
 NEXT_PUBLIC_TWITCH_REDIRECT_URI=http://localhost:3000/auth/twitch/callback
 ```
+
+`API_PROXY_TARGET` используется в `next.config.ts` для проксирования `/api/*` на backend.
+В браузере запросы идут на same-origin путь `/api/*`, поэтому CORS не требуется.
 
 ### Запуск
 
