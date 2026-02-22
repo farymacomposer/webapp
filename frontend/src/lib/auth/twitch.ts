@@ -1,4 +1,5 @@
-import { generateOAuthState, generatePkcePair } from "@/lib/auth/pkce";
+import { getTwitchLoginState } from "@/lib/api/auth";
+import { generatePkcePair } from "@/lib/auth/pkce";
 import { setPkceVerifier, setTwitchAuthState } from "@/lib/auth/storage";
 
 const TWITCH_AUTHORIZE_URL = "https://id.twitch.tv/oauth2/authorize";
@@ -21,7 +22,7 @@ export async function startTwitchLogin(): Promise<void> {
 
   const redirectUri = getTwitchRedirectUri();
   const { verifier, challenge } = await generatePkcePair();
-  const state = generateOAuthState();
+  const state = await getTwitchLoginState();
 
   setPkceVerifier(verifier);
   setTwitchAuthState(state);

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Options;
@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Saunter;
 using Saunter.AsyncApiSchema.v2;
+using System.Threading.RateLimiting;
 
 namespace Faryma.Composer.Api.DependencyInjection
 {
@@ -53,9 +54,13 @@ namespace Faryma.Composer.Api.DependencyInjection
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services
-                .AddHttpClient<TwitchOAuthClient>()
+                .AddHttpClient<TwitchPkceCodeExchangeClient>()
                 .Services
+                .AddScoped<TwitchOAuthClient>()
+                .AddScoped<ITwitchPkceCodeExchangeClient, TwitchPkceCodeExchangeClient>()
+                .AddScoped<ITwitchTokenValidationClient, TwitchTokenValidationClient>()
                 .AddScoped<AuthService>()
+                .AddScoped<TwitchOAuthStateService>()
                 .AddScoped<TwitchAuthService>()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -81,6 +86,22 @@ namespace Faryma.Composer.Api.DependencyInjection
             services
                 .AddProblemDetails()
                 .AddMemoryCache()
+                .AddRateLimiter(options =>
+                {
+                    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                    options.AddPolicy("auth-login", context =>
+                    {
+                        string partitionKey = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                        return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ =>
+                            new FixedWindowRateLimiterOptions
+                            {
+                                PermitLimit = 10,
+                                Window = TimeSpan.FromMinutes(1),
+                                QueueLimit = 0,
+                                AutoReplenishment = true
+                            });
+                    });
+                })
                 .AddOpenApi()
                 .AddAsyncApiSpecification(environment);
 

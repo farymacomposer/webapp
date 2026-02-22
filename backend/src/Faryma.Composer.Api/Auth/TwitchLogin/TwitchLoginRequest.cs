@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Faryma.Composer.Api.Auth.TwitchLogin
 {
@@ -15,9 +15,17 @@ namespace Faryma.Composer.Api.Auth.TwitchLogin
         public required string Code { get; init; }
 
         /// <summary>
-        /// PKCE code_verifier, если используется на фронтенде
+        /// PKCE code_verifier
         /// </summary>
+        [Required]
         [StringLength(512, MinimumLength = 1)]
-        public string? CodeVerifier { get; init; }
+        public required string CodeVerifier { get; init; }
+
+        /// <summary>
+        /// OAuth state, выданный backend перед редиректом на Twitch
+        /// </summary>
+        [Required]
+        [StringLength(128, MinimumLength = 32)]
+        public required string State { get; init; }
     }
 }

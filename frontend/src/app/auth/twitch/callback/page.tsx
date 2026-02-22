@@ -32,7 +32,7 @@ function TwitchCallbackContent() {
       }
 
       try {
-        const token = await exchangeTwitchCodeForJwt(code, codeVerifier);
+        const token = await exchangeTwitchCodeForJwt(code, codeVerifier, state);
         setAuthToken(token);
         setMessage("Успешный вход. Перенаправляем...");
         router.replace("/");

@@ -1,20 +1,20 @@
-﻿using System.Net.Http.Headers;
 using System.Security.Authentication;
-using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Auth.Options;
 using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Api.Auth
 {
-    public sealed class TwitchOAuthClient(HttpClient httpClient, IOptions<TwitchOptions> options)
+    public sealed class TwitchOAuthClient(
+        ITwitchTokenValidationClient twitchTokenValidationClient,
+        ITwitchPkceCodeExchangeClient twitchPkceCodeExchangeClient,
+        IOptions<TwitchOptions> options)
     {
-        private const string _tokenEndpoint = "https://id.twitch.tv/oauth2/token";
-        private const string _validateEndpoint = "https://id.twitch.tv/oauth2/validate";
-
-        public async Task<TwitchUserData> AuthenticateUser(string code, string? codeVerifier, CancellationToken cancellationToken)
+        public async Task<TwitchUserData> AuthenticateUser(string code, string codeVerifier, CancellationToken cancellationToken)
         {
+            ValidateInput(code, codeVerifier);
+
             string accessToken = await ExchangeCode(code, codeVerifier, cancellationToken);
-            TwitchValidateResponse validation = await ValidateAccessToken(accessToken, cancellationToken);
+            TwitchValidateData validation = await ValidateAccessToken(accessToken, cancellationToken);
 
             if (!string.Equals(validation.ClientId, options.Value.ClientId, StringComparison.Ordinal))
             {
@@ -29,71 +29,63 @@ namespace Faryma.Composer.Api.Auth
             return new TwitchUserData(validation.UserId, validation.Login);
         }
 
-        private async Task<string> ExchangeCode(string code, string? codeVerifier, CancellationToken cancellationToken)
+        private async Task<string> ExchangeCode(string code, string codeVerifier, CancellationToken cancellationToken)
         {
-            Dictionary<string, string> form = new()
+            try
             {
-                ["client_id"] = options.Value.ClientId,
-                ["client_secret"] = options.Value.ClientSecret,
-                ["code"] = code,
-                ["grant_type"] = "authorization_code",
-                ["redirect_uri"] = options.Value.RedirectUri
-            };
-
-            if (!string.IsNullOrWhiteSpace(codeVerifier))
-            {
-                form["code_verifier"] = codeVerifier;
+                return await twitchPkceCodeExchangeClient.ExchangeCodeWithPkce(code, codeVerifier, cancellationToken);
             }
-
-            using HttpResponseMessage response = await httpClient.PostAsync(_tokenEndpoint, new FormUrlEncodedContent(form), cancellationToken);
-            if (!response.IsSuccessStatusCode)
+            catch (AuthenticationException)
             {
-                throw new AuthenticationException("Не удалось обменять code на access token Twitch");
+                throw;
             }
-
-            TwitchTokenResponse? token = await response.Content.ReadFromJsonAsync<TwitchTokenResponse>(cancellationToken);
-            if (token is null || string.IsNullOrWhiteSpace(token.AccessToken))
+            catch (Exception exception)
             {
-                throw new AuthenticationException("Twitch не вернул access token");
+                throw new AuthenticationException("Не удалось обменять code на access token Twitch", exception);
             }
-
-            return token.AccessToken;
         }
 
-        private async Task<TwitchValidateResponse> ValidateAccessToken(string accessToken, CancellationToken cancellationToken)
+        private async Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken cancellationToken)
         {
-            using HttpRequestMessage request = new(HttpMethod.Get, _validateEndpoint);
-            request.Headers.Authorization = new AuthenticationHeaderValue("OAuth", accessToken);
-
-            using HttpResponseMessage response = await httpClient.SendAsync(request, cancellationToken);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                throw new AuthenticationException("Не удалось валидировать access token Twitch");
+                return await twitchTokenValidationClient.ValidateAccessToken(accessToken, cancellationToken);
+            }
+            catch (AuthenticationException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw new AuthenticationException("Не удалось валидировать access token Twitch", exception);
+            }
+        }
+
+        private static void ValidateInput(string code, string codeVerifier)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                throw new AuthenticationException("Параметр code обязателен");
             }
 
-            TwitchValidateResponse? validation = await response.Content.ReadFromJsonAsync<TwitchValidateResponse>(cancellationToken)
-                ?? throw new AuthenticationException("Пустой ответ валидации Twitch");
+            if (string.IsNullOrWhiteSpace(codeVerifier))
+            {
+                throw new AuthenticationException("Параметр code_verifier обязателен");
+            }
 
-            return validation;
+            if (codeVerifier.Length is < 43 or > 128)
+            {
+                throw new AuthenticationException("Некорректная длина code_verifier");
+            }
+
+            if (codeVerifier.Any(static symbol => !IsPkceUnreserved(symbol)))
+            {
+                throw new AuthenticationException("code_verifier содержит недопустимые символы");
+            }
         }
 
-        private sealed record TwitchTokenResponse
-        {
-            [JsonPropertyName("access_token")]
-            public required string AccessToken { get; init; }
-        }
-
-        private sealed record TwitchValidateResponse
-        {
-            [JsonPropertyName("client_id")]
-            public required string ClientId { get; init; }
-
-            [JsonPropertyName("login")]
-            public required string Login { get; init; }
-
-            [JsonPropertyName("user_id")]
-            public required string UserId { get; init; }
-        }
+        private static bool IsPkceUnreserved(char symbol) =>
+            char.IsAsciiLetterOrDigit(symbol) || symbol is '-' or '.' or '_' or '~';
     }
 
     public sealed record TwitchUserData(string UserId, string Login);

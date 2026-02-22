@@ -1,0 +1,39 @@
+using System.Security.Authentication;
+using Faryma.Composer.Api.Auth.Options;
+using Microsoft.Extensions.Options;
+using TwitchLib.Api;
+using TwitchLib.Api.Auth;
+
+namespace Faryma.Composer.Api.Auth
+{
+    public sealed class TwitchTokenValidationClient(IOptions<TwitchOptions> options) : ITwitchTokenValidationClient
+    {
+        public async Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken cancellationToken)
+        {
+            try
+            {
+                TwitchAPI twitchApi = CreateTwitchApi();
+                ValidateAccessTokenResponse? validation = await twitchApi.Auth.ValidateAccessTokenAsync(accessToken).WaitAsync(cancellationToken)
+                    ?? throw new AuthenticationException("Пустой ответ валидации Twitch");
+
+                return new TwitchValidateData(validation.ClientId, validation.Login, validation.UserId);
+            }
+            catch (AuthenticationException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw new AuthenticationException("Не удалось валидировать access token Twitch", exception);
+            }
+        }
+
+        private TwitchAPI CreateTwitchApi()
+        {
+            TwitchAPI twitchApi = new();
+            twitchApi.Settings.ClientId = options.Value.ClientId;
+
+            return twitchApi;
+        }
+    }
+}

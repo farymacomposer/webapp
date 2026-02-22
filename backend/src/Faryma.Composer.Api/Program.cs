@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Api.DependencyInjection;
+using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
@@ -20,6 +20,16 @@ namespace Faryma.Composer.Api
             };
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder();
+            string[] allowedCorsOrigins = builder.Configuration.GetSection("CORS:ALLOWED_ORIGINS").Get<string[]>()
+                ?? ["http://localhost:5173", "http://localhost:3000"];
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy => policy
+                    .WithOrigins(allowedCorsOrigins)
+                    .WithMethods("GET", "POST")
+                    .AllowAnyHeader());
+            });
 
             builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration));
 
@@ -43,11 +53,12 @@ namespace Faryma.Composer.Api
             app.UseApiDocumentation();
 
             app.UseCors(config => config
-                .AllowAnyOrigin()
+                .WithOrigins(allowedCorsOrigins)
                 .WithMethods("GET", "POST")
                 .AllowAnyHeader());
 
             app.UseHttpsRedirection();
+            app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
 
