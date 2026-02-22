@@ -23,13 +23,13 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             return result;
         }
 
-        public Task<UserNicknameEntity?> Find(string nickname)
+        public Task<UserNicknameEntity?> FindByNickname(string nickname, CancellationToken ct)
         {
             string normalized = normalizer.NormalizeName(nickname);
 
             return context.UserNicknames
                 .Include(x => x.Account)
-                .FirstOrDefaultAsync(x => x.NormalizedNickname == normalized);
+                .FirstOrDefaultAsync(x => x.NormalizedNickname == normalized, ct);
         }
     }
 }

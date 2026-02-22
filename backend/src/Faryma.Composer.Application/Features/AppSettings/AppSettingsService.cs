@@ -21,7 +21,7 @@ namespace Faryma.Composer.Application.Features.AppSettings
                 .SingleAsync();
         }
 
-        public async Task<AppSettingsEntity> Update(AppSettingsModel item)
+        public async Task<AppSettingsEntity> Update(AppSettingsModel item, CancellationToken ct)
         {
             if (Settings.ReviewOrderNominalAmount == item.ReviewOrderNominalAmount)
             {
@@ -31,7 +31,7 @@ namespace Faryma.Composer.Application.Features.AppSettings
             AppSettingsEntity entity = Clone(Settings);
             entity.ReviewOrderNominalAmount = item.ReviewOrderNominalAmount;
 
-            await Save(entity);
+            await Save(entity, ct);
             Settings = entity;
 
             return entity;
@@ -46,11 +46,11 @@ namespace Faryma.Composer.Application.Features.AppSettings
             };
         }
 
-        private async Task Save(AppSettingsEntity item)
+        private async Task Save(AppSettingsEntity item, CancellationToken ct)
         {
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
             context.Update(item);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(ct);
         }
     }
 }

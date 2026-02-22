@@ -1,142 +1,137 @@
-﻿using System.Security.Authentication;
+﻿using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Faryma.Composer.Contracts.Api.Auth.Options;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Faryma.Composer.Api.Auth.Services
 {
     public sealed class AuthTokenService(
-        AppDbContext dbContext,
-        AuthService authService,
+        UnitOfWork uow,
         UserManager<UserEntity> userManager,
         IOptions<JwtOptions> options)
     {
-        public async Task<(string AccessToken, string RefreshToken)> IssueForUser(UserEntity user, DateTime now, CancellationToken cancellationToken)
+        public Task RevokeAll(Guid userId, DateTime now) => uow.RefreshTokenStore.RevokeAllForUser(userId, now);
+
+        public async Task<(string AccessToken, string RefreshToken)> IssueForUser(UserEntity user, DateTime now, CancellationToken ct)
         {
-            string accessToken = await authService.GenerateJwtToken(user, now);
+            string accessToken = await GenerateAccessToken(user, now);
             string refreshToken = GenerateRefreshToken();
 
-            dbContext.RefreshTokens.Add(new RefreshTokenEntity
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                User = user,
-                TokenHash = ComputeSha256(refreshToken),
-                FamilyId = Guid.NewGuid(),
-                CreatedAt = now,
-                ExpiresAt = now.AddDays(options.Value.RefreshExpiryInDays)
-            });
+            uow.RefreshTokenStore.Create(
+                tokenHash: Hash(refreshToken),
+                familyId: Guid.NewGuid(),
+                createdAt: now,
+                options.Value.RefreshExpiryInDays,
+                user);
 
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await uow.SaveChanges(ct);
 
             return (accessToken, refreshToken);
         }
 
-        public async Task<(string AccessToken, string RefreshToken)> Refresh(string refreshToken, DateTime now, CancellationToken cancellationToken)
+        public async Task<(string AccessToken, string RefreshToken)> Refresh(string refreshToken, DateTime now, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
                 throw new AuthenticationException("Refresh token не передан");
             }
 
-            string tokenHash = ComputeSha256(refreshToken);
-            await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
-
-            RefreshTokenEntity? storedToken = await dbContext.RefreshTokens
-                .FirstOrDefaultAsync(x => x.TokenHash == tokenHash, cancellationToken)
+            string hash = Hash(refreshToken);
+            RefreshTokenEntity stored = await uow.RefreshTokenStore.FindByHash(hash, ct)
                 ?? throw new AuthenticationException("Refresh token не найден");
 
-            if (storedToken.RevokedAt is not null)
+            if (stored.RevokedAt is not null)
             {
-                if (!string.IsNullOrWhiteSpace(storedToken.ReplacedByTokenHash))
+                if (!string.IsNullOrWhiteSpace(stored.ReplacedByTokenHash))
                 {
-                    await RevokeFamily(storedToken.FamilyId, now, cancellationToken);
+                    await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, now);
                 }
 
                 throw new AuthenticationException("Refresh token отозван");
             }
 
-            if (storedToken.ExpiresAt <= now)
+            if (stored.IsExpired(now))
             {
-                storedToken.RevokedAt = now;
-                await dbContext.SaveChangesAsync(cancellationToken);
-                await transaction.CommitAsync(cancellationToken);
+                stored.RevokedAt = now;
+                await uow.SaveChanges(CancellationToken.None);
 
                 throw new AuthenticationException("Refresh token истек");
             }
 
-            UserEntity user = await userManager.Users
-                .FirstOrDefaultAsync(x => x.Id == storedToken.UserId, cancellationToken)
+            UserEntity user = await uow.UserStore.FindById(stored.UserId, ct)
                 ?? throw new AuthenticationException("Пользователь не найден");
 
-            string nextRefreshToken = GenerateRefreshToken();
-            string nextRefreshTokenHash = ComputeSha256(nextRefreshToken);
-            storedToken.RevokedAt = now;
-            storedToken.ReplacedByTokenHash = nextRefreshTokenHash;
+            string nextRefresh = GenerateRefreshToken();
+            string nextHash = Hash(nextRefresh);
 
-            dbContext.RefreshTokens.Add(new RefreshTokenEntity
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                User = user,
-                TokenHash = nextRefreshTokenHash,
-                FamilyId = storedToken.FamilyId,
-                CreatedAt = now,
-                ExpiresAt = now.AddDays(options.Value.RefreshExpiryInDays)
-            });
+            stored.RevokedAt = now;
+            stored.ReplacedByTokenHash = nextHash;
 
-            string accessToken = await authService.GenerateJwtToken(user, now);
-            await dbContext.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
+            RefreshTokenEntity nextToken = uow.RefreshTokenStore.Create(
+                nextHash,
+                stored.FamilyId,
+                createdAt: now,
+                options.Value.RefreshExpiryInDays,
+                user);
 
-            return (accessToken, nextRefreshToken);
+            string accessToken = await GenerateAccessToken(user, now);
+            await uow.SaveChanges(ct);
+
+            return (accessToken, nextRefresh);
         }
 
-        public async Task RevokeSession(Guid userId, string refreshToken, DateTime now, CancellationToken cancellationToken)
+        public async Task RevokeSession(Guid userId, string refreshToken, DateTime now)
         {
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
                 return;
             }
 
-            string tokenHash = ComputeSha256(refreshToken);
-            RefreshTokenEntity? storedToken = await dbContext.RefreshTokens
-                .FirstOrDefaultAsync(x => x.TokenHash == tokenHash && x.UserId == userId, cancellationToken);
+            string tokenHash = Hash(refreshToken);
+            RefreshTokenEntity? stored = await uow.RefreshTokenStore.FindByUserIdAndHash(userId, tokenHash, CancellationToken.None);
 
-            if (storedToken is null)
+            if (stored is null)
             {
                 return;
             }
 
-            await RevokeFamily(storedToken.FamilyId, now, cancellationToken);
+            await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, now);
         }
 
-        public async Task RevokeAll(Guid userId, DateTime now, CancellationToken cancellationToken)
+        private async Task<string> GenerateAccessToken(UserEntity user, DateTime now)
         {
-            List<RefreshTokenEntity> activeTokens = await dbContext.RefreshTokens
-                .Where(x => x.UserId == userId && x.RevokedAt == null)
-                .ToListAsync(cancellationToken);
+            List<Claim> claims =
+            [
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(ClaimTypes.Name, user.UserName),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            ];
 
-            if (activeTokens.Count == 0)
-            {
-                return;
-            }
+            IList<string> roles = await userManager.GetRolesAsync(user);
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            foreach (RefreshTokenEntity token in activeTokens)
-            {
-                token.RevokedAt = now;
-            }
+            SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(options.Value.SecretKey));
 
-            await dbContext.SaveChangesAsync(cancellationToken);
+            JwtSecurityToken token = new(
+                issuer: options.Value.Issuer,
+                audience: options.Value.Audience,
+                claims: claims,
+                expires: now.AddMinutes(options.Value.ExpiryInMinutes),
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private static string GenerateRefreshToken()
+        private string GenerateRefreshToken()
         {
             Span<byte> randomBytes = stackalloc byte[64];
             RandomNumberGenerator.Fill(randomBytes);
@@ -147,26 +142,12 @@ namespace Faryma.Composer.Api.Auth.Services
                 .TrimEnd('=');
         }
 
-        private static string ComputeSha256(string value)
+        private string Hash(string refreshToken)
         {
-            byte[] rawBytes = Encoding.UTF8.GetBytes(value);
+            byte[] rawBytes = Encoding.UTF8.GetBytes(refreshToken);
             byte[] hash = SHA256.HashData(rawBytes);
 
             return Convert.ToHexString(hash);
-        }
-
-        private async Task RevokeFamily(Guid familyId, DateTime now, CancellationToken cancellationToken)
-        {
-            List<RefreshTokenEntity> activeFamilyTokens = await dbContext.RefreshTokens
-                .Where(x => x.FamilyId == familyId && x.RevokedAt == null)
-                .ToListAsync(cancellationToken);
-
-            foreach (RefreshTokenEntity token in activeFamilyTokens)
-            {
-                token.RevokedAt = now;
-            }
-
-            await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

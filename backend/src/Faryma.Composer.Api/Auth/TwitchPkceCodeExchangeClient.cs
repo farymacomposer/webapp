@@ -12,7 +12,7 @@ namespace Faryma.Composer.Api.Auth
     {
         private const string _tokenEndpoint = "https://id.twitch.tv/oauth2/token";
 
-        public async Task<string> ExchangeCodeWithPkce(string code, string codeVerifier, CancellationToken cancellationToken)
+        public async Task<string> ExchangeCodeWithPkce(string code, string codeVerifier, CancellationToken ct)
         {
             Dictionary<string, string> form = new()
             {
@@ -24,13 +24,13 @@ namespace Faryma.Composer.Api.Auth
                 ["code_verifier"] = codeVerifier
             };
 
-            using HttpResponseMessage response = await httpClient.PostAsync(_tokenEndpoint, new FormUrlEncodedContent(form), cancellationToken);
+            using HttpResponseMessage response = await httpClient.PostAsync(_tokenEndpoint, new FormUrlEncodedContent(form), ct);
             if (!response.IsSuccessStatusCode)
             {
                 throw new AuthenticationException("Не удалось обменять code на access token Twitch");
             }
 
-            TwitchTokenResponse? token = await response.Content.ReadFromJsonAsync<TwitchTokenResponse>(cancellationToken);
+            TwitchTokenResponse? token = await response.Content.ReadFromJsonAsync<TwitchTokenResponse>(ct);
             if (token is null || string.IsNullOrWhiteSpace(token.AccessToken))
             {
                 throw new AuthenticationException("Twitch не вернул access token");

@@ -15,7 +15,7 @@ namespace Faryma.Composer.Api.Test
 
             public TwitchValidateData ValidationResponse { get; set; } = new("", "", "");
 
-            public Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken cancellationToken)
+            public Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken ct)
             {
                 ValidatedAccessToken = accessToken;
                 return Task.FromResult(ValidationResponse);
@@ -32,7 +32,7 @@ namespace Faryma.Composer.Api.Test
 
             public string AccessTokenToReturn { get; set; } = "pkce-access-token";
 
-            public Task<string> ExchangeCodeWithPkce(string code, string codeVerifier, CancellationToken cancellationToken)
+            public Task<string> ExchangeCodeWithPkce(string code, string codeVerifier, CancellationToken ct)
             {
                 ExchangeCodeWithPkceCalled = true;
                 Code = code;
@@ -61,14 +61,14 @@ namespace Faryma.Composer.Api.Test
             {
                 ValidationResponse = new TwitchValidateData("client-id", "pkce_login", "pkce-user")
             };
+
             FakeTwitchPkceCodeExchangeClient twitchPkceCodeExchangeClient = new()
             {
                 AccessTokenToReturn = "token_pkce"
             };
+
             string codeVerifier = new('a', 43);
-
             TwitchAuthClient sut = CreateSut(twitchTokenValidationClient, twitchPkceCodeExchangeClient);
-
             TwitchUserData result = await sut.AuthenticateUser("oauth-code", codeVerifier, CancellationToken.None);
 
             Assert.Equal("pkce_login", result.Login);
@@ -86,12 +86,13 @@ namespace Faryma.Composer.Api.Test
             {
                 ValidationResponse = new TwitchValidateData("another-client-id", "streamer_login", "user-1")
             };
+
             FakeTwitchPkceCodeExchangeClient twitchPkceCodeExchangeClient = new()
             {
                 AccessTokenToReturn = "token_pkce"
             };
-            string codeVerifier = new('b', 43);
 
+            string codeVerifier = new('b', 43);
             TwitchAuthClient sut = CreateSut(twitchTokenValidationClient, twitchPkceCodeExchangeClient);
 
             await Assert.ThrowsAsync<AuthenticationException>(() => sut.AuthenticateUser("oauth-code", codeVerifier, CancellationToken.None));

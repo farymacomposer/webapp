@@ -33,15 +33,18 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// </summary>
         /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос создания заказа</param>
+        /// <param name="ct">Токен отмены</param>
         [HttpPost(nameof(CreateReviewOrder))]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
-            [FromBody] CreateReviewOrderRequest request)
+            [FromBody] CreateReviewOrderRequest request,
+            CancellationToken ct)
         {
             _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
+            DateTime now = DateTime.UtcNow;
 
             ReviewOrderEntity order = request.OrderType switch
             {
@@ -51,7 +54,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
-                }),
+                }, now, ct),
                 ReviewOrderType.Donation => await reviewOrderService.CreateDonation(new CreateDonationOrderCommand
                 {
                     Nickname = request.Nickname,
@@ -60,21 +63,21 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                     PaymentAmount = request.PaymentAmount!.Value,
                     TopUpProvider = request.TopUpProvider!.Value,
                     CreatedByUserId = userId,
-                }),
+                }, now, ct),
                 ReviewOrderType.Free => await reviewOrderService.CreateFree(new CreateFreeOrderCommand
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
-                }),
+                }, now, ct),
                 ReviewOrderType.Charity => await reviewOrderService.CreateCharity(new CreateCharityOrderCommand
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
-                }),
+                }, now, ct),
                 _ => throw new InvalidOperationException(),
             };
 
@@ -89,15 +92,18 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// </summary>
         /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос поднятия заказа в очереди</param>
+        /// <param name="ct">Токен отмены</param>
         [HttpPost(nameof(MoveUpReviewOrder))]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<MoveUpReviewOrderResponse>> MoveUpReviewOrder(
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
-            [FromBody] MoveUpReviewOrderRequest request)
+            [FromBody] MoveUpReviewOrderRequest request,
+            CancellationToken ct)
         {
             _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
+            DateTime now = DateTime.UtcNow;
 
             TransactionEntity transaction = await reviewOrderService.MoveUp(new MoveUpCommand
             {
@@ -106,7 +112,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 PaymentAmount = request.PaymentAmount,
                 TopUpProvider = request.TopUpProvider,
                 CreatedByUserId = userId,
-            });
+            }, now, ct);
 
             return Ok(new MoveUpReviewOrderResponse
             {
@@ -120,13 +126,13 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// </summary>
         [HttpPost(nameof(AddTrackUrl))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl(AddTrackUrlRequest request)
+        public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl(AddTrackUrlRequest request, CancellationToken ct)
         {
             ReviewOrderEntity order = await reviewOrderService.AddTrackUrl(new AddTrackUrlCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 TrackUrl = request.TrackUrl,
-            });
+            }, ct);
 
             return Ok(new AddTrackUrlResponse
             {
@@ -139,9 +145,10 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// </summary>
         [HttpPost(nameof(TakeOrderInProgress))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request)
+        public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.TakeInProgress(request.ReviewOrderId);
+            DateTime now = DateTime.UtcNow;
+            ReviewOrderEntity order = await reviewOrderService.TakeInProgress(request.ReviewOrderId, now, ct);
 
             return Ok(new TakeOrderInProgressResponse
             {
@@ -154,16 +161,17 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// </summary>
         [HttpPost(nameof(CompleteReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder(CompleteReviewOrderRequest request)
+        public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder(CompleteReviewOrderRequest request, CancellationToken ct)
         {
             Guid userId = User.GetUserId();
+            DateTime now = DateTime.UtcNow;
 
             ReviewOrderEntity order = await reviewOrderService.Complete(new CompleteCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Rating = request.Rating,
                 CreatedByUserId = userId,
-            });
+            }, now, ct);
 
             return Ok(new CompleteReviewOrderResponse
             {
@@ -177,9 +185,9 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// </summary>
         [HttpPost(nameof(FreezeReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(FreezeReviewOrderRequest request)
+        public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(FreezeReviewOrderRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.Freeze(request.ReviewOrderId);
+            ReviewOrderEntity order = await reviewOrderService.Freeze(request.ReviewOrderId, ct);
 
             return Ok(new FreezeReviewOrderResponse
             {
@@ -192,9 +200,9 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// </summary>
         [HttpPost(nameof(UnfreezeReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(UnfreezeReviewOrderRequest request)
+        public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(UnfreezeReviewOrderRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.Unfreeze(request.ReviewOrderId);
+            ReviewOrderEntity order = await reviewOrderService.Unfreeze(request.ReviewOrderId, ct);
 
             return Ok(new UnfreezeReviewOrderResponse
             {
@@ -207,9 +215,9 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// </summary>
         [HttpPost(nameof(CancelReviewOrder))]
         [AuthorizeAdmins]
-        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request)
+        public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.Cancel(request.ReviewOrderId);
+            ReviewOrderEntity order = await reviewOrderService.Cancel(request.ReviewOrderId, ct);
 
             return Ok(new CancelReviewOrderResponse
             {

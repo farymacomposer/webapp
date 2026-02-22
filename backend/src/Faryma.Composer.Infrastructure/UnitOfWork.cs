@@ -12,6 +12,7 @@ namespace Faryma.Composer.Infrastructure
         UserNicknameQueries userNicknameQueries,
 
         ComposerStreamStore composerStreamStore,
+        RefreshTokenStore refreshTokenStore,
         ReviewStore reviewStore,
         ReviewOrderStore reviewOrderStore,
         TransactionStore transactionStore,
@@ -24,14 +25,15 @@ namespace Faryma.Composer.Infrastructure
         public UserNicknameQueries UserNicknameQueries { get; } = userNicknameQueries;
 
         public ComposerStreamStore ComposerStreamStore { get; } = composerStreamStore;
+        public RefreshTokenStore RefreshTokenStore { get; } = refreshTokenStore;
         public ReviewStore ReviewStore { get; } = reviewStore;
         public ReviewOrderStore ReviewOrderStore { get; } = reviewOrderStore;
         public TransactionStore TransactionStore { get; } = transactionStore;
         public UserNicknameStore UserNicknameStore { get; } = userNicknameStore;
         public UserStore UserStore { get; } = userStore;
 
-        public Task<IDbContextTransaction> BeginTransaction(CancellationToken cancellationToken = default) => context.Database.BeginTransactionAsync(cancellationToken);
-        public Task<int> SaveChanges(CancellationToken cancellationToken = default) => context.SaveChangesAsync(cancellationToken);
+        public Task<IDbContextTransaction> BeginTransaction(CancellationToken ct) => context.Database.BeginTransactionAsync(ct);
+        public Task<int> SaveChanges(CancellationToken ct) => context.SaveChangesAsync(ct);
         public void Remove<TEntity>(TEntity entity) where TEntity : class => context.Remove(entity);
     }
 }

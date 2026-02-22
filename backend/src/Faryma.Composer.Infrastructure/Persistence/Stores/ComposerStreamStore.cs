@@ -1,5 +1,4 @@
-using Faryma.Composer.Contracts.Exceptions;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,22 +22,21 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             }).Entity;
         }
 
-        public async Task<ComposerStreamEntity> Get(long id) => await context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id)
-            ?? throw new NotFoundException("Стрим не существует", id);
+        public Task<ComposerStreamEntity?> FindById(long id, CancellationToken ct) => context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id, ct);
 
-        public Task<ComposerStreamEntity?> FindLive() => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
+        public Task<ComposerStreamEntity?> FindLive(CancellationToken ct) => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
 
-        public Task<ComposerStreamEntity?> FindNearest(DateOnly date)
+        public Task<ComposerStreamEntity?> FindNearest(DateOnly date, CancellationToken ct)
         {
             IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= date))
                 .OrderBy(x => x.EventDate);
 
-            return query.FirstOrDefaultAsync();
+            return query.FirstOrDefaultAsync(ct);
         }
 
-        public Task<ComposerStreamEntity?> FindNearest(DateOnly date, ComposerStreamType type)
+        public Task<ComposerStreamEntity?> FindNearest(DateOnly date, ComposerStreamType type, CancellationToken ct)
         {
             IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .Where(x => x.Type == type
@@ -46,7 +44,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                     && (x.Status == ComposerStreamStatus.Planned || x.Status == ComposerStreamStatus.Live))
                 .OrderBy(x => x.EventDate);
 
-            return query.FirstOrDefaultAsync();
+            return query.FirstOrDefaultAsync(ct);
         }
     }
 }

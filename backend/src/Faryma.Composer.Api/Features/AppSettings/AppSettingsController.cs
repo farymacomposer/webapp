@@ -27,12 +27,12 @@ namespace Faryma.Composer.Api.Features.AppSettings
         /// </summary>
         [HttpPost(nameof(UpdateAppSettings))]
         [AuthorizeUser]
-        public async Task<ActionResult<AppSettingsDto>> UpdateAppSettings(AppSettingsDto dto)
+        public async Task<ActionResult<AppSettingsDto>> UpdateAppSettings(AppSettingsDto dto, CancellationToken ct)
         {
             AppSettingsEntity settings = await appSettingsService.Update(new AppSettingsModel
             {
                 ReviewOrderNominalAmount = dto.ReviewOrderNominalAmount,
-            });
+            }, ct);
 
             return Ok(AppSettingsDto.Map(settings));
         }

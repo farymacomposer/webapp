@@ -15,12 +15,12 @@ namespace Faryma.Composer.Api.Test
 
             public string LastBody { get; private set; } = string.Empty;
 
-            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
             {
                 LastRequest = request;
                 if (request.Content is not null)
                 {
-                    LastBody = await request.Content.ReadAsStringAsync(cancellationToken);
+                    LastBody = await request.Content.ReadAsStringAsync(ct);
                 }
 
                 return responseFactory(request);
@@ -37,8 +37,8 @@ namespace Faryma.Composer.Api.Test
                     Content = new StringContent("{\"access_token\":\"pkce-token\"}", Encoding.UTF8, "application/json")
                 };
             });
-            TwitchPkceCodeExchangeClient sut = CreateSut(handler);
 
+            TwitchPkceCodeExchangeClient sut = CreateSut(handler);
             string token = await sut.ExchangeCodeWithPkce("oauth-code", "verifier", CancellationToken.None);
 
             Assert.Equal("pkce-token", token);
@@ -70,6 +70,7 @@ namespace Faryma.Composer.Api.Test
                     Content = new StringContent("{\"access_token\":\"\"}", Encoding.UTF8, "application/json")
                 };
             });
+
             TwitchPkceCodeExchangeClient sut = CreateSut(handler);
 
             await Assert.ThrowsAsync<AuthenticationException>(

@@ -61,7 +61,6 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .AddScoped<TwitchAuthClient>()
                 .AddScoped<ITwitchPkceCodeExchangeClient, TwitchPkceCodeExchangeClient>()
                 .AddScoped<ITwitchTokenValidationClient, TwitchTokenValidationClient>()
-                .AddScoped<AuthService>()
                 .AddScoped<AuthTokenService>()
                 .AddScoped<TwitchAuthStateService>()
                 .AddScoped<TwitchAuthService>()

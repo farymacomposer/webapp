@@ -27,9 +27,9 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// Возвращает список стримов
         /// </summary>
         [HttpGet(nameof(FindStreams))]
-        public async Task<ActionResult<FindStreamsResponse>> FindStreams([FromQuery] FindStreamsRequest request)
+        public async Task<ActionResult<FindStreamsResponse>> FindStreams([FromQuery] FindStreamsRequest request, CancellationToken ct)
         {
-            List<ComposerStreamEntity> streams = await composerStreamService.Find(request.DateFrom, request.DateTo);
+            List<ComposerStreamEntity> streams = await composerStreamService.Find(request.DateFrom, request.DateTo, ct);
 
             return Ok(new FindStreamsResponse
             {
@@ -41,9 +41,9 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// Возвращает текущий и запланированные стримы
         /// </summary>
         [HttpGet(nameof(FindLiveAndPlanned))]
-        public async Task<ActionResult<FindLiveAndPlannedStreamsResponse>> FindLiveAndPlanned()
+        public async Task<ActionResult<FindLiveAndPlannedStreamsResponse>> FindLiveAndPlanned(CancellationToken ct)
         {
-            List<ComposerStreamEntity> streams = await composerStreamService.FindLiveAndPlanned();
+            List<ComposerStreamEntity> streams = await composerStreamService.FindLiveAndPlanned(ct);
 
             return Ok(new FindLiveAndPlannedStreamsResponse
             {
@@ -56,7 +56,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// </summary>
         [HttpPost(nameof(CreateStream))]
         [AuthorizeComposer]
-        public async Task<ActionResult<CreateStreamResponse>> CreateStream(CreateStreamRequest request)
+        public async Task<ActionResult<CreateStreamResponse>> CreateStream(CreateStreamRequest request, CancellationToken ct)
         {
             Guid userId = User.GetUserId();
 
@@ -65,7 +65,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
                 EventDate = request.EventDate,
                 Type = request.Type,
                 CreatedByUserId = userId
-            });
+            }, ct);
 
             return Ok(new CreateStreamResponse
             {
@@ -78,9 +78,9 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// </summary>
         [HttpPost(nameof(StartStream))]
         [AuthorizeComposer]
-        public async Task<ActionResult<StartStreamResponse>> StartStream(StartStreamRequest request)
+        public async Task<ActionResult<StartStreamResponse>> StartStream(StartStreamRequest request, CancellationToken ct)
         {
-            ComposerStreamEntity stream = await composerStreamService.Start(request.ComposerStreamId);
+            ComposerStreamEntity stream = await composerStreamService.Start(request.ComposerStreamId, DateTime.UtcNow, ct);
 
             return Ok(new StartStreamResponse
             {
@@ -93,9 +93,9 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// </summary>
         [HttpPost(nameof(CompleteStream))]
         [AuthorizeComposer]
-        public async Task<ActionResult<CompleteStreamResponse>> CompleteStream(CompleteStreamRequest request)
+        public async Task<ActionResult<CompleteStreamResponse>> CompleteStream(CompleteStreamRequest request, CancellationToken ct)
         {
-            ComposerStreamEntity stream = await composerStreamService.Complete(request.ComposerStreamId);
+            ComposerStreamEntity stream = await composerStreamService.Complete(request.ComposerStreamId, DateTime.UtcNow, ct);
 
             return Ok(new CompleteStreamResponse
             {
@@ -108,9 +108,9 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// </summary>
         [HttpPost(nameof(CancelStream))]
         [AuthorizeComposer]
-        public async Task<ActionResult<CancelStreamResponse>> CancelStream(CancelStreamRequest request)
+        public async Task<ActionResult<CancelStreamResponse>> CancelStream(CancelStreamRequest request, CancellationToken ct)
         {
-            ComposerStreamEntity stream = await composerStreamService.Cancel(request.ComposerStreamId);
+            ComposerStreamEntity stream = await composerStreamService.Cancel(request.ComposerStreamId, ct);
 
             return Ok(new CancelStreamResponse
             {

@@ -11,12 +11,12 @@ namespace Faryma.Composer.Api.Auth
         ITwitchPkceCodeExchangeClient twitchPkceCodeExchangeClient,
         IOptions<TwitchOptions> options)
     {
-        public async Task<TwitchUserData> AuthenticateUser(string code, string codeVerifier, CancellationToken cancellationToken)
+        public async Task<TwitchUserData> AuthenticateUser(string code, string codeVerifier, CancellationToken ct)
         {
             ValidateInput(code, codeVerifier);
 
-            string accessToken = await ExchangeCode(code, codeVerifier, cancellationToken);
-            TwitchValidateData validation = await ValidateAccessToken(accessToken, cancellationToken);
+            string accessToken = await ExchangeCode(code, codeVerifier, ct);
+            TwitchValidateData validation = await ValidateAccessToken(accessToken, ct);
 
             if (!string.Equals(validation.ClientId, options.Value.ClientId, StringComparison.Ordinal))
             {
@@ -56,11 +56,11 @@ namespace Faryma.Composer.Api.Auth
 
         private static bool IsPkceUnreserved(char symbol) => char.IsAsciiLetterOrDigit(symbol) || symbol is '-' or '.' or '_' or '~';
 
-        private async Task<string> ExchangeCode(string code, string codeVerifier, CancellationToken cancellationToken)
+        private async Task<string> ExchangeCode(string code, string codeVerifier, CancellationToken ct)
         {
             try
             {
-                return await twitchPkceCodeExchangeClient.ExchangeCodeWithPkce(code, codeVerifier, cancellationToken);
+                return await twitchPkceCodeExchangeClient.ExchangeCodeWithPkce(code, codeVerifier, ct);
             }
             catch (AuthenticationException)
             {
@@ -72,11 +72,11 @@ namespace Faryma.Composer.Api.Auth
             }
         }
 
-        private async Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken cancellationToken)
+        private async Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken ct)
         {
             try
             {
-                return await twitchTokenValidationClient.ValidateAccessToken(accessToken, cancellationToken);
+                return await twitchTokenValidationClient.ValidateAccessToken(accessToken, ct);
             }
             catch (AuthenticationException)
             {

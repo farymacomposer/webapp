@@ -1,5 +1,4 @@
-using Faryma.Composer.Contracts.Exceptions;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -8,17 +7,14 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
     public sealed class ReviewOrderStore(AppDbContext context)
     {
-        public async Task<ReviewOrderEntity> Get(long id) => await Find(id)
-            ?? throw new NotFoundException("Заказ разбора трека не существует", id);
-
-        public Task<ReviewOrderEntity?> Find(long id)
+        public Task<ReviewOrderEntity?> FindById(long id, CancellationToken ct)
         {
             return context.ReviewOrders
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
                 .Include(x => x.Transactions)
                 .Include(x => x.Review)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
         public ReviewOrderEntity Create(

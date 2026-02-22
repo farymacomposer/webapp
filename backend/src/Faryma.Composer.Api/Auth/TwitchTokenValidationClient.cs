@@ -9,7 +9,7 @@ namespace Faryma.Composer.Api.Auth
 {
     public sealed class TwitchTokenValidationClient(IOptions<TwitchOptions> options) : ITwitchTokenValidationClient
     {
-        public async Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken cancellationToken)
+        public async Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken ct)
         {
             try
             {
@@ -17,7 +17,7 @@ namespace Faryma.Composer.Api.Auth
                 twitchApi.Settings.ClientId = options.Value.ClientId;
 
                 // TODO: Разобраться с WaitAsync
-                ValidateAccessTokenResponse? validation = await twitchApi.Auth.ValidateAccessTokenAsync(accessToken).WaitAsync(cancellationToken)
+                ValidateAccessTokenResponse? validation = await twitchApi.Auth.ValidateAccessTokenAsync(accessToken).WaitAsync(ct)
                     ?? throw new AuthenticationException("Пустой ответ валидации Twitch");
 
                 return new TwitchValidateData(validation.ClientId, validation.Login, validation.UserId);

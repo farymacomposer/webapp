@@ -1,11 +1,11 @@
-﻿using Faryma.Composer.Contracts.Exceptions;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
     public sealed class UserStore(AppDbContext context)
     {
-        public UserEntity Get(Guid id) => context.Users.Find(id)
-            ?? throw new NotFoundException("Пользователь не найден", id);
+        public Task<UserEntity?> FindById(Guid id, CancellationToken ct) =>
+            context.Users.FirstOrDefaultAsync(x => x.Id == id, ct);
     }
 }

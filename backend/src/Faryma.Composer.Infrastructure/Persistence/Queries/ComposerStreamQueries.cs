@@ -6,22 +6,22 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
 {
     public sealed class ComposerStreamQueries(AppDbContext context)
     {
-        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo)
+        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct)
         {
             return context.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.EventDate >= dateFrom && x.EventDate <= dateTo)
-                .ToListAsync();
+                .ToListAsync(ct);
         }
 
-        public Task<ComposerStreamEntity?> FindLive()
+        public Task<ComposerStreamEntity?> FindLive(CancellationToken ct)
         {
             return context.ComposerStreams
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live);
+                .FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
         }
 
-        public Task<ComposerStreamEntity?> FindNearest()
+        public Task<ComposerStreamEntity?> FindNearest(CancellationToken ct)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
@@ -31,10 +31,10 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
                 .OrderBy(x => x.EventDate);
 
-            return query.FirstOrDefaultAsync();
+            return query.FirstOrDefaultAsync(ct);
         }
 
-        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned()
+        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
@@ -43,10 +43,10 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today));
 
-            return query.ToListAsync();
+            return query.ToListAsync(ct);
         }
 
-        public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate()
+        public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate(CancellationToken ct)
         {
             var query = context.ComposerStreams
                 .AsNoTracking()
@@ -61,7 +61,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                         .Last().MainNormalizedNickname
                 });
 
-            return query.ToDictionaryAsync(k => k.EventDate, v => v.MainNormalizedNickname);
+            return query.ToDictionaryAsync(k => k.EventDate, v => v.MainNormalizedNickname, ct);
         }
     }
 }
