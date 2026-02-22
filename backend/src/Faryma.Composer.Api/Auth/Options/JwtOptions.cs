@@ -16,7 +16,7 @@ namespace Faryma.Composer.Api.Auth.Options
 
         [ConfigurationKeyName("SECRET_KEY")]
         [Required]
-        [MinLength(36)]
+        [StringLength(256, MinimumLength = 36)]
         public required string SecretKey { get; init; }
 
         [ConfigurationKeyName("EXPIRY_IN_MINUTES")]

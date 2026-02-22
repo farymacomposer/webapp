@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Faryma.Composer.Application\Faryma.Composer.Application.csproj" />
+    <ProjectReference Include="..\..\src\Faryma.Composer.Api\Faryma.Composer.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

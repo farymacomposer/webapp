@@ -17,7 +17,7 @@ namespace Faryma.Composer.Api.Auth
             List<Claim> claims =
             [
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Name, user.UserName!),
+                new(ClaimTypes.Name, user.UserName),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             ];
 
