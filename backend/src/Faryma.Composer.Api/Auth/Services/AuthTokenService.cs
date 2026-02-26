@@ -18,8 +18,6 @@ namespace Faryma.Composer.Api.Auth.Services
         UserManager<UserEntity> userManager,
         IOptions<JwtOptions> options)
     {
-        public Task RevokeAll(Guid userId, DateTime now) => uow.RefreshTokenStore.RevokeAllForUser(userId, now);
-
         public async Task<(string AccessToken, string RefreshToken)> IssueForUser(UserEntity user, DateTime now, CancellationToken ct)
         {
             string accessToken = await GenerateAccessToken(user, now);
@@ -52,7 +50,7 @@ namespace Faryma.Composer.Api.Auth.Services
             {
                 if (!string.IsNullOrWhiteSpace(stored.ReplacedByTokenHash))
                 {
-                    await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, now);
+                    await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, now, CancellationToken.None);
                 }
 
                 throw new AuthenticationException("Refresh token отозван");
@@ -88,7 +86,7 @@ namespace Faryma.Composer.Api.Auth.Services
             return (accessToken, nextRefresh);
         }
 
-        public async Task RevokeSession(Guid userId, string refreshToken, DateTime now)
+        public async Task RevokeSession(Guid userId, string refreshToken, DateTime now, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
@@ -96,15 +94,17 @@ namespace Faryma.Composer.Api.Auth.Services
             }
 
             string tokenHash = Hash(refreshToken);
-            RefreshTokenEntity? stored = await uow.RefreshTokenStore.FindByUserIdAndHash(userId, tokenHash, CancellationToken.None);
+            RefreshTokenEntity? stored = await uow.RefreshTokenStore.FindByUserIdAndHash(userId, tokenHash, ct);
 
             if (stored is null)
             {
                 return;
             }
 
-            await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, now);
+            await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, now, ct);
         }
+
+        public Task RevokeAll(Guid userId, DateTime now, CancellationToken ct) => uow.RefreshTokenStore.RevokeAllForUser(userId, now, ct);
 
         private async Task<string> GenerateAccessToken(UserEntity user, DateTime now)
         {

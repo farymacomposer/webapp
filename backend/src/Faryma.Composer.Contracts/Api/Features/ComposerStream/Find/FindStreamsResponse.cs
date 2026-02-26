@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Contracts.Api.Shared.Dto;
+﻿using Faryma.Composer.Contracts.Api.Shared.Dto;
 
 namespace Faryma.Composer.Contracts.Api.Features.ComposerStream.Find
 {
@@ -11,7 +10,6 @@ namespace Faryma.Composer.Contracts.Api.Features.ComposerStream.Find
         /// <summary>
         /// Список стримов
         /// </summary>
-        [Required]
         public required IEnumerable<ComposerStreamDto> Streams { get; init; }
     }
 }

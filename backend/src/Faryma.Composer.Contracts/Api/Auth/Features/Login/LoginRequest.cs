@@ -18,7 +18,7 @@ namespace Faryma.Composer.Contracts.Api.Auth.Features.Login
         /// Пароль
         /// </summary>
         [Required]
-        [StringLength(40, MinimumLength = 12)]
+        [StringLength(40, MinimumLength = 12, ErrorMessage = "Длина пароля должна быть в пределах от 12 до 40 символов")]
         public required string Password { get; init; }
     }
 }

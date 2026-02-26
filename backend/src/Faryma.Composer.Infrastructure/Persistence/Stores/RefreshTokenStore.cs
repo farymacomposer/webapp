@@ -23,20 +23,20 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             }).Entity;
         }
 
-        public Task RevokeFamily(Guid familyId, DateTime now)
+        public Task RevokeFamily(Guid familyId, DateTime now, CancellationToken ct)
         {
             return context.RefreshTokens
                 .Where(x => x.FamilyId == familyId && x.RevokedAt == null)
                 .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(x => x.RevokedAt, now));
+                    .SetProperty(x => x.RevokedAt, now), ct);
         }
 
-        public Task RevokeAllForUser(Guid userId, DateTime now)
+        public Task RevokeAllForUser(Guid userId, DateTime now, CancellationToken ct)
         {
             return context.RefreshTokens
                 .Where(x => x.UserId == userId && x.RevokedAt == null)
                 .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(x => x.RevokedAt, now));
+                    .SetProperty(x => x.RevokedAt, now), ct);
         }
     }
 }

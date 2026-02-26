@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Contracts.Api.Shared.Dto
@@ -47,7 +46,6 @@ namespace Faryma.Composer.Contracts.Api.Shared.Dto
         /// <summary>
         /// Ссылка на трек
         /// </summary>
-        [Url]
         public required string? TrackUrl { get; init; }
 
         /// <summary>
@@ -58,7 +56,6 @@ namespace Faryma.Composer.Contracts.Api.Shared.Dto
         /// <summary>
         /// Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа
         /// </summary>
-        [Required]
         public required string MainNickname { get; init; }
 
         /// <summary>
@@ -69,7 +66,6 @@ namespace Faryma.Composer.Contracts.Api.Shared.Dto
         /// <summary>
         /// Связанный cтрим композитора, где создан заказ
         /// </summary>
-        [Required]
         public required ComposerStreamDto CreationStream { get; init; }
 
         public static ReviewOrderDto Map(ReviewOrderEntity item)

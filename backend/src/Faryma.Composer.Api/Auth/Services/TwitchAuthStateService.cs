@@ -26,7 +26,7 @@ namespace Faryma.Composer.Api.Auth.Services
             return (state, browserNonce);
         }
 
-        public bool TryConsumeState(string? state, string? browserNonce)
+        public bool TryConsumeState(string state, string? browserNonce)
         {
             if (string.IsNullOrWhiteSpace(state) || string.IsNullOrWhiteSpace(browserNonce))
             {

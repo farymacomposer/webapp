@@ -5,14 +5,7 @@
     /// </summary>
     public sealed record RefreshTokenResponse
     {
-        /// <summary>
-        /// JWT access token
-        /// </summary>
-        public required string Token { get; init; }
-
-        /// <summary>
-        /// Refresh token для продления сессии
-        /// </summary>
+        public required string AccessToken { get; init; }
         public required string RefreshToken { get; init; }
     }
 }

@@ -22,7 +22,7 @@ namespace Faryma.Composer.Api.Auth
     public sealed class AuthController(
         AuthTokenService authTokenService,
         TwitchAuthService twitchAuthService,
-        TwitchAuthStateService twitchOAuthStateService,
+        TwitchAuthStateService twitchAuthStateService,
         UserManager<UserEntity> userManager) : ControllerBase
     {
         /// <summary>
@@ -42,7 +42,7 @@ namespace Faryma.Composer.Api.Auth
 
             (string accessToken, string refreshToken) = await authTokenService.IssueForUser(user, DateTime.UtcNow, ct);
 
-            return Ok(new LoginResponse { Token = accessToken, RefreshToken = refreshToken });
+            return Ok(new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken });
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Faryma.Composer.Api.Auth
         [EnableRateLimiting("auth-login")]
         public ActionResult<TwitchLoginStateResponse> TwitchLoginState()
         {
-            (string state, string browserNonce) = twitchOAuthStateService.IssueState();
+            (string state, string browserNonce) = twitchAuthStateService.IssueState();
 
             Response.Cookies.Append(
                 TwitchAuthStateService.BrowserNonceCookieName,
@@ -91,7 +91,7 @@ namespace Faryma.Composer.Api.Auth
                 DateTime.UtcNow,
                 ct);
 
-            return Ok(new TwitchLoginResponse { Token = accessToken, RefreshToken = refreshToken });
+            return Ok(new TwitchLoginResponse { AccessToken = accessToken, RefreshToken = refreshToken });
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Faryma.Composer.Api.Auth
         {
             (string accessToken, string refreshToken) = await authTokenService.Refresh(request.RefreshToken, DateTime.UtcNow, ct);
 
-            return Ok(new RefreshTokenResponse { Token = accessToken, RefreshToken = refreshToken });
+            return Ok(new RefreshTokenResponse { AccessToken = accessToken, RefreshToken = refreshToken });
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace Faryma.Composer.Api.Auth
         public async Task<IActionResult> Logout(LogoutRequest request)
         {
             Guid userId = User.GetUserId();
-            await authTokenService.RevokeSession(userId, request.RefreshToken, DateTime.UtcNow);
+            await authTokenService.RevokeSession(userId, request.RefreshToken, DateTime.UtcNow, CancellationToken.None);
 
             return NoContent();
         }
@@ -129,7 +129,7 @@ namespace Faryma.Composer.Api.Auth
         public async Task<IActionResult> LogoutAll()
         {
             Guid userId = User.GetUserId();
-            await authTokenService.RevokeAll(userId, DateTime.UtcNow);
+            await authTokenService.RevokeAll(userId, DateTime.UtcNow, CancellationToken.None);
 
             return NoContent();
         }

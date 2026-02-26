@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Api.Test
 {
-    public sealed class TwitchOAuthClientTest
+    public sealed class TwitchAuthClientTest
     {
         private sealed class FakeTwitchTokenValidationClient : ITwitchTokenValidationClient
         {

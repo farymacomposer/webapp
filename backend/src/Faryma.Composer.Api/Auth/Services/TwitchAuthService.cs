@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Faryma.Composer.Api.Auth.Services
 {
     public sealed class TwitchAuthService(
-        TwitchAuthClient twitchOAuthClient,
+        TwitchAuthClient twitchAuthClient,
         AuthTokenService authTokenService,
-        TwitchAuthStateService twitchOAuthStateService,
+        TwitchAuthStateService twitchAuthStateService,
         UserManager<UserEntity> userManager)
     {
         public async Task<(string AccessToken, string RefreshToken)> Login(
@@ -20,12 +20,12 @@ namespace Faryma.Composer.Api.Auth.Services
             DateTime now,
             CancellationToken cancellationToken)
         {
-            if (!twitchOAuthStateService.TryConsumeState(state, browserNonce))
+            if (!twitchAuthStateService.TryConsumeState(state, browserNonce))
             {
                 throw new AuthenticationException("Некорректный OAuth state");
             }
 
-            TwitchUserData twitchUser = await twitchOAuthClient.AuthenticateUser(code, codeVerifier, cancellationToken);
+            TwitchUserData twitchUser = await twitchAuthClient.AuthenticateUser(code, codeVerifier, cancellationToken);
 
             UserEntity? user = await userManager.Users
                 .FirstOrDefaultAsync(x => x.TwitchUserId == twitchUser.UserId, cancellationToken);
