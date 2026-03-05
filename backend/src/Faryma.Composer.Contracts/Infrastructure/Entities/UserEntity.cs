@@ -1,4 +1,4 @@
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities

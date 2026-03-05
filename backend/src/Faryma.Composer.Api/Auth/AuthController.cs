@@ -35,7 +35,7 @@ namespace Faryma.Composer.Api.Auth
             UserEntity? user = await userManager.FindByNameAsync(request.UserName);
             if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
             {
-                await Task.Delay(1000);
+                await Task.Delay(1000, ct);
 
                 return Unauthorized();
             }

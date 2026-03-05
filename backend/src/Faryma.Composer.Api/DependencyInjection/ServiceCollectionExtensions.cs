@@ -57,7 +57,6 @@ namespace Faryma.Composer.Api.DependencyInjection
             services
                 .AddHttpClient<TwitchAuthClient>()
                 .Services
-                .AddScoped<TwitchAuthClient>()
                 .AddScoped<AuthTokenService>()
                 .AddScoped<TwitchAuthStateService>()
                 .AddScoped<TwitchAuthService>()

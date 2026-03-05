@@ -31,7 +31,7 @@ namespace Faryma.Composer.Api.Auth
             return new TwitchUserData(validation.UserId, validation.Login);
         }
 
-        public async Task<string> ExchangeCodeWithPkce(string code, string codeVerifier, CancellationToken ct)
+        private async Task<string> ExchangeCode(string code, string codeVerifier, CancellationToken ct)
         {
             Dictionary<string, string> form = new()
             {
@@ -58,43 +58,16 @@ namespace Faryma.Composer.Api.Auth
             return token.AccessToken;
         }
 
-        private async Task<string> ExchangeCode(string code, string codeVerifier, CancellationToken ct)
-        {
-            try
-            {
-                return await ExchangeCodeWithPkce(code, codeVerifier, ct);
-            }
-            catch (AuthenticationException)
-            {
-                throw;
-            }
-            catch (Exception exception)
-            {
-                throw new AuthenticationException("Не удалось обменять code на access token Twitch", exception);
-            }
-        }
-
         private async Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken ct)
         {
-            try
-            {
-                TwitchAPI twitchApi = new();
-                twitchApi.Settings.ClientId = options.Value.ClientId;
+            TwitchAPI twitchApi = new();
+            twitchApi.Settings.ClientId = options.Value.ClientId;
 
-                // TODO: Разобраться с WaitAsync
-                ValidateAccessTokenResponse? validation = await twitchApi.Auth.ValidateAccessTokenAsync(accessToken).WaitAsync(ct)
-                    ?? throw new AuthenticationException("Пустой ответ валидации Twitch");
+            // TODO: Разобраться с WaitAsync
+            ValidateAccessTokenResponse? validation = await twitchApi.Auth.ValidateAccessTokenAsync(accessToken).WaitAsync(ct)
+                ?? throw new AuthenticationException("Пустой ответ валидации Twitch");
 
-                return new TwitchValidateData(validation.ClientId, validation.Login, validation.UserId);
-            }
-            catch (AuthenticationException)
-            {
-                throw;
-            }
-            catch (Exception exception)
-            {
-                throw new AuthenticationException("Не удалось валидировать access token Twitch", exception);
-            }
+            return new TwitchValidateData(validation.ClientId, validation.Login, validation.UserId);
         }
 
         private sealed record TwitchTokenResponse
