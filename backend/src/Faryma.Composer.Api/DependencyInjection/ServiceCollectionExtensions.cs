@@ -4,7 +4,6 @@ using System.Threading.RateLimiting;
 using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Auth.Services;
 using Faryma.Composer.Api.Features.OrderQueue;
-using Faryma.Composer.Contracts.Api.Auth.Contracts;
 using Faryma.Composer.Contracts.Api.Auth.Options;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
@@ -56,11 +55,9 @@ namespace Faryma.Composer.Api.DependencyInjection
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services
-                .AddHttpClient<TwitchPkceCodeExchangeClient>()
+                .AddHttpClient<TwitchAuthClient>()
                 .Services
                 .AddScoped<TwitchAuthClient>()
-                .AddScoped<ITwitchPkceCodeExchangeClient, TwitchPkceCodeExchangeClient>()
-                .AddScoped<ITwitchTokenValidationClient, TwitchTokenValidationClient>()
                 .AddScoped<AuthTokenService>()
                 .AddScoped<TwitchAuthStateService>()
                 .AddScoped<TwitchAuthService>()

@@ -1,20 +1,20 @@
 ﻿using System.Security.Authentication;
+using System.Text.Json.Serialization;
 using Faryma.Composer.Contracts.Api.Auth.Contracts;
 using Faryma.Composer.Contracts.Api.Auth.Models;
 using Faryma.Composer.Contracts.Api.Auth.Options;
 using Microsoft.Extensions.Options;
+using TwitchLib.Api;
+using TwitchLib.Api.Auth;
 
 namespace Faryma.Composer.Api.Auth
 {
-    public sealed class TwitchAuthClient(
-        ITwitchTokenValidationClient twitchTokenValidationClient,
-        ITwitchPkceCodeExchangeClient twitchPkceCodeExchangeClient,
-        IOptions<TwitchOptions> options)
+    public sealed class TwitchAuthClient(HttpClient httpClient, IOptions<TwitchOptions> options)
     {
+        private const string _tokenEndpoint = "https://id.twitch.tv/oauth2/token";
+
         public async Task<TwitchUserData> AuthenticateUser(string code, string codeVerifier, CancellationToken ct)
         {
-            ValidateInput(code, codeVerifier);
-
             string accessToken = await ExchangeCode(code, codeVerifier, ct);
             TwitchValidateData validation = await ValidateAccessToken(accessToken, ct);
 
@@ -31,36 +31,38 @@ namespace Faryma.Composer.Api.Auth
             return new TwitchUserData(validation.UserId, validation.Login);
         }
 
-        private static void ValidateInput(string code, string codeVerifier)
+        public async Task<string> ExchangeCodeWithPkce(string code, string codeVerifier, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(code))
+            Dictionary<string, string> form = new()
             {
-                throw new AuthenticationException("Параметр code обязателен");
+                ["client_id"] = options.Value.ClientId,
+                ["client_secret"] = options.Value.ClientSecret,
+                ["code"] = code,
+                ["grant_type"] = "authorization_code",
+                ["redirect_uri"] = options.Value.RedirectUri,
+                ["code_verifier"] = codeVerifier
+            };
+
+            using HttpResponseMessage response = await httpClient.PostAsync(_tokenEndpoint, new FormUrlEncodedContent(form), ct);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new AuthenticationException("Не удалось обменять code на access token Twitch");
             }
 
-            if (string.IsNullOrWhiteSpace(codeVerifier))
+            TwitchTokenResponse? token = await response.Content.ReadFromJsonAsync<TwitchTokenResponse>(ct);
+            if (token is null || string.IsNullOrWhiteSpace(token.AccessToken))
             {
-                throw new AuthenticationException("Параметр code_verifier обязателен");
+                throw new AuthenticationException("Twitch не вернул access token");
             }
 
-            if (codeVerifier.Length is < 43 or > 128)
-            {
-                throw new AuthenticationException("Некорректная длина code_verifier");
-            }
-
-            if (codeVerifier.Any(static symbol => !IsPkceUnreserved(symbol)))
-            {
-                throw new AuthenticationException("code_verifier содержит недопустимые символы");
-            }
+            return token.AccessToken;
         }
-
-        private static bool IsPkceUnreserved(char symbol) => char.IsAsciiLetterOrDigit(symbol) || symbol is '-' or '.' or '_' or '~';
 
         private async Task<string> ExchangeCode(string code, string codeVerifier, CancellationToken ct)
         {
             try
             {
-                return await twitchPkceCodeExchangeClient.ExchangeCodeWithPkce(code, codeVerifier, ct);
+                return await ExchangeCodeWithPkce(code, codeVerifier, ct);
             }
             catch (AuthenticationException)
             {
@@ -76,7 +78,14 @@ namespace Faryma.Composer.Api.Auth
         {
             try
             {
-                return await twitchTokenValidationClient.ValidateAccessToken(accessToken, ct);
+                TwitchAPI twitchApi = new();
+                twitchApi.Settings.ClientId = options.Value.ClientId;
+
+                // TODO: Разобраться с WaitAsync
+                ValidateAccessTokenResponse? validation = await twitchApi.Auth.ValidateAccessTokenAsync(accessToken).WaitAsync(ct)
+                    ?? throw new AuthenticationException("Пустой ответ валидации Twitch");
+
+                return new TwitchValidateData(validation.ClientId, validation.Login, validation.UserId);
             }
             catch (AuthenticationException)
             {
@@ -86,6 +95,12 @@ namespace Faryma.Composer.Api.Auth
             {
                 throw new AuthenticationException("Не удалось валидировать access token Twitch", exception);
             }
+        }
+
+        private sealed record TwitchTokenResponse
+        {
+            [JsonPropertyName("access_token")]
+            public required string AccessToken { get; init; }
         }
     }
 }

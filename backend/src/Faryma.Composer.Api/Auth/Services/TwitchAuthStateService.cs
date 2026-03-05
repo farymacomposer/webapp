@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -14,7 +14,7 @@ namespace Faryma.Composer.Api.Auth.Services
         /// <summary>
         /// Время жизни nonce браузера
         /// </summary>
-        public static readonly TimeSpan StateLifetime = TimeSpan.FromMinutes(5);
+        public static readonly TimeSpan StateLifetime = TimeSpan.FromMinutes(10);
 
         public (string State, string BrowserNonce) IssueState()
         {
