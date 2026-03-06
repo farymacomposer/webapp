@@ -11,14 +11,14 @@ namespace Faryma.Composer.Contracts.Api.Auth.Features.Login
         /// Имя пользователя
         /// </summary>
         [Required]
-        [StringLength(40, MinimumLength = 1, ErrorMessage = "Длина имени должна быть в пределах от 1 до 40 символов")]
+        [StringLength(40, MinimumLength = 1)]
         public required string UserName { get; init; }
 
         /// <summary>
         /// Пароль
         /// </summary>
         [Required]
-        [StringLength(40, MinimumLength = 12, ErrorMessage = "Длина пароля должна быть в пределах от 12 до 40 символов")]
+        [StringLength(40, MinimumLength = 12)]
         public required string Password { get; init; }
     }
 }

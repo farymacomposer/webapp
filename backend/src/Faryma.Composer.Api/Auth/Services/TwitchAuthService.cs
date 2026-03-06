@@ -18,17 +18,17 @@ namespace Faryma.Composer.Api.Auth.Services
             string state,
             string? browserNonce,
             DateTime now,
-            CancellationToken cancellationToken)
+            CancellationToken ct)
         {
             if (!twitchAuthStateService.TryConsumeState(state, browserNonce))
             {
                 throw new AuthenticationException("Некорректный OAuth state");
             }
 
-            ValidateAccessTokenResponse twitchToken = await twitchAuthClient.AuthenticateUser(code, codeVerifier, cancellationToken);
+            ValidateAccessTokenResponse twitchToken = await twitchAuthClient.AuthenticateUser(code, codeVerifier, ct);
 
             UserEntity? user = await userManager.Users
-                .FirstOrDefaultAsync(x => x.TwitchUserId == twitchToken.UserId, cancellationToken);
+                .FirstOrDefaultAsync(x => x.TwitchUserId == twitchToken.UserId, ct);
 
             if (user is null)
             {
@@ -44,17 +44,10 @@ namespace Faryma.Composer.Api.Auth.Services
                 IdentityResult createResult = await userManager.CreateAsync(user);
                 if (!createResult.Succeeded)
                 {
-                    UserEntity? existingUser = await userManager.Users
-                        .FirstOrDefaultAsync(x => x.TwitchUserId == twitchToken.UserId, cancellationToken);
+                    UserEntity? existingUser = await userManager.Users.FirstOrDefaultAsync(x => x.TwitchUserId == twitchToken.UserId, ct)
+                        ?? throw new InvalidOperationException($"Не удалось создать пользователя Twitch: {string.Join("; ", createResult.Errors.Select(x => x.Description))}");
 
-                    if (existingUser is not null)
-                    {
-                        user = existingUser;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"Не удалось создать пользователя Twitch: {string.Join("; ", createResult.Errors.Select(x => x.Description))}");
-                    }
+                    user = existingUser;
                 }
             }
             else if (!string.Equals(user.TwitchLogin, twitchToken.Login, StringComparison.Ordinal))
@@ -76,7 +69,7 @@ namespace Faryma.Composer.Api.Auth.Services
                 }
             }
 
-            return await authTokenService.IssueForUser(user, now, cancellationToken);
+            return await authTokenService.IssueForUser(user, now, ct);
         }
     }
 }

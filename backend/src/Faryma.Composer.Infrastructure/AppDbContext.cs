@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -100,24 +101,24 @@ namespace Faryma.Composer.Infrastructure
             builder.Entity<IdentityRole<Guid>>().HasData(
                 new IdentityRole<Guid>
                 {
-                    Id = Guid.Parse("9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD"),
-                    Name = "Composer",
-                    NormalizedName = "COMPOSER",
-                    ConcurrencyStamp = "9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD"
+                    Id = Guid.Parse("910C6755-4833-4C62-8DF7-4241A159A8D2"),
+                    Name = AppRoles.User,
+                    NormalizedName = AppRoles.User.ToUpper(),
+                    ConcurrencyStamp = "910C6755-4833-4C62-8DF7-4241A159A8D2"
                 },
                 new IdentityRole<Guid>
                 {
                     Id = Guid.Parse("AC0B9E85-A06F-4655-822B-9C125D8D7BB4"),
-                    Name = "Moderator",
-                    NormalizedName = "MODERATOR",
+                    Name = AppRoles.Moderator,
+                    NormalizedName = AppRoles.Moderator.ToUpper(),
                     ConcurrencyStamp = "AC0B9E85-A06F-4655-822B-9C125D8D7BB4"
                 },
                 new IdentityRole<Guid>
                 {
-                    Id = Guid.Parse("910C6755-4833-4C62-8DF7-4241A159A8D2"),
-                    Name = "User",
-                    NormalizedName = "USER",
-                    ConcurrencyStamp = "910C6755-4833-4C62-8DF7-4241A159A8D2"
+                    Id = Guid.Parse("9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD"),
+                    Name = AppRoles.Composer,
+                    NormalizedName = AppRoles.Composer.ToUpper(),
+                    ConcurrencyStamp = "9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD"
                 }
             );
 
