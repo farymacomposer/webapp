@@ -1,7 +1,5 @@
 ﻿using System.Security.Authentication;
 using System.Text.Json.Serialization;
-using Faryma.Composer.Contracts.Api.Auth.Contracts;
-using Faryma.Composer.Contracts.Api.Auth.Models;
 using Faryma.Composer.Contracts.Api.Auth.Options;
 using Microsoft.Extensions.Options;
 using TwitchLib.Api;
@@ -13,22 +11,22 @@ namespace Faryma.Composer.Api.Auth
     {
         private const string _tokenEndpoint = "https://id.twitch.tv/oauth2/token";
 
-        public async Task<TwitchUserData> AuthenticateUser(string code, string codeVerifier, CancellationToken ct)
+        public async Task<ValidateAccessTokenResponse> AuthenticateUser(string code, string codeVerifier, CancellationToken ct)
         {
             string accessToken = await ExchangeCode(code, codeVerifier, ct);
-            TwitchValidateData validation = await ValidateAccessToken(accessToken, ct);
+            ValidateAccessTokenResponse result = await ValidateAccessToken(accessToken, ct);
 
-            if (!string.Equals(validation.ClientId, options.Value.ClientId, StringComparison.Ordinal))
+            if (!string.Equals(result.ClientId, options.Value.ClientId, StringComparison.Ordinal))
             {
                 throw new AuthenticationException("Токен Twitch выпущен не для текущего приложения");
             }
 
-            if (string.IsNullOrWhiteSpace(validation.UserId) || string.IsNullOrWhiteSpace(validation.Login))
+            if (string.IsNullOrWhiteSpace(result.UserId) || string.IsNullOrWhiteSpace(result.Login))
             {
                 throw new AuthenticationException("Twitch не вернул идентификатор пользователя");
             }
 
-            return new TwitchUserData(validation.UserId, validation.Login);
+            return result;
         }
 
         private async Task<string> ExchangeCode(string code, string codeVerifier, CancellationToken ct)
@@ -50,7 +48,7 @@ namespace Faryma.Composer.Api.Auth
             }
 
             TwitchTokenResponse? token = await response.Content.ReadFromJsonAsync<TwitchTokenResponse>(ct);
-            if (token is null || string.IsNullOrWhiteSpace(token.AccessToken))
+            if (string.IsNullOrWhiteSpace(token?.AccessToken))
             {
                 throw new AuthenticationException("Twitch не вернул access token");
             }
@@ -58,16 +56,16 @@ namespace Faryma.Composer.Api.Auth
             return token.AccessToken;
         }
 
-        private async Task<TwitchValidateData> ValidateAccessToken(string accessToken, CancellationToken ct)
+        private async Task<ValidateAccessTokenResponse> ValidateAccessToken(string accessToken, CancellationToken ct)
         {
             TwitchAPI twitchApi = new();
             twitchApi.Settings.ClientId = options.Value.ClientId;
 
             // TODO: Разобраться с WaitAsync
-            ValidateAccessTokenResponse? validation = await twitchApi.Auth.ValidateAccessTokenAsync(accessToken).WaitAsync(ct)
+            ValidateAccessTokenResponse? result = await twitchApi.Auth.ValidateAccessTokenAsync(accessToken).WaitAsync(ct)
                 ?? throw new AuthenticationException("Пустой ответ валидации Twitch");
 
-            return new TwitchValidateData(validation.ClientId, validation.Login, validation.UserId);
+            return result;
         }
 
         private sealed record TwitchTokenResponse

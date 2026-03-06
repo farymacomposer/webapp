@@ -5,12 +5,16 @@ using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
 namespace Faryma.Composer.Application.Features.ComposerStream
 {
-    public sealed class ComposerStreamService(UnitOfWork uow, OrderQueueService orderQueueService)
+    public sealed class ComposerStreamService(
+        UnitOfWork uow,
+        UserManager<UserEntity> userManager,
+        OrderQueueService orderQueueService)
     {
         public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct) => uow.ComposerStreamQueries.Find(dateFrom, dateTo, ct);
         public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct) => uow.ComposerStreamQueries.FindLiveAndPlanned(ct);
@@ -19,7 +23,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
         {
             try
             {
-                UserEntity createdByUser = await uow.UserStore.FindById(command.CreatedByUserId, ct)
+                UserEntity createdByUser = await userManager.Users.FirstOrDefaultAsync(x => x.Id == command.CreatedByUserId, ct)
                     ?? throw new ComposerStreamException($"Пользователь с id: {command.CreatedByUserId} не найден");
 
                 ComposerStreamEntity stream = uow.ComposerStreamStore.Create(command.EventDate, command.Type, createdByUser);

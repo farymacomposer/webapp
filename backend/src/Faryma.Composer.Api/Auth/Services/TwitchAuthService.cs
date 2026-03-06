@@ -1,8 +1,8 @@
 ﻿using System.Security.Authentication;
-using Faryma.Composer.Contracts.Api.Auth.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using TwitchLib.Api.Auth;
 
 namespace Faryma.Composer.Api.Auth.Services
 {
@@ -25,27 +25,27 @@ namespace Faryma.Composer.Api.Auth.Services
                 throw new AuthenticationException("Некорректный OAuth state");
             }
 
-            TwitchUserData twitchUser = await twitchAuthClient.AuthenticateUser(code, codeVerifier, cancellationToken);
+            ValidateAccessTokenResponse twitchToken = await twitchAuthClient.AuthenticateUser(code, codeVerifier, cancellationToken);
 
             UserEntity? user = await userManager.Users
-                .FirstOrDefaultAsync(x => x.TwitchUserId == twitchUser.UserId, cancellationToken);
+                .FirstOrDefaultAsync(x => x.TwitchUserId == twitchToken.UserId, cancellationToken);
 
             if (user is null)
             {
                 user = new UserEntity
                 {
                     Id = Guid.NewGuid(),
-                    UserName = $"twitch_{twitchUser.UserId}",
+                    UserName = $"twitch_{twitchToken.UserId}",
                     CreatedAt = now,
-                    TwitchUserId = twitchUser.UserId,
-                    TwitchLogin = twitchUser.Login
+                    TwitchUserId = twitchToken.UserId,
+                    TwitchLogin = twitchToken.Login
                 };
 
                 IdentityResult createResult = await userManager.CreateAsync(user);
                 if (!createResult.Succeeded)
                 {
                     UserEntity? existingUser = await userManager.Users
-                        .FirstOrDefaultAsync(x => x.TwitchUserId == twitchUser.UserId, cancellationToken);
+                        .FirstOrDefaultAsync(x => x.TwitchUserId == twitchToken.UserId, cancellationToken);
 
                     if (existingUser is not null)
                     {
@@ -57,9 +57,9 @@ namespace Faryma.Composer.Api.Auth.Services
                     }
                 }
             }
-            else if (!string.Equals(user.TwitchLogin, twitchUser.Login, StringComparison.Ordinal))
+            else if (!string.Equals(user.TwitchLogin, twitchToken.Login, StringComparison.Ordinal))
             {
-                user.TwitchLogin = twitchUser.Login;
+                user.TwitchLogin = twitchToken.Login;
                 IdentityResult updateResult = await userManager.UpdateAsync(user);
                 if (!updateResult.Succeeded)
                 {

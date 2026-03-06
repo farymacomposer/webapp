@@ -30,8 +30,7 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
                 .AddScoped<ReviewStore>()
                 .AddScoped<ReviewOrderStore>()
                 .AddScoped<TransactionStore>()
-                .AddScoped<UserNicknameStore>()
-                .AddScoped<UserStore>();
+                .AddScoped<UserNicknameStore>();
 
             return services;
         }

@@ -8,6 +8,7 @@ using Faryma.Composer.Contracts.Api.Auth.Options;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -64,7 +65,7 @@ namespace Faryma.Composer.Api.Auth.Services
                 throw new AuthenticationException("Refresh token истек");
             }
 
-            UserEntity user = await uow.UserStore.FindById(stored.UserId, ct)
+            UserEntity user = await userManager.Users.FirstOrDefaultAsync(x => x.Id == stored.UserId, ct)
                 ?? throw new AuthenticationException("Пользователь не найден");
 
             string nextRefresh = GenerateRefreshToken();

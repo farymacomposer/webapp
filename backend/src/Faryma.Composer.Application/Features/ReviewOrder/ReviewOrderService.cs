@@ -9,11 +9,14 @@ using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Application.Features.ReviewOrder
 {
     public sealed class ReviewOrderService(
         UnitOfWork uow,
+        UserManager<UserEntity> userManager,
         UserNicknameService userNicknameService,
         AppSettingsService appSettingsService,
         OrderQueueService orderQueueService)
@@ -332,7 +335,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
         private async Task<UserEntity> GetUser(Guid userId, CancellationToken ct)
         {
-            return await uow.UserStore.FindById(userId, ct)
+            return await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId, ct)
                 ?? throw new ReviewOrderException("Пользователь не найден.");
         }
 
