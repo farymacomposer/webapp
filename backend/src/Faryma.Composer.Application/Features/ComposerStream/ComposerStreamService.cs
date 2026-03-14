@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.ComposerStream;
 using Faryma.Composer.Contracts.Application.Features.ComposerStream.Commands;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
@@ -14,7 +15,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
     public sealed class ComposerStreamService(
         UnitOfWork uow,
         UserManager<UserEntity> userManager,
-        OrderQueueService orderQueueService)
+        OrderQueueEventChannel orderQueueEventChannel)
     {
         public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct) => uow.ComposerStreamQueries.Find(dateFrom, dateTo, ct);
         public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct) => uow.ComposerStreamQueries.FindLiveAndPlanned(ct);
@@ -29,7 +30,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 ComposerStreamEntity stream = uow.ComposerStreamStore.Create(command.EventDate, command.Type, createdByUser);
                 await uow.SaveChanges(ct);
 
-                await orderQueueService.CreateStream(stream);
+                orderQueueEventChannel.Write(new StreamCreatedEvent(stream, OrderQueueUpdateType.OrderCreated));
 
                 return stream;
             }
@@ -66,7 +67,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.StartStream(stream);
+            orderQueueEventChannel.Write(new StreamCreatedEvent(stream, OrderQueueUpdateType.StreamStarted));
 
             return stream;
         }
@@ -96,7 +97,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.CompleteStream(stream);
+            orderQueueEventChannel.Write(new StreamCreatedEvent(stream, OrderQueueUpdateType.StreamCompleted));
 
             return stream;
         }
@@ -121,7 +122,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.CancelStream();
+            orderQueueEventChannel.Write(new StreamCanceledEvent());
 
             return stream;
         }

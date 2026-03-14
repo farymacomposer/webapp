@@ -15,6 +15,7 @@ namespace Faryma.Composer.Application.DependencyInjection
             services
                 .AddSingleton<AppSettingsService>()
                 .AddSingleton<OrderQueueService>()
+                .AddSingleton<OrderQueueEventChannel>()
 
                 .AddScoped<ComposerStreamService>()
                 .AddScoped<ReviewOrderService>()

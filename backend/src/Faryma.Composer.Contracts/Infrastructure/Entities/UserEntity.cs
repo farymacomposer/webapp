@@ -9,11 +9,6 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
     public sealed class UserEntity : IdentityUser<Guid>
     {
         /// <summary>
-        /// Имя пользователя
-        /// </summary>
-        public override required string UserName { get; set; }
-
-        /// <summary>
         /// Идентификатор пользователя в Twitch
         /// </summary>
         public string? TwitchUserId { get; set; }

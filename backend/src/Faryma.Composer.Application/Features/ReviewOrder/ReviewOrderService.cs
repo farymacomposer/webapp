@@ -19,7 +19,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         UserManager<UserEntity> userManager,
         UserNicknameService userNicknameService,
         AppSettingsService appSettingsService,
-        OrderQueueService orderQueueService)
+        OrderQueueService orderQueueService,
+        OrderQueueEventChannel orderQueueEventChannel)
     {
         public async Task<ReviewOrderEntity> CreateOutOfQueue(CreateOutOfQueueOrderCommand command, DateTime now, CancellationToken ct)
         {
@@ -43,7 +44,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCreated));
 
             return order;
         }
@@ -81,7 +82,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCreated));
 
             return order;
         }
@@ -106,7 +107,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCreated));
 
             return order;
         }
@@ -135,7 +136,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCreated));
 
             return order;
         }
@@ -167,7 +168,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderMovedUp);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderMovedUp));
 
             return payment;
         }
@@ -190,7 +191,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.TrackUrlAdded);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.TrackUrlAdded));
 
             return order;
         }
@@ -226,7 +227,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderTaken);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderTaken));
 
             return order;
         }
@@ -251,7 +252,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderCompleted);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCompleted));
 
             return order;
         }
@@ -273,7 +274,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderFrozen);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderFrozen));
 
             return order;
         }
@@ -295,7 +296,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.UpdateOrder(order, OrderQueueUpdateType.OrderUnfrozen);
+            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderUnfrozen));
 
             return order;
         }
@@ -322,7 +323,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            await orderQueueService.CancelOrder(order, previousStatus);
+            orderQueueEventChannel.Write(new OrderCanceledEvent(order, previousStatus));
 
             return order;
         }

@@ -112,7 +112,7 @@ namespace Faryma.Composer.Api.Auth.Services
             List<Claim> claims =
             [
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new(ClaimTypes.Name, user.UserName),
+                new(ClaimTypes.Name, user.TwitchLogin ?? user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             ];
 
