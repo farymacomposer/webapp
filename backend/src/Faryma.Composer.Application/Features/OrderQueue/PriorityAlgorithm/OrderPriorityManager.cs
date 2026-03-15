@@ -99,16 +99,16 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 CategoryState.Initial when _donationCategory?.HasOrders == true => (CategoryState.Donation, true),
                 CategoryState.Initial when _debtCategories.HasOrders => (CategoryState.Debt, true),
 
-                CategoryState.OutOfQueue when _outOfQueueCategory.HasOrderFromNewNickname(_lastIssuedNickname) => (CategoryState.OutOfQueue, false),
-                CategoryState.OutOfQueue when _donationCategory?.HasOrderFromNewNickname(_lastIssuedNickname) == true => (CategoryState.Donation, false),
+                CategoryState.OutOfQueue when _outOfQueueCategory.HasOrderSkippingNicknameAndCategoryLast(_lastIssuedNickname) => (CategoryState.OutOfQueue, false),
+                CategoryState.OutOfQueue when _donationCategory?.HasOrderSkippingNicknameAndCategoryLast(_lastIssuedNickname) == true => (CategoryState.Donation, false),
                 CategoryState.OutOfQueue when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (CategoryState.Debt, false),
 
                 CategoryState.Donation when _outOfQueueCategory.HasOrders => (CategoryState.OutOfQueue, true),
                 CategoryState.Donation when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (CategoryState.Debt, false),
-                CategoryState.Donation when _donationCategory?.HasOrderFromNewNickname(_lastIssuedNickname) == true => (CategoryState.Donation, false),
+                CategoryState.Donation when _donationCategory?.HasOrderSkippingNicknameAndCategoryLast(_lastIssuedNickname) == true => (CategoryState.Donation, false),
 
                 CategoryState.Debt when _outOfQueueCategory.HasOrders => (CategoryState.OutOfQueue, true),
-                CategoryState.Debt when _donationCategory?.HasOrderFromOtherNickname(_lastIssuedNickname) == true => (CategoryState.Donation, false),
+                CategoryState.Debt when _donationCategory?.HasOrderSkippingNickname(_lastIssuedNickname) == true => (CategoryState.Donation, false),
                 CategoryState.Debt when _debtCategories.HasOrderFromNewNickname(_lastIssuedNickname) => (CategoryState.Debt, false),
 
                 not CategoryState.Completed when _outOfQueueCategory.HasOrders => (CategoryState.OutOfQueue, true),

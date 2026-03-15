@@ -48,7 +48,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         /// <summary>
         /// В категориях существует заказ с другим никнеймом и никнейм не совпадает с последним выданным никнеймом из категорий
         /// </summary>
-        public bool HasOrderFromNewNickname(string? nicknameToSkip) => _debtCategoriesByStreamDate.Any(x => x.Category.HasOrderFromNewNickname(nicknameToSkip));
+        public bool HasOrderFromNewNickname(string? nicknameToSkip) => _debtCategoriesByStreamDate.Any(x => x.Category.HasOrderSkippingNicknameAndCategoryLast(nicknameToSkip));
 
         /// <summary>
         /// Последовательно перебирает долговые категории и извлекает заказ из категории, в которой есть заказы
@@ -82,7 +82,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 int index = _roundRobinCounter % _debtCategoriesByStreamDate.Count;
 
                 (DateOnly streamDate, OrderCategory category) = _debtCategoriesByStreamDate[index];
-                if (category.HasOrderFromOtherNickname(nicknameToSkip))
+                if (category.HasOrderSkippingNickname(nicknameToSkip))
                 {
                     ReviewOrderEntity order = category.Dequeue(nicknameToSkip);
                     _roundRobinCounter++;

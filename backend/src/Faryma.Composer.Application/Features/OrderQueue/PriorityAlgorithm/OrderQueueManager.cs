@@ -35,11 +35,13 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         /// </summary>
         public void UpdateAllPositions()
         {
+            // Порядок обновления важен: сначала рассчитываются активные позиции,
+            // затем они переопределяются для специальных состояний
             UpdateActive();
-            UpdateInProgress();
-            UpdateCompleted();
             UpdateScheduled();
             UpdateFrozen();
+            UpdateInProgress();
+            UpdateCompleted();
             UpdateRemoved();
         }
 
@@ -119,34 +121,17 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         }
 
         /// <summary>
-        /// Возвращает все позиции заказов
+        /// Очищает позиции удаленных заказов
         /// </summary>
-        public OrderPosition[] GetAllOrderPositions()
+        public void ClearRemovedOrderPositions()
         {
-            return OrderPositionsById
-                .Select(x => x.Value.Clone())
-                .ToArray();
-        }
-
-        /// <summary>
-        /// Возвращает обновленные позиции заказов
-        /// </summary>
-        public OrderPosition[] GetUpdatedOrderPositions()
-        {
-            OrderPosition[] result = OrderPositionsById
-                .Select(x => x.Value)
-                .Where(x => x.IsOrderUpdated || x.PositionHistory.IsPositionChanged)
-                .ToArray();
-
-            foreach (OrderPosition position in result)
+            foreach (KeyValuePair<long, OrderPosition> kvp in OrderPositionsById)
             {
-                if (position.PositionHistory.Current.ActivityStatus == OrderActivityStatus.Removed)
+                if (kvp.Value.PositionHistory.Current.ActivityStatus == OrderActivityStatus.Removed)
                 {
-                    OrderPositionsById.Remove(position.Order.Id);
+                    OrderPositionsById.Remove(kvp.Value.Order.Id);
                 }
             }
-
-            return result;
         }
 
         /// <summary>
@@ -187,8 +172,13 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         /// </summary>
         private void UpdateInProgress()
         {
+            if (OrderPositionsById.Count(x => x.Value.Order.Status == ReviewOrderStatus.InProgress) > 1)
+            {
+                throw new InvalidOperationException("Обнаружено более одного заказа со статусом `InProgress`");
+            }
+
             KeyValuePair<long, OrderPosition> kvp = OrderPositionsById
-                .SingleOrDefault(x => x.Value.Order.Status == ReviewOrderStatus.InProgress);
+                .FirstOrDefault(x => x.Value.Order.Status == ReviewOrderStatus.InProgress);
 
             if (kvp.Value is not null)
             {

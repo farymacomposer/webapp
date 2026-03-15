@@ -26,13 +26,13 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         /// <summary>
         /// В категории существует заказ с другим никнеймом
         /// </summary>
-        public bool HasOrderFromOtherNickname(string? nicknameToSkip) =>
+        public bool HasOrderSkippingNickname(string? nicknameToSkip) =>
             orders.Any(x => x.MainNormalizedNickname != nicknameToSkip);
 
         /// <summary>
         /// В категории существует заказ с другим никнеймом и никнейм не совпадает с последним выданным никнеймом из данной категории
         /// </summary>
-        public bool HasOrderFromNewNickname(string? nicknameToSkip) =>
+        public bool HasOrderSkippingNicknameAndCategoryLast(string? nicknameToSkip) =>
             orders.Any(x => x.MainNormalizedNickname != nicknameToSkip && x.MainNormalizedNickname != _lastIssuedNickname);
 
         /// <summary>
@@ -44,9 +44,9 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
             ReviewOrderEntity? fallback = null;
             ReviewOrderEntity first = orders[0];
 
-            // bestMatch - когда в категории есть никнейм, который не совпадает с последним прослушанным `nicknameToSkip` и с последним из данной категории `_lastIssuedNickname`
-            // fallback - когда в категории есть никнейм, который не совпадает с последним прослушанным `nicknameToSkip`
-            // first - если в категории остались только заказы, совпадающие с `nicknameToSkip`
+            // bestMatch - заказ с никнеймом, отличным и от глобально последнего выданного никнейма, и от последнего никнейма, выданного внутри этой категории
+            // fallback - заказ с никнеймом, отличным от глобально последнего выданного никнейма
+            // first - первый заказ в категории, если альтернатив по никнейму уже нет
             foreach (ReviewOrderEntity order in orders)
             {
                 if (order.MainNormalizedNickname != nicknameToSkip)

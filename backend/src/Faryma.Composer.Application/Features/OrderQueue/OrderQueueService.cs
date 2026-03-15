@@ -72,14 +72,17 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             }
 
             _syncVersion++;
-            OrderPosition[] positions = _queueManager.GetAllOrderPositions();
 
             await notificationService.NotifyQueueUpdated(new OrderQueueSnapshot
             {
                 SyncVersion = _syncVersion,
                 OrderQueueUpdateType = evt.UpdateType,
-                Positions = positions,
+                Positions = _queueManager.OrderPositionsById
+                    .Select(x => x.Value)
+                    .ToArray(),
             });
+
+            _queueManager.ClearRemovedOrderPositions();
         });
 
         public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrderEntity order) =>
@@ -89,7 +92,9 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         {
             SyncVersion = _syncVersion,
             OrderQueueUpdateType = OrderQueueUpdateType.Unspecified,
-            Positions = _queueManager.GetAllOrderPositions(),
+            Positions = _queueManager.OrderPositionsById
+                .Select(x => x.Value.Clone())
+                .ToArray(),
         });
 
         private static async Task<DateOnly> GetNearestStreamDate(AppDbContext context)
