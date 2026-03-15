@@ -157,7 +157,7 @@ namespace Faryma.Composer.Desktop.Services
                 OrderActivityStatus.Completed => CompletedOrders,
                 OrderActivityStatus.Scheduled => ScheduledOrders,
                 OrderActivityStatus.Frozen => FrozenOrders,
-                _ => throw new InvalidOperationException($"Статус активности заказа '{status}' не поддерживается"),
+                _ => throw new NotSupportedException($"Неподдерживаемый статус активности заказа '{status}'"),
             };
         }
     }

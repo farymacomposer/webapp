@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
@@ -42,7 +41,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 OrderCategoryType.OutOfQueue => CategoryState.OutOfQueue,
                 OrderCategoryType.Donation => CategoryState.Donation,
                 OrderCategoryType.Debt => CategoryState.Debt,
-                _ => throw new OrderQueueException($"Тип категории заказа '{categoryType}' не поддерживается")
+                _ => throw new NotSupportedException($"Неподдерживаемый тип категории заказа '{categoryType}'")
             };
         }
 

@@ -28,7 +28,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             ReviewOrderQueries reviewOrderQueries = new(context);
             ComposerStreamQueries composerStreamQueries = new(context);
 
-            ComposerStreamEntity? nearestStream = await composerStreamQueries.FindNearest(CancellationToken.None);
+            DateOnly nearestStreamDate = await GetNearestStreamDate(context);
             ReviewOrderEntity? lastTakenOrder = await reviewOrderQueries.FindLastTaken(CancellationToken.None);
             ReviewOrderEntity? lastTakenDebt = await reviewOrderQueries.FindLastTakenDebt(CancellationToken.None);
             ReviewOrderEntity? lastTakenOutOfQueue = await reviewOrderQueries.FindLastTakenOutOfQueue(CancellationToken.None);
@@ -37,11 +37,13 @@ namespace Faryma.Composer.Application.Features.OrderQueue
 
             _queueManager = new OrderQueueManager
             {
-                NearestStreamDate = nearestStream?.EventDate ?? DateOnly.MinValue,
+                NearestStreamDate = nearestStreamDate,
                 OrderPositionsById = orders.ToDictionary(k => k.Id, OrderPosition.Create),
                 PriorityManagerState = new OrderPriorityManagerState
                 {
-                    LastPriorityManagerState = (lastTakenOrder is null) ? CategoryState.Initial : OrderPriorityManagerState.MapCategoryState(lastTakenOrder.CategoryType),
+                    LastPriorityManagerState = (lastTakenOrder is null)
+                        ? CategoryState.Initial
+                        : OrderPriorityManagerState.MapCategoryState(lastTakenOrder.CategoryType),
                     LastIssuedNickname = lastTakenOrder?.MainNormalizedNickname,
                     LastDebtCategoryDate = lastTakenDebt?.CreationStream.EventDate,
                     LastOutOfQueueNickname = lastTakenOutOfQueue?.MainNormalizedNickname,
@@ -55,6 +57,31 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             }
         }
 
+        public Task HandleEvent(OrderQueueEvent evt) => _locker.Lock(async () =>
+        {
+            switch (evt)
+            {
+                case ReviewOrderChangedEvent orderChanged:
+                    await HandleOrderChanged(orderChanged);
+                    break;
+                case ComposerStreamChangedEvent streamChanged:
+                    await HandleStreamChanged(streamChanged);
+                    break;
+                default:
+                    throw new NotSupportedException($"Неподдерживаемый тип события: {evt.GetType().Name}");
+            }
+
+            _syncVersion++;
+            OrderPosition[] positions = _queueManager.GetAllOrderPositions();
+
+            await notificationService.NotifyQueueUpdated(new OrderQueueSnapshot
+            {
+                SyncVersion = _syncVersion,
+                OrderQueueUpdateType = evt.UpdateType,
+                Positions = positions,
+            });
+        });
+
         public Task<OrderQueuePosition> GetCurrentQueuePosition(ReviewOrderEntity order) =>
             _locker.Lock(() => _queueManager.GetCurrentQueuePosition(order).Clone());
 
@@ -62,30 +89,20 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         {
             SyncVersion = _syncVersion,
             OrderQueueUpdateType = OrderQueueUpdateType.Unspecified,
-            Positions = _queueManager.OrderPositionsById
-                .Select(x => x.Value.Clone())
-                .ToArray(),
+            Positions = _queueManager.GetAllOrderPositions(),
         });
 
-        public Task UpdateOrder(ReviewOrderEntity order, OrderQueueUpdateType updateType) => _locker.Lock(async () =>
+        private static async Task<DateOnly> GetNearestStreamDate(AppDbContext context)
         {
-            _syncVersion++;
+            ComposerStreamQueries composerStreamQueries = new(context);
+            ComposerStreamEntity? nearestStream = await composerStreamQueries.FindNearest(CancellationToken.None);
 
-            OrderQueueSnapshot snapshot = new()
-            {
-                SyncVersion = _syncVersion,
-                OrderQueueUpdateType = updateType,
-                Positions = _queueManager.UpdateOrder(order, updateType),
-            };
+            return nearestStream?.EventDate ?? DateOnly.MinValue;
+        }
 
-            await notificationService.NotifyQueueUpdated(snapshot);
-        });
-
-        public Task CancelOrder(ReviewOrderEntity order, ReviewOrderStatus previousStatus) => _locker.Lock(async () =>
+        private async Task HandleOrderChanged(ReviewOrderChangedEvent evt)
         {
-            _syncVersion++;
-
-            if (previousStatus == ReviewOrderStatus.InProgress)
+            if (evt.UpdateType == OrderQueueUpdateType.OrderCanceled && evt.PreviousStatus == ReviewOrderStatus.InProgress)
             {
                 await using AppDbContext context = await contextFactory.CreateDbContextAsync();
                 ReviewOrderQueries reviewOrderQueries = new(context);
@@ -96,91 +113,47 @@ namespace Faryma.Composer.Application.Features.OrderQueue
                 }
             }
 
-            OrderQueueSnapshot snapshot = new()
-            {
-                SyncVersion = _syncVersion,
-                OrderQueueUpdateType = OrderQueueUpdateType.OrderCanceled,
-                Positions = _queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCanceled),
-            };
+            _queueManager.UpdateOrder(evt.Order, evt.UpdateType);
+        }
 
-            await notificationService.NotifyQueueUpdated(snapshot);
-        });
-
-        public Task CreateStream(ComposerStreamEntity stream) => _locker.Lock(async () =>
+        private async Task HandleStreamChanged(ComposerStreamChangedEvent evt)
         {
-            _syncVersion++;
-
-            _queueManager.NearestStreamDate = stream.EventDate;
-
-            OrderQueueSnapshot snapshot = new()
-            {
-                SyncVersion = _syncVersion,
-                OrderQueueUpdateType = OrderQueueUpdateType.StreamCreated,
-                Positions = _queueManager.UpdateOrders(),
-            };
-
-            await notificationService.NotifyQueueUpdated(snapshot);
-        });
-
-        public Task StartStream(ComposerStreamEntity stream) => _locker.Lock(async () =>
-        {
-            _syncVersion++;
-
-            _queueManager.NearestStreamDate = stream.EventDate;
-
-            await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ReviewOrderQueries reviewOrderQueries = new(context);
-            List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToStartStream(stream.Id, CancellationToken.None);
-
-            OrderQueueSnapshot snapshot = new()
-            {
-                SyncVersion = _syncVersion,
-                OrderQueueUpdateType = OrderQueueUpdateType.StreamStarted,
-                Positions = _queueManager.UpdateOrders(orders),
-            };
-
-            await notificationService.NotifyQueueUpdated(snapshot);
-        });
-
-        public Task CompleteStream(ComposerStreamEntity stream) => _locker.Lock(async () =>
-        {
-            _syncVersion++;
-
             await using AppDbContext context = await contextFactory.CreateDbContextAsync();
             ComposerStreamQueries composerStreamQueries = new(context);
-            ComposerStreamEntity? nearestStream = await composerStreamQueries.FindNearest(CancellationToken.None);
-            _queueManager.NearestStreamDate = nearestStream?.EventDate ?? DateOnly.MinValue;
-
             ReviewOrderQueries reviewOrderQueries = new(context);
-            List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToCompleteStream(stream.Id, CancellationToken.None);
+            ComposerStreamEntity stream = evt.Stream;
 
-            OrderQueueSnapshot snapshot = new()
+            switch (evt.UpdateType)
             {
-                SyncVersion = _syncVersion,
-                OrderQueueUpdateType = OrderQueueUpdateType.StreamCompleted,
-                Positions = _queueManager.UpdateOrders(orders),
-            };
-
-            await notificationService.NotifyQueueUpdated(snapshot);
-        });
-
-        public Task CancelStream() => _locker.Lock(async () =>
-        {
-            _syncVersion++;
-
-            await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ComposerStreamQueries composerStreamQueries = new(context);
-            ComposerStreamEntity? nearestStream = await composerStreamQueries.FindNearest(CancellationToken.None);
-            _queueManager.NearestStreamDate = nearestStream?.EventDate ?? DateOnly.MinValue;
-
-            OrderQueueSnapshot snapshot = new()
-            {
-                SyncVersion = _syncVersion,
-                OrderQueueUpdateType = OrderQueueUpdateType.StreamCanceled,
-                Positions = _queueManager.UpdateOrders(),
-            };
-
-            await notificationService.NotifyQueueUpdated(snapshot);
-        });
+                case OrderQueueUpdateType.StreamCreated:
+                {
+                    _queueManager.NearestStreamDate = stream.EventDate;
+                    _queueManager.UpdateOrders();
+                    break;
+                }
+                case OrderQueueUpdateType.StreamStarted:
+                {
+                    List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToStartStream(stream.Id, CancellationToken.None);
+                    _queueManager.NearestStreamDate = stream.EventDate;
+                    _queueManager.UpdateOrders(orders);
+                    break;
+                }
+                case OrderQueueUpdateType.StreamCompleted:
+                {
+                    List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToCompleteStream(stream.Id, CancellationToken.None);
+                    _queueManager.NearestStreamDate = await GetNearestStreamDate(context);
+                    _queueManager.UpdateOrders(orders);
+                    break;
+                }
+                case OrderQueueUpdateType.StreamCanceled:
+                {
+                    _queueManager.NearestStreamDate = await GetNearestStreamDate(context);
+                    _queueManager.UpdateOrders();
+                    break;
+                }
+                default:
+                    throw new NotSupportedException($"Неподдерживаемый тип обновления стрима: {evt.UpdateType}");
+            }
+        }
     }
 }

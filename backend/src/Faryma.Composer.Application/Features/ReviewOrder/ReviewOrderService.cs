@@ -44,7 +44,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCreated));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified));
 
             return order;
         }
@@ -82,7 +82,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCreated));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified));
 
             return order;
         }
@@ -107,7 +107,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCreated));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified));
 
             return order;
         }
@@ -136,7 +136,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCreated));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified));
 
             return order;
         }
@@ -145,6 +145,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         {
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
             ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderStatus previousStatus = order.Status;
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
             {
@@ -168,7 +169,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderMovedUp));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderMovedUp, previousStatus));
 
             return payment;
         }
@@ -176,6 +177,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         public async Task<ReviewOrderEntity> AddTrackUrl(AddTrackUrlCommand command, CancellationToken ct)
         {
             ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderStatus previousStatus = order.Status;
 
             if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
             {
@@ -191,7 +193,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.TrackUrlAdded));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.TrackUrlAdded, previousStatus));
 
             return order;
         }
@@ -199,6 +201,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         public async Task<ReviewOrderEntity> TakeInProgress(long reviewOrderId, DateTime now, CancellationToken ct)
         {
             ReviewOrderEntity order = await GetOrder(reviewOrderId, ct);
+            ReviewOrderStatus previousStatus = order.Status;
+
             if (order.Status == ReviewOrderStatus.InProgress)
             {
                 return order;
@@ -227,7 +231,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderTaken));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderTaken, previousStatus));
 
             return order;
         }
@@ -235,6 +239,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         public async Task<ReviewOrderEntity> Complete(CompleteCommand command, DateTime now, CancellationToken ct)
         {
             ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderStatus previousStatus = order.Status;
+
             if (order.Status == ReviewOrderStatus.Completed)
             {
                 return order;
@@ -252,7 +258,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderCompleted));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderCompleted, previousStatus));
 
             return order;
         }
@@ -260,6 +266,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         public async Task<ReviewOrderEntity> Freeze(long reviewOrderId, CancellationToken ct)
         {
             ReviewOrderEntity order = await GetOrder(reviewOrderId, ct);
+            ReviewOrderStatus previousStatus = order.Status;
+
             if (order.IsFrozen)
             {
                 return order;
@@ -274,7 +282,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderFrozen));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderFrozen, previousStatus));
 
             return order;
         }
@@ -282,6 +290,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         public async Task<ReviewOrderEntity> Unfreeze(long reviewOrderId, CancellationToken ct)
         {
             ReviewOrderEntity order = await GetOrder(reviewOrderId, ct);
+            ReviewOrderStatus previousStatus = order.Status;
+
             if (!order.IsFrozen)
             {
                 return order;
@@ -296,7 +306,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderUpdatedEvent(order, OrderQueueUpdateType.OrderUnfrozen));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderUnfrozen, previousStatus));
 
             return order;
         }
@@ -304,6 +314,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         public async Task<ReviewOrderEntity> Cancel(long reviewOrderId, CancellationToken ct)
         {
             ReviewOrderEntity order = await GetOrder(reviewOrderId, ct);
+            ReviewOrderStatus previousStatus = order.Status;
+
             if (order.Status == ReviewOrderStatus.Canceled)
             {
                 return order;
@@ -314,8 +326,6 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
                 throw new ReviewOrderException("Невозможно отменить заказ", order);
             }
 
-            ReviewOrderStatus previousStatus = order.Status;
-
             order.CategoryType = OrderCategoryType.Unspecified;
             order.ProcessingStream = null;
             order.Status = ReviewOrderStatus.Canceled;
@@ -323,7 +333,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new OrderCanceledEvent(order, previousStatus));
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderCanceled, previousStatus));
 
             return order;
         }

@@ -110,7 +110,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
                 ReviewOrderType.Donation => Transactions.Where(x => x.Kind == TransactionKind.Payment).Sum(x => x.Debit),
                 ReviewOrderType.Free => NominalAmount + Transactions.Where(x => x.Kind == TransactionKind.Payment).Sum(x => x.Debit),
                 ReviewOrderType.Charity => 0,
-                _ => throw new InvalidOperationException(),
+                _ => throw new NotSupportedException("Неподдерживаемый тип заказа"),
             };
 
             return result;

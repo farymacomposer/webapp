@@ -78,7 +78,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
                 }, now, ct),
-                _ => throw new InvalidOperationException(),
+                _ => throw new NotSupportedException("Неподдерживаемый тип заказа"),
             };
 
             return Ok(new CreateReviewOrderResponse

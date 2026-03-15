@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
@@ -47,18 +46,16 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         /// <summary>
         /// Обновляет заказы
         /// </summary>
-        public OrderPosition[] UpdateOrders()
+        public void UpdateOrders()
         {
             SaveCurrentPositionsToPrevious();
             UpdateAllPositions();
-
-            return GetUpdatedOrderPositions();
         }
 
         /// <summary>
         /// Обновляет заказы
         /// </summary>
-        public OrderPosition[] UpdateOrders(IEnumerable<ReviewOrderEntity> orders)
+        public void UpdateOrders(IEnumerable<ReviewOrderEntity> orders)
         {
             SaveCurrentPositionsToPrevious();
 
@@ -68,14 +65,12 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
             }
 
             UpdateAllPositions();
-
-            return GetUpdatedOrderPositions();
         }
 
         /// <summary>
         /// Обновляет заказ
         /// </summary>
-        public OrderPosition[] UpdateOrder(ReviewOrderEntity order, OrderQueueUpdateType updateType)
+        public void UpdateOrder(ReviewOrderEntity order, OrderQueueUpdateType updateType)
         {
             switch (updateType)
             {
@@ -104,7 +99,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                     break;
 
                 default:
-                    throw new OrderQueueException($"Тип обновления очереди '{updateType}' не поддерживается");
+                    throw new NotSupportedException($"Неподдерживаемый тип обновления очереди '{updateType}'");
             }
 
             SaveCurrentPositionsToPrevious();
@@ -121,8 +116,37 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
             }
 
             UpdateAllPositions();
+        }
 
-            return GetUpdatedOrderPositions();
+        /// <summary>
+        /// Возвращает все позиции заказов
+        /// </summary>
+        public OrderPosition[] GetAllOrderPositions()
+        {
+            return OrderPositionsById
+                .Select(x => x.Value.Clone())
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Возвращает обновленные позиции заказов
+        /// </summary>
+        public OrderPosition[] GetUpdatedOrderPositions()
+        {
+            OrderPosition[] result = OrderPositionsById
+                .Select(x => x.Value)
+                .Where(x => x.IsOrderUpdated || x.PositionHistory.IsPositionChanged)
+                .ToArray();
+
+            foreach (OrderPosition position in result)
+            {
+                if (position.PositionHistory.Current.ActivityStatus == OrderActivityStatus.Removed)
+                {
+                    OrderPositionsById.Remove(position.Order.Id);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -239,27 +263,6 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 OrderPositionsById[order.Id].UpdateCurrentPosition(index, activityStatus);
                 index++;
             }
-        }
-
-        /// <summary>
-        /// Возвращает обновленные позиции заказов
-        /// </summary>
-        private OrderPosition[] GetUpdatedOrderPositions()
-        {
-            OrderPosition[] result = OrderPositionsById
-                .Select(x => x.Value)
-                .Where(x => x.IsOrderUpdated || x.PositionHistory.IsPositionChanged)
-                .ToArray();
-
-            foreach (OrderPosition position in result)
-            {
-                if (position.PositionHistory.Current.ActivityStatus == OrderActivityStatus.Removed)
-                {
-                    OrderPositionsById.Remove(position.Order.Id);
-                }
-            }
-
-            return result;
         }
     }
 }

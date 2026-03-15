@@ -30,20 +30,9 @@ namespace Faryma.Composer.Application.Features.OrderQueue
     }
 
     /// <summary>
-    /// Заказ был обновлен
+    /// Заказ был изменен
     /// </summary>
-    public sealed class OrderUpdatedEvent(ReviewOrderEntity order, OrderQueueUpdateType updateType) : OrderQueueEvent(updateType)
-    {
-        /// <summary>
-        /// Заказ разбора трека
-        /// </summary>
-        public ReviewOrderEntity Order { get; } = order;
-    }
-
-    /// <summary>
-    /// Заказ был отменен
-    /// </summary>
-    public sealed class OrderCanceledEvent(ReviewOrderEntity order, ReviewOrderStatus previousStatus) : OrderQueueEvent(OrderQueueUpdateType.OrderCanceled)
+    public sealed class ReviewOrderChangedEvent(ReviewOrderEntity order, OrderQueueUpdateType updateType, ReviewOrderStatus previousStatus) : OrderQueueEvent(updateType)
     {
         /// <summary>
         /// Заказ разбора трека
@@ -51,26 +40,19 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         public ReviewOrderEntity Order { get; } = order;
 
         /// <summary>
-        /// Статус заказа перед отменой
+        /// Предыдущий статус заказа
         /// </summary>
         public ReviewOrderStatus PreviousStatus { get; } = previousStatus;
     }
 
     /// <summary>
-    /// Был создан стрим
+    /// Стрим композитора был изменен
     /// </summary>
-    public sealed class StreamCreatedEvent(ComposerStreamEntity stream, OrderQueueUpdateType updateType) : OrderQueueEvent(updateType)
+    public sealed class ComposerStreamChangedEvent(ComposerStreamEntity stream, OrderQueueUpdateType updateType) : OrderQueueEvent(updateType)
     {
         /// <summary>
         /// Стрим композитора
         /// </summary>
         public ComposerStreamEntity Stream { get; } = stream;
-    }
-
-    /// <summary>
-    /// Стрим был отменен
-    /// </summary>
-    public sealed class StreamCanceledEvent() : OrderQueueEvent(OrderQueueUpdateType.StreamCanceled)
-    {
     }
 }

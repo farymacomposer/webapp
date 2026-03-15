@@ -30,7 +30,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 ComposerStreamEntity stream = uow.ComposerStreamStore.Create(command.EventDate, command.Type, createdByUser);
                 await uow.SaveChanges(ct);
 
-                orderQueueEventChannel.Write(new StreamCreatedEvent(stream, OrderQueueUpdateType.OrderCreated));
+                orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.OrderCreated));
 
                 return stream;
             }
@@ -67,7 +67,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new StreamCreatedEvent(stream, OrderQueueUpdateType.StreamStarted));
+            orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.StreamStarted));
 
             return stream;
         }
@@ -97,7 +97,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new StreamCreatedEvent(stream, OrderQueueUpdateType.StreamCompleted));
+            orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.StreamCompleted));
 
             return stream;
         }
@@ -122,7 +122,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new StreamCanceledEvent());
+            orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.StreamCanceled));
 
             return stream;
         }
