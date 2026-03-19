@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Api.Auth;
+﻿using System.Diagnostics;
+using Faryma.Composer.Api.Auth;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Contracts.Api;
@@ -78,7 +79,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
                 }, now, ct),
-                _ => throw new NotSupportedException("Неподдерживаемый тип заказа"),
+                _ => throw new UnreachableException("Неподдерживаемый тип заказа"),
             };
 
             return Ok(new CreateReviewOrderResponse

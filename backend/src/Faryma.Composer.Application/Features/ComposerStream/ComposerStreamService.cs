@@ -2,6 +2,7 @@
 using Faryma.Composer.Contracts.Application.Features.ComposerStream;
 using Faryma.Composer.Contracts.Application.Features.ComposerStream.Commands;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;

@@ -2,6 +2,7 @@
 using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Application.Features.UserNickname;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;

@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto;
+﻿using System.Diagnostics;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 
@@ -77,7 +78,7 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts
                         break;
 
                     default:
-                        throw new NotSupportedException($"Неподдерживаемый статус активности заказа '{position.PositionHistory.Current.ActivityStatus}'");
+                        throw new UnreachableException($"Неподдерживаемый статус активности заказа '{position.PositionHistory.Current.ActivityStatus}'");
                 }
             }
 

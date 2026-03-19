@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using System.Diagnostics;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
@@ -17,7 +18,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             if (topUpProvider == AccountTopUpProvider.Unspecified)
             {
-                throw new InvalidOperationException($"Недопустимый провайдер пополнения счета '{topUpProvider}'");
+                throw new UnreachableException($"Недопустимый провайдер пополнения счета '{topUpProvider}'");
             }
 
             AccountTopUpEntity source = new()
@@ -51,7 +52,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             if (source is not ReviewOrderEntity)
             {
-                throw new InvalidOperationException($"Недопустимый источник платежа '{source.GetType().Name}'");
+                throw new UnreachableException($"Недопустимый источник платежа '{source.GetType().Name}'");
             }
 
             return context.Add(new TransactionEntity
@@ -69,7 +70,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
         {
             if (reversedTransaction.Kind == TransactionKind.Reversal)
             {
-                throw new InvalidOperationException("Невозможно отменить транзакцию отмены");
+                throw new UnreachableException("Невозможно отменить транзакцию отмены");
             }
 
             TransactionReversalEntity source = new()

@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using System.Diagnostics;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +33,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             if (type == ReviewOrderType.Unspecified)
             {
-                throw new InvalidOperationException($"Недопустимый тип заказа разбора трека '{type}'");
+                throw new UnreachableException($"Недопустимый тип заказа разбора трека '{type}'");
             }
 
             return context.Add(new ReviewOrderEntity

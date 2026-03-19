@@ -90,6 +90,7 @@ namespace Faryma.Composer.Contracts.Application.Features.OrderQueue.Models
             {
                 Order = Order,
                 PositionHistory = PositionHistory.Clone(),
+                IsOrderUpdated = IsOrderUpdated,
             };
         }
     }

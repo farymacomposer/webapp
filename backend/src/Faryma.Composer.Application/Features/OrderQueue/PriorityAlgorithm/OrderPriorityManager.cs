@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+﻿using System.Diagnostics;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
@@ -134,7 +135,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 CategoryState.Donation => _donationCategory!.Dequeue(_lastIssuedNickname),
                 CategoryState.Debt when isOnlyNicknameLeft => _debtCategories.DequeueRoundRobin(_lastIssuedNickname),
                 CategoryState.Debt when isOnlyNicknameLeft == false => _debtCategories.DequeueRoundRobinFromOtherNickname(_lastIssuedNickname),
-                _ => throw new NotSupportedException($"Неподдерживаемый тип категории очереди '{_currentState}'")
+                _ => throw new UnreachableException($"Неподдерживаемый тип категории очереди '{_currentState}'")
             };
 
             _lastIssuedNickname = result.MainNormalizedNickname;

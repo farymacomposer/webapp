@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
@@ -157,7 +158,7 @@ namespace Faryma.Composer.Desktop.Services
                 OrderActivityStatus.Completed => CompletedOrders,
                 OrderActivityStatus.Scheduled => ScheduledOrders,
                 OrderActivityStatus.Frozen => FrozenOrders,
-                _ => throw new NotSupportedException($"Неподдерживаемый статус активности заказа '{status}'"),
+                _ => throw new UnreachableException($"Неподдерживаемый статус активности заказа '{status}'"),
             };
         }
     }
