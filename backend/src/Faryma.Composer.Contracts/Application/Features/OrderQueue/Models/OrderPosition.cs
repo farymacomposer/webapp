@@ -20,7 +20,7 @@ namespace Faryma.Composer.Contracts.Application.Features.OrderQueue.Models
         public required OrderPositionHistory PositionHistory { get; init; }
 
         /// <summary>
-        /// Признак обновления заказа
+        /// Заказ был обновлен
         /// </summary>
         public bool IsOrderUpdated { get; private set; }
 

@@ -13,9 +13,7 @@ namespace Faryma.Composer.Api.Features.OrderQueue
         public override Task OnConnectedAsync() => GetSnapshot();
 
         [Channel(nameof(GetSnapshot), Servers = new[] { IOrderQueueNotificationServer.HubServerName })]
-        [SubscribeOperation(
-            typeof(object),
-            Description = "Запрос полного снимка очереди")]
+        [SubscribeOperation(typeof(object), Description = "Запрос полного снимка очереди")]
         public async Task GetSnapshot()
         {
             OrderQueueSnapshot snapshot = await orderQueueService.GetQueueSnapshot();

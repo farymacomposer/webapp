@@ -16,6 +16,11 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts
         public required int SyncVersion { get; init; }
 
         /// <summary>
+        /// Тип обновления очереди
+        /// </summary>
+        public required OrderQueueUpdateType OrderQueueUpdateType { get; init; }
+
+        /// <summary>
         /// Активные заказы
         /// </summary>
         public required List<OrderPositionDto> ActiveOrders { get; init; }
@@ -45,6 +50,7 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts
             OrderQueueSnapshotMessage result = new()
             {
                 SyncVersion = snapshot.SyncVersion,
+                OrderQueueUpdateType = snapshot.OrderQueueUpdateType,
                 ActiveOrders = new List<OrderPositionDto>(),
                 CompletedOrders = new List<OrderPositionDto>(),
                 ScheduledOrders = new List<OrderPositionDto>(),

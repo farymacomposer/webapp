@@ -1,12 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto;
-using Faryma.Composer.Contracts.Api.Shared.Dto;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Desktop.Api.OrderQueue;
 using Faryma.Composer.Desktop.ViewModels;
 using Microsoft.UI.Dispatching;
@@ -52,14 +49,13 @@ namespace Faryma.Composer.Desktop.Services
 
         public async Task Initialize()
         {
-            _orderQueueHub.ReceiveSnapshot(message => _dispatcherQueue.EnqueueAsync(() => ReceiveSnapshot(message)));
-            _orderQueueHub.ReceiveUpdated(@event => _dispatcherQueue.EnqueueAsync(() => ReceiveUpdated(@event)));
+            _orderQueueHub.ReceiveSnapshot(ReceiveSnapshot);
             await _orderQueueHub.Start();
         }
 
         public Task UpdateOrderQueue() => _orderQueueHub.GetSnapshot();
 
-        public Task ReceiveSnapshot(OrderQueueSnapshotMessage message)
+        public Task ReceiveSnapshot(OrderQueueSnapshotMessage message) => _dispatcherQueue.EnqueueAsync(() =>
         {
             SyncVersion = message.SyncVersion;
 
@@ -73,8 +69,6 @@ namespace Faryma.Composer.Desktop.Services
             Update(ScheduledOrders, message.ScheduledOrders);
             Update(FrozenOrders, message.FrozenOrders);
 
-            return Task.CompletedTask;
-
             void Update(ObservableCollection<ReviewOrderVM> target, IEnumerable<OrderPositionDto> source)
             {
                 target.Clear();
@@ -84,82 +78,6 @@ namespace Faryma.Composer.Desktop.Services
                     target.Add(new ReviewOrderVM(item.Order, item.CurrentPosition));
                 }
             }
-        }
-
-        public async Task ReceiveUpdated(OrderQueueUpdatedEvent @event)
-        {
-            if (@event.SyncVersion - SyncVersion == 1)
-            {
-                SyncVersion = @event.SyncVersion;
-
-                foreach (OrderPositionDto item in @event.OrderPositions.OrderByDescending(x => x.PreviousPosition.QueueIndex))
-                {
-                    RemoveOrder(item.Order, item.PreviousPosition);
-                }
-
-                foreach (OrderPositionDto item in @event.OrderPositions.OrderBy(x => x.CurrentPosition.QueueIndex))
-                {
-                    InsertOrder(item.Order, item.CurrentPosition);
-                }
-            }
-            else
-            {
-                await UpdateOrderQueue();
-            }
-        }
-
-        private void RemoveOrder(ReviewOrderDto order, OrderQueuePositionDto position)
-        {
-            if (position.ActivityStatus == OrderActivityStatus.Unspecified)
-            {
-                return;
-            }
-
-            if (position.ActivityStatus == OrderActivityStatus.InProgress)
-            {
-                InProgressOrder = null;
-
-                return;
-            }
-
-            ObservableCollection<ReviewOrderVM> list = GetOrdersList(position.ActivityStatus);
-
-            if (list[position.QueueIndex].Id != order.Id)
-            {
-                throw new InvalidOperationException("Нарушена очередность");
-            }
-
-            list.RemoveAt(position.QueueIndex);
-        }
-
-        private void InsertOrder(ReviewOrderDto order, OrderQueuePositionDto position)
-        {
-            if (position.ActivityStatus == OrderActivityStatus.Removed)
-            {
-                return;
-            }
-
-            if (position.ActivityStatus == OrderActivityStatus.InProgress)
-            {
-                InProgressOrder = new ReviewOrderVM(order, position);
-
-                return;
-            }
-
-            ObservableCollection<ReviewOrderVM> list = GetOrdersList(position.ActivityStatus);
-            list.Insert(position.QueueIndex, new ReviewOrderVM(order, position));
-        }
-
-        private ObservableCollection<ReviewOrderVM> GetOrdersList(OrderActivityStatus status)
-        {
-            return status switch
-            {
-                OrderActivityStatus.Active => ActiveOrders,
-                OrderActivityStatus.Completed => CompletedOrders,
-                OrderActivityStatus.Scheduled => ScheduledOrders,
-                OrderActivityStatus.Frozen => FrozenOrders,
-                _ => throw new UnreachableException($"Неподдерживаемый статус активности заказа '{status}'"),
-            };
-        }
+        });
     }
 }

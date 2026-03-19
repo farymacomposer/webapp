@@ -16,7 +16,6 @@ namespace Faryma.Composer.Desktop.Api.OrderQueue
 
         public Task Start() => _signalrClient.StartAsync();
         public Task GetSnapshot() => _signalrClient.SendAsync(nameof(GetSnapshot));
-        public IDisposable ReceiveSnapshot(Func<OrderQueueSnapshotMessage, Task> handler) => _signalrClient.On(nameof(ReceiveSnapshot), handler);
-        public IDisposable ReceiveUpdated(Func<OrderQueueUpdatedEvent, Task> handler) => _signalrClient.On(nameof(ReceiveUpdated), handler);
+        public IDisposable ReceiveSnapshot(Func<OrderQueueSnapshotMessage, Task> handler) => _signalrClient.On(nameof(IOrderQueueNotificationClient.ReceiveSnapshot), handler);
     }
 }

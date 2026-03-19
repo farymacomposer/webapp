@@ -8,10 +8,5 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue
         /// Передача полного снимка очереди
         /// </summary>
         Task ReceiveSnapshot(OrderQueueSnapshotMessage message);
-
-        /// <summary>
-        /// Инкрементальные обновления очереди
-        /// </summary>
-        Task ReceiveUpdated(OrderQueueUpdatedEvent @event);
     }
 }

@@ -7,15 +7,7 @@ namespace Faryma.Composer.Api.Features.OrderQueue
     public interface IClient : IOrderQueueNotificationClient
     {
         [Channel(nameof(ReceiveSnapshot), Servers = new[] { IOrderQueueNotificationServer.HubServerName })]
-        [PublishOperation(
-            typeof(OrderQueueSnapshotMessage),
-            Description = "Передача полного снимка очереди")]
+        [PublishOperation(typeof(OrderQueueSnapshotMessage), Description = "Передача полного снимка очереди")]
         new Task ReceiveSnapshot(OrderQueueSnapshotMessage message);
-
-        [Channel(nameof(ReceiveUpdated), Servers = new[] { IOrderQueueNotificationServer.HubServerName })]
-        [PublishOperation(
-            typeof(OrderQueueUpdatedEvent),
-            Description = "Инкрементальные обновления очереди")]
-        new Task ReceiveUpdated(OrderQueueUpdatedEvent @event);
     }
 }

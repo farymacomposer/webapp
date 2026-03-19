@@ -78,29 +78,26 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
             switch (updateType)
             {
                 case OrderQueueUpdateType.OrderCreated:
-
+                {
                     if (NearestStreamDate == default)
                     {
                         NearestStreamDate = order.CreationStream.EventDate;
                     }
 
                     break;
-
+                }
                 case OrderQueueUpdateType.OrderTaken:
-
+                {
                     PriorityManagerState.UpdateFromOrder(order);
-
                     break;
-
+                }
                 case OrderQueueUpdateType.TrackUrlAdded:
                 case OrderQueueUpdateType.OrderMovedUp:
                 case OrderQueueUpdateType.OrderFrozen:
                 case OrderQueueUpdateType.OrderUnfrozen:
                 case OrderQueueUpdateType.OrderCompleted:
                 case OrderQueueUpdateType.OrderCanceled:
-
                     break;
-
                 default:
                     throw new UnreachableException($"Неподдерживаемый тип обновления очереди '{updateType}'");
             }
