@@ -27,6 +27,7 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
                 .AddScoped<UserNicknameQueries>()
 
                 .AddScoped<ComposerStreamStore>()
+                .AddScoped<RefreshTokenStore>()
                 .AddScoped<ReviewStore>()
                 .AddScoped<ReviewOrderStore>()
                 .AddScoped<TransactionStore>()
