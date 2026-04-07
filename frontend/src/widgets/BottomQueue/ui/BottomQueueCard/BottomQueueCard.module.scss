@@ -1,0 +1,29 @@
+.card {
+  height: 100%;
+  max-width: 374px;
+  transition: 0.3s ease-in transform;
+  width: calc(33.3% - 10px);
+
+  @include xxl {
+    width: calc(25% - 15px);
+  }
+
+  @include xxxl {
+    width: calc(20% - 16px);
+  }
+
+  &:hover {
+    transform: translateY(-30px);
+    transition: 0.2s ease-in transform;
+  }
+}
+
+.open {
+  height: var(--open-bottom-queue-height);
+  transform: translateY(-120px);
+  z-index: var(--modal-z-index);
+
+  &:hover {
+    transform: translateY(-120px);
+  }
+}

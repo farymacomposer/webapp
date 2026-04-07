@@ -1,0 +1,15 @@
+.primary {
+  color: var(--text-color);
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.orange {
+  color: var(--orange);
+
+  &:hover {
+    opacity: 0.8;
+  }
+}

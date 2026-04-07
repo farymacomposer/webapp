@@ -1,0 +1,16 @@
+.sidebar {
+  height: 100vh;
+  width: var(--size-sidebar-xl);
+
+  @include xxl {
+    width: var(--size-sidebar);
+  }
+}
+
+.btn {
+  margin-top: 20px;
+}
+
+.items {
+  padding: 18px 20px 0;
+}

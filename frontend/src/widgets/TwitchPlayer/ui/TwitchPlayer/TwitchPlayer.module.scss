@@ -1,0 +1,7 @@
+.stream {
+  background: var(--accent-bg-color);
+  height: calc(100% - var(--close-bottom-queue-height) - var(--app-gap));
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}

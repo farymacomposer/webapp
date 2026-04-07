@@ -1,0 +1,7 @@
+.wrapper {
+  padding: 20px var(--side-queue-padding);
+
+  @include xxl {
+    padding: 20px var(--side-queue-padding-xxl);
+  }
+}

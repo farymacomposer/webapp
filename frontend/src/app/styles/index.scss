@@ -1,0 +1,39 @@
+@use 'reset';
+@use 'variables/global';
+@use 'colors/colors';
+
+/* inter-400 */
+@font-face {
+  font-display: swap;
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400;
+  src: url('@shared/assets/fonts/Inter-Regular.ttf') format('truetype');
+}
+
+/* inter-500 */
+@font-face {
+  font-display: swap;
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 500;
+  src: url('@shared/assets/fonts/Inter-Medium.ttf') format('truetype');
+}
+
+/* inter-600 */
+@font-face {
+  font-display: swap;
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 600;
+  src: url('@shared/assets/fonts/Inter-SemiBold.ttf') format('truetype');
+}
+
+.app {
+  background: var(--bg-color);
+  color: var(--text-color);
+  column-gap: var(--app-gap);
+  display: flex;
+  font: var(--font-m);
+  min-height: 100vh;
+}

@@ -1,0 +1,24 @@
+{
+  "extends": ["stylelint-config-standard-scss"],
+  "plugins": ["stylelint-order"],
+  "rules": {
+    "order/properties-alphabetical-order": true,
+    "scss/at-import-partial-extension": null,
+    "scss/dollar-variable-pattern": null,
+    "selector-class-pattern": null,
+    "color-named": null,
+    "font-weight-notation": null,
+    "color-function-notation": null,
+    "alpha-value-notation": null,
+    "color-function-alias-notation": null,
+    "value-keyword-case": null,
+    "media-feature-range-notation": null,
+    "custom-property-empty-line-before": null,
+    "at-rule-empty-line-before": null,
+    "rule-empty-line-before": null,
+    "unit-allowed-list": null,
+    "scss/operator-no-unspaced": null,
+    "declaration-block-no-redundant-longhand-properties": null
+  },
+  "ignoreFiles": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx", "**/*.md"]
+}

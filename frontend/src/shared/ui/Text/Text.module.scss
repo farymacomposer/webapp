@@ -1,0 +1,59 @@
+.text {
+  color: var(--text-color);
+}
+
+.error {
+  color: var(--error-color);
+}
+
+.left {
+  text-align: left;
+}
+
+.right {
+  text-align: right;
+}
+
+.center {
+  text-align: center;
+}
+
+.size_12 {
+  font: var(--font-12);
+}
+
+.size_16 {
+  font: var(--font-16);
+}
+
+.size_18 {
+  font: var(--font-18);
+}
+
+.size_20 {
+  font: var(--font-20);
+}
+
+.size_22 {
+  font: var(--font-22);
+}
+
+.size_24 {
+  font: var(--font-24);
+}
+
+.regular {
+  font-weight: 400;
+}
+
+.medium {
+  font-weight: 500;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.italic {
+  font-style: italic;
+}

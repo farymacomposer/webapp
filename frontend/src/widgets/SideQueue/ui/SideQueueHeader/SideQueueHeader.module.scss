@@ -1,0 +1,11 @@
+.wrapper {
+  background: var(--bg-color);
+  height: 114px;
+  padding: 20px 38px 20px var(--side-queue-padding);
+  position: fixed;
+  top: 0;
+
+  @include xxl {
+    padding: 20px var(--side-queue-padding-xxl);
+  }
+}

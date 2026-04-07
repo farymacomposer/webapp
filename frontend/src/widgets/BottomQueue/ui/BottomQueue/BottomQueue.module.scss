@@ -1,0 +1,14 @@
+.wrapper {
+  bottom: 0;
+  flex-shrink: 0;
+  height: var(--close-bottom-queue-height);
+  position: fixed;
+  width: calc(100% - var(--size-sidebar) - var(--app-gap));
+  z-index: 2;
+}
+
+.cardsRow {
+  height: calc(100% + 30px);
+  margin-bottom: -30px;
+  width: calc(100% - var(--size-queue-btn-width) - 20px);
+}
