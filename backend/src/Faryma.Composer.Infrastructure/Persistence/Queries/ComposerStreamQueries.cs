@@ -23,7 +23,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
 
         public Task<ComposerStreamEntity?> FindNearest(CancellationToken ct)
         {
-            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
 
             IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .AsNoTracking()
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
 
         public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct)
         {
-            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
 
             IQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .AsNoTracking()

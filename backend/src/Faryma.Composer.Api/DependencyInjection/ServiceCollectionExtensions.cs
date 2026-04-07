@@ -83,21 +83,21 @@ namespace Faryma.Composer.Api.DependencyInjection
         {
             services
                 .AddProblemDetails()
-                .AddMemoryCache()
+                .AddMemoryCache() // TODO: HybridCache
                 .AddRateLimiter(options =>
                 {
                     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
                     options.AddPolicy("auth-login", context =>
                     {
                         string partitionKey = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-                        return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ =>
-                            new FixedWindowRateLimiterOptions
-                            {
-                                PermitLimit = 10,
-                                Window = TimeSpan.FromMinutes(1),
-                                QueueLimit = 0,
-                                AutoReplenishment = true
-                            });
+
+                        return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 10,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
+                            AutoReplenishment = true
+                        });
                     });
                 })
                 .AddOpenApi()

@@ -31,7 +31,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 ComposerStreamEntity stream = uow.ComposerStreamStore.Create(command.EventDate, command.Type, createdByUser);
                 await uow.SaveChanges(ct);
 
-                orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.OrderCreated));
+                orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.StreamCreated));
 
                 return stream;
             }

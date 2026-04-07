@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Contracts.Api;
+﻿using Faryma.Composer.Api.Extensions;
+using Faryma.Composer.Contracts.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
@@ -39,9 +40,12 @@ namespace Faryma.Composer.Api
                 ?? context.HttpContext.Request.Path.Value
                     ?? "unknown";
 
+            string userScope = (context.HttpContext.User.Identity?.IsAuthenticated == true)
+                ? context.HttpContext.User.GetUserId().ToString("D")
+                : "anonymous";
+
             IMemoryCache cache = context.HttpContext.RequestServices.GetRequiredService<IMemoryCache>();
-            // TODO: добавить id пользователя
-            string cacheKey = $"Idempotent:{routePattern}:{idempotencyKey}";
+            string cacheKey = $"Idempotent:{routePattern}:{userScope}:{idempotencyKey}";
 
             Task<object?> task = cache.GetOrCreate(cacheKey, async entry =>
             {

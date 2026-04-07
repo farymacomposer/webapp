@@ -87,10 +87,10 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create
                 }
             }
 
-            if (OrderType
-                is ReviewOrderType.Free
+            if (OrderType is (
+                ReviewOrderType.Free
                 or ReviewOrderType.OutOfQueue
-                or ReviewOrderType.Charity
+                or ReviewOrderType.Charity)
                 && (PaymentAmount ?? 0) != 0)
             {
                 yield return new ValidationResult("Для бесплатных, внеочередных и благотворительных заказов сумма платежа должна быть равна нулю");
