@@ -83,7 +83,7 @@ namespace Faryma.Composer.Api.DependencyInjection
         {
             services
                 .AddProblemDetails()
-                .AddMemoryCache() // TODO: HybridCache
+                .AddMemoryCache()
                 .AddRateLimiter(options =>
                 {
                     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;

@@ -1,4 +1,4 @@
-using Faryma.Composer.Api.DependencyInjection;
+﻿using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
@@ -29,11 +29,6 @@ namespace Faryma.Composer.Api
                 .AddJwtAuthentication(builder.Configuration)
                 .AddAuthorization()
                 .AddCoreServices();
-
-            //if (false && builder.Environment.IsDevelopment())
-            //{
-            //    builder.Services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
-            //}
 
             builder.Services.AddPresentationLayer(builder.Environment);
 
