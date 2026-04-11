@@ -1,4 +1,4 @@
-using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
@@ -22,6 +22,11 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// Дата и время последнего обновления
         /// </summary>
         public required DateTime UpdatedAt { get; set; }
+
+        /// <summary>
+        /// Ссылка на видео разбора
+        /// </summary>
+        public string? TimestampUrl { get; set; }
 
         public long? ReviewOrderId { get; set; }
         public long? TrackId { get; set; }

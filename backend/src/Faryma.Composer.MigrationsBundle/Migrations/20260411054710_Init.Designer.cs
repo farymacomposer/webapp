@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260411051611_Init")]
+    [Migration("20260411054710_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -162,6 +162,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<long?>("ReviewOrderId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("TimestampUrl")
+                        .HasColumnType("text");
+
                     b.Property<long?>("TrackId")
                         .HasColumnType("bigint");
 
@@ -243,6 +246,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     b.Property<Guid>("CreatedByUserId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("DurationSeconds")
+                        .HasColumnType("integer");
 
                     b.PrimitiveCollection<List<string>>("ExtendedGenres")
                         .IsRequired()

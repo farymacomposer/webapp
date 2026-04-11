@@ -1,4 +1,4 @@
-using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Models;
 
@@ -18,6 +18,11 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         /// Название трека
         /// </summary>
         public required string Title { get; set; }
+
+        /// <summary>
+        /// Длительность трека
+        /// </summary>
+        public required int DurationSeconds { get; set; }
 
         /// <summary>
         /// Ссылка на трек

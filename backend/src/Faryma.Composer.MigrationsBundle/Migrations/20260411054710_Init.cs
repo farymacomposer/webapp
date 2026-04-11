@@ -393,6 +393,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     AddedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
+                    DurationSeconds = table.Column<int>(type: "integer", nullable: false),
                     Url = table.Column<string>(type: "text", nullable: false),
                     ReleaseDate = table.Column<DateOnly>(type: "date", nullable: true),
                     CoverUrl = table.Column<string>(type: "text", nullable: true),
@@ -691,6 +692,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     RatingValue = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TimestampUrl = table.Column<string>(type: "text", nullable: true),
                     ReviewOrderId = table.Column<long>(type: "bigint", nullable: true),
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
