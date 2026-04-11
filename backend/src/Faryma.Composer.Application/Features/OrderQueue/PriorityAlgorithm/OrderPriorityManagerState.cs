@@ -35,14 +35,19 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         /// </summary>
         public required DateOnly? LastDebtCategoryDate { get; set; }
 
-        public static CategoryState MapCategoryState(OrderCategoryType categoryType)
+        public static CategoryState MapCategoryState(QueueCategory? queueCategory)
         {
-            return categoryType switch
+            if (!queueCategory.HasValue)
             {
-                OrderCategoryType.OutOfQueue => CategoryState.OutOfQueue,
-                OrderCategoryType.Donation => CategoryState.Donation,
-                OrderCategoryType.Debt => CategoryState.Debt,
-                _ => throw new UnreachableException($"Неподдерживаемый тип категории заказа '{categoryType}'")
+                throw new UnreachableException("Категория заказа не определена");
+            }
+
+            return queueCategory.Value switch
+            {
+                QueueCategory.OutOfQueue => CategoryState.OutOfQueue,
+                QueueCategory.Donation => CategoryState.Donation,
+                QueueCategory.Debt => CategoryState.Debt,
+                _ => throw new UnreachableException($"Неподдерживаемая категория заказа '{queueCategory}'")
             };
         }
 
@@ -51,7 +56,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         /// </summary>
         public void UpdateFromOrder(ReviewOrderEntity order)
         {
-            LastPriorityManagerState = MapCategoryState(order.CategoryType);
+            LastPriorityManagerState = MapCategoryState(order.QueueCategory);
             LastIssuedNickname = order.MainNormalizedNickname;
 
             if (order.Type == ReviewOrderType.OutOfQueue)
@@ -60,7 +65,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
             }
             else
             {
-                if (order.CategoryType == OrderCategoryType.Debt)
+                if (order.QueueCategory == QueueCategory.Debt)
                 {
                     LastDebtCategoryDate = order.CreationStream.EventDate;
                 }

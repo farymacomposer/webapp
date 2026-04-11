@@ -225,7 +225,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             OrderQueuePosition position = await orderQueueService.GetCurrentQueuePosition(order);
 
-            order.CategoryType = position.Category.Type;
+            order.QueueCategory = position.Category.QueueCategory;
             order.ProcessingStream = liveStream;
             order.Status = ReviewOrderStatus.InProgress;
             order.InProgressAt = now;
@@ -312,9 +312,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<ReviewOrderEntity> Cancel(long reviewOrderId, CancellationToken ct)
+        public async Task<ReviewOrderEntity> Cancel(CancelCommand command, CancellationToken ct)
         {
-            ReviewOrderEntity order = await GetOrder(reviewOrderId, ct);
+            ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
             if (order.Status == ReviewOrderStatus.Canceled)
@@ -327,7 +327,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
                 throw new ReviewOrderException("Невозможно отменить заказ", order);
             }
 
-            order.CategoryType = OrderCategoryType.Unspecified;
+            order.CanceledAt = DateTime.Now;
+            order.CancelReason = command.CancelReason;
+            order.QueueCategory = null;
             order.ProcessingStream = null;
             order.Status = ReviewOrderStatus.Canceled;
             order.InProgressAt = null;

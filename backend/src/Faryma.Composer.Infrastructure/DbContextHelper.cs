@@ -23,7 +23,7 @@ namespace Faryma.Composer.Infrastructure
             return builder
                 .MapEnum<ComposerStreamStatus>("composer_stream_status", SchemaName)
                 .MapEnum<ComposerStreamType>("composer_stream_type", SchemaName)
-                .MapEnum<OrderCategoryType>("order_category_type", SchemaName)
+                .MapEnum<QueueCategory>("queue_category", SchemaName)
                 .MapEnum<ReviewOrderStatus>("review_order_status", SchemaName)
                 .MapEnum<ReviewOrderType>("review_order_type", SchemaName)
                 .MapEnum<TransactionKind>("transaction_kind", SchemaName)
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Infrastructure
             builder
                 .HasPostgresEnum<ComposerStreamStatus>(SchemaName, "composer_stream_status")
                 .HasPostgresEnum<ComposerStreamType>(SchemaName, "composer_stream_type")
-                .HasPostgresEnum<OrderCategoryType>(SchemaName, "order_category_type")
+                .HasPostgresEnum<QueueCategory>(SchemaName, "queue_category")
                 .HasPostgresEnum<ReviewOrderStatus>(SchemaName, "review_order_status")
                 .HasPostgresEnum<ReviewOrderType>(SchemaName, "review_order_type")
                 .HasPostgresEnum<TransactionKind>(SchemaName, "transaction_kind")

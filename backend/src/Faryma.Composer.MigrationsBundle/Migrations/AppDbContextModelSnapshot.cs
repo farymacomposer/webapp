@@ -20,13 +20,13 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("app")
-                .HasAnnotation("ProductVersion", "10.0.3")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "account_top_up_provider", new[] { "unspecified", "donationalerts", "donatty", "twitch_channel_points", "manual" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "composer_stream_status", new[] { "unspecified", "planned", "live", "completed", "canceled" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "composer_stream_type", new[] { "unspecified", "donation", "debt", "charity" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "order_category_type", new[] { "unspecified", "out_of_queue", "donation", "debt" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "queue_category", new[] { "unspecified", "out_of_queue", "donation", "debt" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "review_order_status", new[] { "unspecified", "preorder", "pending", "in_progress", "completed", "canceled" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "review_order_type", new[] { "unspecified", "out_of_queue", "donation", "free", "charity", "custom" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "transaction_kind", new[] { "unspecified", "account_top_up", "payment", "reversal" });
@@ -120,6 +120,12 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -489,7 +495,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -595,7 +600,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.HasIndex("TrackId");
+                    b.HasIndex("TrackId", "CreatedByUserId")
+                        .IsUnique();
 
                     b.ToTable("user_track_ratings", "app");
                 });
@@ -648,10 +654,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9c3ddcde-24e7-458c-8d9c-1e5f424d3ddd"),
-                            ConcurrencyStamp = "9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD",
-                            Name = "Composer",
-                            NormalizedName = "COMPOSER"
+                            Id = new Guid("910c6755-4833-4c62-8df7-4241a159a8d2"),
+                            ConcurrencyStamp = "910C6755-4833-4C62-8DF7-4241A159A8D2",
+                            Name = "User",
+                            NormalizedName = "USER"
                         },
                         new
                         {
@@ -662,10 +668,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         },
                         new
                         {
-                            Id = new Guid("910c6755-4833-4c62-8df7-4241a159a8d2"),
-                            ConcurrencyStamp = "910C6755-4833-4C62-8DF7-4241A159A8D2",
-                            Name = "User",
-                            NormalizedName = "USER"
+                            Id = new Guid("9c3ddcde-24e7-458c-8d9c-1e5f424d3ddd"),
+                            ConcurrencyStamp = "9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD",
+                            Name = "Composer",
+                            NormalizedName = "COMPOSER"
                         });
                 });
 
@@ -851,8 +857,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 {
                     b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
 
-                    b.Property<OrderCategoryType>("CategoryType")
-                        .HasColumnType("app.order_category_type");
+                    b.Property<string>("CancelReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CanceledAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -882,8 +891,14 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<long>("PayableAmount")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("PricingComment")
+                        .HasColumnType("text");
+
                     b.Property<long?>("ProcessingStreamId")
                         .HasColumnType("bigint");
+
+                    b.Property<int?>("QueueCategory")
+                        .HasColumnType("app.order_category_type");
 
                     b.Property<ReviewOrderStatus>("Status")
                         .HasColumnType("app.review_order_status");

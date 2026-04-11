@@ -36,7 +36,7 @@ namespace Faryma.Composer.Contracts.Application.Features.OrderQueue.Models
                     {
                         Category = new OrderCategoryInfo
                         {
-                            Type = OrderCategoryType.Unspecified,
+                            QueueCategory = QueueCategory.Unspecified,
                             DebtIndex = 0
                         }
                     },
@@ -44,7 +44,7 @@ namespace Faryma.Composer.Contracts.Application.Features.OrderQueue.Models
                     {
                         Category = new OrderCategoryInfo
                         {
-                            Type = OrderCategoryType.Unspecified,
+                            QueueCategory = QueueCategory.Unspecified,
                             DebtIndex = 0
                         }
                     }
@@ -75,11 +75,11 @@ namespace Faryma.Composer.Contracts.Application.Features.OrderQueue.Models
         /// <summary>
         /// Обновляет текущую категорию заказа
         /// </summary>
-        public void UpdateCurrentCategory(OrderCategoryType type, int debtIndex)
+        public void UpdateCurrentCategory(QueueCategory queueCategory, int debtIndex)
         {
             PositionHistory.Current.Category = new OrderCategoryInfo
             {
-                Type = type,
+                QueueCategory = queueCategory,
                 DebtIndex = debtIndex
             };
         }

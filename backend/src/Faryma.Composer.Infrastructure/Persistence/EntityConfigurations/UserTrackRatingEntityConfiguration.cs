@@ -20,6 +20,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.EntityConfigurations
             builder.HasOne(x => x.CreatedByUser)
                 .WithMany(x => x.TrackRatings)
                 .HasForeignKey(x => x.CreatedByUserId);
+
+            builder.HasIndex(x => new { x.TrackId, x.CreatedByUserId })
+                .IsUnique();
         }
     }
 }

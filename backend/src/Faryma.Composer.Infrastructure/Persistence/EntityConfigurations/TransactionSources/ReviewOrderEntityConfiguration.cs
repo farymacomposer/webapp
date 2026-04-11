@@ -1,4 +1,4 @@
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -25,7 +25,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.EntityConfigurations.Transa
             builder.Property(x => x.Status)
                 .HasColumnType(DbEnumConst.ReviewOrderStatusEnum);
 
-            builder.Property(x => x.CategoryType)
+            builder.Property(x => x.QueueCategory)
                 .HasColumnType(DbEnumConst.OrderCategoryTypeEnum);
 
             builder.HasOne(x => x.Track)

@@ -20,9 +20,9 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto
         public required OrderActivityStatus ActivityStatus { get; init; }
 
         /// <summary>
-        /// Тип категории заказа
+        /// Категория заказа в очереди
         /// </summary>
-        public required OrderCategoryType CategoryType { get; init; }
+        public required QueueCategory QueueCategory { get; init; }
 
         /// <summary>
         /// Индекс категории, если заказ относится к долговой категории
@@ -35,7 +35,7 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto
             {
                 QueueIndex = item.QueueIndex,
                 ActivityStatus = item.ActivityStatus,
-                CategoryType = item.Category.Type,
+                QueueCategory = item.Category.QueueCategory,
                 CategoryDebtIndex = item.Category.DebtIndex,
             };
         }

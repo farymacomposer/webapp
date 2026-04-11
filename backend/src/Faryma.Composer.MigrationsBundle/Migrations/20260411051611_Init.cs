@@ -1,4 +1,6 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using System;
+using System.Collections.Generic;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -21,7 +23,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 .Annotation("Npgsql:Enum:app.account_top_up_provider", "unspecified,donationalerts,donatty,twitch_channel_points,manual")
                 .Annotation("Npgsql:Enum:app.composer_stream_status", "unspecified,planned,live,completed,canceled")
                 .Annotation("Npgsql:Enum:app.composer_stream_type", "unspecified,donation,debt,charity")
-                .Annotation("Npgsql:Enum:app.order_category_type", "unspecified,out_of_queue,donation,debt")
+                .Annotation("Npgsql:Enum:app.queue_category", "unspecified,out_of_queue,donation,debt")
                 .Annotation("Npgsql:Enum:app.review_order_status", "unspecified,preorder,pending,in_progress,completed,canceled")
                 .Annotation("Npgsql:Enum:app.review_order_type", "unspecified,out_of_queue,donation,free,charity,custom")
                 .Annotation("Npgsql:Enum:app.transaction_kind", "unspecified,account_top_up,payment,reversal");
@@ -35,7 +37,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ReviewOrderNominalAmount = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => table.PrimaryKey("PK_app_settings", x => x.Id));
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_app_settings", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
@@ -47,7 +52,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table => table.PrimaryKey("PK_AspNetRoles", x => x.Id));
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
@@ -55,10 +63,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     TwitchUserId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     TwitchLogin = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -73,7 +81,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table => table.PrimaryKey("PK_AspNetUsers", x => x.Id));
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "DataProtectionKeys",
@@ -85,7 +96,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     FriendlyName = table.Column<string>(type: "text", nullable: true),
                     Xml = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table => table.PrimaryKey("PK_DataProtectionKeys", x => x.Id));
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DataProtectionKeys", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "track_artists",
@@ -97,7 +111,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     NormalizedName = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table => table.PrimaryKey("PK_track_artists", x => x.Id));
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_track_artists", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "track_countries",
@@ -108,7 +125,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table => table.PrimaryKey("PK_track_countries", x => x.Id));
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_track_countries", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "track_genres",
@@ -119,7 +139,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table => table.PrimaryKey("PK_track_genres", x => x.Id));
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_track_genres", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
@@ -270,13 +293,14 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     TokenHash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     FamilyId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     RevokedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ReplacedByTokenHash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true)
+                    ReplacedByTokenHash = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -437,14 +461,17 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     ProcessingStreamId = table.Column<long>(type: "bigint", nullable: true),
                     InProgressAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CanceledAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CancelReason = table.Column<string>(type: "text", nullable: true),
                     Type = table.Column<ReviewOrderType>(type: "app.review_order_type", nullable: false),
                     Status = table.Column<ReviewOrderStatus>(type: "app.review_order_status", nullable: false),
-                    CategoryType = table.Column<OrderCategoryType>(type: "app.order_category_type", nullable: false),
+                    QueueCategory = table.Column<int>(type: "app.order_category_type", nullable: true),
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
                     NominalAmount = table.Column<long>(type: "bigint", nullable: false),
                     PayableAmount = table.Column<long>(type: "bigint", nullable: false),
+                    PricingComment = table.Column<string>(type: "text", nullable: true),
                     UserComment = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true)
                 },
                 constraints: table =>
@@ -1006,10 +1033,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 column: "CreatedByUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_user_track_ratings_TrackId",
+                name: "IX_user_track_ratings_TrackId_CreatedByUserId",
                 schema: "app",
                 table: "user_track_ratings",
-                column: "TrackId");
+                columns: new[] { "TrackId", "CreatedByUserId" },
+                unique: true);
         }
 
         /// <inheritdoc />

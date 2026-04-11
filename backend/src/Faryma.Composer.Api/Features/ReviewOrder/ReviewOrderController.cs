@@ -218,7 +218,11 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [AuthorizeAdmins]
         public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.Cancel(request.ReviewOrderId, ct);
+            ReviewOrderEntity order = await reviewOrderService.Cancel(new CancelCommand
+            {
+                ReviewOrderId = request.ReviewOrderId,
+                CancelReason = request.CancelReason,
+            }, ct);
 
             return Ok(new CancelReviewOrderResponse
             {

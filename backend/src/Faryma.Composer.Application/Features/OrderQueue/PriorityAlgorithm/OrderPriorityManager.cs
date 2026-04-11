@@ -51,7 +51,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 .ToList());
 
             _outOfQueueCategory.SetLastIssuedNickname(state.LastOutOfQueueNickname);
-            _outOfQueueCategory.UpdateOrdersCategory(queueManager, OrderCategoryType.OutOfQueue);
+            _outOfQueueCategory.UpdateOrdersCategory(queueManager, QueueCategory.OutOfQueue);
 
             List<(DateOnly StreamDate, OrderCategory Category)> activeOrderCategories = queueManager.OrderPositionsById
                 .Select(x => x.Value.Order)
@@ -79,7 +79,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 {
                     activeOrderCategories.Remove(item);
                     _donationCategory = item.Category;
-                    _donationCategory.UpdateOrdersCategory(queueManager, OrderCategoryType.Donation);
+                    _donationCategory.UpdateOrdersCategory(queueManager, QueueCategory.Donation);
                 }
             }
 

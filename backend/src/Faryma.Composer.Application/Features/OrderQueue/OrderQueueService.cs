@@ -45,7 +45,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
                 {
                     LastPriorityManagerState = (lastTakenOrder is null)
                         ? CategoryState.Initial
-                        : OrderPriorityManagerState.MapCategoryState(lastTakenOrder.CategoryType),
+                        : OrderPriorityManagerState.MapCategoryState(lastTakenOrder.QueueCategory),
                     LastIssuedNickname = lastTakenOrder?.MainNormalizedNickname,
                     LastDebtCategoryDate = lastTakenDebt?.CreationStream.EventDate,
                     LastOutOfQueueNickname = lastTakenOutOfQueue?.MainNormalizedNickname,

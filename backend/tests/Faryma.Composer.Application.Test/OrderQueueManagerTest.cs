@@ -939,7 +939,7 @@ namespace Faryma.Composer.Application.Test
         {
             OrderQueuePosition position = queueManager.GetCurrentQueuePosition(order);
 
-            order.CategoryType = position.Category.Type;
+            order.QueueCategory = position.Category.QueueCategory;
             order.Status = ReviewOrderStatus.InProgress;
 
             queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderTaken);
@@ -995,7 +995,6 @@ namespace Faryma.Composer.Application.Test
                 IsFrozen = isFrozen,
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.Donation,
-                CategoryType = OrderCategoryType.Unspecified,
                 NominalAmount = amount,
                 PayableAmount = amount,
                 MainNickname = name,
@@ -1026,7 +1025,6 @@ namespace Faryma.Composer.Application.Test
                 IsFrozen = false,
                 Status = ReviewOrderStatus.Pending,
                 Type = ReviewOrderType.OutOfQueue,
-                CategoryType = OrderCategoryType.Unspecified,
                 NominalAmount = 0,
                 PayableAmount = 0,
                 MainNickname = name,

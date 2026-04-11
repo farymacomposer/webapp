@@ -31,6 +31,16 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         public DateTime? CompletedAt { get; set; }
 
         /// <summary>
+        /// Дата и время отмены заказа
+        /// </summary>
+        public DateTime? CanceledAt { get; set; }
+
+        /// <summary>
+        /// Причина отмены заказа
+        /// </summary>
+        public string? CancelReason { get; set; }
+
+        /// <summary>
         /// Тип заказа
         /// </summary>
         public required ReviewOrderType Type { get; set; }
@@ -41,9 +51,9 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         public required ReviewOrderStatus Status { get; set; }
 
         /// <summary>
-        /// Тип категории заказа (записывается при взятии заказа в работу)
+        /// Категория заказа в очереди (записывается при взятии заказа в работу)
         /// </summary>
-        public required OrderCategoryType CategoryType { get; set; }
+        public QueueCategory? QueueCategory { get; set; }
 
         /// <summary>
         /// Заказ заморожен
@@ -66,6 +76,11 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// Сумма к оплате
         /// </summary>
         public required long PayableAmount { get; set; }
+
+        /// <summary>
+        /// Комментарий к цене
+        /// </summary>
+        public string? PricingComment { get; set; }
 
         /// <summary>
         /// Комментарий пользователя

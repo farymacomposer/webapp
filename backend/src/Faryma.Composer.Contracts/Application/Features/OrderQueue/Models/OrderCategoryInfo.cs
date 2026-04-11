@@ -8,9 +8,9 @@ namespace Faryma.Composer.Contracts.Application.Features.OrderQueue.Models
     public sealed record OrderCategoryInfo
     {
         /// <summary>
-        /// Тип категории заказа
+        /// Категория заказа в очереди
         /// </summary>
-        public required OrderCategoryType Type { get; init; }
+        public required QueueCategory QueueCategory { get; init; }
 
         /// <summary>
         /// Индекс категории, если заказ относится к долговой категории

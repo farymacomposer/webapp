@@ -84,9 +84,9 @@ namespace Faryma.Composer.Desktop.ViewModels
         public OrderActivityStatus ActivityStatus { get; } = currentPosition.ActivityStatus;
 
         /// <summary>
-        /// Тип категории заказа
+        /// Категория заказа в очереди
         /// </summary>
-        public OrderCategoryType CurrentCategoryType { get; } = currentPosition.CategoryType;
+        public QueueCategory CurrentQueueCategory { get; } = currentPosition.QueueCategory;
 
         /// <summary>
         /// Номер категории, если заказ относится к долговой категории

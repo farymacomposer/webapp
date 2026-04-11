@@ -39,7 +39,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                         _roundRobinCounter = debtCategoriesByStreamDate.Count - debtIndex - 1;
                     }
 
-                    category.UpdateOrdersCategory(queueManager, OrderCategoryType.Debt, debtIndex);
+                    category.UpdateOrdersCategory(queueManager, QueueCategory.Debt, debtIndex);
                     debtIndex++;
                 }
             }

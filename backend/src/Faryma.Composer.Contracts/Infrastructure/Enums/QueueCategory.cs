@@ -3,9 +3,9 @@
 namespace Faryma.Composer.Contracts.Infrastructure.Enums
 {
     /// <summary>
-    /// Тип категории заказа
+    /// Категория заказа в очереди
     /// </summary>
-    public enum OrderCategoryType
+    public enum QueueCategory
     {
         /// <summary>
         /// Не задан

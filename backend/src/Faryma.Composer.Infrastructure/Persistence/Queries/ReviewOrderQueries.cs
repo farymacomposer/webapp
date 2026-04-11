@@ -28,12 +28,12 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return await context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
-                .Where(x => x.CategoryType == OrderCategoryType.Debt && x.Status == ReviewOrderStatus.InProgress)
+                .Where(x => x.QueueCategory == QueueCategory.Debt && x.Status == ReviewOrderStatus.InProgress)
                 .FirstOrDefaultAsync(ct)
                 ?? await context.ReviewOrders
                     .AsNoTracking()
                     .Include(x => x.CreationStream)
-                    .Where(x => x.CategoryType == OrderCategoryType.Debt && x.Status == ReviewOrderStatus.Completed)
+                    .Where(x => x.QueueCategory == QueueCategory.Debt && x.Status == ReviewOrderStatus.Completed)
                     .OrderBy(x => x.CompletedAt)
                     .LastOrDefaultAsync(ct);
         }

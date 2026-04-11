@@ -1,9 +1,9 @@
-﻿namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Cancel
+﻿namespace Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands
 {
     /// <summary>
-    /// Запрос отмены заказа
+    /// Команда отмены заказа
     /// </summary>
-    public sealed record CancelReviewOrderRequest
+    public sealed record CancelCommand
     {
         /// <summary>
         /// Id заказа разбора трека
