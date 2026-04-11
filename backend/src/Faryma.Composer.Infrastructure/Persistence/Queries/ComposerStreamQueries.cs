@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Queries
 {
-    public sealed class ComposerStreamQueries(AppDbContext context)
+    public sealed class ComposerStreamQueries(AppDbContext context, DateTimeService dateTimeService)
     {
         public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct)
         {
@@ -23,7 +23,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
 
         public Task<ComposerStreamEntity?> FindNearest(CancellationToken ct)
         {
-            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            DateOnly today = dateTimeService.Today;
 
             IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .AsNoTracking()
@@ -34,9 +34,16 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return query.FirstOrDefaultAsync(ct);
         }
 
+        public async Task<DateOnly> GetNearestStreamDate(CancellationToken ct)
+        {
+            ComposerStreamEntity? nearestStream = await FindNearest(ct);
+
+            return nearestStream?.EventDate ?? DateOnly.MinValue;
+        }
+
         public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct)
         {
-            DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow);
+            DateOnly today = dateTimeService.Today;
 
             IQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .AsNoTracking()

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
-    public sealed class ReviewOrderStore(AppDbContext context)
+    public sealed class ReviewOrderStore(AppDbContext context, DateTimeService dateTimeService)
     {
         public Task<ReviewOrderEntity?> FindById(long id, CancellationToken ct)
         {
@@ -19,7 +19,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
         }
 
         public ReviewOrderEntity Create(
-            DateTime createdAt,
             int nominalAmount,
             int payableAmount,
             string? trackUrl,
@@ -38,7 +37,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             return context.Add(new ReviewOrderEntity
             {
-                CreatedAt = createdAt,
+                CreatedAt = dateTimeService.Now,
                 MainNickname = userNickname.Nickname,
                 MainNormalizedNickname = userNickname.NormalizedNickname,
                 Type = type,

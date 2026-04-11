@@ -40,7 +40,7 @@ namespace Faryma.Composer.Api.Auth
                 return Unauthorized();
             }
 
-            (string accessToken, string refreshToken) = await authTokenService.IssueForUser(user, DateTime.UtcNow, ct);
+            (string accessToken, string refreshToken) = await authTokenService.IssueForUser(user, ct);
 
             return Ok(new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken });
         }
@@ -88,7 +88,6 @@ namespace Faryma.Composer.Api.Auth
                 request.CodeVerifier,
                 request.State,
                 browserNonce,
-                DateTime.UtcNow,
                 ct);
 
             return Ok(new TwitchLoginResponse { AccessToken = accessToken, RefreshToken = refreshToken });
@@ -101,7 +100,7 @@ namespace Faryma.Composer.Api.Auth
         [EnableRateLimiting("auth-login")]
         public async Task<ActionResult<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest request, CancellationToken ct)
         {
-            (string accessToken, string refreshToken) = await authTokenService.Refresh(request.RefreshToken, DateTime.UtcNow, ct);
+            (string accessToken, string refreshToken) = await authTokenService.Refresh(request.RefreshToken, ct);
 
             return Ok(new RefreshTokenResponse { AccessToken = accessToken, RefreshToken = refreshToken });
         }
@@ -115,7 +114,7 @@ namespace Faryma.Composer.Api.Auth
         public async Task<IActionResult> Logout(LogoutRequest request)
         {
             Guid userId = User.GetUserId();
-            await authTokenService.RevokeSession(userId, request.RefreshToken, DateTime.UtcNow, CancellationToken.None);
+            await authTokenService.RevokeSession(userId, request.RefreshToken, CancellationToken.None);
 
             return NoContent();
         }
@@ -129,7 +128,7 @@ namespace Faryma.Composer.Api.Auth
         public async Task<IActionResult> LogoutAll()
         {
             Guid userId = User.GetUserId();
-            await authTokenService.RevokeAll(userId, DateTime.UtcNow, CancellationToken.None);
+            await authTokenService.RevokeAll(userId, CancellationToken.None);
 
             return NoContent();
         }

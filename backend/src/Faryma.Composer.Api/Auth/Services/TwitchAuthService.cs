@@ -1,6 +1,7 @@
 ﻿using System.Security.Authentication;
 using Faryma.Composer.Contracts.Infrastructure;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TwitchLib.Api.Auth;
@@ -11,14 +12,14 @@ namespace Faryma.Composer.Api.Auth.Services
         TwitchAuthClient twitchAuthClient,
         AuthTokenService authTokenService,
         TwitchAuthStateService twitchAuthStateService,
-        UserManager<UserEntity> userManager)
+        UserManager<UserEntity> userManager,
+        DateTimeService dateTimeService)
     {
         public async Task<(string AccessToken, string RefreshToken)> Login(
             string code,
             string codeVerifier,
             string state,
             string? browserNonce,
-            DateTime now,
             CancellationToken ct)
         {
             if (!twitchAuthStateService.TryConsumeState(state, browserNonce))
@@ -31,7 +32,7 @@ namespace Faryma.Composer.Api.Auth.Services
 
             if (user is null)
             {
-                user = await Create(now, twitchToken, ct);
+                user = await Create(twitchToken, ct);
             }
             else if (!string.Equals(user.TwitchLogin, twitchToken.Login, StringComparison.Ordinal))
             {
@@ -43,17 +44,17 @@ namespace Faryma.Composer.Api.Auth.Services
                 await EnsureUserRole(user);
             }
 
-            return await authTokenService.IssueForUser(user, now, ct);
+            return await authTokenService.IssueForUser(user, ct);
         }
 
         private static string GetErrors(IdentityResult identityResult) => string.Join("; ", identityResult.Errors.Select(x => x.Description));
 
-        private async Task<UserEntity> Create(DateTime now, ValidateAccessTokenResponse twitchToken, CancellationToken ct)
+        private async Task<UserEntity> Create(ValidateAccessTokenResponse twitchToken, CancellationToken ct)
         {
             UserEntity result = new()
             {
                 Id = Guid.NewGuid(),
-                CreatedAt = now,
+                CreatedAt = dateTimeService.Now,
                 TwitchUserId = twitchToken.UserId,
                 TwitchLogin = twitchToken.Login
             };

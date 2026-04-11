@@ -80,7 +80,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [AuthorizeComposer]
         public async Task<ActionResult<StartStreamResponse>> StartStream(StartStreamRequest request, CancellationToken ct)
         {
-            ComposerStreamEntity stream = await composerStreamService.Start(request.ComposerStreamId, DateTime.UtcNow, ct);
+            ComposerStreamEntity stream = await composerStreamService.Start(request.ComposerStreamId, ct);
 
             return Ok(new StartStreamResponse
             {
@@ -95,7 +95,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [AuthorizeComposer]
         public async Task<ActionResult<CompleteStreamResponse>> CompleteStream(CompleteStreamRequest request, CancellationToken ct)
         {
-            ComposerStreamEntity stream = await composerStreamService.Complete(request.ComposerStreamId, DateTime.UtcNow, ct);
+            ComposerStreamEntity stream = await composerStreamService.Complete(request.ComposerStreamId, ct);
 
             return Ok(new CompleteStreamResponse
             {

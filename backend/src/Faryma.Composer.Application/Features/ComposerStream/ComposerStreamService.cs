@@ -16,7 +16,8 @@ namespace Faryma.Composer.Application.Features.ComposerStream
     public sealed class ComposerStreamService(
         UnitOfWork uow,
         UserManager<UserEntity> userManager,
-        OrderQueueEventChannel orderQueueEventChannel)
+        OrderQueueEventChannel orderQueueEventChannel,
+        DateTimeService dateTimeService)
     {
         public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct) => uow.ComposerStreamQueries.Find(dateFrom, dateTo, ct);
         public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct) => uow.ComposerStreamQueries.FindLiveAndPlanned(ct);
@@ -41,7 +42,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             }
         }
 
-        public async Task<ComposerStreamEntity> Start(long composerStreamId, DateTime now, CancellationToken ct)
+        public async Task<ComposerStreamEntity> Start(long composerStreamId, CancellationToken ct)
         {
             // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
 
@@ -64,7 +65,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             }
 
             stream.Status = ComposerStreamStatus.Live;
-            stream.StartedAt = now;
+            stream.StartedAt = dateTimeService.Now;
 
             await uow.SaveChanges(ct);
 
@@ -73,7 +74,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             return stream;
         }
 
-        public async Task<ComposerStreamEntity> Complete(long composerStreamId, DateTime now, CancellationToken ct)
+        public async Task<ComposerStreamEntity> Complete(long composerStreamId, CancellationToken ct)
         {
             ComposerStreamEntity stream = await GetStream(composerStreamId, ct);
 
@@ -94,7 +95,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             }
 
             stream.Status = ComposerStreamStatus.Completed;
-            stream.CompletedAt = now;
+            stream.CompletedAt = dateTimeService.Now;
 
             await uow.SaveChanges(ct);
 

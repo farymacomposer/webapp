@@ -45,7 +45,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
-            DateTime now = DateTime.UtcNow;
 
             ReviewOrderEntity order = request.OrderType switch
             {
@@ -55,7 +54,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
-                }, now, ct),
+                }, ct),
                 ReviewOrderType.Donation => await reviewOrderService.CreateDonation(new CreateDonationOrderCommand
                 {
                     Nickname = request.Nickname,
@@ -64,21 +63,21 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                     PaymentAmount = request.PaymentAmount!.Value,
                     TopUpProvider = request.TopUpProvider!.Value,
                     CreatedByUserId = userId,
-                }, now, ct),
+                }, ct),
                 ReviewOrderType.Free => await reviewOrderService.CreateFree(new CreateFreeOrderCommand
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
-                }, now, ct),
+                }, ct),
                 ReviewOrderType.Charity => await reviewOrderService.CreateCharity(new CreateCharityOrderCommand
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
-                }, now, ct),
+                }, ct),
                 _ => throw new UnreachableException("Неподдерживаемый тип заказа"),
             };
 
@@ -104,7 +103,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
-            DateTime now = DateTime.UtcNow;
 
             TransactionEntity transaction = await reviewOrderService.MoveUp(new MoveUpCommand
             {
@@ -113,7 +111,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 PaymentAmount = request.PaymentAmount,
                 TopUpProvider = request.TopUpProvider,
                 CreatedByUserId = userId,
-            }, now, ct);
+            }, ct);
 
             return Ok(new MoveUpReviewOrderResponse
             {
@@ -148,8 +146,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [AuthorizeAdmins]
         public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request, CancellationToken ct)
         {
-            DateTime now = DateTime.UtcNow;
-            ReviewOrderEntity order = await reviewOrderService.TakeInProgress(request.ReviewOrderId, now, ct);
+            ReviewOrderEntity order = await reviewOrderService.TakeInProgress(request.ReviewOrderId, ct);
 
             return Ok(new TakeOrderInProgressResponse
             {
@@ -165,14 +162,13 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder(CompleteReviewOrderRequest request, CancellationToken ct)
         {
             Guid userId = User.GetUserId();
-            DateTime now = DateTime.UtcNow;
 
             ReviewOrderEntity order = await reviewOrderService.Complete(new CompleteCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Rating = request.Rating,
                 CreatedByUserId = userId,
-            }, now, ct);
+            }, ct);
 
             return Ok(new CompleteReviewOrderResponse
             {

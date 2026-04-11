@@ -9,12 +9,13 @@ using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure;
-using Faryma.Composer.Infrastructure.Persistence.Queries;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Faryma.Composer.Application.Features.OrderQueue
 {
-    public sealed class OrderQueueService(IDbContextFactory<AppDbContext> contextFactory, IOrderQueueNotificationService notificationService)
+    public sealed class OrderQueueService(
+        IOrderQueueNotificationService notificationService,
+        IServiceScopeFactory scopeFactory)
     {
         private readonly SemaphoreLocker _locker = new();
         private OrderQueueManager _queueManager = null!;
@@ -26,16 +27,15 @@ namespace Faryma.Composer.Application.Features.OrderQueue
 
         public async Task Initialize()
         {
-            await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ReviewOrderQueries reviewOrderQueries = new(context);
-            ComposerStreamQueries composerStreamQueries = new(context);
+            await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
+            UnitOfWork uow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
 
-            DateOnly nearestStreamDate = await GetNearestStreamDate(context);
-            ReviewOrderEntity? lastTakenOrder = await reviewOrderQueries.FindLastTaken(CancellationToken.None);
-            ReviewOrderEntity? lastTakenDebt = await reviewOrderQueries.FindLastTakenDebt(CancellationToken.None);
-            ReviewOrderEntity? lastTakenOutOfQueue = await reviewOrderQueries.FindLastTakenOutOfQueue(CancellationToken.None);
-            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await composerStreamQueries.GetLastNicknamesByStreamDate(CancellationToken.None);
-            List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersInQueue(CancellationToken.None);
+            DateOnly nearestStreamDate = await uow.ComposerStreamQueries.GetNearestStreamDate(CancellationToken.None);
+            ReviewOrderEntity? lastTakenOrder = await uow.ReviewOrderQueries.FindLastTaken(CancellationToken.None);
+            ReviewOrderEntity? lastTakenDebt = await uow.ReviewOrderQueries.FindLastTakenDebt(CancellationToken.None);
+            ReviewOrderEntity? lastTakenOutOfQueue = await uow.ReviewOrderQueries.FindLastTakenOutOfQueue(CancellationToken.None);
+            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await uow.ComposerStreamQueries.GetLastNicknamesByStreamDate(CancellationToken.None);
+            List<ReviewOrderEntity> orders = await uow.ReviewOrderQueries.GetOrdersInQueue(CancellationToken.None);
 
             _queueManager = new OrderQueueManager
             {
@@ -99,21 +99,14 @@ namespace Faryma.Composer.Application.Features.OrderQueue
                 .ToArray(),
         });
 
-        private static async Task<DateOnly> GetNearestStreamDate(AppDbContext context)
-        {
-            ComposerStreamQueries composerStreamQueries = new(context);
-            ComposerStreamEntity? nearestStream = await composerStreamQueries.FindNearest(CancellationToken.None);
-
-            return nearestStream?.EventDate ?? DateOnly.MinValue;
-        }
-
         private async Task HandleOrderChanged(ReviewOrderChangedEvent evt)
         {
             if (evt.UpdateType == OrderQueueUpdateType.OrderCanceled && evt.PreviousStatus == ReviewOrderStatus.InProgress)
             {
-                await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-                ReviewOrderQueries reviewOrderQueries = new(context);
-                ReviewOrderEntity? lastTakenOrder = await reviewOrderQueries.FindLastTaken(CancellationToken.None);
+                await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
+                UnitOfWork uow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+
+                ReviewOrderEntity? lastTakenOrder = await uow.ReviewOrderQueries.FindLastTaken(CancellationToken.None);
                 if (lastTakenOrder is not null)
                 {
                     _queueManager.PriorityManagerState.UpdateFromOrder(lastTakenOrder);
@@ -125,9 +118,9 @@ namespace Faryma.Composer.Application.Features.OrderQueue
 
         private async Task HandleStreamChanged(ComposerStreamChangedEvent evt)
         {
-            await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            ComposerStreamQueries composerStreamQueries = new(context);
-            ReviewOrderQueries reviewOrderQueries = new(context);
+            await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
+            UnitOfWork uow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+
             ComposerStreamEntity stream = evt.Stream;
 
             switch (evt.UpdateType)
@@ -140,21 +133,21 @@ namespace Faryma.Composer.Application.Features.OrderQueue
                 }
                 case OrderQueueUpdateType.StreamStarted:
                 {
-                    List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToStartStream(stream.Id, CancellationToken.None);
+                    List<ReviewOrderEntity> orders = await uow.ReviewOrderQueries.GetOrdersToStartStream(stream.Id, CancellationToken.None);
                     _queueManager.NearestStreamDate = stream.EventDate;
                     _queueManager.UpdateOrders(orders);
                     break;
                 }
                 case OrderQueueUpdateType.StreamCompleted:
                 {
-                    List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToCompleteStream(stream.Id, CancellationToken.None);
-                    _queueManager.NearestStreamDate = await GetNearestStreamDate(context);
+                    List<ReviewOrderEntity> orders = await uow.ReviewOrderQueries.GetOrdersToCompleteStream(stream.Id, CancellationToken.None);
+                    _queueManager.NearestStreamDate = await uow.ComposerStreamQueries.GetNearestStreamDate(CancellationToken.None);
                     _queueManager.UpdateOrders(orders);
                     break;
                 }
                 case OrderQueueUpdateType.StreamCanceled:
                 {
-                    _queueManager.NearestStreamDate = await GetNearestStreamDate(context);
+                    _queueManager.NearestStreamDate = await uow.ComposerStreamQueries.GetNearestStreamDate(CancellationToken.None);
                     _queueManager.UpdateOrders();
                     break;
                 }

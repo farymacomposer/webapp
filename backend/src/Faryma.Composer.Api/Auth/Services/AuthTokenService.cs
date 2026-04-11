@@ -17,17 +17,17 @@ namespace Faryma.Composer.Api.Auth.Services
     public sealed class AuthTokenService(
         UnitOfWork uow,
         UserManager<UserEntity> userManager,
+        DateTimeService dateTimeService,
         IOptions<JwtOptions> options)
     {
-        public async Task<(string AccessToken, string RefreshToken)> IssueForUser(UserEntity user, DateTime now, CancellationToken ct)
+        public async Task<(string AccessToken, string RefreshToken)> IssueForUser(UserEntity user, CancellationToken ct)
         {
-            string accessToken = await GenerateAccessToken(user, now);
+            string accessToken = await GenerateAccessToken(user);
             string refreshToken = GenerateRefreshToken();
 
             uow.RefreshTokenStore.Create(
                 tokenHash: Hash(refreshToken),
                 familyId: Guid.NewGuid(),
-                createdAt: now,
                 options.Value.RefreshExpiryInDays,
                 user);
 
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Api.Auth.Services
             return (accessToken, refreshToken);
         }
 
-        public async Task<(string AccessToken, string RefreshToken)> Refresh(string refreshToken, DateTime now, CancellationToken ct)
+        public async Task<(string AccessToken, string RefreshToken)> Refresh(string refreshToken, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
@@ -51,15 +51,15 @@ namespace Faryma.Composer.Api.Auth.Services
             {
                 if (!string.IsNullOrWhiteSpace(stored.ReplacedByTokenHash))
                 {
-                    await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, now, CancellationToken.None);
+                    await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, CancellationToken.None);
                 }
 
                 throw new AuthenticationException("Refresh token отозван");
             }
 
-            if (stored.IsExpired(now))
+            if (stored.IsExpired(dateTimeService.Now))
             {
-                stored.RevokedAt = now;
+                stored.RevokedAt = dateTimeService.Now;
                 await uow.SaveChanges(CancellationToken.None);
 
                 throw new AuthenticationException("Refresh token истек");
@@ -71,23 +71,22 @@ namespace Faryma.Composer.Api.Auth.Services
             string nextRefresh = GenerateRefreshToken();
             string nextHash = Hash(nextRefresh);
 
-            stored.RevokedAt = now;
+            stored.RevokedAt = dateTimeService.Now;
             stored.ReplacedByTokenHash = nextHash;
 
             RefreshTokenEntity nextToken = uow.RefreshTokenStore.Create(
                 nextHash,
                 stored.FamilyId,
-                createdAt: now,
                 options.Value.RefreshExpiryInDays,
                 user);
 
-            string accessToken = await GenerateAccessToken(user, now);
+            string accessToken = await GenerateAccessToken(user);
             await uow.SaveChanges(ct);
 
             return (accessToken, nextRefresh);
         }
 
-        public async Task RevokeSession(Guid userId, string refreshToken, DateTime now, CancellationToken ct)
+        public async Task RevokeSession(Guid userId, string refreshToken, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
@@ -102,12 +101,12 @@ namespace Faryma.Composer.Api.Auth.Services
                 return;
             }
 
-            await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, now, ct);
+            await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, ct);
         }
 
-        public Task RevokeAll(Guid userId, DateTime now, CancellationToken ct) => uow.RefreshTokenStore.RevokeAllForUser(userId, now, ct);
+        public Task RevokeAll(Guid userId, CancellationToken ct) => uow.RefreshTokenStore.RevokeAllForUser(userId, ct);
 
-        private async Task<string> GenerateAccessToken(UserEntity user, DateTime now)
+        private async Task<string> GenerateAccessToken(UserEntity user)
         {
             List<Claim> claims =
             [
@@ -125,7 +124,7 @@ namespace Faryma.Composer.Api.Auth.Services
                 issuer: options.Value.Issuer,
                 audience: options.Value.Audience,
                 claims: claims,
-                expires: now.AddMinutes(options.Value.ExpiryInMinutes),
+                expires: dateTimeService.Now.AddMinutes(options.Value.ExpiryInMinutes),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
 

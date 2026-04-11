@@ -5,10 +5,9 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
-    public sealed class TransactionStore(AppDbContext context)
+    public sealed class TransactionStore(AppDbContext context, DateTimeService dateTimeService)
     {
         public TransactionEntity CreateAccountTopUp(
-            DateTime createdAt,
             AccountTopUpProvider topUpProvider,
             long amount,
             UserNicknameAccountEntity account,
@@ -23,7 +22,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             AccountTopUpEntity source = new()
             {
-                CreatedAt = createdAt,
+                CreatedAt = dateTimeService.Now,
                 Provider = topUpProvider,
                 UserNicknameAccount = account,
                 CreatedByUser = createdByUser,
@@ -33,7 +32,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             return context.Add(new TransactionEntity
             {
-                CreatedAt = createdAt,
+                CreatedAt = dateTimeService.Now,
                 Kind = TransactionKind.AccountTopUp,
                 UserNicknameAccount = account,
                 Credit = amount,
@@ -43,7 +42,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
         }
 
         public TransactionEntity CreatePayment(
-            DateTime createdAt,
             long amount,
             UserNicknameAccountEntity account,
             TransactionSourceEntity source)
@@ -57,7 +55,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             return context.Add(new TransactionEntity
             {
-                CreatedAt = createdAt,
+                CreatedAt = dateTimeService.Now,
                 Kind = TransactionKind.Payment,
                 UserNicknameAccount = account,
                 Credit = 0,
@@ -66,7 +64,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             }).Entity;
         }
 
-        public TransactionEntity CreateReversal(DateTime createdAt, UserEntity createdByUser, TransactionEntity reversedTransaction)
+        public TransactionEntity CreateReversal(UserEntity createdByUser, TransactionEntity reversedTransaction)
         {
             if (reversedTransaction.Kind == TransactionKind.Reversal)
             {
@@ -75,7 +73,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             TransactionReversalEntity source = new()
             {
-                CreatedAt = createdAt,
+                CreatedAt = dateTimeService.Now,
                 CreatedByUser = createdByUser,
                 ReversedTransaction = reversedTransaction,
             };
@@ -84,7 +82,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             TransactionEntity result = new()
             {
-                CreatedAt = createdAt,
+                CreatedAt = dateTimeService.Now,
                 Kind = TransactionKind.Reversal,
                 Credit = reversedTransaction.Debit,
                 Debit = reversedTransaction.Credit,
