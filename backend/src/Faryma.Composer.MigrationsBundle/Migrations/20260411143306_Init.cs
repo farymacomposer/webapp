@@ -20,13 +20,13 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 name: "app");
 
             migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:app.account_top_up_provider", "unspecified,donationalerts,donatty,twitch_channel_points,manual")
-                .Annotation("Npgsql:Enum:app.composer_stream_status", "unspecified,planned,live,completed,canceled")
-                .Annotation("Npgsql:Enum:app.composer_stream_type", "unspecified,donation,debt,charity")
-                .Annotation("Npgsql:Enum:app.queue_category", "unspecified,out_of_queue,donation,debt")
-                .Annotation("Npgsql:Enum:app.review_order_status", "unspecified,preorder,pending,in_progress,completed,canceled")
-                .Annotation("Npgsql:Enum:app.review_order_type", "unspecified,out_of_queue,donation,free,charity,custom")
-                .Annotation("Npgsql:Enum:app.transaction_kind", "unspecified,account_top_up,payment,reversal");
+                .Annotation("Npgsql:Enum:app.AccountTopUpProvider", "unspecified,donationalerts,donatty,twitch_channel_points,manual")
+                .Annotation("Npgsql:Enum:app.ComposerStreamStatus", "unspecified,planned,live,completed,canceled")
+                .Annotation("Npgsql:Enum:app.ComposerStreamType", "unspecified,donation,debt,charity")
+                .Annotation("Npgsql:Enum:app.QueueCategory", "unspecified,out_of_queue,donation,debt")
+                .Annotation("Npgsql:Enum:app.ReviewOrderStatus", "unspecified,preorder,pending,in_progress,completed,canceled")
+                .Annotation("Npgsql:Enum:app.ReviewOrderType", "unspecified,out_of_queue,donation,free,charity,custom")
+                .Annotation("Npgsql:Enum:app.TransactionKind", "unspecified,account_top_up,payment,reversal");
 
             migrationBuilder.CreateTable(
                 name: "app_settings",
@@ -269,8 +269,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     EventDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Type = table.Column<ComposerStreamType>(type: "app.composer_stream_type", nullable: false),
-                    Status = table.Column<ComposerStreamStatus>(type: "app.composer_stream_status", nullable: false),
+                    Type = table.Column<ComposerStreamType>(type: "app.\"ComposerStreamType\"", nullable: false),
+                    Status = table.Column<ComposerStreamStatus>(type: "app.\"ComposerStreamStatus\"", nullable: false),
                     StartedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
@@ -464,9 +464,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CanceledAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CancelReason = table.Column<string>(type: "text", nullable: true),
-                    Type = table.Column<ReviewOrderType>(type: "app.review_order_type", nullable: false),
-                    Status = table.Column<ReviewOrderStatus>(type: "app.review_order_status", nullable: false),
-                    QueueCategory = table.Column<int>(type: "app.order_category_type", nullable: true),
+                    Type = table.Column<ReviewOrderType>(type: "app.\"ReviewOrderType\"", nullable: false),
+                    Status = table.Column<ReviewOrderStatus>(type: "app.\"ReviewOrderStatus\"", nullable: false),
+                    QueueCategory = table.Column<QueueCategory>(type: "app.\"QueueCategory\"", nullable: true),
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
@@ -600,7 +600,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false),
-                    Provider = table.Column<AccountTopUpProvider>(type: "app.account_top_up_provider", nullable: false),
+                    Provider = table.Column<AccountTopUpProvider>(type: "app.\"AccountTopUpProvider\"", nullable: false),
                     UserNicknameAccountId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -630,7 +630,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Kind = table.Column<TransactionKind>(type: "app.transaction_kind", nullable: false),
+                    Kind = table.Column<TransactionKind>(type: "app.\"TransactionKind\"", nullable: false),
                     Credit = table.Column<long>(type: "bigint", nullable: false),
                     Debit = table.Column<long>(type: "bigint", nullable: false),
                     UserNicknameAccountId = table.Column<Guid>(type: "uuid", nullable: false),

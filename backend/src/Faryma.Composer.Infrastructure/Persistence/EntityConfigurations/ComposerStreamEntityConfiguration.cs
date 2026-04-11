@@ -14,10 +14,10 @@ namespace Faryma.Composer.Infrastructure.Persistence.EntityConfigurations
                 .IsUnique();
 
             builder.Property(x => x.Type)
-                .HasColumnType(DbEnumConst.ComposerStreamTypeEnum);
+                .HasColumnType(DbContextHelper.ComposerStreamTypeEnum);
 
             builder.Property(x => x.Status)
-                .HasColumnType(DbEnumConst.ComposerStreamStatusEnum);
+                .HasColumnType(DbContextHelper.ComposerStreamStatusEnum);
 
             builder.HasOne(x => x.CreatedByUser)
                 .WithMany(x => x.CreatedComposerStreams)

@@ -11,7 +11,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.EntityConfigurations
             builder.ToTable("transactions");
 
             builder.Property(x => x.Kind)
-                .HasColumnType(DbEnumConst.TransactionKindEnum);
+                .HasColumnType(DbContextHelper.TransactionKindEnum);
 
             builder.Ignore(x => x.SignedAmount);
 

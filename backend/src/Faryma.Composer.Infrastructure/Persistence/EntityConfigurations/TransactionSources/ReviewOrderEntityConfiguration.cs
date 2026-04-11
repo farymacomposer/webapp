@@ -20,13 +20,13 @@ namespace Faryma.Composer.Infrastructure.Persistence.EntityConfigurations.Transa
                 .HasMaxLength(200);
 
             builder.Property(x => x.Type)
-                .HasColumnType(DbEnumConst.ReviewOrderTypeEnum);
+                .HasColumnType(DbContextHelper.ReviewOrderTypeEnum);
 
             builder.Property(x => x.Status)
-                .HasColumnType(DbEnumConst.ReviewOrderStatusEnum);
+                .HasColumnType(DbContextHelper.ReviewOrderStatusEnum);
 
             builder.Property(x => x.QueueCategory)
-                .HasColumnType(DbEnumConst.OrderCategoryTypeEnum);
+                .HasColumnType(DbContextHelper.QueueCategoryEnum);
 
             builder.HasOne(x => x.Track)
                 .WithMany(x => x.ReviewOrders)

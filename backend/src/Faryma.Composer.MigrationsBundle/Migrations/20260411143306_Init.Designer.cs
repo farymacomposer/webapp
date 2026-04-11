@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260411054710_Init")]
+    [Migration("20260411143306_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -26,13 +26,13 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "account_top_up_provider", new[] { "unspecified", "donationalerts", "donatty", "twitch_channel_points", "manual" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "composer_stream_status", new[] { "unspecified", "planned", "live", "completed", "canceled" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "composer_stream_type", new[] { "unspecified", "donation", "debt", "charity" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "queue_category", new[] { "unspecified", "out_of_queue", "donation", "debt" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "review_order_status", new[] { "unspecified", "preorder", "pending", "in_progress", "completed", "canceled" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "review_order_type", new[] { "unspecified", "out_of_queue", "donation", "free", "charity", "custom" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "transaction_kind", new[] { "unspecified", "account_top_up", "payment", "reversal" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "AccountTopUpProvider", new[] { "unspecified", "donationalerts", "donatty", "twitch_channel_points", "manual" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ComposerStreamStatus", new[] { "unspecified", "planned", "live", "completed", "canceled" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ComposerStreamType", new[] { "unspecified", "donation", "debt", "charity" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "QueueCategory", new[] { "unspecified", "out_of_queue", "donation", "debt" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ReviewOrderStatus", new[] { "unspecified", "preorder", "pending", "in_progress", "completed", "canceled" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ReviewOrderType", new[] { "unspecified", "out_of_queue", "donation", "free", "charity", "custom" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "TransactionKind", new[] { "unspecified", "account_top_up", "payment", "reversal" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.AppSettingsEntity", b =>
@@ -79,10 +79,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<ComposerStreamStatus>("Status")
-                        .HasColumnType("app.composer_stream_status");
+                        .HasColumnType("app.ComposerStreamStatus");
 
                     b.Property<ComposerStreamType>("Type")
-                        .HasColumnType("app.composer_stream_type");
+                        .HasColumnType("app.ComposerStreamType");
 
                     b.HasKey("Id");
 
@@ -403,7 +403,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<TransactionKind>("Kind")
-                        .HasColumnType("app.transaction_kind");
+                        .HasColumnType("app.TransactionKind");
 
                     b.Property<long>("TransactionSourceId")
                         .HasColumnType("bigint");
@@ -852,7 +852,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
 
                     b.Property<AccountTopUpProvider>("Provider")
-                        .HasColumnType("app.account_top_up_provider");
+                        .HasColumnType("app.AccountTopUpProvider");
 
                     b.Property<Guid>("UserNicknameAccountId")
                         .HasColumnType("uuid");
@@ -906,11 +906,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<long?>("ProcessingStreamId")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("QueueCategory")
-                        .HasColumnType("app.order_category_type");
+                    b.Property<QueueCategory?>("QueueCategory")
+                        .HasColumnType("app.QueueCategory");
 
                     b.Property<ReviewOrderStatus>("Status")
-                        .HasColumnType("app.review_order_status");
+                        .HasColumnType("app.ReviewOrderStatus");
 
                     b.Property<long?>("TrackId")
                         .HasColumnType("bigint");
@@ -919,7 +919,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .HasColumnType("text");
 
                     b.Property<ReviewOrderType>("Type")
-                        .HasColumnType("app.review_order_type");
+                        .HasColumnType("app.ReviewOrderType");
 
                     b.Property<string>("UserComment")
                         .HasMaxLength(200)
