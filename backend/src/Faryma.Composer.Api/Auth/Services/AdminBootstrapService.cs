@@ -6,7 +6,10 @@ using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Api.Auth.Services
 {
-    public sealed class AdminBootstrapService(UserManager<UserEntity> userManager, IOptions<AdminBootstrapOptions> options)
+    public sealed class AdminBootstrapService(
+        UserManager<UserEntity> userManager,
+        AuthTokenService authTokenService,
+        IOptions<AdminBootstrapOptions> options)
     {
         public async Task Initialize()
         {
@@ -57,8 +60,13 @@ namespace Faryma.Composer.Api.Auth.Services
                 await EnsureSuccess(await userManager.CreateAsync(user), $"Не удалось создать аккаунт администратора для роли '{targetRole}'");
             }
 
-            await SyncPassword(user, account.Password);
+            bool passwordChanged = await SyncPassword(user, account.Password);
             await EnsureRole(user, targetRole);
+
+            if (passwordChanged)
+            {
+                await authTokenService.RevokeAll(user.Id);
+            }
         }
 
         private async Task<UserEntity?> GetSingleUserInRole(string role)
@@ -73,13 +81,27 @@ namespace Faryma.Composer.Api.Auth.Services
             };
         }
 
-        private async Task SyncPassword(UserEntity user, string password)
+        private async Task<bool> SyncPassword(UserEntity user, string password)
         {
-            IdentityResult result = await userManager.HasPasswordAsync(user)
-                ? await ResetPassword(user, password)
-                : await userManager.AddPasswordAsync(user, password);
+            IdentityResult result;
+
+            if (await userManager.HasPasswordAsync(user))
+            {
+                if (await userManager.CheckPasswordAsync(user, password))
+                {
+                    return false;
+                }
+
+                result = await ResetPassword(user, password);
+            }
+            else
+            {
+                result = await userManager.AddPasswordAsync(user, password);
+            }
 
             await EnsureSuccess(result, $"Не удалось синхронизировать пароль для аккаунта администратора '{user.UserName}'");
+
+            return true;
         }
 
         private async Task<IdentityResult> ResetPassword(UserEntity user, string password)

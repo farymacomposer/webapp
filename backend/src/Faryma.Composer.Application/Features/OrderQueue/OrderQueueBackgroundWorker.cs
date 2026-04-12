@@ -9,18 +9,18 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         OrderQueueService orderQueueService,
         ILogger<OrderQueueBackgroundWorker> logger) : BackgroundService
     {
-        protected override async Task ExecuteAsync(CancellationToken ct)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!ct.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    await foreach (OrderQueueEvent evt in orderQueueEventChannel.ReadAll(ct))
+                    await foreach (OrderQueueEvent evt in orderQueueEventChannel.ReadAll(stoppingToken))
                     {
                         await orderQueueService.HandleEvent(evt);
                     }
                 }
-                catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {
                     break;
                 }

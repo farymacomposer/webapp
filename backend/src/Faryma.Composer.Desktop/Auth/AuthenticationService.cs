@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Faryma.Composer.Contracts.Api.Auth.Features.Login;
 using Faryma.Composer.Contracts.Api.Auth.Features.RefreshToken;
 
 namespace Faryma.Composer.Desktop.Auth
@@ -21,7 +22,7 @@ namespace Faryma.Composer.Desktop.Auth
 
             _tokens = storedTokens;
 
-            return await TryRefreshInternal();
+            return await TryRefreshInternal(CancellationToken.None);
         }
 
         public async Task Login(string userName, string password)
@@ -30,7 +31,7 @@ namespace Faryma.Composer.Desktop.Auth
 
             AuthTokens tokens = await Exchange(async () =>
             {
-                Contracts.Api.Auth.Features.Login.LoginResponse response = await authHttpClient.Login(normalizedUserName, password);
+                LoginResponse response = await authHttpClient.Login(normalizedUserName, password);
                 return new AuthTokens
                 {
                     AccessToken = response.AccessToken,
@@ -60,13 +61,13 @@ namespace Faryma.Composer.Desktop.Auth
             return _tokens?.AccessToken;
         }
 
-        public async Task Logout(CancellationToken ct = default)
+        public async Task Logout()
         {
             if (_tokens is not null)
             {
                 try
                 {
-                    await authHttpClient.Logout(_tokens.RefreshToken, _tokens.AccessToken, ct);
+                    await authHttpClient.Logout(_tokens.RefreshToken, _tokens.AccessToken);
                 }
                 catch
                 {
@@ -112,7 +113,7 @@ namespace Faryma.Composer.Desktop.Auth
             return DateTimeOffset.FromUnixTimeSeconds(expiresAtUnixTime);
         }
 
-        private async Task<bool> TryRefreshInternal(CancellationToken ct = default)
+        private async Task<bool> TryRefreshInternal(CancellationToken ct)
         {
             if (_tokens is null)
             {
@@ -143,7 +144,7 @@ namespace Faryma.Composer.Desktop.Auth
                             AccessToken = response.AccessToken,
                             RefreshToken = response.RefreshToken,
                         };
-                    }, ct);
+                    });
 
                     _tokens = refreshedTokens;
 
@@ -162,10 +163,10 @@ namespace Faryma.Composer.Desktop.Auth
             }
         }
 
-        private async Task<AuthTokens> Exchange(Func<Task<AuthTokens>> exchange, CancellationToken ct = default)
+        private async Task<AuthTokens> Exchange(Func<Task<AuthTokens>> exchange)
         {
             AuthTokens tokens = await exchange();
-            await authTokenStore.Save(tokens, ct);
+            await authTokenStore.Save(tokens);
 
             return tokens;
         }

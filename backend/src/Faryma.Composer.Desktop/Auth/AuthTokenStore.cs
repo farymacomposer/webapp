@@ -10,7 +10,7 @@ namespace Faryma.Composer.Desktop.Auth
 
         private static readonly string _sessionFilePath = Path.Combine(_sessionDirectoryPath, "session.dat");
 
-        public async Task<AuthTokens?> TryLoad(CancellationToken ct = default)
+        public async Task<AuthTokens?> TryLoad()
         {
             if (!File.Exists(_sessionFilePath))
             {
@@ -19,14 +19,14 @@ namespace Faryma.Composer.Desktop.Auth
 
             await using FileStream stream = File.OpenRead(_sessionFilePath);
 
-            return await JsonSerializer.DeserializeAsync<AuthTokens>(stream, serializerOptions, ct);
+            return await JsonSerializer.DeserializeAsync<AuthTokens>(stream, serializerOptions);
         }
 
-        public async Task Save(AuthTokens tokens, CancellationToken ct = default)
+        public async Task Save(AuthTokens tokens)
         {
             Directory.CreateDirectory(_sessionDirectoryPath);
             await using FileStream stream = File.Create(_sessionFilePath);
-            await JsonSerializer.SerializeAsync(stream, tokens, serializerOptions, ct);
+            await JsonSerializer.SerializeAsync(stream, tokens, serializerOptions);
         }
 
         public void Clear()

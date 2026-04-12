@@ -10,34 +10,31 @@ namespace Faryma.Composer.Desktop.Auth
 {
     public sealed class AuthHttpClient(HttpClient httpClient, JsonSerializerOptions serializerOptions)
     {
-        public async Task<LoginResponse> Login(string userName, string password, CancellationToken ct = default)
+        public Task<LoginResponse> Login(string userName, string password)
         {
-            HttpResponseMessage response = await httpClient.PostAsJsonAsync("/api/Auth/Login", new LoginRequest
-            {
-                UserName = userName,
-                Password = password,
-            }, serializerOptions, ct);
-
-            await EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadFromJsonAsync<LoginResponse>(serializerOptions, ct)
-                ?? throw new InvalidOperationException("Не удалось десериализовать LoginResponse");
+            return Post<LoginRequest, LoginResponse>(
+                "/api/Auth/Login",
+                new LoginRequest
+                {
+                    UserName = userName,
+                    Password = password,
+                },
+                unauthorizedMessage: "Неверное имя пользователя или пароль");
         }
 
-        public async Task<RefreshTokenResponse> Refresh(string refreshToken, CancellationToken ct = default)
+        public Task<RefreshTokenResponse> Refresh(string refreshToken, CancellationToken ct)
         {
-            HttpResponseMessage response = await httpClient.PostAsJsonAsync("/api/Auth/RefreshToken", new RefreshTokenRequest
-            {
-                RefreshToken = refreshToken
-            }, serializerOptions, ct);
-
-            await EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadFromJsonAsync<RefreshTokenResponse>(serializerOptions, ct)
-                ?? throw new InvalidOperationException("Не удалось десериализовать RefreshTokenResponse");
+            return Post<RefreshTokenRequest, RefreshTokenResponse>(
+                "/api/Auth/RefreshToken",
+                new RefreshTokenRequest
+                {
+                    RefreshToken = refreshToken
+                },
+                unauthorizedMessage: "Сессия истекла или была отозвана",
+                ct);
         }
 
-        public async Task Logout(string refreshToken, string accessToken, CancellationToken ct = default)
+        public async Task Logout(string refreshToken, string accessToken)
         {
             using HttpRequestMessage request = new(HttpMethod.Post, "/api/Auth/Logout")
             {
@@ -49,12 +46,12 @@ namespace Faryma.Composer.Desktop.Auth
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            HttpResponseMessage response = await httpClient.SendAsync(request, ct);
+            HttpResponseMessage response = await httpClient.SendAsync(request);
 
-            await EnsureSuccessStatusCode(response);
+            await EnsureSuccessStatusCode(response, "Сессия уже недействительна");
         }
 
-        private static async Task EnsureSuccessStatusCode(HttpResponseMessage response)
+        private static async Task EnsureSuccessStatusCode(HttpResponseMessage response, string? unauthorizedMessage = null)
         {
             try
             {
@@ -62,8 +59,27 @@ namespace Faryma.Composer.Desktop.Auth
             }
             catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Unauthorized)
             {
-                throw new InvalidOperationException("Неверное имя пользователя или пароль.", ex);
+                throw new InvalidOperationException(unauthorizedMessage ?? "Ошибка авторизации", ex);
             }
+            catch (Exception ex)
+            {
+                string message = await response.Content.ReadAsStringAsync();
+                throw new InvalidOperationException(message, ex);
+            }
+        }
+
+        private async Task<TResponse> Post<TRequest, TResponse>(
+            string requestUri,
+            TRequest request,
+            string? unauthorizedMessage = null,
+            CancellationToken ct = default)
+        {
+            HttpResponseMessage response = await httpClient.PostAsJsonAsync(requestUri, request, serializerOptions, ct);
+
+            await EnsureSuccessStatusCode(response, unauthorizedMessage);
+
+            return await response.Content.ReadFromJsonAsync<TResponse>(serializerOptions, ct)
+                ?? throw new InvalidOperationException($"Не удалось десериализовать {typeof(TResponse).Name}");
         }
     }
 }

@@ -98,9 +98,9 @@ namespace Faryma.Composer.Api.Auth
         /// </summary>
         [HttpPost(nameof(RefreshToken))]
         [EnableRateLimiting("auth-login")]
-        public async Task<ActionResult<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest request, CancellationToken ct)
+        public async Task<ActionResult<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest request)
         {
-            (string accessToken, string refreshToken) = await authTokenService.Refresh(request.RefreshToken, ct);
+            (string accessToken, string refreshToken) = await authTokenService.Refresh(request.RefreshToken);
 
             return Ok(new RefreshTokenResponse { AccessToken = accessToken, RefreshToken = refreshToken });
         }
@@ -114,7 +114,7 @@ namespace Faryma.Composer.Api.Auth
         public async Task<IActionResult> Logout(LogoutRequest request)
         {
             Guid userId = User.GetUserId();
-            await authTokenService.RevokeSession(userId, request.RefreshToken, CancellationToken.None);
+            await authTokenService.RevokeSession(userId, request.RefreshToken);
 
             return NoContent();
         }
@@ -128,7 +128,7 @@ namespace Faryma.Composer.Api.Auth
         public async Task<IActionResult> LogoutAll()
         {
             Guid userId = User.GetUserId();
-            await authTokenService.RevokeAll(userId, CancellationToken.None);
+            await authTokenService.RevokeAll(userId);
 
             return NoContent();
         }

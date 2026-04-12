@@ -36,7 +36,7 @@ namespace Faryma.Composer.Api.Auth.Services
             return (accessToken, refreshToken);
         }
 
-        public async Task<(string AccessToken, string RefreshToken)> Refresh(string refreshToken, CancellationToken ct)
+        public async Task<(string AccessToken, string RefreshToken)> Refresh(string refreshToken)
         {
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
@@ -44,14 +44,14 @@ namespace Faryma.Composer.Api.Auth.Services
             }
 
             string hash = Hash(refreshToken);
-            RefreshTokenEntity stored = await uow.RefreshTokenStore.FindByHash(hash, ct)
+            RefreshTokenEntity stored = await uow.RefreshTokenStore.FindByHash(hash)
                 ?? throw new AuthenticationException("Refresh token не найден");
 
             if (stored.RevokedAt is not null)
             {
                 if (!string.IsNullOrWhiteSpace(stored.ReplacedByTokenHash))
                 {
-                    await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, CancellationToken.None);
+                    await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId);
                 }
 
                 throw new AuthenticationException("Refresh token отозван");
@@ -65,7 +65,7 @@ namespace Faryma.Composer.Api.Auth.Services
                 throw new AuthenticationException("Refresh token истек");
             }
 
-            UserEntity user = await userManager.Users.FirstOrDefaultAsync(x => x.Id == stored.UserId, ct)
+            UserEntity user = await userManager.Users.FirstOrDefaultAsync(x => x.Id == stored.UserId)
                 ?? throw new AuthenticationException("Пользователь не найден");
 
             string nextRefresh = GenerateRefreshToken();
@@ -81,12 +81,12 @@ namespace Faryma.Composer.Api.Auth.Services
                 user);
 
             string accessToken = await GenerateAccessToken(user);
-            await uow.SaveChanges(ct);
+            await uow.SaveChanges(CancellationToken.None);
 
             return (accessToken, nextRefresh);
         }
 
-        public async Task RevokeSession(Guid userId, string refreshToken, CancellationToken ct)
+        public async Task RevokeSession(Guid userId, string refreshToken)
         {
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
@@ -94,17 +94,17 @@ namespace Faryma.Composer.Api.Auth.Services
             }
 
             string tokenHash = Hash(refreshToken);
-            RefreshTokenEntity? stored = await uow.RefreshTokenStore.FindByUserIdAndHash(userId, tokenHash, ct);
+            RefreshTokenEntity? stored = await uow.RefreshTokenStore.FindByUserIdAndHash(userId, tokenHash);
 
             if (stored is null)
             {
                 return;
             }
 
-            await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId, ct);
+            await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId);
         }
 
-        public Task RevokeAll(Guid userId, CancellationToken ct) => uow.RefreshTokenStore.RevokeAllForUser(userId, ct);
+        public Task RevokeAll(Guid userId) => uow.RefreshTokenStore.RevokeAllForUser(userId);
 
         private async Task<string> GenerateAccessToken(UserEntity user)
         {
