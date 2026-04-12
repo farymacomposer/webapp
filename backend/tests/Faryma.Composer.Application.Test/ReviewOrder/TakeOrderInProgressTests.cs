@@ -1,4 +1,4 @@
-using Faryma.Composer.Application.Features.ReviewOrder;
+﻿using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
@@ -64,8 +64,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 processingStreamId: liveStream.Id,
                 nickname: "Nick-InProgress",
                 status: ReviewOrderStatus.InProgress,
-                inProgressAt: app.FixedNow,
-                totalPaymentAmount: 1_000);
+                totalPaymentAmount: 1_000,
+                inProgressAt: app.FixedNow);
 
             int beforeUpdates = app.QueueUpdateCount;
             ReviewOrderEntity result = await app.RunScopeAsync(services =>

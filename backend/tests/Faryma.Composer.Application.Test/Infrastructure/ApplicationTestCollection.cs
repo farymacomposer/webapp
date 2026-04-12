@@ -1,6 +1,4 @@
-using Faryma.Composer.Application.Test.Infrastructure;
-
-namespace Faryma.Composer.Application.Test.Infrastructure
+﻿namespace Faryma.Composer.Application.Test.Infrastructure
 {
     [CollectionDefinition(nameof(ApplicationTestCollection))]
     public sealed class ApplicationTestCollection : ICollectionFixture<PostgreSqlFixture>;

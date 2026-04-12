@@ -1,4 +1,4 @@
-using Faryma.Composer.Application.Features.ReviewOrder;
+﻿using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
@@ -18,8 +18,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             UserEntity user = await app.Data.CreateUserAsync("admin");
             ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
                 createdByUserId: user.Id,
-                status: status,
                 type: ReviewOrderType.Donation,
+                status: status,
                 trackUrl: status == ReviewOrderStatus.Preorder ? null : "https://example.com/track");
 
             TransactionEntity payment = await app.RunScopeAsync(services =>
@@ -58,10 +58,10 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
                 createdByUserId: user.Id,
                 status: status,
+                inProgressAt: status == ReviewOrderStatus.InProgress ? app.FixedNow : null,
                 completedAt: status == ReviewOrderStatus.Completed ? app.FixedNow : null,
                 canceledAt: status == ReviewOrderStatus.Canceled ? app.FixedNow : null,
-                cancelReason: status == ReviewOrderStatus.Canceled ? "reason" : null,
-                inProgressAt: status == ReviewOrderStatus.InProgress ? app.FixedNow : null);
+                cancelReason: status == ReviewOrderStatus.Canceled ? "reason" : null);
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>

@@ -1,4 +1,4 @@
-using Faryma.Composer.Application.Features.ComposerStream;
+﻿using Faryma.Composer.Application.Features.ComposerStream;
 using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
@@ -12,22 +12,26 @@ namespace Faryma.Composer.Application.Test.ComposerStream
         {
             await using ApplicationTestHost app = await CreateAppAsync();
             UserEntity user = await app.Data.CreateUserAsync("composer");
+
             ComposerStreamEntity live = await app.Data.CreateStreamAsync(
                 createdByUserId: user.Id,
                 eventDate: app.Today.AddDays(-2),
                 type: ComposerStreamType.Donation,
                 status: ComposerStreamStatus.Live,
                 startedAt: app.FixedNow);
+
             ComposerStreamEntity plannedFuture = await app.Data.CreateStreamAsync(
                 createdByUserId: user.Id,
                 eventDate: app.Today.AddDays(2),
                 type: ComposerStreamType.Charity,
                 status: ComposerStreamStatus.Planned);
+
             ComposerStreamEntity plannedPast = await app.Data.CreateStreamAsync(
                 createdByUserId: user.Id,
                 eventDate: app.Today.AddDays(-1),
                 type: ComposerStreamType.Debt,
                 status: ComposerStreamStatus.Planned);
+
             ComposerStreamEntity completed = await app.Data.CreateStreamAsync(
                 createdByUserId: user.Id,
                 eventDate: app.Today.AddDays(-3),

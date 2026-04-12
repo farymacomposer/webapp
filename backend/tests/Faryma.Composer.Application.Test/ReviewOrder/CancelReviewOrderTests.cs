@@ -1,6 +1,5 @@
-using Faryma.Composer.Application.Features.ReviewOrder;
+﻿using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
-using Faryma.Composer.Contracts.Application.Features.ReviewOrder;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
@@ -24,8 +23,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 creationStreamId: liveStream.Id,
                 processingStreamId: liveStream.Id,
                 status: ReviewOrderStatus.InProgress,
-                inProgressAt: app.FixedNow,
-                queueCategory: QueueCategory.Donation);
+                queueCategory: QueueCategory.Donation,
+                inProgressAt: app.FixedNow);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand

@@ -1,15 +1,13 @@
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
-using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Application.Test.Infrastructure
 {
     public sealed class TestDataBuilder(ApplicationTestHost app)
     {
-        private const string DefaultTrackUrl = "https://example.com/track";
+        private const string _defaultTrackUrl = "https://example.com/track";
         private int _streamSequence;
 
         public Task<UserEntity> CreateUserAsync(string? userName = null) =>
@@ -89,8 +87,8 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 ComposerStreamEntity? processingStream = await GetOrCreateProcessingStreamAsync(uow, createdByUser, processingStreamId, status);
                 UserNicknameEntity userNickname = await GetOrCreateNicknameAsync(uow, nickname);
 
-                string? initialTrackUrl = trackUrl ?? (status == ReviewOrderStatus.Preorder ? null : DefaultTrackUrl);
-                int initialPayableAmount = (type == ReviewOrderType.Donation || type == ReviewOrderType.Free)
+                string? initialTrackUrl = trackUrl ?? (status == ReviewOrderStatus.Preorder ? null : _defaultTrackUrl);
+                int initialPayableAmount = (type is ReviewOrderType.Donation or ReviewOrderType.Free)
                     ? payableAmount
                     : 0;
 
@@ -144,8 +142,22 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 return order;
             });
 
+        private static async Task<UserNicknameEntity> GetOrCreateNicknameAsync(UnitOfWork uow, string nickname)
+        {
+            UserNicknameEntity? existing = await uow.UserNicknameStore.FindByNickname(nickname, CancellationToken.None);
+            if (existing is not null)
+            {
+                return existing;
+            }
+
+            UserNicknameEntity created = uow.UserNicknameStore.Create(nickname);
+            await uow.SaveChanges(CancellationToken.None);
+
+            return created;
+        }
+
         private async Task<UserEntity> GetOrCreateUserAsync(
-            UserManager<UserEntity> userManager,
+                    UserManager<UserEntity> userManager,
             Guid? userId,
             string prefix)
         {
@@ -212,20 +224,6 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             await uow.SaveChanges(CancellationToken.None);
 
             return stream;
-        }
-
-        private static async Task<UserNicknameEntity> GetOrCreateNicknameAsync(UnitOfWork uow, string nickname)
-        {
-            UserNicknameEntity? existing = await uow.UserNicknameStore.FindByNickname(nickname, CancellationToken.None);
-            if (existing is not null)
-            {
-                return existing;
-            }
-
-            UserNicknameEntity created = uow.UserNicknameStore.Create(nickname);
-            await uow.SaveChanges(CancellationToken.None);
-
-            return created;
         }
 
         private DateOnly GetNextStreamDate() =>

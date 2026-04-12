@@ -1,4 +1,4 @@
-using Faryma.Composer.Application.Test.Infrastructure;
+﻿using Faryma.Composer.Application.Test.Infrastructure;
 
 namespace Faryma.Composer.Application.Test.Specification
 {

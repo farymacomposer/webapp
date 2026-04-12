@@ -1,15 +1,11 @@
-using Faryma.Composer.Application.DependencyInjection;
+﻿using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
@@ -21,8 +17,14 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         private readonly IHost _host;
         private readonly string _databaseName;
 
+        public DateTime FixedNow { get; }
+        public DateOnly Today => DateOnly.FromDateTime(FixedNow);
+        public TestOrderQueueNotificationService Notifications { get; }
+        public TestDataBuilder Data { get; }
+        public int QueueUpdateCount => Notifications.UpdateCount;
+
         private ApplicationTestHost(
-            PostgreSqlFixture fixture,
+                                                    PostgreSqlFixture fixture,
             IHost host,
             string databaseName,
             DateTime fixedNow)
@@ -34,13 +36,6 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             Notifications = (TestOrderQueueNotificationService)_host.Services.GetRequiredService<IOrderQueueNotificationService>();
             Data = new TestDataBuilder(this);
         }
-
-        public DateTime FixedNow { get; }
-        public DateOnly Today => DateOnly.FromDateTime(FixedNow);
-        public TestOrderQueueNotificationService Notifications { get; }
-        public TestDataBuilder Data { get; }
-
-        public int QueueUpdateCount => Notifications.UpdateCount;
 
         public static async Task<ApplicationTestHost> CreateAsync(PostgreSqlFixture fixture, DateTime? now = null)
         {

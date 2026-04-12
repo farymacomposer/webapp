@@ -1,6 +1,5 @@
-using Faryma.Composer.Application.Features.ComposerStream;
+﻿using Faryma.Composer.Application.Features.ComposerStream;
 using Faryma.Composer.Application.Test.Infrastructure;
-using Faryma.Composer.Contracts.Application.Features.ComposerStream;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 

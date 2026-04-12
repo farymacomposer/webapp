@@ -1,24 +1,24 @@
-using Npgsql;
+﻿using Npgsql;
 using Testcontainers.PostgreSql;
 
 namespace Faryma.Composer.Application.Test.Infrastructure
 {
     public sealed class PostgreSqlFixture : IAsyncLifetime
     {
-        private const string DefaultUsername = "postgres";
-        private const string DefaultPassword = "postgres";
+        private const string _defaultUsername = "postgres";
+        private const string _defaultPassword = "postgres";
 
         private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
             .WithImage("postgres:17-alpine")
             .WithDatabase("postgres")
-            .WithUsername(DefaultUsername)
-            .WithPassword(DefaultPassword)
+            .WithUsername(_defaultUsername)
+            .WithPassword(_defaultPassword)
             .Build();
 
         public string Host => _container.Hostname;
         public int Port => _container.GetMappedPublicPort(PostgreSqlBuilder.PostgreSqlPort);
-        public string Username => DefaultUsername;
-        public string Password => DefaultPassword;
+        public string Username => _defaultUsername;
+        public string Password => _defaultPassword;
 
         public Task InitializeAsync() => _container.StartAsync();
 
