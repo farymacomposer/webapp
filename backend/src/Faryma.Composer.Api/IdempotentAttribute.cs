@@ -23,14 +23,14 @@ namespace Faryma.Composer.Api
 
             if (!Guid.TryParse(raw, out Guid idempotencyKey))
             {
-                context.Result = new BadRequestObjectResult($"Некорректный {Globals.IdempotencyKey}");
+                context.Result = new BadRequestObjectResult($"Некорректный заголовок {Globals.IdempotencyKey}");
 
                 return;
             }
 
             if (idempotencyKey == Guid.Empty)
             {
-                context.Result = new BadRequestObjectResult($"Пустой {Globals.IdempotencyKey}");
+                context.Result = new BadRequestObjectResult($"Пустой заголовок {Globals.IdempotencyKey}");
 
                 return;
             }

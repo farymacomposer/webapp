@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Contracts.Api.Shared.Dto
@@ -66,6 +67,7 @@ namespace Faryma.Composer.Contracts.Api.Shared.Dto
         /// <summary>
         /// Связанный cтрим композитора, где создан заказ
         /// </summary>
+        [Required]
         public required ComposerStreamDto CreationStream { get; init; }
 
         public static ReviewOrderDto Map(ReviewOrderEntity item)

@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Contracts.Api.Shared.Dto;
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
 
 namespace Faryma.Composer.Contracts.Api.Features.ComposerStream.Start
 {
@@ -10,6 +11,7 @@ namespace Faryma.Composer.Contracts.Api.Features.ComposerStream.Start
         /// <summary>
         /// Стрим композитора
         /// </summary>
+        [Required]
         public required ComposerStreamDto ComposerStream { get; init; }
     }
 }

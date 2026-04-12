@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
@@ -23,6 +24,7 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts
         /// <summary>
         /// Активные заказы
         /// </summary>
+        [Required]
         public required List<OrderPositionDto> ActiveOrders { get; init; }
 
         /// <summary>
@@ -33,16 +35,19 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts
         /// <summary>
         /// Выполненные заказы
         /// </summary>
+        [Required]
         public required List<OrderPositionDto> CompletedOrders { get; init; }
 
         /// <summary>
         /// Запланированные заказы
         /// </summary>
+        [Required]
         public required List<OrderPositionDto> ScheduledOrders { get; init; }
 
         /// <summary>
         /// Замороженные заказы
         /// </summary>
+        [Required]
         public required List<OrderPositionDto> FrozenOrders { get; init; }
 
         public static OrderQueueSnapshotMessage Map(OrderQueueSnapshot snapshot)

@@ -21,12 +21,11 @@ namespace Faryma.Composer.Contracts.Api.Auth.Options
         public required string SecretKey { get; init; }
 
         [ConfigurationKeyName("EXPIRY_IN_MINUTES")]
-        [Required]
         [Range(1, 1440)]
         public required int ExpiryInMinutes { get; init; }
 
         [ConfigurationKeyName("REFRESH_EXPIRY_IN_DAYS")]
         [Range(1, 90)]
-        public int RefreshExpiryInDays { get; init; } = 14;
+        public required int RefreshExpiryInDays { get; init; } = 14;
     }
 }
