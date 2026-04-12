@@ -19,7 +19,7 @@ namespace Faryma.Composer.Desktop.Api.Exceptions
                 {
                     string message = await responseMessage.Content.ReadAsStringAsync();
 
-                    throw new(message, ex);
+                    throw new InvalidOperationException(message, ex);
                 }
 
                 throw new ApiException(result, ex);
@@ -28,7 +28,7 @@ namespace Faryma.Composer.Desktop.Api.Exceptions
             {
                 string message = await responseMessage.Content.ReadAsStringAsync();
 
-                throw new(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
     }

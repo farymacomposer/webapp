@@ -22,7 +22,7 @@ namespace Faryma.Composer.Desktop.Auth
                 unauthorizedMessage: "Неверное имя пользователя или пароль");
         }
 
-        public Task<RefreshTokenResponse> Refresh(string refreshToken, CancellationToken ct)
+        public Task<RefreshTokenResponse> RefreshToken(string refreshToken, CancellationToken ct)
         {
             return Post<RefreshTokenRequest, RefreshTokenResponse>(
                 "/api/Auth/RefreshToken",

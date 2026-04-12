@@ -137,7 +137,7 @@ namespace Faryma.Composer.Desktop.Auth
                 {
                     AuthTokens refreshedTokens = await Exchange(async () =>
                     {
-                        RefreshTokenResponse response = await authHttpClient.Refresh(_tokens.RefreshToken, ct);
+                        RefreshTokenResponse response = await authHttpClient.RefreshToken(_tokens.RefreshToken, ct);
 
                         return new AuthTokens
                         {
@@ -150,7 +150,7 @@ namespace Faryma.Composer.Desktop.Auth
 
                     return true;
                 }
-                catch (InvalidOperationException)
+                catch
                 {
                     ClearSession();
 
