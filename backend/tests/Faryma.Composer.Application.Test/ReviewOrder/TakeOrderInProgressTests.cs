@@ -1,0 +1,145 @@
+using Faryma.Composer.Application.Features.ReviewOrder;
+using Faryma.Composer.Application.Test.Infrastructure;
+using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
+
+namespace Faryma.Composer.Application.Test.ReviewOrder
+{
+    public sealed class TakeOrderInProgressTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    {
+        [Fact]
+        public async Task TakeInProgress_TransitionsPendingOrderToInProgress()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity liveStream = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                type: ComposerStreamType.Donation,
+                status: ComposerStreamStatus.Live,
+                startedAt: app.FixedNow);
+
+            int expectedCreateUpdates = app.QueueUpdateCount + 1;
+            ReviewOrderEntity order = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = "Nick-Take",
+                    TrackUrl = "https://example.com/take",
+                    UserComment = null,
+                    PaymentAmount = 1_000,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    CreatedByUserId = user.Id,
+                }, CancellationToken.None));
+
+            await app.WaitForQueueUpdateCountAsync(expectedCreateUpdates);
+
+            int expectedUpdates = app.QueueUpdateCount + 1;
+            ReviewOrderEntity result = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None));
+
+            await app.WaitForQueueUpdateCountAsync(expectedUpdates);
+
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
+            Assert.Equal(ReviewOrderStatus.InProgress, result.Status);
+            Assert.Equal(ReviewOrderStatus.InProgress, persisted.Status);
+            Assert.Equal(liveStream.Id, persisted.ProcessingStreamId);
+            Assert.Equal(app.FixedNow, persisted.InProgressAt);
+            Assert.NotEqual(QueueCategory.Unspecified, persisted.QueueCategory);
+        }
+
+        [Fact]
+        public async Task TakeInProgress_ReturnsCurrentOrder_WhenOrderAlreadyInProgress()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity liveStream = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                type: ComposerStreamType.Donation,
+                status: ComposerStreamStatus.Live,
+                startedAt: app.FixedNow);
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                creationStreamId: liveStream.Id,
+                processingStreamId: liveStream.Id,
+                nickname: "Nick-InProgress",
+                status: ReviewOrderStatus.InProgress,
+                inProgressAt: app.FixedNow,
+                totalPaymentAmount: 1_000);
+
+            int beforeUpdates = app.QueueUpdateCount;
+            ReviewOrderEntity result = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None));
+
+            Assert.Equal(order.Id, result.Id);
+            Assert.Equal(beforeUpdates, app.QueueUpdateCount);
+        }
+
+        [Fact]
+        public async Task TakeInProgress_Throws_WhenOrderIsFrozen()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity liveStream = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                status: ComposerStreamStatus.Live,
+                startedAt: app.FixedNow);
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                creationStreamId: liveStream.Id,
+                status: ReviewOrderStatus.Pending,
+                isFrozen: true);
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task TakeInProgress_Throws_WhenLiveStreamIsMissing()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity plannedStream = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                status: ComposerStreamStatus.Planned);
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                creationStreamId: plannedStream.Id,
+                status: ReviewOrderStatus.Pending);
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task TakeInProgress_Throws_WhenAnotherOrderIsAlreadyInProgress()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity liveStream = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                status: ComposerStreamStatus.Live,
+                startedAt: app.FixedNow);
+
+            await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                creationStreamId: liveStream.Id,
+                processingStreamId: liveStream.Id,
+                nickname: "Nick-Existing",
+                status: ReviewOrderStatus.InProgress,
+                inProgressAt: app.FixedNow);
+
+            ReviewOrderEntity candidate = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                creationStreamId: liveStream.Id,
+                nickname: "Nick-Candidate",
+                status: ReviewOrderStatus.Pending);
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(candidate.Id, CancellationToken.None)));
+        }
+    }
+}

@@ -5,10 +5,14 @@
         public DateTime Now { get; }
         public DateOnly Today { get; }
 
-        public DateTimeService()
+        public DateTimeService() : this(DateTime.UtcNow)
         {
-            Now = DateTime.UtcNow;
-            Today = DateOnly.FromDateTime(Now);
+        }
+
+        public DateTimeService(DateTime now)
+        {
+            Now = now;
+            Today = DateOnly.FromDateTime(now);
         }
     }
 }
