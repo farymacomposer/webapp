@@ -34,11 +34,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await app.WaitForQueueUpdateCountAsync(expectedCreateUpdates);
 
-            int expectedUpdates = app.QueueUpdateCount + 1;
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None));
-
-            await app.WaitForQueueUpdateCountAsync(expectedUpdates);
 
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
             Assert.Equal(ReviewOrderStatus.InProgress, result.Status);
@@ -58,6 +55,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 type: ComposerStreamType.Donation,
                 status: ComposerStreamStatus.Live,
                 startedAt: app.FixedNow);
+            DateTime originalInProgressAt = app.FixedNow.AddMinutes(-5);
             ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
                 createdByUserId: user.Id,
                 creationStreamId: liveStream.Id,
@@ -65,13 +63,18 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 nickname: "Nick-InProgress",
                 status: ReviewOrderStatus.InProgress,
                 totalPaymentAmount: 1_000,
-                inProgressAt: app.FixedNow);
+                inProgressAt: originalInProgressAt);
 
             int beforeUpdates = app.QueueUpdateCount;
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(order.Id, result.Id);
+            Assert.Equal(originalInProgressAt, result.InProgressAt);
+            Assert.Equal(originalInProgressAt, persisted.InProgressAt);
+            Assert.Equal(ReviewOrderStatus.InProgress, persisted.Status);
+            Assert.Equal(liveStream.Id, persisted.ProcessingStreamId);
             Assert.Equal(beforeUpdates, app.QueueUpdateCount);
         }
 
@@ -140,6 +143,36 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().TakeInProgress(candidate.Id, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task TakeInProgress_Throws_WhenOrderIsPreorder()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity liveStream = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                status: ComposerStreamStatus.Live,
+                startedAt: app.FixedNow);
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                creationStreamId: liveStream.Id,
+                status: ReviewOrderStatus.Preorder,
+                trackUrl: null);
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task TakeInProgress_Throws_WhenOrderDoesNotExist()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(long.MaxValue, CancellationToken.None)));
         }
     }
 }

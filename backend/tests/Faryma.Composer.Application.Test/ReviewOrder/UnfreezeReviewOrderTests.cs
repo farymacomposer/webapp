@@ -23,8 +23,10 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().Unfreeze(order.Id, CancellationToken.None));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.False(result.IsFrozen);
+            Assert.False(persisted.IsFrozen);
         }
 
         [Fact]
@@ -39,8 +41,10 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().Unfreeze(order.Id, CancellationToken.None));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.False(result.IsFrozen);
+            Assert.False(persisted.IsFrozen);
         }
 
         [Theory]
@@ -64,6 +68,16 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().Unfreeze(order.Id, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task Unfreeze_Throws_WhenOrderDoesNotExist()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().Unfreeze(long.MaxValue, CancellationToken.None)));
         }
     }
 }

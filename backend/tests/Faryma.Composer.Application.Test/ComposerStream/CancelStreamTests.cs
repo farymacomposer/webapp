@@ -55,5 +55,15 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id, CancellationToken.None)));
         }
+
+        [Fact]
+        public async Task Cancel_Throws_WhenStreamDoesNotExist()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+
+            await Assert.ThrowsAsync<ComposerStreamException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ComposerStreamService>().Cancel(long.MaxValue, CancellationToken.None)));
+        }
     }
 }

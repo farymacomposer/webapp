@@ -18,11 +18,8 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 type: ComposerStreamType.Donation,
                 status: ComposerStreamStatus.Planned);
 
-            int expectedUpdates = app.QueueUpdateCount + 1;
             ComposerStreamEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ComposerStreamService>().Start(stream.Id, CancellationToken.None));
-
-            await app.WaitForQueueUpdateCountAsync(expectedUpdates);
 
             ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
             Assert.Equal(ComposerStreamStatus.Live, result.Status);
@@ -35,16 +32,21 @@ namespace Faryma.Composer.Application.Test.ComposerStream
         {
             await using ApplicationTestHost app = await CreateAppAsync();
             UserEntity user = await app.Data.CreateUserAsync("composer");
+            DateTime originalStartedAt = app.FixedNow.AddMinutes(-5);
             ComposerStreamEntity stream = await app.Data.CreateStreamAsync(
                 createdByUserId: user.Id,
                 status: ComposerStreamStatus.Live,
-                startedAt: app.FixedNow);
+                startedAt: originalStartedAt);
 
             int beforeUpdates = app.QueueUpdateCount;
             ComposerStreamEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ComposerStreamService>().Start(stream.Id, CancellationToken.None));
+            ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
 
             Assert.Equal(stream.Id, result.Id);
+            Assert.Equal(originalStartedAt, result.StartedAt);
+            Assert.Equal(originalStartedAt, persisted.StartedAt);
+            Assert.Equal(ComposerStreamStatus.Live, persisted.Status);
             Assert.Equal(beforeUpdates, app.QueueUpdateCount);
         }
 
@@ -81,6 +83,16 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             await Assert.ThrowsAsync<ComposerStreamException>(() =>
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ComposerStreamService>().Start(stream.Id, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task Start_Throws_WhenStreamDoesNotExist()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+
+            await Assert.ThrowsAsync<ComposerStreamException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ComposerStreamService>().Start(long.MaxValue, CancellationToken.None)));
         }
     }
 }

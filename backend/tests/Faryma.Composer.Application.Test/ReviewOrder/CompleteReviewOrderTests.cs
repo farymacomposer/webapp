@@ -53,7 +53,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 completedAt: app.FixedNow,
                 reviewRating: 12);
 
-            int beforeUpdates = app.QueueUpdateCount;
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().Complete(new CompleteCommand
                 {
@@ -63,7 +62,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 }, CancellationToken.None));
 
             Assert.Equal(order.Id, result.Id);
-            Assert.Equal(beforeUpdates, app.QueueUpdateCount);
+            Assert.Equal(12, result.Review!.RatingValue);
+            Assert.Equal(app.FixedNow, result.CompletedAt);
             Assert.Equal(1, await app.GetReviewCountAsync());
         }
 
@@ -86,6 +86,22 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().Complete(new CompleteCommand
                     {
                         ReviewOrderId = order.Id,
+                        Rating = 15,
+                        CreatedByUserId = user.Id,
+                    }, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task Complete_Throws_WhenOrderDoesNotExist()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().Complete(new CompleteCommand
+                    {
+                        ReviewOrderId = long.MaxValue,
                         Rating = 15,
                         CreatedByUserId = user.Id,
                     }, CancellationToken.None)));

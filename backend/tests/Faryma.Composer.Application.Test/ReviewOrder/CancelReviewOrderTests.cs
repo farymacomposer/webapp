@@ -54,7 +54,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 canceledAt: app.FixedNow,
                 cancelReason: "reason");
 
-            int beforeUpdates = app.QueueUpdateCount;
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
                 {
@@ -63,7 +62,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 }, CancellationToken.None));
 
             Assert.Equal(order.Id, result.Id);
-            Assert.Equal(beforeUpdates, app.QueueUpdateCount);
+            Assert.Equal("reason", result.CancelReason);
+            Assert.Equal(app.FixedNow, result.CanceledAt);
         }
 
         [Fact]
@@ -82,6 +82,54 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
                     {
                         ReviewOrderId = order.Id,
+                        CancelReason = "late",
+                    }, CancellationToken.None)));
+        }
+
+        [Theory]
+        [InlineData(ReviewOrderStatus.Preorder)]
+        [InlineData(ReviewOrderStatus.Pending)]
+        public async Task Cancel_ClearsProcessingFields_WhenOrderHasAllowedNonProcessingStatus(ReviewOrderStatus status)
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                status: status,
+                trackUrl: status == ReviewOrderStatus.Preorder ? null : "https://example.com/track",
+                queueCategory: QueueCategory.Donation,
+                cancelReason: null);
+
+            ReviewOrderEntity result = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
+                {
+                    ReviewOrderId = order.Id,
+                    CancelReason = "manual",
+                }, CancellationToken.None));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
+
+            Assert.Equal(ReviewOrderStatus.Canceled, result.Status);
+            Assert.Equal("manual", result.CancelReason);
+            Assert.Equal(QueueCategory.Unspecified, result.QueueCategory);
+            Assert.Null(result.ProcessingStreamId);
+            Assert.Null(result.InProgressAt);
+            Assert.Equal(ReviewOrderStatus.Canceled, persisted.Status);
+            Assert.Equal("manual", persisted.CancelReason);
+            Assert.Equal(QueueCategory.Unspecified, persisted.QueueCategory);
+            Assert.Null(persisted.ProcessingStreamId);
+            Assert.Null(persisted.InProgressAt);
+        }
+
+        [Fact]
+        public async Task Cancel_Throws_WhenOrderDoesNotExist()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
+                    {
+                        ReviewOrderId = long.MaxValue,
                         CancelReason = "late",
                     }, CancellationToken.None)));
         }

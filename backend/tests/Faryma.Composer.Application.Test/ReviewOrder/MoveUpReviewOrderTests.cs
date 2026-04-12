@@ -1,5 +1,7 @@
-﻿using Faryma.Composer.Application.Features.ReviewOrder;
+﻿using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
@@ -33,18 +35,24 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 }, CancellationToken.None));
 
             List<TransactionEntity> orderTransactions = await app.GetOrderTransactionsAsync(order.Id);
-            int transactionCount = await app.RunScopeAsync(async services =>
+            List<TransactionEntity> accountTransactions = await app.RunScopeAsync(async services =>
             {
                 IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
                 await using AppDbContext context = await factory.CreateDbContextAsync();
-                return await context.Transactions.CountAsync();
+                Guid accountId = orderTransactions[0].UserNicknameAccountId;
+                return await context.Transactions
+                    .AsNoTracking()
+                    .Where(x => x.UserNicknameAccountId == accountId)
+                    .OrderBy(x => x.Id)
+                    .ToListAsync();
             });
 
             Assert.Equal(TransactionKind.Payment, payment.Kind);
             Assert.Equal(order.Id, payment.TransactionSourceId);
             Assert.Single(orderTransactions);
             Assert.Equal(500, orderTransactions[0].Debit);
-            Assert.Equal(2, transactionCount);
+            Assert.Contains(accountTransactions, x => x.Kind == TransactionKind.AccountTopUp && x.Credit == 500);
+            Assert.Contains(accountTransactions, x => x.Kind == TransactionKind.Payment && x.Debit == 500);
         }
 
         [Theory]
@@ -73,6 +81,87 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         TopUpProvider = AccountTopUpProvider.Manual,
                         CreatedByUserId = user.Id,
                     }, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task MoveUp_Throws_WhenOrderDoesNotExist()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().MoveUp(new MoveUpCommand
+                    {
+                        ReviewOrderId = long.MaxValue,
+                        Nickname = "Nick-Move",
+                        PaymentAmount = 500,
+                        TopUpProvider = AccountTopUpProvider.Manual,
+                        CreatedByUserId = user.Id,
+                    }, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task MoveUp_ImprovesOrderPositionInQueue()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            _ = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today,
+                type: ComposerStreamType.Donation,
+                status: ComposerStreamStatus.Live,
+                startedAt: app.FixedNow);
+
+            int expectedFirstCreateUpdate = app.QueueUpdateCount + 1;
+            ReviewOrderEntity strongerOrder = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = "Nick-Strong",
+                    TrackUrl = "https://example.com/strong",
+                    UserComment = null,
+                    PaymentAmount = 1_000,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    CreatedByUserId = user.Id,
+                }, CancellationToken.None));
+            await app.WaitForQueueUpdateCountAsync(expectedFirstCreateUpdate);
+
+            int expectedSecondCreateUpdate = app.QueueUpdateCount + 1;
+            ReviewOrderEntity candidate = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = "Nick-Candidate",
+                    TrackUrl = "https://example.com/candidate",
+                    UserComment = null,
+                    PaymentAmount = 700,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    CreatedByUserId = user.Id,
+                }, CancellationToken.None));
+            await app.WaitForQueueUpdateCountAsync(expectedSecondCreateUpdate);
+
+            OrderQueueSnapshot beforeSnapshot = await app.RunScopeAsync(services =>
+                services.GetRequiredService<OrderQueueService>().GetQueueSnapshot());
+            int beforeIndex = beforeSnapshot.Positions.Single(x => x.Order.Id == candidate.Id).PositionHistory.Current.QueueIndex;
+
+            int expectedMoveUpUpdate = app.QueueUpdateCount + 1;
+            await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().MoveUp(new MoveUpCommand
+                {
+                    ReviewOrderId = candidate.Id,
+                    Nickname = "Nick-Candidate",
+                    PaymentAmount = 500,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    CreatedByUserId = user.Id,
+                }, CancellationToken.None));
+            await app.WaitForQueueUpdateCountAsync(expectedMoveUpUpdate);
+
+            OrderQueueSnapshot afterSnapshot = await app.RunScopeAsync(services =>
+                services.GetRequiredService<OrderQueueService>().GetQueueSnapshot());
+            int afterIndex = afterSnapshot.Positions.Single(x => x.Order.Id == candidate.Id).PositionHistory.Current.QueueIndex;
+            int strongerIndex = afterSnapshot.Positions.Single(x => x.Order.Id == strongerOrder.Id).PositionHistory.Current.QueueIndex;
+
+            Assert.True(afterIndex < beforeIndex);
+            Assert.True(afterIndex < strongerIndex);
         }
     }
 }

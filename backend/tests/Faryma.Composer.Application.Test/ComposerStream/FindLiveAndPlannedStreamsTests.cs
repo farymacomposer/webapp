@@ -26,11 +26,23 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 type: ComposerStreamType.Charity,
                 status: ComposerStreamStatus.Planned);
 
+            ComposerStreamEntity plannedToday = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today,
+                type: ComposerStreamType.Donation,
+                status: ComposerStreamStatus.Planned);
+
             ComposerStreamEntity plannedPast = await app.Data.CreateStreamAsync(
                 createdByUserId: user.Id,
                 eventDate: app.Today.AddDays(-1),
                 type: ComposerStreamType.Debt,
                 status: ComposerStreamStatus.Planned);
+
+            ComposerStreamEntity canceled = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Charity,
+                status: ComposerStreamStatus.Canceled);
 
             ComposerStreamEntity completed = await app.Data.CreateStreamAsync(
                 createdByUserId: user.Id,
@@ -45,7 +57,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             long[] ids = result.Select(x => x.Id).ToArray();
             Assert.Contains(live.Id, ids);
             Assert.Contains(plannedFuture.Id, ids);
+            Assert.Contains(plannedToday.Id, ids);
             Assert.DoesNotContain(plannedPast.Id, ids);
+            Assert.DoesNotContain(canceled.Id, ids);
             Assert.DoesNotContain(completed.Id, ids);
         }
     }

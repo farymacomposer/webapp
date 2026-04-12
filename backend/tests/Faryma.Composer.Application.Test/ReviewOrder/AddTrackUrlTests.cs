@@ -25,9 +25,12 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/new-track",
                 }, CancellationToken.None));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(ReviewOrderStatus.Pending, result.Status);
             Assert.Equal("https://example.com/new-track", result.TrackUrl);
+            Assert.Equal(ReviewOrderStatus.Pending, persisted.Status);
+            Assert.Equal("https://example.com/new-track", persisted.TrackUrl);
         }
 
         [Theory]
@@ -48,9 +51,12 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/updated-track",
                 }, CancellationToken.None));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(status, result.Status);
             Assert.Equal("https://example.com/updated-track", result.TrackUrl);
+            Assert.Equal(status, persisted.Status);
+            Assert.Equal("https://example.com/updated-track", persisted.TrackUrl);
         }
 
         [Theory]
@@ -74,6 +80,20 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         ReviewOrderId = order.Id,
                         TrackUrl = "https://example.com/fail-track",
+                    }, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task AddTrackUrl_Throws_WhenOrderDoesNotExist()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                    {
+                        ReviewOrderId = long.MaxValue,
+                        TrackUrl = "https://example.com/missing-track",
                     }, CancellationToken.None)));
         }
     }

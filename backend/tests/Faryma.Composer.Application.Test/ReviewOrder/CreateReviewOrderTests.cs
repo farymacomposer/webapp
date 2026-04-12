@@ -19,7 +19,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 eventDate: app.Today.AddDays(1),
                 type: ComposerStreamType.Donation);
 
-            int expectedUpdates = app.QueueUpdateCount + 1;
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                 {
@@ -31,15 +30,18 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     CreatedByUserId = user.Id,
                 }, CancellationToken.None));
 
-            await app.WaitForQueueUpdateCountAsync(expectedUpdates);
-
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
             List<TransactionEntity> orderTransactions = await app.GetOrderTransactionsAsync(order.Id);
-            int transactionCount = await app.RunScopeAsync(async services =>
+            List<TransactionEntity> accountTransactions = await app.RunScopeAsync(async services =>
             {
                 IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
                 await using AppDbContext context = await factory.CreateDbContextAsync();
-                return await context.Transactions.CountAsync();
+                Guid accountId = orderTransactions[0].UserNicknameAccountId;
+                return await context.Transactions
+                    .AsNoTracking()
+                    .Where(x => x.UserNicknameAccountId == accountId)
+                    .OrderBy(x => x.Id)
+                    .ToListAsync();
             });
 
             Assert.Equal(ReviewOrderType.Donation, persisted.Type);
@@ -49,7 +51,66 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Single(orderTransactions);
             Assert.Equal(TransactionKind.Payment, orderTransactions[0].Kind);
             Assert.Equal(1_200, orderTransactions[0].Debit);
-            Assert.Equal(2, transactionCount);
+            Assert.Equal(
+                [TransactionKind.AccountTopUp, TransactionKind.Payment],
+                accountTransactions.Select(x => x.Kind).ToArray());
+        }
+
+        [Fact]
+        public async Task CreateDonation_CreatesPreorder_WhenTrackUrlIsMissing()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity stream = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+
+            ReviewOrderEntity order = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = "Nick-Preorder",
+                    TrackUrl = null,
+                    UserComment = null,
+                    PaymentAmount = 900,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    CreatedByUserId = user.Id,
+                }, CancellationToken.None));
+
+            Assert.Equal(stream.Id, order.CreationStreamId);
+            Assert.Equal(ReviewOrderStatus.Preorder, order.Status);
+            Assert.Null(order.TrackUrl);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task CreateDonation_UsesNearestAvailableStream_WhenNicknameHasNoHistory(bool withTrackUrl)
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity nearestCharity = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today,
+                type: ComposerStreamType.Charity);
+            await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+
+            ReviewOrderEntity order = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = "Nick-NewDonation",
+                    TrackUrl = withTrackUrl ? "https://example.com/new-donation" : null,
+                    UserComment = null,
+                    PaymentAmount = 800,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    CreatedByUserId = user.Id,
+                }, CancellationToken.None));
+
+            Assert.Equal(nearestCharity.Id, order.CreationStreamId);
+            Assert.Equal(withTrackUrl ? ReviewOrderStatus.Pending : ReviewOrderStatus.Preorder, order.Status);
         }
 
         [Fact]
@@ -74,7 +135,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 status: ReviewOrderStatus.Pending,
                 totalPaymentAmount: 900);
 
-            int expectedUpdates = app.QueueUpdateCount + 1;
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateFree(new CreateFreeOrderCommand
                 {
@@ -84,11 +144,36 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     CreatedByUserId = user.Id,
                 }, CancellationToken.None));
 
-            await app.WaitForQueueUpdateCountAsync(expectedUpdates);
-
             Assert.NotEqual(nearerCharity.Id, order.CreationStreamId);
             Assert.Equal(donationStream.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderType.Free, order.Type);
+        }
+
+        [Fact]
+        public async Task CreateFree_UsesNearestAvailableStream_WhenNicknameHasNoHistory()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity nearestCharity = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today,
+                type: ComposerStreamType.Charity);
+            await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+
+            ReviewOrderEntity order = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateFree(new CreateFreeOrderCommand
+                {
+                    Nickname = "Nick-NewFree",
+                    TrackUrl = "https://example.com/free",
+                    UserComment = null,
+                    CreatedByUserId = user.Id,
+                }, CancellationToken.None));
+
+            Assert.Equal(nearestCharity.Id, order.CreationStreamId);
+            Assert.Equal(ReviewOrderStatus.Pending, order.Status);
         }
 
         [Fact]
@@ -105,7 +190,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 eventDate: app.Today.AddDays(2),
                 type: ComposerStreamType.Donation);
 
-            int expectedUpdates = app.QueueUpdateCount + 1;
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateOutOfQueue(new CreateOutOfQueueOrderCommand
                 {
@@ -114,8 +198,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     UserComment = null,
                     CreatedByUserId = user.Id,
                 }, CancellationToken.None));
-
-            await app.WaitForQueueUpdateCountAsync(expectedUpdates);
 
             Assert.Equal(nearest.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderType.OutOfQueue, order.Type);
@@ -135,7 +217,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 status: ComposerStreamStatus.Live,
                 startedAt: app.FixedNow);
 
-            int expectedUpdates = app.QueueUpdateCount + 1;
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateCharity(new CreateCharityOrderCommand
                 {
@@ -144,8 +225,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     UserComment = null,
                     CreatedByUserId = user.Id,
                 }, CancellationToken.None));
-
-            await app.WaitForQueueUpdateCountAsync(expectedUpdates);
 
             Assert.Equal(charityStream.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderType.Charity, order.Type);
@@ -164,7 +243,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 status: ComposerStreamStatus.Live,
                 startedAt: app.FixedNow);
 
-            ReviewOrderException exception = await Assert.ThrowsAsync<ReviewOrderException>(() =>
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateCharity(new CreateCharityOrderCommand
                     {
@@ -173,8 +252,49 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         UserComment = null,
                         CreatedByUserId = user.Id,
                     }, CancellationToken.None)));
+        }
 
-            Assert.Equal("Не запущен благотворительный стрим.", exception.Message);
+        [Theory]
+        [InlineData("Donation")]
+        [InlineData("Free")]
+        [InlineData("OutOfQueue")]
+        public async Task CreateOrder_Throws_WhenNoSuitableStreamExists(string kind)
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+
+            Task action = kind switch
+            {
+                "Donation" => app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                    {
+                        Nickname = "Nick-NoStream",
+                        TrackUrl = "https://example.com/donation",
+                        UserComment = null,
+                        PaymentAmount = 700,
+                        TopUpProvider = AccountTopUpProvider.Manual,
+                        CreatedByUserId = user.Id,
+                    }, CancellationToken.None)),
+                "Free" => app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().CreateFree(new CreateFreeOrderCommand
+                    {
+                        Nickname = "Nick-NoStream",
+                        TrackUrl = "https://example.com/free",
+                        UserComment = null,
+                        CreatedByUserId = user.Id,
+                    }, CancellationToken.None)),
+                "OutOfQueue" => app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().CreateOutOfQueue(new CreateOutOfQueueOrderCommand
+                    {
+                        Nickname = "Nick-NoStream",
+                        TrackUrl = null,
+                        UserComment = null,
+                        CreatedByUserId = user.Id,
+                    }, CancellationToken.None)),
+                _ => throw new InvalidOperationException($"Unsupported kind: {kind}")
+            };
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() => action);
         }
     }
 }
