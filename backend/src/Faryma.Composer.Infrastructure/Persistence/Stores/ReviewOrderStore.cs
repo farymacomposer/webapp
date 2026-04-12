@@ -42,6 +42,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 MainNormalizedNickname = userNickname.NormalizedNickname,
                 Type = type,
                 Status = (trackUrl is null) ? ReviewOrderStatus.Preorder : ReviewOrderStatus.Pending,
+                QueueCategory = QueueCategory.Unspecified,
                 IsFrozen = false,
                 TrackUrl = trackUrl,
                 NominalAmount = nominalAmount,

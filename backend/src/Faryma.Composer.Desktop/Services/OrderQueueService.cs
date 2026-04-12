@@ -59,10 +59,9 @@ namespace Faryma.Composer.Desktop.Services
         {
             SyncVersion = message.SyncVersion;
 
-            if (message.InProgressOrder is not null)
-            {
-                InProgressOrder = new ReviewOrderVM(message.InProgressOrder.Order, message.InProgressOrder.CurrentPosition);
-            }
+            InProgressOrder = message.InProgressOrder is null
+                ? null
+                : new ReviewOrderVM(message.InProgressOrder.Order, message.InProgressOrder.CurrentPosition);
 
             Update(ActiveOrders, message.ActiveOrders);
             Update(CompletedOrders, message.CompletedOrders);

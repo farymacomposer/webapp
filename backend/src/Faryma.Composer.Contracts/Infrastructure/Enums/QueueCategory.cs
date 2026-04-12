@@ -10,7 +10,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Enums
         /// <summary>
         /// Не задан
         /// </summary>
-        [Description("Не задан")]
+        [Description("Не задана")]
         Unspecified = 0,
 
         /// <summary>

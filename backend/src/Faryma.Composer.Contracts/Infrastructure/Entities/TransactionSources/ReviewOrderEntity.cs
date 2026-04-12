@@ -53,7 +53,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// <summary>
         /// Категория заказа в очереди (записывается при взятии заказа в работу)
         /// </summary>
-        public QueueCategory? QueueCategory { get; set; }
+        public required QueueCategory QueueCategory { get; set; }
 
         /// <summary>
         /// Заказ заморожен

@@ -466,7 +466,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     CancelReason = table.Column<string>(type: "text", nullable: true),
                     Type = table.Column<ReviewOrderType>(type: "app.\"ReviewOrderType\"", nullable: false),
                     Status = table.Column<ReviewOrderStatus>(type: "app.\"ReviewOrderStatus\"", nullable: false),
-                    QueueCategory = table.Column<QueueCategory>(type: "app.\"QueueCategory\"", nullable: true),
+                    QueueCategory = table.Column<QueueCategory>(type: "app.\"QueueCategory\"", nullable: false),
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
                     TrackId = table.Column<long>(type: "bigint", nullable: true),

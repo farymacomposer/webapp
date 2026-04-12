@@ -321,7 +321,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             order.CanceledAt = dateTimeService.Now;
             order.CancelReason = command.CancelReason;
-            order.QueueCategory = null;
+            order.QueueCategory = QueueCategory.Unspecified;
             order.ProcessingStream = null;
             order.Status = ReviewOrderStatus.Canceled;
             order.InProgressAt = null;

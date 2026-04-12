@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260412094529_Init")]
+    [Migration("20260412151346_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -899,7 +899,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<long?>("ProcessingStreamId")
                         .HasColumnType("bigint");
 
-                    b.Property<QueueCategory?>("QueueCategory")
+                    b.Property<QueueCategory>("QueueCategory")
                         .HasColumnType("app.QueueCategory");
 
                     b.Property<ReviewOrderStatus>("Status")

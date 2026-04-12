@@ -896,7 +896,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<long?>("ProcessingStreamId")
                         .HasColumnType("bigint");
 
-                    b.Property<QueueCategory?>("QueueCategory")
+                    b.Property<QueueCategory>("QueueCategory")
                         .HasColumnType("app.QueueCategory");
 
                     b.Property<ReviewOrderStatus>("Status")
