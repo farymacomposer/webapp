@@ -24,6 +24,12 @@ namespace Faryma.Composer.Desktop.Navigation
             typeof(CustomContentDialog),
             null);
 
+        public static readonly DependencyProperty IsCloseButtonVisibleProperty = DependencyProperty.Register(
+            nameof(IsCloseButtonVisible),
+            typeof(bool),
+            typeof(CustomContentDialog),
+            new PropertyMetadata(true));
+
         public string Title
         {
             get => (string)GetValue(TitleProperty);
@@ -40,6 +46,12 @@ namespace Faryma.Composer.Desktop.Navigation
         {
             get => (ICommand)GetValue(CloseButtonCommandProperty);
             set => SetValue(CloseButtonCommandProperty, value);
+        }
+
+        public bool IsCloseButtonVisible
+        {
+            get => (bool)GetValue(IsCloseButtonVisibleProperty);
+            set => SetValue(IsCloseButtonVisibleProperty, value);
         }
 
         public CustomContentDialog()

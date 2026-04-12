@@ -89,7 +89,7 @@
         <SemanticZoom x:Name="SemanticZoomControl" Width="1020">
             <SemanticZoom.ZoomedInView>
                 <ListView
-                    GotFocus="List_GotFocus"
+                    GotFocus="ListView_GotFocus"
                     ItemTemplate="{StaticResource ZoomedInTemplate}"
                     ItemsSource="{x:Bind ActivityGroups.View}"
                     ScrollViewer.IsHorizontalScrollChainingEnabled="False"
@@ -101,7 +101,7 @@
             </SemanticZoom.ZoomedInView>
             <SemanticZoom.ZoomedOutView>
                 <ListView
-                    GotFocus="List_GotFocus"
+                    GotFocus="ListView_GotFocus"
                     ItemTemplate="{StaticResource ZoomedOutTemplate}"
                     ItemsSource="{x:Bind ActivityGroups.View.CollectionGroups}"
                     SelectionMode="None" />

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.Messaging;
 using Faryma.Composer.Desktop.Api.ComposerStream;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
+using Faryma.Composer.Desktop.Auth;
 using Faryma.Composer.Desktop.Navigation;
 using Faryma.Composer.Desktop.Services;
 using Faryma.Composer.Desktop.UI;
@@ -19,6 +20,7 @@ namespace Faryma.Composer.Desktop
         public const string BaseAddress = "https://localhost:7166";
 
         private static readonly ServiceProvider _services;
+        private static bool _authenticatedSessionInitialized;
 
         static App()
         {
@@ -31,8 +33,6 @@ namespace Faryma.Composer.Desktop
                 .Console(LogEventLevel.Verbose, applyThemeToRedirectedOutput: true)
                 .CreateLogger()));
 
-            services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
-            services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
             services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
                 Converters = { new JsonStringEnumConverter() }
@@ -41,6 +41,14 @@ namespace Faryma.Composer.Desktop
             services.AddSingleton<IMessenger, StrongReferenceMessenger>();
             services.AddNavigation();
             services.AddServices();
+
+            services.AddHttpClient<AuthHttpClient>(client => client.BaseAddress = new Uri(BaseAddress));
+
+            services.AddHttpClient<ReviewOrderHttpClient>(client => client.BaseAddress = new Uri(BaseAddress))
+                .AddHttpMessageHandler<BearerTokenHandler>();
+
+            services.AddHttpClient<ComposerStreamHttpClient>(client => client.BaseAddress = new Uri(BaseAddress))
+                .AddHttpMessageHandler<BearerTokenHandler>();
 
             _services = services.BuildServiceProvider();
         }
@@ -51,6 +59,20 @@ namespace Faryma.Composer.Desktop
         }
 
         public static T GetService<T>() where T : notnull => _services.GetRequiredService<T>();
+
+        public static async Task InitializeAuthenticatedSession()
+        {
+            if (_authenticatedSessionInitialized)
+            {
+                return;
+            }
+
+            await GetService<OrderQueueService>().Initialize();
+            await GetService<OrderQueuePageVM>().Initialize();
+            await GetService<ComposerStreamPageVM>().Initialize();
+
+            _authenticatedSessionInitialized = true;
+        }
 
         protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
@@ -63,10 +85,16 @@ namespace Faryma.Composer.Desktop
 
             await GetService<MessageService>().HandleException(async () =>
             {
-                await GetService<OrderQueueService>().Initialize();
-                await GetService<OrderQueuePageVM>().Initialize();
-                await GetService<ComposerStreamPageVM>().Initialize();
-            }, "Приложение не инициализировано");
+                AuthenticationService authenticationService = GetService<AuthenticationService>();
+
+                if (await authenticationService.TryRestoreSession())
+                {
+                    await InitializeAuthenticatedSession();
+                    return;
+                }
+
+                await GetService<DialogService>().ShowDialog<LoginDialog, LoginDialogVM>();
+            }, "Не удалось инициализировать приложение");
         }
     }
 }

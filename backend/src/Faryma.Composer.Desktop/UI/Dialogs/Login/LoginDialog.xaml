@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="Faryma.Composer.Desktop.UI.LoginDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:navigation="using:Faryma.Composer.Desktop.Navigation">
+
+    <navigation:CustomContentDialog Title="Вход" IsCloseButtonVisible="False">
+        <navigation:CustomContentDialog.DialogContent>
+            <Grid Width="430">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Style="{StaticResource StackPanelContentDialogStyle}">
+                    <TextBox Header="Логин" Text="{x:Bind ViewModel.UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <PasswordBox Header="Пароль" PasswordChanged="PasswordBox_PasswordChanged" />
+                </StackPanel>
+
+                <Button
+                    Grid.Row="1"
+                    Width="130"
+                    Margin="24"
+                    HorizontalAlignment="Right"
+                    Command="{x:Bind ViewModel.LoginCommand}"
+                    Content="Войти"
+                    Style="{StaticResource AccentButtonStyle}" />
+            </Grid>
+        </navigation:CustomContentDialog.DialogContent>
+    </navigation:CustomContentDialog>
+</UserControl>

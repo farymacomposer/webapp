@@ -5,7 +5,7 @@
       {
         "Path": "src\\Faryma.Composer.Api\\Faryma.Composer.Api.csproj",
         "Action": "Start",
-        "DebugTarget": "swagger"
+        "DebugTarget": "scalar"
       },
       {
         "Path": "src\\Faryma.Composer.Desktop\\Faryma.Composer.Desktop.csproj",
