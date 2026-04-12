@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{5B9664
 		..\backend.Dockerfile = ..\backend.Dockerfile
 		..\.github\workflows\backend.yml = ..\.github\workflows\backend.yml
 		..\docker-compose.yml = ..\docker-compose.yml
+		dotnet-tools.json = dotnet-tools.json
 		entrypoint.sh = entrypoint.sh
 	EndProjectSection
 EndProject

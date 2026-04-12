@@ -30,7 +30,7 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts
         /// <summary>
         /// Заказ в работе
         /// </summary>
-        public OrderPositionDto? InProgressOrder { get; private set; }
+        public OrderPositionDto? InProgressOrder { get; set; }
 
         /// <summary>
         /// Выполненные заказы

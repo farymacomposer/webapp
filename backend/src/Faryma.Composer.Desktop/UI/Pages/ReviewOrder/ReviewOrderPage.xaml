@@ -176,7 +176,7 @@
                     <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.ActivityStatus, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
                 </local:TitledContentRow>
 
-                <local:TitledContentRow Title="Тип категории заказа">
+                <local:TitledContentRow Title="Категория заказа в очереди">
                     <TextBlock Text="{x:Bind ViewModel.SelectedReviewOrder.CurrentQueueCategory, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}, FallbackValue={x:Null}}" />
                 </local:TitledContentRow>
 
