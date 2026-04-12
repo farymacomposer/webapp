@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Faryma.Composer.Api.Auth
 {
-    public sealed class AuthorizeUserAttribute : AuthorizeAttribute
-    {
-        public AuthorizeUserAttribute() => Roles = AppRoles.User;
-    }
-
     public sealed class AuthorizeModeratorAttribute : AuthorizeAttribute
     {
         public AuthorizeModeratorAttribute() => Roles = AppRoles.Moderator;

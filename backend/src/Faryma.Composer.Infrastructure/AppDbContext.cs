@@ -101,13 +101,6 @@ namespace Faryma.Composer.Infrastructure
             builder.Entity<IdentityRole<Guid>>().HasData(
                 new IdentityRole<Guid>
                 {
-                    Id = Guid.Parse("910C6755-4833-4C62-8DF7-4241A159A8D2"),
-                    Name = AppRoles.User,
-                    NormalizedName = AppRoles.User.ToUpper(),
-                    ConcurrencyStamp = "910C6755-4833-4C62-8DF7-4241A159A8D2"
-                },
-                new IdentityRole<Guid>
-                {
                     Id = Guid.Parse("AC0B9E85-A06F-4655-822B-9C125D8D7BB4"),
                     Name = AppRoles.Moderator,
                     NormalizedName = AppRoles.Moderator.ToUpper(),

@@ -53,7 +53,8 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .AddPersistence(configuration)
                 .AddIdentityCore<UserEntity>()
                 .AddRoles<IdentityRole<Guid>>()
-                .AddEntityFrameworkStores<AppDbContext>();
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
 
             return services;
         }

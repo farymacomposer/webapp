@@ -6,15 +6,12 @@ using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Api.Auth.Services
 {
-    public sealed class AdminBootstrapService(
-        UserManager<UserEntity> userManager,
-        IOptions<AdminBootstrapOptions> options,
-        ILogger<AdminBootstrapService> logger)
+    public sealed class AdminBootstrapService(UserManager<UserEntity> userManager, IOptions<AdminBootstrapOptions> options)
     {
-        public async Task Initialize(CancellationToken ct = default)
+        public async Task Initialize()
         {
-            await SyncAdminAccount(options.Value.Composer, AppRoles.Composer, AppRoles.Moderator, ct);
-            await SyncAdminAccount(options.Value.Moderator, AppRoles.Moderator, AppRoles.Composer, ct);
+            await SyncAdminAccount(options.Value.Composer, AppRoles.Composer);
+            await SyncAdminAccount(options.Value.Moderator, AppRoles.Moderator);
         }
 
         private static Task EnsureSuccess(IdentityResult result, string message)
@@ -25,90 +22,55 @@ namespace Faryma.Composer.Api.Auth.Services
             }
 
             string details = string.Join("; ", result.Errors.Select(x => x.Description));
-            throw new InvalidOperationException($"{message} {details}".Trim());
+
+            throw new InvalidOperationException($"{message} {details}");
         }
 
-        private async Task SyncAdminAccount(
-                    AdminBootstrapAccountOptions account,
-            string targetRole,
-            string otherAdminRole,
-            CancellationToken ct)
+        private async Task SyncAdminAccount(AdminBootstrapAccountOptions account, string targetRole)
         {
-            ct.ThrowIfCancellationRequested();
-
-            string targetUserName = account.UserName.Trim();
-            UserEntity? roleUser = await GetSingleUserInRole(targetRole);
-            UserEntity? userByName = await userManager.FindByNameAsync(targetUserName);
+            string targetName = account.UserName;
+            UserEntity? userByRole = await GetSingleUserInRole(targetRole);
 
             UserEntity user;
-            if (roleUser is not null)
+            if (userByRole is not null)
             {
-                if (userByName is not null && userByName.Id != roleUser.Id)
+                if (!string.Equals(userByRole.UserName, targetName, StringComparison.Ordinal))
                 {
-                    throw new InvalidOperationException(
-                        $"Cannot sync '{targetRole}' account because username '{targetUserName}' is already used by another user.");
+                    throw new InvalidOperationException($"Невозможно запустить bootstrap администратора для роли '{targetRole}', так как в базе уже существует учетная запись '{userByRole.UserName}', а в env указан логин '{targetName}'");
                 }
 
-                user = roleUser;
-                await SyncUserName(user, targetUserName);
+                user = userByRole;
             }
-            else if (userByName is not null)
+            else if (await userManager.FindByNameAsync(targetName) is not null)
             {
-                if (await userManager.IsInRoleAsync(userByName, otherAdminRole))
-                {
-                    throw new InvalidOperationException(
-                        $"Cannot sync '{targetRole}' account because username '{targetUserName}' is already assigned to '{otherAdminRole}'.");
-                }
-
-                user = userByName;
+                throw new InvalidOperationException($"Невозможно запустить bootstrap администратора для роли '{targetRole}', так как логин '{targetName}' уже существует в базе, но не назначен на эту роль");
             }
             else
             {
                 user = new UserEntity
                 {
-                    UserName = targetUserName,
-                    NormalizedUserName = userManager.NormalizeName(targetUserName),
+                    UserName = targetName,
+                    NormalizedUserName = userManager.NormalizeName(targetName),
                     CreatedAt = DateTime.UtcNow
                 };
 
-                await EnsureSuccess(
-                    await userManager.CreateAsync(user),
-                    $"Failed to create '{targetRole}' account.");
+                await EnsureSuccess(await userManager.CreateAsync(user), $"Не удалось создать аккаунт администратора для роли '{targetRole}'");
             }
 
             await SyncPassword(user, account.Password);
-            await EnsureRole(user, AppRoles.User);
             await EnsureRole(user, targetRole);
-            await RemoveRoleIfAssigned(user, otherAdminRole);
-
-            logger.LogInformation("Administrative account synchronized for role {Role}.", targetRole);
         }
 
         private async Task<UserEntity?> GetSingleUserInRole(string role)
         {
             IList<UserEntity> users = await userManager.GetUsersInRoleAsync(role);
+
             return users.Count switch
             {
                 0 => null,
                 1 => users[0],
-                _ => throw new InvalidOperationException(
-                    $"Cannot bootstrap administrators because role '{role}' is assigned to multiple users.")
+                _ => throw new InvalidOperationException($"Невозможно запустить bootstrap администраторов, так как роль '{role}' назначена нескольким пользователям")
             };
-        }
-
-        private async Task SyncUserName(UserEntity user, string targetUserName)
-        {
-            if (string.Equals(user.UserName, targetUserName, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            user.UserName = targetUserName;
-            user.NormalizedUserName = userManager.NormalizeName(targetUserName);
-
-            await EnsureSuccess(
-                await userManager.UpdateAsync(user),
-                $"Failed to update username for administrative account '{targetUserName}'.");
         }
 
         private async Task SyncPassword(UserEntity user, string password)
@@ -117,12 +79,13 @@ namespace Faryma.Composer.Api.Auth.Services
                 ? await ResetPassword(user, password)
                 : await userManager.AddPasswordAsync(user, password);
 
-            await EnsureSuccess(result, $"Failed to synchronize password for administrative account '{user.UserName}'.");
+            await EnsureSuccess(result, $"Не удалось синхронизировать пароль для аккаунта администратора '{user.UserName}'");
         }
 
         private async Task<IdentityResult> ResetPassword(UserEntity user, string password)
         {
             string resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+
             return await userManager.ResetPasswordAsync(user, resetToken, password);
         }
 
@@ -133,21 +96,7 @@ namespace Faryma.Composer.Api.Auth.Services
                 return;
             }
 
-            await EnsureSuccess(
-                await userManager.AddToRoleAsync(user, role),
-                $"Failed to assign role '{role}' to administrative account '{user.UserName}'.");
-        }
-
-        private async Task RemoveRoleIfAssigned(UserEntity user, string role)
-        {
-            if (!await userManager.IsInRoleAsync(user, role))
-            {
-                return;
-            }
-
-            await EnsureSuccess(
-                await userManager.RemoveFromRoleAsync(user, role),
-                $"Failed to remove role '{role}' from administrative account '{user.UserName}'.");
+            await EnsureSuccess(await userManager.AddToRoleAsync(user, role), $"Не удалось назначить роль '{role}' для аккаунта администратора '{user.UserName}'");
         }
     }
 }

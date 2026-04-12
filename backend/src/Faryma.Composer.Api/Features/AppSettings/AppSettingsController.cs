@@ -1,8 +1,8 @@
-﻿using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Application.Features.AppSettings;
+﻿using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Contracts.Api.Features.AppSettings;
 using Faryma.Composer.Contracts.Application.Features.AppSettings;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Faryma.Composer.Api.Features.AppSettings
@@ -19,14 +19,14 @@ namespace Faryma.Composer.Api.Features.AppSettings
         /// Возвращает текущие настройки
         /// </summary>
         [HttpGet(nameof(GetAppSettings))]
-        [AuthorizeUser]
+        [Authorize]
         public ActionResult<AppSettingsDto> GetAppSettings() => Ok(AppSettingsDto.Map(appSettingsService.Settings));
 
         /// <summary>
         /// Обновляет настройки
         /// </summary>
         [HttpPost(nameof(UpdateAppSettings))]
-        [AuthorizeUser]
+        [Authorize]
         public async Task<ActionResult<AppSettingsDto>> UpdateAppSettings(AppSettingsDto dto, CancellationToken ct)
         {
             AppSettingsEntity settings = await appSettingsService.Update(new AppSettingsModel

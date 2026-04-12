@@ -1,5 +1,4 @@
 ﻿using System.Security.Authentication;
-using Faryma.Composer.Contracts.Infrastructure;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -39,11 +38,6 @@ namespace Faryma.Composer.Api.Auth.Services
                 await UpdateTwitchLogin(user, twitchToken.Login);
             }
 
-            if (!await userManager.IsInRoleAsync(user, AppRoles.User))
-            {
-                await EnsureUserRole(user);
-            }
-
             return await authTokenService.IssueForUser(user, ct);
         }
 
@@ -78,15 +72,6 @@ namespace Faryma.Composer.Api.Auth.Services
             if (!updateResult.Succeeded)
             {
                 throw new AuthenticationException($"Не удалось обновить Twitch-логин пользователя: {GetErrors(updateResult)}");
-            }
-        }
-
-        private async Task EnsureUserRole(UserEntity user)
-        {
-            IdentityResult addRoleResult = await userManager.AddToRoleAsync(user, AppRoles.User);
-            if (!addRoleResult.Succeeded)
-            {
-                throw new AuthenticationException($"Не удалось назначить роль User: {GetErrors(addRoleResult)}");
             }
         }
     }

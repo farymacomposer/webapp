@@ -660,13 +660,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("910c6755-4833-4c62-8df7-4241a159a8d2"),
-                            ConcurrencyStamp = "910C6755-4833-4C62-8DF7-4241A159A8D2",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        },
-                        new
-                        {
                             Id = new Guid("ac0b9e85-a06f-4655-822b-9c125d8d7bb4"),
                             ConcurrencyStamp = "AC0B9E85-A06F-4655-822B-9C125D8D7BB4",
                             Name = "Moderator",

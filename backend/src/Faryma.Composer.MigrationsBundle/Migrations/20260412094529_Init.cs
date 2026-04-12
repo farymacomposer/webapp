@@ -763,7 +763,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("910c6755-4833-4c62-8df7-4241a159a8d2"), "910C6755-4833-4C62-8DF7-4241A159A8D2", "User", "USER" },
                     { new Guid("9c3ddcde-24e7-458c-8d9c-1e5f424d3ddd"), "9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD", "Composer", "COMPOSER" },
                     { new Guid("ac0b9e85-a06f-4655-822b-9c125d8d7bb4"), "AC0B9E85-A06F-4655-822B-9C125D8D7BB4", "Moderator", "MODERATOR" }
                 });
