@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Api.DependencyInjection;
+﻿using Faryma.Composer.Api.Auth.Services;
+using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
@@ -44,6 +45,11 @@ namespace Faryma.Composer.Api
 
             app.MapControllers();
             app.MapHub<OrderQueueNotificationHub>(IOrderQueueNotificationServer.RoutePattern);
+
+            await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
+            {
+                await scope.ServiceProvider.GetRequiredService<AdminBootstrapService>().Initialize();
+            }
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();

@@ -38,12 +38,18 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .Bind(configuration.GetRequiredSection("POSTGRES"))
                 .ValidateDataAnnotations();
 
+            services
+                .AddOptionsWithValidateOnStart<AdminBootstrapOptions>()
+                .Bind(configuration.GetRequiredSection("ADMIN_BOOTSTRAP"))
+                .ValidateDataAnnotations();
+
             return services;
         }
 
         public static IServiceCollection AddPersistenceAndIdentity(this IServiceCollection services, IConfiguration configuration)
         {
             services
+                .AddScoped<AdminBootstrapService>()
                 .AddPersistence(configuration)
                 .AddIdentityCore<UserEntity>()
                 .AddRoles<IdentityRole<Guid>>()

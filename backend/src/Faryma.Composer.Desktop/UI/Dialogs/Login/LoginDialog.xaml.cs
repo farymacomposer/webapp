@@ -11,6 +11,7 @@ namespace Faryma.Composer.Desktop.UI
         public LoginDialog()
         {
             InitializeComponent();
+            ViewModel.LoginSucceeded += OnLoginSucceeded;
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs _)
@@ -20,5 +21,7 @@ namespace Faryma.Composer.Desktop.UI
                 ViewModel.Password = passwordBox.Password;
             }
         }
+
+        private void OnLoginSucceeded(object? sender, EventArgs e) => PasswordControl.Password = string.Empty;
     }
 }

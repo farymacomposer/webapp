@@ -14,8 +14,13 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Style="{StaticResource StackPanelContentDialogStyle}">
+
                     <TextBox Header="Логин" Text="{x:Bind ViewModel.UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <PasswordBox Header="Пароль" PasswordChanged="PasswordBox_PasswordChanged" />
+
+                    <PasswordBox
+                        x:Name="PasswordControl"
+                        Header="Пароль"
+                        PasswordChanged="PasswordBox_PasswordChanged" />
                 </StackPanel>
 
                 <Button
