@@ -20,7 +20,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 status: ComposerStreamStatus.Live,
                 startedAt: app.FixedNow);
 
-            int expectedCreateUpdates = app.QueueUpdateCount + 1;
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                 {
@@ -31,8 +30,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
                 }, CancellationToken.None));
-
-            await app.WaitForQueueUpdateCountAsync(expectedCreateUpdates);
+            await app.DrainQueueEventsAsync();
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None));

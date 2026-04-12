@@ -13,19 +13,26 @@ namespace Faryma.Composer.Application.Test.ComposerStream
         {
             await using ApplicationTestHost app = await CreateAppAsync();
             UserEntity user = await app.Data.CreateUserAsync("composer");
+            DateOnly eventDate = app.Today.AddDays(5);
 
             ComposerStreamEntity stream = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ComposerStreamService>().Create(new CreateCommand
                 {
-                    EventDate = app.Today.AddDays(5),
+                    EventDate = eventDate,
                     Type = ComposerStreamType.Donation,
                     CreatedByUserId = user.Id,
                 }, CancellationToken.None));
+            ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
 
             Assert.Equal(ComposerStreamStatus.Planned, stream.Status);
             Assert.Equal(ComposerStreamType.Donation, stream.Type);
             Assert.Null(stream.StartedAt);
             Assert.Null(stream.CompletedAt);
+            Assert.Equal(eventDate, persisted.EventDate);
+            Assert.Equal(ComposerStreamStatus.Planned, persisted.Status);
+            Assert.Equal(ComposerStreamType.Donation, persisted.Type);
+            Assert.Null(persisted.StartedAt);
+            Assert.Null(persisted.CompletedAt);
         }
 
         [Fact]

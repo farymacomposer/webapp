@@ -113,7 +113,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 status: ComposerStreamStatus.Live,
                 startedAt: app.FixedNow);
 
-            int expectedFirstCreateUpdate = app.QueueUpdateCount + 1;
             ReviewOrderEntity strongerOrder = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                 {
@@ -124,9 +123,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
                 }, CancellationToken.None));
-            await app.WaitForQueueUpdateCountAsync(expectedFirstCreateUpdate);
+            await app.DrainQueueEventsAsync();
 
-            int expectedSecondCreateUpdate = app.QueueUpdateCount + 1;
             ReviewOrderEntity candidate = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                 {
@@ -137,13 +135,12 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
                 }, CancellationToken.None));
-            await app.WaitForQueueUpdateCountAsync(expectedSecondCreateUpdate);
+            await app.DrainQueueEventsAsync();
 
             OrderQueueSnapshot beforeSnapshot = await app.RunScopeAsync(services =>
                 services.GetRequiredService<OrderQueueService>().GetQueueSnapshot());
             int beforeIndex = beforeSnapshot.Positions.Single(x => x.Order.Id == candidate.Id).PositionHistory.Current.QueueIndex;
 
-            int expectedMoveUpUpdate = app.QueueUpdateCount + 1;
             await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().MoveUp(new MoveUpCommand
                 {
@@ -153,7 +150,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
                 }, CancellationToken.None));
-            await app.WaitForQueueUpdateCountAsync(expectedMoveUpUpdate);
+            await app.DrainQueueEventsAsync();
 
             OrderQueueSnapshot afterSnapshot = await app.RunScopeAsync(services =>
                 services.GetRequiredService<OrderQueueService>().GetQueueSnapshot());

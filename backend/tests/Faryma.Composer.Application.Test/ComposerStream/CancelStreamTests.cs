@@ -18,8 +18,10 @@ namespace Faryma.Composer.Application.Test.ComposerStream
 
             ComposerStreamEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id, CancellationToken.None));
+            ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
 
             Assert.Equal(ComposerStreamStatus.Canceled, result.Status);
+            Assert.Equal(ComposerStreamStatus.Canceled, persisted.Status);
         }
 
         [Fact]
@@ -31,11 +33,15 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 createdByUserId: user.Id,
                 status: ComposerStreamStatus.Canceled);
 
+            int beforeUpdates = app.QueueUpdateCount;
             ComposerStreamEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id, CancellationToken.None));
+            ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
 
             Assert.Equal(stream.Id, result.Id);
             Assert.Equal(ComposerStreamStatus.Canceled, result.Status);
+            Assert.Equal(ComposerStreamStatus.Canceled, persisted.Status);
+            Assert.Equal(beforeUpdates, app.QueueUpdateCount);
         }
 
         [Theory]

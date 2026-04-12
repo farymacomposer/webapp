@@ -12,6 +12,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         });
 
         public void Write(OrderQueueEvent item) => _channel.Writer.TryWrite(item);
+        public bool TryRead(out OrderQueueEvent? item) => _channel.Reader.TryRead(out item);
         public IAsyncEnumerable<OrderQueueEvent> ReadAll(CancellationToken ct) => _channel.Reader.ReadAllAsync(ct);
     }
 }

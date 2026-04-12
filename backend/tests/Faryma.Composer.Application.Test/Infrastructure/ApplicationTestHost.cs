@@ -2,6 +2,7 @@
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Infrastructure.DependencyInjection;
@@ -16,6 +17,8 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         private readonly PostgreSqlFixture _fixture;
         private readonly IHost _host;
         private readonly string _databaseName;
+        private readonly OrderQueueService _orderQueueService;
+        private readonly OrderQueueEventChannel _orderQueueEventChannel;
 
         public DateTime FixedNow { get; }
         public DateOnly Today => DateOnly.FromDateTime(FixedNow);
@@ -24,7 +27,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         public int QueueUpdateCount => Notifications.UpdateCount;
 
         private ApplicationTestHost(
-                                                    PostgreSqlFixture fixture,
+            PostgreSqlFixture fixture,
             IHost host,
             string databaseName,
             DateTime fixedNow)
@@ -34,6 +37,8 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             _databaseName = databaseName;
             FixedNow = fixedNow;
             Notifications = (TestOrderQueueNotificationService)_host.Services.GetRequiredService<IOrderQueueNotificationService>();
+            _orderQueueService = _host.Services.GetRequiredService<OrderQueueService>();
+            _orderQueueEventChannel = _host.Services.GetRequiredService<OrderQueueEventChannel>();
             Data = new TestDataBuilder(this);
         }
 
@@ -64,6 +69,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                     .AddRoles<IdentityRole<Guid>>()
                     .AddEntityFrameworkStores<AppDbContext>();
                 builder.Services.AddCoreServices();
+                builder.Services.RemoveAll<IHostedService>();
 
                 host = builder.Build();
 
@@ -94,8 +100,13 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             await action(scope.ServiceProvider);
         }
 
-        public Task WaitForQueueUpdateCountAsync(int expectedCount, TimeSpan? timeout = null) =>
-            Notifications.WaitForCountAsync(expectedCount, timeout ?? TimeSpan.FromSeconds(5));
+        public async Task DrainQueueEventsAsync()
+        {
+            while (_orderQueueEventChannel.TryRead(out OrderQueueEvent? evt) && evt is not null)
+            {
+                await _orderQueueService.HandleEvent(evt);
+            }
+        }
 
         public Task<ReviewOrderEntity> GetOrderAsync(long orderId) =>
             RunScopeAsync(async services =>
