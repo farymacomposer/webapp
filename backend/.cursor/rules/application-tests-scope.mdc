@@ -1,0 +1,15 @@
+---
+description: Scope rules for Application tests
+globs: tests/Faryma.Composer.Application.Test/**
+alwaysApply: false
+---
+
+# Application Tests Scope
+
+- `Application`-тесты проверяют только бизнес-логику и state transitions в `Application`-сервисах.
+- Основной объект проверки: изменение persisted state, idempotency, side effects доменной логики, работа с реальной БД и интеграция сервисов внутри application layer.
+- Не покрывай здесь HTTP/API validation, `DataAnnotations`, model binding, сериализацию, фильтры, middleware, авторизацию endpoint-уровня и прочую transport-layer логику.
+- Причина: такие проверки принадлежат `Api`-тестам и смешивание слоев делает `Application`-тесты хрупкими, дублирующимися и хуже локализует причину падения.
+- Если сценарий ломается только из-за некорректного request DTO или endpoint pipeline, это не кейс для `Faryma.Composer.Application.Test`.
+- В `Application`-тестах предпочитай прямой вызов service methods и проверку persisted state через новую scope/повторное чтение из БД.
+- Для negative cases проверяй только инварианты и ограничения application logic, а не валидацию входного контракта, которая должна отсеиваться до входа в service.
