@@ -8,3 +8,4 @@
 - `freeze-review-order.md` - заморозка заказа.
 - `unfreeze-review-order.md` - разморозка заказа.
 - `cancel-review-order.md` - отмена заказа.
+- `review-order-status-graph.md` - граф переходов статусов заказа.
