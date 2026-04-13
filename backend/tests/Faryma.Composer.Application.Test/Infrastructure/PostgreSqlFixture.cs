@@ -9,7 +9,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         private const string _defaultPassword = "postgres";
 
         private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-            .WithImage("postgres:17-alpine")
+            .WithImage("postgres:18-alpine")
             .WithDatabase("postgres")
             .WithUsername(_defaultUsername)
             .WithPassword(_defaultPassword)
