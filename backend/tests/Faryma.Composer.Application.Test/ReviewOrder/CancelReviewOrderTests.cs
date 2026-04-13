@@ -61,9 +61,12 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     CancelReason = "another",
                 }, CancellationToken.None));
 
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
             Assert.Equal(order.Id, result.Id);
             Assert.Equal("reason", result.CancelReason);
             Assert.Equal(app.FixedNow, result.CanceledAt);
+            Assert.Equal("reason", persisted.CancelReason);
+            Assert.Equal(app.FixedNow, persisted.CanceledAt);
         }
 
         [Fact]

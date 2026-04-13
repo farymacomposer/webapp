@@ -10,27 +10,26 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         private const string _defaultTrackUrl = "https://example.com/track";
         private int _streamSequence;
 
-        public Task<UserEntity> CreateUserAsync(string? userName = null) =>
-            app.RunScopeAsync(async services =>
+        public Task<UserEntity> CreateUserAsync(string? userName = null) => app.RunScopeAsync(async services =>
+        {
+            UserManager<UserEntity> userManager = services.GetRequiredService<UserManager<UserEntity>>();
+            string actualUserName = userName ?? $"user-{Guid.NewGuid():N}";
+
+            UserEntity user = new()
             {
-                UserManager<UserEntity> userManager = services.GetRequiredService<UserManager<UserEntity>>();
-                string actualUserName = userName ?? $"user-{Guid.NewGuid():N}";
+                Id = Guid.NewGuid(),
+                UserName = actualUserName,
+                Email = $"{actualUserName}@example.com",
+                CreatedAt = app.FixedNow,
+            };
 
-                UserEntity user = new()
-                {
-                    Id = Guid.NewGuid(),
-                    UserName = actualUserName,
-                    Email = $"{actualUserName}@example.com",
-                    CreatedAt = app.FixedNow,
-                };
+            IdentityResult result = await userManager.CreateAsync(user);
+            Assert.True(
+                result.Succeeded,
+                $"Failed to create test user: {string.Join(", ", result.Errors.Select(x => x.Description))}");
 
-                IdentityResult result = await userManager.CreateAsync(user);
-                Assert.True(
-                    result.Succeeded,
-                    $"Failed to create test user: {string.Join(", ", result.Errors.Select(x => x.Description))}");
-
-                return user;
-            });
+            return user;
+        });
 
         public Task<ComposerStreamEntity> CreateStreamAsync(
             Guid? createdByUserId = null,
@@ -157,7 +156,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         }
 
         private async Task<UserEntity> GetOrCreateUserAsync(
-                    UserManager<UserEntity> userManager,
+            UserManager<UserEntity> userManager,
             Guid? userId,
             string prefix)
         {
@@ -226,7 +225,6 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             return stream;
         }
 
-        private DateOnly GetNextStreamDate() =>
-            app.Today.AddDays(Interlocked.Increment(ref _streamSequence) - 1);
+        private DateOnly GetNextStreamDate() => app.Today.AddDays(Interlocked.Increment(ref _streamSequence) - 1);
     }
 }

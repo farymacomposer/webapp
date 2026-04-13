@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Application.Features.ComposerStream;
+﻿using System.Diagnostics;
+using Faryma.Composer.Application.Features.ComposerStream;
 using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Contracts.Application.Features.ComposerStream.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
@@ -69,6 +70,22 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                         EventDate = app.Today.AddDays(1),
                         Type = ComposerStreamType.Donation,
                         CreatedByUserId = Guid.NewGuid(),
+                    }, CancellationToken.None)));
+        }
+
+        [Fact]
+        public async Task Create_Throws_WhenTypeIsUnspecified()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("composer");
+
+            await Assert.ThrowsAsync<UnreachableException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ComposerStreamService>().Create(new CreateCommand
+                    {
+                        EventDate = app.Today.AddDays(1),
+                        Type = ComposerStreamType.Unspecified,
+                        CreatedByUserId = user.Id,
                     }, CancellationToken.None)));
         }
     }

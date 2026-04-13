@@ -150,6 +150,44 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         }
 
         [Fact]
+        public async Task CreateDonation_UsesNearestDonationStream_WhenNicknameAlreadyHasOrders()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ComposerStreamEntity nearerCharity = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today,
+                type: ComposerStreamType.Charity);
+            ComposerStreamEntity donationStream = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+
+            await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                creationStreamId: donationStream.Id,
+                nickname: "Nick-DonationHistory",
+                type: ReviewOrderType.Donation,
+                status: ReviewOrderStatus.Pending,
+                totalPaymentAmount: 900);
+
+            ReviewOrderEntity order = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = "Nick-DonationHistory",
+                    TrackUrl = "https://example.com/donation-repeat",
+                    UserComment = null,
+                    PaymentAmount = 600,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    CreatedByUserId = user.Id,
+                }, CancellationToken.None));
+
+            Assert.NotEqual(nearerCharity.Id, order.CreationStreamId);
+            Assert.Equal(donationStream.Id, order.CreationStreamId);
+            Assert.Equal(ReviewOrderType.Donation, order.Type);
+        }
+
+        [Fact]
         public async Task CreateFree_UsesNearestAvailableStream_WhenNicknameHasNoHistory()
         {
             await using ApplicationTestHost app = await CreateAppAsync();

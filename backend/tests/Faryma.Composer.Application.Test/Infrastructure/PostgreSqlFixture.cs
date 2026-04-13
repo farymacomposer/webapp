@@ -5,20 +5,16 @@ namespace Faryma.Composer.Application.Test.Infrastructure
 {
     public sealed class PostgreSqlFixture : IAsyncLifetime
     {
-        private const string _defaultUsername = "postgres";
-        private const string _defaultPassword = "postgres";
-
-        private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-            .WithImage("postgres:18-alpine")
-            .WithDatabase("postgres")
-            .WithUsername(_defaultUsername)
-            .WithPassword(_defaultPassword)
+        private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:18-alpine")
+            .WithDatabase(PostgreSqlBuilder.DefaultDatabase)
+            .WithUsername(PostgreSqlBuilder.DefaultUsername)
+            .WithPassword(PostgreSqlBuilder.DefaultPassword)
             .Build();
 
         public string Host => _container.Hostname;
         public int Port => _container.GetMappedPublicPort(PostgreSqlBuilder.PostgreSqlPort);
-        public string Username => _defaultUsername;
-        public string Password => _defaultPassword;
+        public string Username => PostgreSqlBuilder.DefaultUsername;
+        public string Password => PostgreSqlBuilder.DefaultPassword;
 
         public Task InitializeAsync() => _container.StartAsync();
 
@@ -54,8 +50,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             await connection.OpenAsync();
 
             await ExecuteAsync(connection, $"""REVOKE CONNECT ON DATABASE "{databaseName}" FROM PUBLIC;""");
-            await ExecuteAsync(
-                connection,
+            await ExecuteAsync(connection,
                 $"""
                 SELECT pg_terminate_backend(pid)
                 FROM pg_stat_activity
