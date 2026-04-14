@@ -106,8 +106,6 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
         public async Task<ComposerStreamEntity> Cancel(long composerStreamId, CancellationToken ct = default)
         {
-            // TODO: отмена только если нет заказов на этот стрим
-
             ComposerStreamEntity stream = await GetStream(composerStreamId, ct);
 
             if (stream.Status == ComposerStreamStatus.Canceled)
@@ -118,6 +116,12 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             if (stream.Status != ComposerStreamStatus.Planned)
             {
                 throw new ComposerStreamException($"Невозможно отменить стрим в статусе '{stream.Status}'", stream);
+            }
+
+            bool hasActiveCreatedOrders = await uow.ReviewOrderQueries.ExistsActiveCreatedOrdersForStream(stream.Id, ct);
+            if (hasActiveCreatedOrders)
+            {
+                throw new ComposerStreamException("Невозможно отменить стрим: для него существуют активные заказы", stream);
             }
 
             stream.Status = ComposerStreamStatus.Canceled;

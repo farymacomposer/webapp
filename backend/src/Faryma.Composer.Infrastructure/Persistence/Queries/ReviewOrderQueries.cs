@@ -6,6 +6,19 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
 {
     public sealed class ReviewOrderQueries(AppDbContext context)
     {
+        /// <summary>
+        /// Проверяет, есть ли у стрима активные созданные заказы в статусах Preorder или Pending
+        /// </summary>
+        public Task<bool> ExistsActiveCreatedOrdersForStream(long streamId, CancellationToken ct = default)
+        {
+            return context.ReviewOrders
+                .AnyAsync(x => x.CreationStreamId == streamId
+                    && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending), ct);
+        }
+
+        /// <summary>
+        /// Возвращает заказ в статусе InProgress, если он существует
+        /// </summary>
         public Task<ReviewOrderEntity?> FindInProgress(CancellationToken ct)
         {
             return context.ReviewOrders
@@ -13,6 +26,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                 .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct);
         }
 
+        /// <summary>
+        /// Возвращает текущий заказ в работе, либо последний завершенный заказ
+        /// </summary>
         public async Task<ReviewOrderEntity?> FindLastTaken(CancellationToken ct = default)
         {
             return await FindInProgress(ct)
@@ -23,6 +39,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                     .LastOrDefaultAsync(ct);
         }
 
+        /// <summary>
+        /// Возвращает текущий/последний взятый заказ категории Debt
+        /// </summary>
         public async Task<ReviewOrderEntity?> FindLastTakenDebt(CancellationToken ct = default)
         {
             return await context.ReviewOrders
@@ -38,6 +57,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                     .LastOrDefaultAsync(ct);
         }
 
+        /// <summary>
+        /// Возвращает текущий/последний взятый заказ типа OutOfQueue
+        /// </summary>
         public async Task<ReviewOrderEntity?> FindLastTakenOutOfQueue(CancellationToken ct = default)
         {
             return await context.ReviewOrders
@@ -51,6 +73,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                     .LastOrDefaultAsync(ct);
         }
 
+        /// <summary>
+        /// Возвращает заказы, которые нужно обновить при старте стрима
+        /// </summary>
         public Task<List<ReviewOrderEntity>> GetOrdersToStartStream(long streamId, CancellationToken ct = default)
         {
             IQueryable<ReviewOrderEntity> query = context.ReviewOrders
@@ -63,6 +88,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return query.ToListAsync(ct);
         }
 
+        /// <summary>
+        /// Возвращает заказы, которые нужно обновить при завершении стрима
+        /// </summary>
         public Task<List<ReviewOrderEntity>> GetOrdersToCompleteStream(long streamId, CancellationToken ct = default)
         {
             IQueryable<ReviewOrderEntity> query = context.ReviewOrders
@@ -77,6 +105,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return query.ToListAsync(ct);
         }
 
+        /// <summary>
+        /// Возвращает заказы, которые участвуют в расчете текущей очереди
+        /// </summary>
         public Task<List<ReviewOrderEntity>> GetOrdersInQueue(CancellationToken ct = default)
         {
             IQueryable<ReviewOrderEntity> query = context.ReviewOrders

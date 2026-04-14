@@ -6,6 +6,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
 {
     public sealed class ComposerStreamQueries(AppDbContext context, DateTimeService dateTimeService)
     {
+        /// <summary>
+        /// Возвращает стримы в указанном диапазоне дат
+        /// </summary>
         public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct)
         {
             return context.ComposerStreams
@@ -14,6 +17,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                 .ToListAsync(ct);
         }
 
+        /// <summary>
+        /// Возвращает текущий стрим в статусе Live, если он существует
+        /// </summary>
         public Task<ComposerStreamEntity?> FindLive(CancellationToken ct)
         {
             return context.ComposerStreams
@@ -21,6 +27,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                 .FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
         }
 
+        /// <summary>
+        /// Возвращает ближайший доступный стрим: Live или ближайший Planned на сегодня/будущее
+        /// </summary>
         public Task<ComposerStreamEntity?> FindNearest(CancellationToken ct)
         {
             DateOnly today = dateTimeService.Today;
@@ -34,6 +43,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return query.FirstOrDefaultAsync(ct);
         }
 
+        /// <summary>
+        /// Возвращает дату ближайшего доступного стрима или DateOnly.MinValue, если стримов нет
+        /// </summary>
         public async Task<DateOnly> GetNearestStreamDate(CancellationToken ct = default)
         {
             ComposerStreamEntity? nearestStream = await FindNearest(ct);
@@ -41,6 +53,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return nearestStream?.EventDate ?? DateOnly.MinValue;
         }
 
+        /// <summary>
+        /// Возвращает список актуальных стримов: Live и Planned на сегодня/будущее
+        /// </summary>
         public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct)
         {
             DateOnly today = dateTimeService.Today;
@@ -53,6 +68,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return query.ToListAsync(ct);
         }
 
+        /// <summary>
+        /// Возвращает последний выданный никнейм по каждой дате стрима для приоритетного алгоритма очереди
+        /// </summary>
         public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate(CancellationToken ct = default)
         {
             var query = context.ComposerStreams
