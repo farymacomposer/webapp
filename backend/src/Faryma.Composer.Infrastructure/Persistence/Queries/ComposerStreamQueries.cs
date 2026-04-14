@@ -14,6 +14,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return context.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.EventDate >= dateFrom && x.EventDate <= dateTo)
+                .OrderBy(x => x.EventDate)
                 .ToListAsync(ct);
         }
 
@@ -63,7 +64,8 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             IQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.Status == ComposerStreamStatus.Live
-                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today));
+                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
+                .OrderBy(x => x.EventDate);
 
             return query.ToListAsync(ct);
         }

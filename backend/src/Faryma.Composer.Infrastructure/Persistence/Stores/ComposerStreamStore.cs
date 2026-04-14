@@ -27,6 +27,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
         public Task<ComposerStreamEntity?> FindLive(CancellationToken ct = default) => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
 
+        /// <summary>
+        /// Возвращает ближайший доступный стрим: Live или ближайший Planned на сегодня/будущее
+        /// </summary>
         public Task<ComposerStreamEntity?> FindNearest(CancellationToken ct = default)
         {
             DateOnly today = dateTimeService.Today;
@@ -39,14 +42,17 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             return query.FirstOrDefaultAsync(ct);
         }
 
+        /// <summary>
+        /// Возвращает ближайший доступный стрим указанного типа: Live или ближайший Planned на сегодня/будущее
+        /// </summary>
         public Task<ComposerStreamEntity?> FindNearest(ComposerStreamType type, CancellationToken ct = default)
         {
             DateOnly today = dateTimeService.Today;
 
             IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .Where(x => x.Type == type
-                    && x.EventDate >= today
-                    && (x.Status == ComposerStreamStatus.Planned || x.Status == ComposerStreamStatus.Live))
+                    && (x.Status == ComposerStreamStatus.Live
+                        || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today)))
                 .OrderBy(x => x.EventDate);
 
             return query.FirstOrDefaultAsync(ct);
