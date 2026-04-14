@@ -9,7 +9,7 @@ config:
   look: neo
 ---
 stateDiagram
-  direction LR
+  direction TB
   [*] --> Active:создание заказа, если заказ привязан к ближайшему стриму
   [*] --> Scheduled:создание заказа, если заказ привязан к будущему стриму
   Active --> InProgress:TakeOrderInProgress

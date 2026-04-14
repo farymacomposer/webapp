@@ -8,18 +8,22 @@
 ## Mermaid
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Preorder: CreateReviewOrder без TrackUrl
-    [*] --> Pending: CreateReviewOrder с TrackUrl
-
-    Preorder --> Pending: AddTrackUrl
-
-    Pending --> InProgress: TakeOrderInProgress
-    InProgress --> Completed: CompleteReviewOrder
-
-    Preorder --> Canceled: CancelReviewOrder
-    Pending --> Canceled: CancelReviewOrder
-    InProgress --> Canceled: CancelReviewOrder
+---
+config:
+  layout: elk
+  theme: neo-dark
+  look: neo
+---
+stateDiagram
+  direction TB
+  [*] --> Preorder:CreateReviewOrder без TrackUrl
+  [*] --> Pending:CreateReviewOrder с TrackUrl
+  Preorder --> Pending:AddTrackUrl
+  Pending --> InProgress:TakeOrderInProgress
+  InProgress --> Completed:CompleteReviewOrder
+  Preorder --> Canceled:CancelReviewOrder
+  Pending --> Canceled:CancelReviewOrder
+  InProgress --> Canceled:CancelReviewOrder
 ```
 
 ## Правила переходов
