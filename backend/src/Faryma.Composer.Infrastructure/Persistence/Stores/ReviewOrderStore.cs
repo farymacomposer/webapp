@@ -8,7 +8,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
     public sealed class ReviewOrderStore(AppDbContext context, DateTimeService dateTimeService)
     {
-        public Task<ReviewOrderEntity?> FindById(long id, CancellationToken ct)
+        public Task<ReviewOrderEntity?> FindById(long id, CancellationToken ct = default)
         {
             return context.ReviewOrders
                 .Include(x => x.CreationStream)

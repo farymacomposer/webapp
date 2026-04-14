@@ -24,7 +24,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         OrderQueueEventChannel orderQueueEventChannel,
         DateTimeService dateTimeService)
     {
-        public async Task<ReviewOrderEntity> CreateOutOfQueue(CreateOutOfQueueOrderCommand command, CancellationToken ct)
+        public async Task<ReviewOrderEntity> CreateOutOfQueue(CreateOutOfQueueOrderCommand command, CancellationToken ct = default)
         {
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
@@ -49,7 +49,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<ReviewOrderEntity> CreateDonation(CreateDonationOrderCommand command, CancellationToken ct)
+        public async Task<ReviewOrderEntity> CreateDonation(CreateDonationOrderCommand command, CancellationToken ct = default)
         {
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
@@ -84,7 +84,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<ReviewOrderEntity> CreateFree(CreateFreeOrderCommand command, CancellationToken ct)
+        public async Task<ReviewOrderEntity> CreateFree(CreateFreeOrderCommand command, CancellationToken ct = default)
         {
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
@@ -108,7 +108,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<ReviewOrderEntity> CreateCharity(CreateCharityOrderCommand command, CancellationToken ct)
+        public async Task<ReviewOrderEntity> CreateCharity(CreateCharityOrderCommand command, CancellationToken ct = default)
         {
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
             ComposerStreamEntity? liveStream = await uow.ComposerStreamStore.FindLive(ct);
@@ -136,7 +136,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<TransactionEntity> MoveUp(MoveUpCommand command, CancellationToken ct)
+        public async Task<TransactionEntity> MoveUp(MoveUpCommand command, CancellationToken ct = default)
         {
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
             ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
@@ -167,7 +167,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return payment;
         }
 
-        public async Task<ReviewOrderEntity> AddTrackUrl(AddTrackUrlCommand command, CancellationToken ct)
+        public async Task<ReviewOrderEntity> AddTrackUrl(AddTrackUrlCommand command, CancellationToken ct = default)
         {
             ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
@@ -191,7 +191,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<ReviewOrderEntity> TakeInProgress(long reviewOrderId, CancellationToken ct)
+        public async Task<ReviewOrderEntity> TakeInProgress(long reviewOrderId, CancellationToken ct = default)
         {
             ReviewOrderEntity order = await GetOrder(reviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
@@ -229,7 +229,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<ReviewOrderEntity> Complete(CompleteCommand command, CancellationToken ct)
+        public async Task<ReviewOrderEntity> Complete(CompleteCommand command, CancellationToken ct = default)
         {
             ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
@@ -256,7 +256,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<ReviewOrderEntity> Freeze(long reviewOrderId, CancellationToken ct)
+        public async Task<ReviewOrderEntity> Freeze(long reviewOrderId, CancellationToken ct = default)
         {
             ReviewOrderEntity order = await GetOrder(reviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
@@ -280,7 +280,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<ReviewOrderEntity> Unfreeze(long reviewOrderId, CancellationToken ct)
+        public async Task<ReviewOrderEntity> Unfreeze(long reviewOrderId, CancellationToken ct = default)
         {
             ReviewOrderEntity order = await GetOrder(reviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
@@ -304,7 +304,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<ReviewOrderEntity> Cancel(CancelCommand command, CancellationToken ct)
+        public async Task<ReviewOrderEntity> Cancel(CancelCommand command, CancellationToken ct = default)
         {
             ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;

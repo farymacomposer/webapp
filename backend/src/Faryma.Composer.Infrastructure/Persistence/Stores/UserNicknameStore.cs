@@ -23,7 +23,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             return result;
         }
 
-        public Task<UserNicknameEntity?> FindByNickname(string nickname, CancellationToken ct)
+        public Task<UserNicknameEntity?> FindByNickname(string nickname, CancellationToken ct = default)
         {
             string normalized = normalizer.NormalizeName(nickname);
 

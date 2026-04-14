@@ -32,7 +32,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     PaymentAmount = 500,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
 
             List<TransactionEntity> orderTransactions = await app.GetOrderTransactionsAsync(order.Id);
             List<TransactionEntity> accountTransactions = await app.RunScopeAsync(async services =>
@@ -80,7 +80,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         PaymentAmount = 500,
                         TopUpProvider = AccountTopUpProvider.Manual,
                         CreatedByUserId = user.Id,
-                    }, CancellationToken.None)));
+                    })));
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         PaymentAmount = 500,
                         TopUpProvider = AccountTopUpProvider.Manual,
                         CreatedByUserId = user.Id,
-                    }, CancellationToken.None)));
+                    })));
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     PaymentAmount = 1_000,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
             await app.DrainQueueEventsAsync();
 
             ReviewOrderEntity candidate = await app.RunScopeAsync(services =>
@@ -134,7 +134,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     PaymentAmount = 700,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
             await app.DrainQueueEventsAsync();
 
             OrderQueueSnapshot beforeSnapshot = await app.RunScopeAsync(services =>
@@ -149,7 +149,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     PaymentAmount = 500,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
             await app.DrainQueueEventsAsync();
 
             OrderQueueSnapshot afterSnapshot = await app.RunScopeAsync(services =>

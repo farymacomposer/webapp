@@ -21,7 +21,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 trackUrl: status == ReviewOrderStatus.Preorder ? null : "https://example.com/track");
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().Freeze(order.Id, CancellationToken.None));
+                services.GetRequiredService<ReviewOrderService>().Freeze(order.Id));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.True(result.IsFrozen);
@@ -39,7 +39,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 isFrozen: true);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().Freeze(order.Id, CancellationToken.None));
+                services.GetRequiredService<ReviewOrderService>().Freeze(order.Id));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.True(result.IsFrozen);
@@ -65,7 +65,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().Freeze(order.Id, CancellationToken.None)));
+                    services.GetRequiredService<ReviewOrderService>().Freeze(order.Id)));
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().Freeze(long.MaxValue, CancellationToken.None)));
+                    services.GetRequiredService<ReviewOrderService>().Freeze(long.MaxValue)));
         }
     }
 }

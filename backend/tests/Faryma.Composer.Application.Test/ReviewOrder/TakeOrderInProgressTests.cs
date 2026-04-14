@@ -29,11 +29,11 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     PaymentAmount = 1_000,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
             await app.DrainQueueEventsAsync();
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None));
+                services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id));
 
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
             Assert.Equal(ReviewOrderStatus.InProgress, result.Status);
@@ -65,7 +65,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             int beforeUpdates = app.QueueUpdateCount;
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None));
+                services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(order.Id, result.Id);
@@ -93,7 +93,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None)));
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id)));
         }
 
         [Fact]
@@ -111,7 +111,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None)));
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id)));
         }
 
         [Fact]
@@ -140,7 +140,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(candidate.Id, CancellationToken.None)));
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(candidate.Id)));
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None)));
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id)));
         }
 
         [Theory]
@@ -185,7 +185,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id, CancellationToken.None)));
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id)));
         }
 
         [Fact]
@@ -195,7 +195,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(long.MaxValue, CancellationToken.None)));
+                    services.GetRequiredService<ReviewOrderService>().TakeInProgress(long.MaxValue)));
         }
     }
 }

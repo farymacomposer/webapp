@@ -23,11 +23,11 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             }).Entity;
         }
 
-        public Task<ComposerStreamEntity?> FindById(long id, CancellationToken ct) => context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id, ct);
+        public Task<ComposerStreamEntity?> FindById(long id, CancellationToken ct = default) => context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id, ct);
 
-        public Task<ComposerStreamEntity?> FindLive(CancellationToken ct) => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
+        public Task<ComposerStreamEntity?> FindLive(CancellationToken ct = default) => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
 
-        public Task<ComposerStreamEntity?> FindNearest(CancellationToken ct)
+        public Task<ComposerStreamEntity?> FindNearest(CancellationToken ct = default)
         {
             DateOnly today = dateTimeService.Today;
 
@@ -39,7 +39,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             return query.FirstOrDefaultAsync(ct);
         }
 
-        public Task<ComposerStreamEntity?> FindNearest(ComposerStreamType type, CancellationToken ct)
+        public Task<ComposerStreamEntity?> FindNearest(ComposerStreamType type, CancellationToken ct = default)
         {
             DateOnly today = dateTimeService.Today;
 

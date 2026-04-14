@@ -14,9 +14,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
 {
     public sealed class ApplicationTestHost : IAsyncDisposable
     {
-        private readonly PostgreSqlFixture _fixture;
         private readonly IHost _host;
-        private readonly string _databaseName;
         private readonly OrderQueueService _orderQueueService;
         private readonly OrderQueueEventChannel _orderQueueEventChannel;
 
@@ -26,15 +24,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         public TestDataBuilder Data { get; }
         public int QueueUpdateCount => Notifications.UpdateCount;
 
-        private ApplicationTestHost(
-            PostgreSqlFixture fixture,
-            IHost host,
-            string databaseName,
-            DateTime fixedNow)
+        private ApplicationTestHost(IHost host, DateTime fixedNow)
         {
-            _fixture = fixture;
             _host = host;
-            _databaseName = databaseName;
             FixedNow = fixedNow;
             Notifications = (TestOrderQueueNotificationService)_host.Services.GetRequiredService<IOrderQueueNotificationService>();
             _orderQueueService = _host.Services.GetRequiredService<OrderQueueService>();
@@ -42,10 +34,10 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             Data = new TestDataBuilder(this);
         }
 
-        public static async Task<ApplicationTestHost> CreateAsync(PostgreSqlFixture fixture, DateTime? now = null)
+        public static async Task<ApplicationTestHost> CreateAsync(PostgreSqlFixture fixture)
         {
             string databaseName = await fixture.CreateDatabaseAsync();
-            DateTime fixedNow = now ?? new DateTime(2030, 1, 10, 12, 0, 0, DateTimeKind.Utc);
+            DateTime fixedNow = new(2030, 1, 10, 12, 0, 0, DateTimeKind.Utc);
             IHost? host = null;
 
             try
@@ -78,12 +70,12 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 await host.Services.GetRequiredService<AppSettingsService>().Initialize();
                 await host.Services.GetRequiredService<OrderQueueService>().Initialize();
 
-                return new ApplicationTestHost(fixture, host, databaseName, fixedNow);
+                return new ApplicationTestHost(host, fixedNow);
             }
             catch
             {
                 host?.Dispose();
-                await fixture.DeleteDatabaseAsync(databaseName);
+
                 throw;
             }
         }
@@ -91,6 +83,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         public async Task<T> RunScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
         {
             await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
+
             return await action(scope.ServiceProvider);
         }
 
@@ -108,52 +101,46 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             }
         }
 
-        public Task<ReviewOrderEntity> GetOrderAsync(long orderId) =>
-            RunScopeAsync(async services =>
-            {
-                UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
-                return await uow.ReviewOrderStore.FindById(orderId, CancellationToken.None)
-                    ?? throw new InvalidOperationException($"Order {orderId} not found.");
-            });
-
-        public Task<ComposerStreamEntity> GetStreamAsync(long streamId) =>
-            RunScopeAsync(async services =>
-            {
-                UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
-                return await uow.ComposerStreamStore.FindById(streamId, CancellationToken.None)
-                    ?? throw new InvalidOperationException($"Stream {streamId} not found.");
-            });
-
-        public Task<List<TransactionEntity>> GetOrderTransactionsAsync(long orderId)
+        public Task<ReviewOrderEntity> GetOrderAsync(long orderId) => RunScopeAsync(async services =>
         {
-            return RunScopeAsync(async services =>
-            {
-                IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
-                await using AppDbContext context = await factory.CreateDbContextAsync();
+            UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
 
-                return await context.Transactions
-                    .AsNoTracking()
-                    .Where(x => x.TransactionSourceId == orderId)
-                    .OrderBy(x => x.Id)
-                    .ToListAsync();
-            });
-        }
+            return await uow.ReviewOrderStore.FindById(orderId)
+                ?? throw new InvalidOperationException($"Order {orderId} not found.");
+        });
 
-        public Task<int> GetReviewCountAsync()
+        public Task<ComposerStreamEntity> GetStreamAsync(long streamId) => RunScopeAsync(async services =>
         {
-            return RunScopeAsync(async services =>
-            {
-                IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
-                await using AppDbContext context = await factory.CreateDbContextAsync();
-                return await context.Reviews.CountAsync();
-            });
-        }
+            UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
+
+            return await uow.ComposerStreamStore.FindById(streamId)
+                ?? throw new InvalidOperationException($"Stream {streamId} not found.");
+        });
+
+        public Task<List<TransactionEntity>> GetOrderTransactionsAsync(long orderId) => RunScopeAsync(async services =>
+        {
+            IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
+            await using AppDbContext context = await factory.CreateDbContextAsync();
+
+            return await context.Transactions
+                .AsNoTracking()
+                .Where(x => x.TransactionSourceId == orderId)
+                .OrderBy(x => x.Id)
+                .ToListAsync();
+        });
+
+        public Task<int> GetReviewCountAsync() => RunScopeAsync(async services =>
+        {
+            IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
+            await using AppDbContext context = await factory.CreateDbContextAsync();
+
+            return await context.Reviews.CountAsync();
+        });
 
         public async ValueTask DisposeAsync()
         {
             await _host.StopAsync();
             _host.Dispose();
-            await _fixture.DeleteDatabaseAsync(_databaseName);
         }
 
         private static async Task EnsureDatabaseCreatedAsync(IHost host)

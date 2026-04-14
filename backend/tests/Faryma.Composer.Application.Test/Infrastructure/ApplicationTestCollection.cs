@@ -6,6 +6,6 @@
     [Collection(nameof(ApplicationTestCollection))]
     public abstract class ApplicationTestBase(PostgreSqlFixture fixture)
     {
-        protected Task<ApplicationTestHost> CreateAppAsync(DateTime? now = null) => ApplicationTestHost.CreateAsync(fixture, now);
+        protected Task<ApplicationTestHost> CreateAppAsync() => ApplicationTestHost.CreateAsync(fixture);
     }
 }

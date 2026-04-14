@@ -24,7 +24,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/new-track",
-                }, CancellationToken.None));
+                }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(ReviewOrderStatus.Pending, result.Status);
@@ -50,7 +50,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/updated-track",
-                }, CancellationToken.None));
+                }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(status, result.Status);
@@ -80,7 +80,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         ReviewOrderId = order.Id,
                         TrackUrl = "https://example.com/fail-track",
-                    }, CancellationToken.None)));
+                    })));
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         ReviewOrderId = long.MaxValue,
                         TrackUrl = "https://example.com/missing-track",
-                    }, CancellationToken.None)));
+                    })));
         }
     }
 }

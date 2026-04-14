@@ -31,7 +31,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     ReviewOrderId = order.Id,
                     CancelReason = "duplicate",
-                }, CancellationToken.None));
+                }));
 
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
             Assert.Equal(ReviewOrderStatus.Canceled, result.Status);
@@ -59,7 +59,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     ReviewOrderId = order.Id,
                     CancelReason = "another",
-                }, CancellationToken.None));
+                }));
 
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
             Assert.Equal(order.Id, result.Id);
@@ -86,7 +86,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         ReviewOrderId = order.Id,
                         CancelReason = "late",
-                    }, CancellationToken.None)));
+                    })));
         }
 
         [Theory]
@@ -108,7 +108,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     ReviewOrderId = order.Id,
                     CancelReason = "manual",
-                }, CancellationToken.None));
+                }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(ReviewOrderStatus.Canceled, result.Status);
@@ -134,7 +134,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         ReviewOrderId = long.MaxValue,
                         CancelReason = "late",
-                    }, CancellationToken.None)));
+                    })));
         }
     }
 }

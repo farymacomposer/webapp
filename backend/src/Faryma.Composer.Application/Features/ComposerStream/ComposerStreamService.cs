@@ -19,10 +19,10 @@ namespace Faryma.Composer.Application.Features.ComposerStream
         OrderQueueEventChannel orderQueueEventChannel,
         DateTimeService dateTimeService)
     {
-        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct) => uow.ComposerStreamQueries.Find(dateFrom, dateTo, ct);
-        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct) => uow.ComposerStreamQueries.FindLiveAndPlanned(ct);
+        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct = default) => uow.ComposerStreamQueries.Find(dateFrom, dateTo, ct);
+        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct = default) => uow.ComposerStreamQueries.FindLiveAndPlanned(ct);
 
-        public async Task<ComposerStreamEntity> Create(CreateCommand command, CancellationToken ct)
+        public async Task<ComposerStreamEntity> Create(CreateCommand command, CancellationToken ct = default)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             }
         }
 
-        public async Task<ComposerStreamEntity> Start(long composerStreamId, CancellationToken ct)
+        public async Task<ComposerStreamEntity> Start(long composerStreamId, CancellationToken ct = default)
         {
             // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
 
@@ -74,7 +74,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             return stream;
         }
 
-        public async Task<ComposerStreamEntity> Complete(long composerStreamId, CancellationToken ct)
+        public async Task<ComposerStreamEntity> Complete(long composerStreamId, CancellationToken ct = default)
         {
             ComposerStreamEntity stream = await GetStream(composerStreamId, ct);
 
@@ -104,7 +104,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             return stream;
         }
 
-        public async Task<ComposerStreamEntity> Cancel(long composerStreamId, CancellationToken ct)
+        public async Task<ComposerStreamEntity> Cancel(long composerStreamId, CancellationToken ct = default)
         {
             // TODO: отмена только если нет заказов на этот стрим
 

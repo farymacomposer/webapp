@@ -22,7 +22,7 @@ namespace Faryma.Composer.Desktop.Auth
 
             _tokens = storedTokens;
 
-            return await TryRefreshInternal(CancellationToken.None);
+            return await TryRefreshInternal();
         }
 
         public async Task Login(string userName, string password)
@@ -113,7 +113,7 @@ namespace Faryma.Composer.Desktop.Auth
             return DateTimeOffset.FromUnixTimeSeconds(expiresAtUnixTime);
         }
 
-        private async Task<bool> TryRefreshInternal(CancellationToken ct)
+        private async Task<bool> TryRefreshInternal(CancellationToken ct = default)
         {
             if (_tokens is null)
             {

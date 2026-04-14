@@ -36,29 +36,6 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             return Task.CompletedTask;
         }
 
-        public async Task WaitForCountAsync(int expectedCount, TimeSpan timeout)
-        {
-            using CancellationTokenSource cts = new(timeout);
-
-            while (true)
-            {
-                Task waitTask;
-
-                lock (_sync)
-                {
-                    if (_snapshots.Count >= expectedCount)
-                    {
-                        return;
-                    }
-
-                    waitTask = _nextUpdate.Task;
-                }
-
-                await waitTask.WaitAsync(cts.Token);
-            }
-        }
-
-        private static TaskCompletionSource CreateWaitSource() =>
-            new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private static TaskCompletionSource CreateWaitSource() => new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
 }

@@ -31,7 +31,7 @@ namespace Faryma.Composer.Infrastructure
         public UserNicknameStore UserNicknameStore { get; } = userNicknameStore;
 
         public Task<IDbContextTransaction> BeginTransaction(CancellationToken ct) => context.Database.BeginTransactionAsync(ct);
-        public Task<int> SaveChanges(CancellationToken ct) => context.SaveChangesAsync(ct);
+        public Task<int> SaveChanges(CancellationToken ct = default) => context.SaveChangesAsync(ct);
         public void Remove<TEntity>(TEntity entity) where TEntity : class => context.Remove(entity);
     }
 }

@@ -34,7 +34,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return query.FirstOrDefaultAsync(ct);
         }
 
-        public async Task<DateOnly> GetNearestStreamDate(CancellationToken ct)
+        public async Task<DateOnly> GetNearestStreamDate(CancellationToken ct = default)
         {
             ComposerStreamEntity? nearestStream = await FindNearest(ct);
 
@@ -53,7 +53,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return query.ToListAsync(ct);
         }
 
-        public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate(CancellationToken ct)
+        public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate(CancellationToken ct = default)
         {
             var query = context.ComposerStreams
                 .AsNoTracking()

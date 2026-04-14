@@ -46,7 +46,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 completedAt: app.FixedNow);
 
             List<ComposerStreamEntity> result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ComposerStreamService>().FindLiveAndPlanned(CancellationToken.None));
+                services.GetRequiredService<ComposerStreamService>().FindLiveAndPlanned());
 
             long[] ids = result.Select(x => x.Id).ToArray();
             Assert.Contains(live.Id, ids);

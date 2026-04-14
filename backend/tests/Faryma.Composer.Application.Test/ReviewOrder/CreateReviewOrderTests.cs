@@ -28,7 +28,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     PaymentAmount = 1_200,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
 
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
             List<TransactionEntity> orderTransactions = await app.GetOrderTransactionsAsync(order.Id);
@@ -75,7 +75,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     PaymentAmount = 900,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
 
             Assert.Equal(stream.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderStatus.Preorder, order.Status);
@@ -107,7 +107,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     PaymentAmount = 800,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
 
             Assert.Equal(nearestCharity.Id, order.CreationStreamId);
             Assert.Equal(withTrackUrl ? ReviewOrderStatus.Pending : ReviewOrderStatus.Preorder, order.Status);
@@ -142,7 +142,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = "https://example.com/free",
                     UserComment = null,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
 
             Assert.NotEqual(nearerCharity.Id, order.CreationStreamId);
             Assert.Equal(donationStream.Id, order.CreationStreamId);
@@ -180,7 +180,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     PaymentAmount = 600,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
 
             Assert.NotEqual(nearerCharity.Id, order.CreationStreamId);
             Assert.Equal(donationStream.Id, order.CreationStreamId);
@@ -208,7 +208,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = "https://example.com/free",
                     UserComment = null,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
 
             Assert.Equal(nearestCharity.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderStatus.Pending, order.Status);
@@ -235,7 +235,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = null,
                     UserComment = null,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
 
             Assert.Equal(nearest.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderType.OutOfQueue, order.Type);
@@ -262,7 +262,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = "https://example.com/charity",
                     UserComment = null,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
 
             Assert.Equal(charityStream.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderType.Charity, order.Type);
@@ -289,7 +289,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         TrackUrl = "https://example.com/charity",
                         UserComment = null,
                         CreatedByUserId = user.Id,
-                    }, CancellationToken.None)));
+                    })));
         }
 
         [Theory]
@@ -312,7 +312,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         PaymentAmount = 700,
                         TopUpProvider = AccountTopUpProvider.Manual,
                         CreatedByUserId = user.Id,
-                    }, CancellationToken.None)),
+                    })),
                 "Free" => app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateFree(new CreateFreeOrderCommand
                     {
@@ -320,7 +320,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         TrackUrl = "https://example.com/free",
                         UserComment = null,
                         CreatedByUserId = user.Id,
-                    }, CancellationToken.None)),
+                    })),
                 "OutOfQueue" => app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateOutOfQueue(new CreateOutOfQueueOrderCommand
                     {
@@ -328,7 +328,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         TrackUrl = null,
                         UserComment = null,
                         CreatedByUserId = user.Id,
-                    }, CancellationToken.None)),
+                    })),
                 _ => throw new InvalidOperationException($"Unsupported kind: {kind}")
             };
 

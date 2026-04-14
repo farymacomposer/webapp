@@ -22,7 +22,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                     EventDate = eventDate,
                     Type = ComposerStreamType.Donation,
                     CreatedByUserId = user.Id,
-                }, CancellationToken.None));
+                }));
             ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
 
             Assert.Equal(ComposerStreamStatus.Planned, stream.Status);
@@ -55,7 +55,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                         EventDate = eventDate,
                         Type = ComposerStreamType.Charity,
                         CreatedByUserId = user.Id,
-                    }, CancellationToken.None)));
+                    })));
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                         EventDate = app.Today.AddDays(1),
                         Type = ComposerStreamType.Donation,
                         CreatedByUserId = Guid.NewGuid(),
-                    }, CancellationToken.None)));
+                    })));
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                         EventDate = app.Today.AddDays(1),
                         Type = ComposerStreamType.Unspecified,
                         CreatedByUserId = user.Id,
-                    }, CancellationToken.None)));
+                    })));
         }
     }
 }

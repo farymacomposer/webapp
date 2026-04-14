@@ -26,7 +26,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 type: ComposerStreamType.Debt);
 
             List<ComposerStreamEntity> result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ComposerStreamService>().Find(app.Today, app.Today.AddDays(2), CancellationToken.None));
+                services.GetRequiredService<ComposerStreamService>().Find(app.Today, app.Today.AddDays(2)));
 
             long[] ids = result.Select(x => x.Id).ToArray();
             Assert.DoesNotContain(before.Id, ids);

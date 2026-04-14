@@ -53,7 +53,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 stream.StartedAt = startedAt;
                 stream.CompletedAt = completedAt;
 
-                await uow.SaveChanges(CancellationToken.None);
+                await uow.SaveChanges();
 
                 return stream;
             });
@@ -136,21 +136,21 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                     order.Review = uow.ReviewStore.Create(order, reviewRating.Value, createdByUser);
                 }
 
-                await uow.SaveChanges(CancellationToken.None);
+                await uow.SaveChanges();
 
                 return order;
             });
 
         private static async Task<UserNicknameEntity> GetOrCreateNicknameAsync(UnitOfWork uow, string nickname)
         {
-            UserNicknameEntity? existing = await uow.UserNicknameStore.FindByNickname(nickname, CancellationToken.None);
+            UserNicknameEntity? existing = await uow.UserNicknameStore.FindByNickname(nickname);
             if (existing is not null)
             {
                 return existing;
             }
 
             UserNicknameEntity created = uow.UserNicknameStore.Create(nickname);
-            await uow.SaveChanges(CancellationToken.None);
+            await uow.SaveChanges();
 
             return created;
         }
@@ -189,12 +189,12 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         {
             if (creationStreamId is long existingStreamId)
             {
-                return await uow.ComposerStreamStore.FindById(existingStreamId, CancellationToken.None)
+                return await uow.ComposerStreamStore.FindById(existingStreamId)
                     ?? throw new InvalidOperationException($"Creation stream {existingStreamId} not found.");
             }
 
             ComposerStreamEntity stream = uow.ComposerStreamStore.Create(GetNextStreamDate(), ComposerStreamType.Donation, createdByUser);
-            await uow.SaveChanges(CancellationToken.None);
+            await uow.SaveChanges();
 
             return stream;
         }
@@ -207,7 +207,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         {
             if (processingStreamId is long existingStreamId)
             {
-                return await uow.ComposerStreamStore.FindById(existingStreamId, CancellationToken.None)
+                return await uow.ComposerStreamStore.FindById(existingStreamId)
                     ?? throw new InvalidOperationException($"Processing stream {existingStreamId} not found.");
             }
 
@@ -220,7 +220,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             stream.Status = ComposerStreamStatus.Live;
             stream.StartedAt = app.FixedNow;
 
-            await uow.SaveChanges(CancellationToken.None);
+            await uow.SaveChanges();
 
             return stream;
         }

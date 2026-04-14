@@ -13,7 +13,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                 .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct);
         }
 
-        public async Task<ReviewOrderEntity?> FindLastTaken(CancellationToken ct)
+        public async Task<ReviewOrderEntity?> FindLastTaken(CancellationToken ct = default)
         {
             return await FindInProgress(ct)
                 ?? await context.ReviewOrders
@@ -23,7 +23,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                     .LastOrDefaultAsync(ct);
         }
 
-        public async Task<ReviewOrderEntity?> FindLastTakenDebt(CancellationToken ct)
+        public async Task<ReviewOrderEntity?> FindLastTakenDebt(CancellationToken ct = default)
         {
             return await context.ReviewOrders
                 .AsNoTracking()
@@ -38,7 +38,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                     .LastOrDefaultAsync(ct);
         }
 
-        public async Task<ReviewOrderEntity?> FindLastTakenOutOfQueue(CancellationToken ct)
+        public async Task<ReviewOrderEntity?> FindLastTakenOutOfQueue(CancellationToken ct = default)
         {
             return await context.ReviewOrders
                 .AsNoTracking()
@@ -51,7 +51,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                     .LastOrDefaultAsync(ct);
         }
 
-        public Task<List<ReviewOrderEntity>> GetOrdersToStartStream(long streamId, CancellationToken ct)
+        public Task<List<ReviewOrderEntity>> GetOrdersToStartStream(long streamId, CancellationToken ct = default)
         {
             IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()
@@ -63,7 +63,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return query.ToListAsync(ct);
         }
 
-        public Task<List<ReviewOrderEntity>> GetOrdersToCompleteStream(long streamId, CancellationToken ct)
+        public Task<List<ReviewOrderEntity>> GetOrdersToCompleteStream(long streamId, CancellationToken ct = default)
         {
             IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()
@@ -77,7 +77,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             return query.ToListAsync(ct);
         }
 
-        public Task<List<ReviewOrderEntity>> GetOrdersInQueue(CancellationToken ct)
+        public Task<List<ReviewOrderEntity>> GetOrdersInQueue(CancellationToken ct = default)
         {
             IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()

@@ -60,7 +60,7 @@ namespace Faryma.Composer.Api.Auth.Services
             if (stored.IsExpired(dateTimeService.Now))
             {
                 stored.RevokedAt = dateTimeService.Now;
-                await uow.SaveChanges(CancellationToken.None);
+                await uow.SaveChanges();
 
                 throw new AuthenticationException("Refresh token истек");
             }
@@ -81,7 +81,7 @@ namespace Faryma.Composer.Api.Auth.Services
                 user);
 
             string accessToken = await GenerateAccessToken(user);
-            await uow.SaveChanges(CancellationToken.None);
+            await uow.SaveChanges();
 
             return (accessToken, nextRefresh);
         }

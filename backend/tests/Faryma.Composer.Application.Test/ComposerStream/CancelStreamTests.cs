@@ -17,7 +17,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 status: ComposerStreamStatus.Planned);
 
             ComposerStreamEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id, CancellationToken.None));
+                services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id));
             ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
 
             Assert.Equal(ComposerStreamStatus.Canceled, result.Status);
@@ -35,7 +35,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
 
             int beforeUpdates = app.QueueUpdateCount;
             ComposerStreamEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id, CancellationToken.None));
+                services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id));
             ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
 
             Assert.Equal(stream.Id, result.Id);
@@ -59,7 +59,32 @@ namespace Faryma.Composer.Application.Test.ComposerStream
 
             await Assert.ThrowsAsync<ComposerStreamException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id, CancellationToken.None)));
+                    services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id)));
+        }
+
+        [Theory]
+        [InlineData(ReviewOrderStatus.Preorder)]
+        [InlineData(ReviewOrderStatus.Pending)]
+        public async Task Cancel_Throws_WhenPlannedStreamHasActiveCreatedOrders(ReviewOrderStatus orderStatus)
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("composer");
+            ComposerStreamEntity stream = await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                status: ComposerStreamStatus.Planned);
+            await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                creationStreamId: stream.Id,
+                status: orderStatus);
+
+            int beforeUpdates = app.QueueUpdateCount;
+            await Assert.ThrowsAsync<ComposerStreamException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id)));
+
+            ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
+            Assert.Equal(ComposerStreamStatus.Planned, persisted.Status);
+            Assert.Equal(beforeUpdates, app.QueueUpdateCount);
         }
 
         [Fact]
@@ -69,7 +94,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
 
             await Assert.ThrowsAsync<ComposerStreamException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ComposerStreamService>().Cancel(long.MaxValue, CancellationToken.None)));
+                    services.GetRequiredService<ComposerStreamService>().Cancel(long.MaxValue)));
         }
     }
 }
