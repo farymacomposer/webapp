@@ -10,6 +10,7 @@
 ```mermaid
 ---
 config:
+  layout: elk
   theme: neo-dark
   look: neo
 ---
