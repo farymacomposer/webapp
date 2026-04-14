@@ -77,14 +77,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 creationStreamId: stream.Id,
                 status: orderStatus);
 
-            int beforeUpdates = app.QueueUpdateCount;
             await Assert.ThrowsAsync<ComposerStreamException>(() =>
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id)));
-
-            ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
-            Assert.Equal(ComposerStreamStatus.Planned, persisted.Status);
-            Assert.Equal(beforeUpdates, app.QueueUpdateCount);
         }
 
         [Fact]

@@ -19,8 +19,8 @@ namespace Faryma.Composer.Application.Features.ComposerStream
         OrderQueueEventChannel orderQueueEventChannel,
         DateTimeService dateTimeService)
     {
-        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct = default) => uow.ComposerStreamQueries.Find(dateFrom, dateTo, ct);
-        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct = default) => uow.ComposerStreamQueries.FindLiveAndPlanned(ct);
+        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct) => uow.ComposerStreamQueries.Find(dateFrom, dateTo, ct);
+        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct) => uow.ComposerStreamQueries.FindLiveAndPlanned(ct);
 
         public async Task<ComposerStreamEntity> Create(CreateCommand command, CancellationToken ct = default)
         {

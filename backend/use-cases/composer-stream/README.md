@@ -7,8 +7,6 @@
 
 | Use case | Файл | Эндпоинт |
 | --- | --- | --- |
-| Получить список стримов за период | `find-streams.md` | `GET /api/ComposerStream/FindStreams` |
-| Получить текущий и запланированные стримы | `find-live-and-planned-streams.md` | `GET /api/ComposerStream/FindLiveAndPlanned` |
 | Создать стрим | `create-stream.md` | `POST /api/ComposerStream/CreateStream` |
 | Запустить стрим | `start-stream.md` | `POST /api/ComposerStream/StartStream` |
 | Завершить стрим | `complete-stream.md` | `POST /api/ComposerStream/CompleteStream` |
