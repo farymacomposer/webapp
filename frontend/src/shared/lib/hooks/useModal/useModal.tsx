@@ -9,7 +9,9 @@ interface UseModalProps {
 export function useModal({ animationDelay, isOpen, onClose }: UseModalProps) {
   const [isClosing, setIsClosing] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const timerRef = useRef() as MutableRefObject<ReturnType<typeof setTimeout>>;
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null) as MutableRefObject<
+    ReturnType<typeof setTimeout> | null
+  >;
 
   useEffect(() => {
     if (isOpen) {
@@ -42,7 +44,9 @@ export function useModal({ animationDelay, isOpen, onClose }: UseModalProps) {
     }
 
     return () => {
-      clearTimeout(timerRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [isOpen, onKeyDown]);

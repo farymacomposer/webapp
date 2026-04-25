@@ -1,5 +1,4 @@
-https://localhost:3000 {
-  tls internal
+:3000 {
 
   handle /api/* {
     reverse_proxy webapi:8080

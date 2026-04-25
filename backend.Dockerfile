@@ -1,10 +1,8 @@
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["backend/src/Faryma.Composer.Api/Faryma.Composer.Api.csproj", "src/Faryma.Composer.Api/"]
-COPY ["backend/src/Faryma.Composer.MigrationsBundle/Faryma.Composer.MigrationsBundle.csproj", "src/Faryma.Composer.MigrationsBundle/"]
-RUN dotnet restore "src/Faryma.Composer.Api/Faryma.Composer.Api.csproj"
 COPY backend/ .
+RUN dotnet restore "src/Faryma.Composer.Api/Faryma.Composer.Api.csproj"
 WORKDIR "/src/src/Faryma.Composer.Api"
 RUN dotnet build "Faryma.Composer.Api.csproj" -c Release -o /app/build
 

@@ -2,17 +2,9 @@ services:
 
   frontend:
     build:
+      context: .
       dockerfile: frontend.Dockerfile
-      args:
-        API_PROXY_TARGET: ${API_PROXY_TARGET}
-        NEXT_PUBLIC_TWITCH_CLIENT_ID: ${NEXT_PUBLIC_TWITCH_CLIENT_ID}
-        NEXT_PUBLIC_TWITCH_REDIRECT_URI: ${NEXT_PUBLIC_TWITCH_REDIRECT_URI}
     container_name: composer-frontend
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      API_PROXY_TARGET: ${API_PROXY_TARGET}
-      NEXT_PUBLIC_TWITCH_CLIENT_ID: ${NEXT_PUBLIC_TWITCH_CLIENT_ID}
-      NEXT_PUBLIC_TWITCH_REDIRECT_URI: ${NEXT_PUBLIC_TWITCH_REDIRECT_URI}
     expose:
       - "3000"
     networks:
@@ -23,6 +15,7 @@ services:
 
   webapi:
     build:
+      context: .
       dockerfile: backend.Dockerfile
     container_name: composer-webapi
     environment:
@@ -76,8 +69,8 @@ services:
       POSTGRES_DB: ${POSTGRES__DATABASE}
       POSTGRES_USER: ${POSTGRES__USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES__PASSWORD}
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     networks:
       - composer-net
     healthcheck:
