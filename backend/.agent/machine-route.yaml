@@ -1,0 +1,87 @@
+project:
+  name: Faryma.Composer backend
+  solution: Faryma.Composer.sln
+  runtime: .NET 10
+
+commands:
+  build: dotnet build Faryma.Composer.sln
+  run_api: dotnet run --project src/Faryma.Composer.Api/Faryma.Composer.Api.csproj
+  test_api: dotnet test tests/Faryma.Composer.Api.Test/Faryma.Composer.Api.Test.csproj
+  test_app: dotnet test tests/Faryma.Composer.Application.Test/Faryma.Composer.Application.Test.csproj
+
+layers:
+  api:
+    path: src/Faryma.Composer.Api
+    entry:
+      - src/Faryma.Composer.Api/Program.cs
+      - src/Faryma.Composer.Api/Features
+      - src/Faryma.Composer.Api/Auth
+  application:
+    path: src/Faryma.Composer.Application
+    entry:
+      - src/Faryma.Composer.Application/Features
+      - src/Faryma.Composer.Application/DependencyInjection/ServiceCollectionExtensions.cs
+  infrastructure:
+    path: src/Faryma.Composer.Infrastructure
+    entry:
+      - src/Faryma.Composer.Infrastructure/AppDbContext.cs
+      - src/Faryma.Composer.Infrastructure/Persistence
+  contracts:
+    path: src/Faryma.Composer.Contracts
+    entry:
+      - src/Faryma.Composer.Contracts/Api
+      - src/Faryma.Composer.Contracts/Application
+      - src/Faryma.Composer.Contracts/Infrastructure
+  migrations:
+    path: src/Faryma.Composer.MigrationsBundle
+    entry:
+      - src/Faryma.Composer.MigrationsBundle/Migrations
+  desktop:
+    path: src/Faryma.Composer.Desktop
+  tests:
+    path: tests
+    entry:
+      - tests/Faryma.Composer.Application.Test
+      - tests/Faryma.Composer.Api.Test
+  use_cases:
+    path: use-cases
+    entry:
+      - use-cases/review-order
+      - use-cases/composer-stream
+      - use-cases/order-queue
+
+features:
+  auth:
+    paths:
+      - src/Faryma.Composer.Api/Auth
+      - src/Faryma.Composer.Contracts/Api/Auth
+  review_order:
+    paths:
+      - src/Faryma.Composer.Api/Features/ReviewOrder
+      - src/Faryma.Composer.Application/Features/ReviewOrder
+      - src/Faryma.Composer.Contracts/Api/Features/ReviewOrder
+      - src/Faryma.Composer.Contracts/Application/Features/ReviewOrder
+      - src/Faryma.Composer.Infrastructure/Persistence/Stores/ReviewOrderStore.cs
+      - src/Faryma.Composer.Infrastructure/Persistence/Queries/ReviewOrderQueries.cs
+      - tests/Faryma.Composer.Application.Test/ReviewOrder
+      - use-cases/review-order
+  composer_stream:
+    paths:
+      - src/Faryma.Composer.Api/Features/ComposerStream
+      - src/Faryma.Composer.Application/Features/ComposerStream
+      - src/Faryma.Composer.Contracts/Api/Features/ComposerStream
+      - src/Faryma.Composer.Contracts/Application/Features/ComposerStream
+      - src/Faryma.Composer.Infrastructure/Persistence/Stores/ComposerStreamStore.cs
+      - src/Faryma.Composer.Infrastructure/Persistence/Queries/ComposerStreamQueries.cs
+      - tests/Faryma.Composer.Application.Test/ComposerStream
+      - use-cases/composer-stream
+  order_queue:
+    paths:
+      - src/Faryma.Composer.Api/Features/OrderQueue
+      - src/Faryma.Composer.Application/Features/OrderQueue
+      - src/Faryma.Composer.Application/Features/OrderQueue/PriorityAlgorithm
+      - src/Faryma.Composer.Contracts/Api/Features/OrderQueue
+      - src/Faryma.Composer.Contracts/Application/Features/OrderQueue
+      - tests/Faryma.Composer.Application.Test/OrderQueueManagerTest.cs
+      - tests/Faryma.Composer.Application.Test/Specification
+      - use-cases/order-queue
