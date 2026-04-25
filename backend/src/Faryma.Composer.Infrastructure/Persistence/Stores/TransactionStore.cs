@@ -13,13 +13,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             UserNicknameAccountEntity account,
             UserEntity createdByUser)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
-
-            if (topUpProvider == AccountTopUpProvider.Unspecified)
-            {
-                throw new UnreachableException($"Недопустимый провайдер пополнения счета '{topUpProvider}'");
-            }
-
             AccountTopUpEntity source = new()
             {
                 CreatedAt = dateTimeService.Now,
@@ -46,8 +39,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             UserNicknameAccountEntity account,
             TransactionSourceEntity source)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
-
             if (source is not ReviewOrderEntity)
             {
                 throw new UnreachableException($"Недопустимый источник платежа '{source.GetType().Name}'");

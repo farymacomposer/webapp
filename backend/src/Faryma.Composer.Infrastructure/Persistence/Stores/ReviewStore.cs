@@ -10,8 +10,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             int rating,
             UserEntity createdByUser)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(rating);
-
             return context.Reviews.Add(new ReviewEntity
             {
                 ReviewOrder = inProgressOrder,

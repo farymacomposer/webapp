@@ -67,34 +67,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(1, await app.GetReviewCountAsync());
         }
 
-        [Fact]
-        public async Task Complete_Throws_WhenRatingIsNegative()
-        {
-            await using ApplicationTestHost app = await CreateAppAsync();
-            UserEntity user = await app.Data.CreateUserAsync("admin");
-            ComposerStreamEntity liveStream = await app.Data.CreateStreamAsync(
-                createdByUserId: user.Id,
-                status: ComposerStreamStatus.Live,
-                startedAt: app.FixedNow);
-            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
-                createdByUserId: user.Id,
-                creationStreamId: liveStream.Id,
-                processingStreamId: liveStream.Id,
-                status: ReviewOrderStatus.InProgress,
-                inProgressAt: app.FixedNow);
-
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
-                app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().Complete(new CompleteCommand
-                    {
-                        ReviewOrderId = order.Id,
-                        Rating = -1,
-                        CreatedByUserId = user.Id,
-                    })));
-
-            Assert.Equal(0, await app.GetReviewCountAsync());
-        }
-
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]

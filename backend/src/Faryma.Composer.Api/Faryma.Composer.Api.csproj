@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>latest</LangVersion>
     <UserSecretsId>22975da3-8390-43b6-89b3-c5747e23402a</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
