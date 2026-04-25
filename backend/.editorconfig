@@ -608,7 +608,7 @@ dotnet_diagnostic.rcs0055.severity = warning
 # Normalize whitespace at the beginning of a file
 dotnet_diagnostic.rcs0057.severity = warning
 
-roslynator_new_line_at_end_of_file = false
+roslynator_new_line_at_end_of_file = true
 # Applicable to: rcs0058
 
 # Normalize whitespace at the end of a file
@@ -919,7 +919,7 @@ dotnet_diagnostic.rcs1107.severity = error
 dotnet_diagnostic.rcs1110.severity = error
 
 # Combine 'Enumerable.Where' method chain
-dotnet_diagnostic.rcs1112.severity = error
+dotnet_diagnostic.rcs1112.severity = none
 
 # Use 'string.IsNullOrEmpty' method
 dotnet_diagnostic.rcs1113.severity = error
@@ -1096,7 +1096,7 @@ dotnet_diagnostic.rcs1235.severity = error
 dotnet_diagnostic.rcs1236.severity = error
 
 # Avoid nested ?: operators
-dotnet_diagnostic.rcs1238.severity = error
+dotnet_diagnostic.rcs1238.severity = none
 
 # Use 'for' statement instead of 'while' statement
 dotnet_diagnostic.rcs1239.severity = error
@@ -1120,7 +1120,7 @@ roslynator_use_var_instead_of_implicit_object_creation = false
 # Applicable to: rcs1250
 
 # Use implicit/explicit object creation
-dotnet_diagnostic.rcs1250.severity = error
+dotnet_diagnostic.rcs1250.severity = none
 
 # Remove unnecessary braces from record declaration
 dotnet_diagnostic.rcs1251.severity = error

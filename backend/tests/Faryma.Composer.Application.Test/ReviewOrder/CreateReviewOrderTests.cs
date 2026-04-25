@@ -9,6 +9,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 {
     public sealed class CreateReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что donation-заказ со ссылкой создается сразу в Pending и с платежом.
+        /// </summary>
         [Fact]
         public async Task CreateDonation_CreatesPendingOrderAndPayment_WhenTrackUrlProvided()
         {
@@ -56,6 +59,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 accountTransactions.Select(x => x.Kind).ToArray());
         }
 
+        /// <summary>
+        /// Проверяет, что donation-заказ без ссылки создается как предзаказ.
+        /// </summary>
         [Fact]
         public async Task CreateDonation_CreatesPreorder_WhenTrackUrlIsMissing()
         {
@@ -82,6 +88,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Null(order.TrackUrl);
         }
 
+        /// <summary>
+        /// Проверяет, что для нового ника выбирается ближайший доступный стрим.
+        /// </summary>
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -113,6 +122,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(withTrackUrl ? ReviewOrderStatus.Pending : ReviewOrderStatus.Preorder, order.Status);
         }
 
+        /// <summary>
+        /// Проверяет, что free-заказ для знакомого ника привязывается к donation-стриму.
+        /// </summary>
         [Fact]
         public async Task CreateFree_UsesNearestDonationStream_WhenNicknameAlreadyHasOrders()
         {
@@ -149,6 +161,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(ReviewOrderType.Free, order.Type);
         }
 
+        /// <summary>
+        /// Проверяет, что donation-заказ для знакомого ника привязывается к donation-стриму.
+        /// </summary>
         [Fact]
         public async Task CreateDonation_UsesNearestDonationStream_WhenNicknameAlreadyHasOrders()
         {
@@ -187,6 +202,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(ReviewOrderType.Donation, order.Type);
         }
 
+        /// <summary>
+        /// Проверяет, что free-заказ для нового ника привязывается к ближайшему доступному стриму.
+        /// </summary>
         [Fact]
         public async Task CreateFree_UsesNearestAvailableStream_WhenNicknameHasNoHistory()
         {
@@ -214,6 +232,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(ReviewOrderStatus.Pending, order.Status);
         }
 
+        /// <summary>
+        /// Проверяет, что out-of-queue заказ создается на ближайшем доступном стриме.
+        /// </summary>
         [Fact]
         public async Task CreateOutOfQueue_UsesNearestAvailableStream()
         {
@@ -243,6 +264,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(0, order.PayableAmount);
         }
 
+        /// <summary>
+        /// Проверяет, что charity-заказ создается на активном charity-стриме.
+        /// </summary>
         [Fact]
         public async Task CreateCharity_UsesLiveCharityStream()
         {
@@ -269,6 +293,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(0, order.PayableAmount);
         }
 
+        /// <summary>
+        /// Проверяет, что charity-заказ нельзя создать без активного charity-стрима.
+        /// </summary>
         [Fact]
         public async Task CreateCharity_Throws_WhenLiveCharityStreamIsMissing()
         {
@@ -292,6 +319,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     })));
         }
 
+        /// <summary>
+        /// Проверяет, что создание заказа падает, если не найден подходящий стрим.
+        /// </summary>
         [Theory]
         [InlineData("Donation")]
         [InlineData("Free")]

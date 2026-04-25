@@ -9,6 +9,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 {
     public sealed class CancelReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что отмена заказа в работе очищает поля обработки.
+        /// </summary>
         [Fact]
         public async Task Cancel_ClearsProcessingFields_WhenOrderWasInProgress()
         {
@@ -43,6 +46,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(QueueCategory.Unspecified, persisted.QueueCategory);
         }
 
+        /// <summary>
+        /// Проверяет, что повторная отмена возвращает уже сохраненное состояние заказа.
+        /// </summary>
         [Fact]
         public async Task Cancel_ReturnsCurrentOrder_WhenOrderAlreadyCanceled()
         {
@@ -69,6 +75,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(app.FixedNow, persisted.CanceledAt);
         }
 
+        /// <summary>
+        /// Проверяет, что завершенный заказ отменить нельзя.
+        /// </summary>
         [Fact]
         public async Task Cancel_Throws_WhenOrderIsCompleted()
         {
@@ -89,6 +98,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     })));
         }
 
+        /// <summary>
+        /// Проверяет, что отмена допустимых неактивных статусов тоже очищает поля обработки.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]
@@ -123,6 +135,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Null(persisted.InProgressAt);
         }
 
+        /// <summary>
+        /// Проверяет, что для несуществующего заказа выбрасывается ошибка.
+        /// </summary>
         [Fact]
         public async Task Cancel_Throws_WhenOrderDoesNotExist()
         {

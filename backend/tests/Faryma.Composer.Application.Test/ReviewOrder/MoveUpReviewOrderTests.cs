@@ -11,6 +11,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 {
     public sealed class MoveUpReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что доплата по заказу создает платеж для допустимого статуса.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]
@@ -55,6 +58,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Contains(accountTransactions, x => x.Kind == TransactionKind.Payment && x.Debit == 500);
         }
 
+        /// <summary>
+        /// Проверяет, что доплата запрещена для недопустимых статусов заказа.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.InProgress)]
         [InlineData(ReviewOrderStatus.Completed)]
@@ -83,6 +89,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     })));
         }
 
+        /// <summary>
+        /// Проверяет, что для несуществующего заказа выбрасывается ошибка.
+        /// </summary>
         [Fact]
         public async Task MoveUp_Throws_WhenOrderDoesNotExist()
         {
@@ -101,6 +110,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     })));
         }
 
+        /// <summary>
+        /// Проверяет, что доплата улучшает позицию заказа в очереди.
+        /// </summary>
         [Fact]
         public async Task MoveUp_ImprovesOrderPositionInQueue()
         {

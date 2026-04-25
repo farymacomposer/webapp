@@ -8,6 +8,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 {
     public sealed class UnfreezeReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что для допустимых статусов снимается флаг заморозки.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]
@@ -29,6 +32,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.False(persisted.IsFrozen);
         }
 
+        /// <summary>
+        /// Проверяет, что повторная разморозка не меняет уже размороженный заказ.
+        /// </summary>
         [Fact]
         public async Task Unfreeze_ReturnsCurrentOrder_WhenAlreadyUnfrozen()
         {
@@ -47,6 +53,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.False(persisted.IsFrozen);
         }
 
+        /// <summary>
+        /// Проверяет, что разморозка запрещена для недопустимых статусов.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.InProgress)]
         [InlineData(ReviewOrderStatus.Completed)]
@@ -70,6 +79,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().Unfreeze(order.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что для несуществующего заказа выбрасывается ошибка.
+        /// </summary>
         [Fact]
         public async Task Unfreeze_Throws_WhenOrderDoesNotExist()
         {

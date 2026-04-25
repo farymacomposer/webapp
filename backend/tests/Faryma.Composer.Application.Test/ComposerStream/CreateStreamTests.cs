@@ -8,6 +8,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
 {
     public sealed class CreateStreamTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что создание стрима сохраняет его в статусе Planned.
+        /// </summary>
         [Fact]
         public async Task Create_CreatesPlannedStream()
         {
@@ -35,6 +38,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             Assert.Null(persisted.CompletedAt);
         }
 
+        /// <summary>
+        /// Проверяет, что нельзя создать второй стрим на ту же дату.
+        /// </summary>
         [Fact]
         public async Task Create_Throws_WhenStreamDateAlreadyExists()
         {
@@ -57,6 +63,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                     })));
         }
 
+        /// <summary>
+        /// Проверяет, что создание стрима недоступно для несуществующего пользователя.
+        /// </summary>
         [Fact]
         public async Task Create_Throws_WhenUserDoesNotExist()
         {

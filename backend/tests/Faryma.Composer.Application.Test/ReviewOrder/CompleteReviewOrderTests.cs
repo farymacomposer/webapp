@@ -9,6 +9,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 {
     public sealed class CompleteReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что завершение создает отзыв и переводит заказ в Completed.
+        /// </summary>
         [Fact]
         public async Task Complete_CreatesReviewAndMarksOrderCompleted()
         {
@@ -42,6 +45,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(1, await app.GetReviewCountAsync());
         }
 
+        /// <summary>
+        /// Проверяет, что повторное завершение не меняет заказ и не создает новый отзыв.
+        /// </summary>
         [Fact]
         public async Task Complete_ReturnsCurrentOrder_WhenOrderAlreadyCompleted()
         {
@@ -67,6 +73,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(1, await app.GetReviewCountAsync());
         }
 
+        /// <summary>
+        /// Проверяет, что завершение разрешено только для заказа в работе.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]
@@ -91,6 +100,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     })));
         }
 
+        /// <summary>
+        /// Проверяет, что для несуществующего заказа выбрасывается ошибка.
+        /// </summary>
         [Fact]
         public async Task Complete_Throws_WhenOrderDoesNotExist()
         {

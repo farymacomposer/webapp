@@ -9,6 +9,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 {
     public sealed class TakeOrderInProgressTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что pending-заказ переводится в статус InProgress.
+        /// </summary>
         [Fact]
         public async Task TakeInProgress_TransitionsPendingOrderToInProgress()
         {
@@ -43,6 +46,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.NotEqual(QueueCategory.Unspecified, persisted.QueueCategory);
         }
 
+        /// <summary>
+        /// Проверяет, что повторный перевод уже взятого заказа ничего не меняет.
+        /// </summary>
         [Fact]
         public async Task TakeInProgress_ReturnsCurrentOrder_WhenOrderAlreadyInProgress()
         {
@@ -76,6 +82,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(beforeUpdates, app.QueueUpdateCount);
         }
 
+        /// <summary>
+        /// Проверяет, что замороженный заказ нельзя взять в работу.
+        /// </summary>
         [Fact]
         public async Task TakeInProgress_Throws_WhenOrderIsFrozen()
         {
@@ -96,6 +105,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что без активного стрима заказ нельзя взять в работу.
+        /// </summary>
         [Fact]
         public async Task TakeInProgress_Throws_WhenLiveStreamIsMissing()
         {
@@ -114,6 +126,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что нельзя взять новый заказ, пока другой уже находится в работе.
+        /// </summary>
         [Fact]
         public async Task TakeInProgress_Throws_WhenAnotherOrderIsAlreadyInProgress()
         {
@@ -143,6 +158,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().TakeInProgress(candidate.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что предзаказ нельзя перевести в работу без ссылки.
+        /// </summary>
         [Fact]
         public async Task TakeInProgress_Throws_WhenOrderIsPreorder()
         {
@@ -163,6 +181,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что в работу можно взять только заказ в статусе Pending.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.Completed)]
         [InlineData(ReviewOrderStatus.Canceled)]
@@ -188,6 +209,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().TakeInProgress(order.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что для несуществующего заказа выбрасывается ошибка.
+        /// </summary>
         [Fact]
         public async Task TakeInProgress_Throws_WhenOrderDoesNotExist()
         {

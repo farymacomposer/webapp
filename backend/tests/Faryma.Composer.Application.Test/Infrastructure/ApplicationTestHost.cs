@@ -12,16 +12,38 @@ using Microsoft.Extensions.Hosting;
 
 namespace Faryma.Composer.Application.Test.Infrastructure
 {
+    /// <summary>
+    /// Поднимает тестовый host приложения с изолированной базой и фиксированным временем.
+    /// </summary>
     public sealed class ApplicationTestHost : IAsyncDisposable
     {
         private readonly IHost _host;
         private readonly OrderQueueService _orderQueueService;
         private readonly OrderQueueEventChannel _orderQueueEventChannel;
 
+        /// <summary>
+        /// Возвращает фиксированный момент времени, используемый в проверках.
+        /// </summary>
         public DateTime FixedNow { get; }
+
+        /// <summary>
+        /// Возвращает тестовую дату, вычисленную из фиксированного времени.
+        /// </summary>
         public DateOnly Today => DateOnly.FromDateTime(FixedNow);
+
+        /// <summary>
+        /// Дает доступ к фиктивным уведомлениям очереди для проверок.
+        /// </summary>
         public TestOrderQueueNotificationService Notifications { get; }
+
+        /// <summary>
+        /// Создает тестовые сущности для сценариев проверки.
+        /// </summary>
         public TestDataBuilder Data { get; }
+
+        /// <summary>
+        /// Показывает, сколько раз тест получил обновление очереди.
+        /// </summary>
         public int QueueUpdateCount => Notifications.UpdateCount;
 
         private ApplicationTestHost(IHost host, DateTime fixedNow)
@@ -34,6 +56,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             Data = new TestDataBuilder(this);
         }
 
+        /// <summary>
+        /// Создает тестовый host на новой временной базе данных.
+        /// </summary>
         public static async Task<ApplicationTestHost> CreateAsync(PostgreSqlFixture fixture)
         {
             string databaseName = await fixture.CreateDatabaseAsync();
@@ -80,6 +105,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Выполняет действие в отдельном DI scope и возвращает результат.
+        /// </summary>
         public async Task<T> RunScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
         {
             await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
@@ -87,12 +115,18 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             return await action(scope.ServiceProvider);
         }
 
+        /// <summary>
+        /// Выполняет действие в отдельном DI scope без возвращаемого значения.
+        /// </summary>
         public async Task RunScopeAsync(Func<IServiceProvider, Task> action)
         {
             await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
             await action(scope.ServiceProvider);
         }
 
+        /// <summary>
+        /// Обрабатывает накопленные события очереди перед проверкой результата.
+        /// </summary>
         public async Task DrainQueueEventsAsync()
         {
             while (_orderQueueEventChannel.TryRead(out OrderQueueEvent? evt) && evt is not null)
@@ -101,6 +135,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Загружает заказ из базы для последующей проверки его состояния.
+        /// </summary>
         public Task<ReviewOrderEntity> GetOrderAsync(long orderId) => RunScopeAsync(async services =>
         {
             UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
@@ -109,6 +146,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 ?? throw new InvalidOperationException($"Order {orderId} not found.");
         });
 
+        /// <summary>
+        /// Загружает стрим из базы для проверки сохраненных изменений.
+        /// </summary>
         public Task<ComposerStreamEntity> GetStreamAsync(long streamId) => RunScopeAsync(async services =>
         {
             UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
@@ -117,6 +157,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 ?? throw new InvalidOperationException($"Stream {streamId} not found.");
         });
 
+        /// <summary>
+        /// Возвращает транзакции заказа, чтобы проверить финансовые эффекты сценария.
+        /// </summary>
         public Task<List<TransactionEntity>> GetOrderTransactionsAsync(long orderId) => RunScopeAsync(async services =>
         {
             IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
@@ -129,6 +172,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 .ToListAsync();
         });
 
+        /// <summary>
+        /// Считает созданные отзывы для проверки побочных эффектов.
+        /// </summary>
         public Task<int> GetReviewCountAsync() => RunScopeAsync(async services =>
         {
             IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
@@ -137,6 +183,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             return await context.Reviews.CountAsync();
         });
 
+        /// <summary>
+        /// Останавливает тестовый host и освобождает его ресурсы.
+        /// </summary>
         public async ValueTask DisposeAsync()
         {
             await _host.StopAsync();

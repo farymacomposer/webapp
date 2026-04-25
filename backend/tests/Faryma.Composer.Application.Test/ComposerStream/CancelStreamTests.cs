@@ -7,6 +7,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
 {
     public sealed class CancelStreamTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что отмена переводит запланированный стрим в статус Canceled.
+        /// </summary>
         [Fact]
         public async Task Cancel_TransitionsPlannedStreamToCanceled()
         {
@@ -24,6 +27,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             Assert.Equal(ComposerStreamStatus.Canceled, persisted.Status);
         }
 
+        /// <summary>
+        /// Проверяет, что повторная отмена уже отмененного стрима ничего не меняет.
+        /// </summary>
         [Fact]
         public async Task Cancel_ReturnsCurrentStream_WhenAlreadyCanceled()
         {
@@ -44,6 +50,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             Assert.Equal(beforeUpdates, app.QueueUpdateCount);
         }
 
+        /// <summary>
+        /// Проверяет, что стрим нельзя отменить из недопустимого статуса.
+        /// </summary>
         [Theory]
         [InlineData(ComposerStreamStatus.Live)]
         [InlineData(ComposerStreamStatus.Completed)]
@@ -62,6 +71,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                     services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что стрим нельзя отменить при наличии активных созданных заказов.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]
@@ -82,6 +94,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                     services.GetRequiredService<ComposerStreamService>().Cancel(stream.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что отмена несуществующего стрима завершается ошибкой.
+        /// </summary>
         [Fact]
         public async Task Cancel_Throws_WhenStreamDoesNotExist()
         {

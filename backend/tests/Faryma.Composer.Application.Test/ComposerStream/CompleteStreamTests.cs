@@ -7,6 +7,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
 {
     public sealed class CompleteStreamTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что завершение переводит активный стрим в статус Completed.
+        /// </summary>
         [Fact]
         public async Task Complete_TransitionsLiveStreamToCompleted()
         {
@@ -26,6 +29,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             Assert.Equal(app.FixedNow, persisted.CompletedAt);
         }
 
+        /// <summary>
+        /// Проверяет, что повторное завершение уже завершенного стрима ничего не меняет.
+        /// </summary>
         [Fact]
         public async Task Complete_ReturnsCurrentStream_WhenAlreadyCompleted()
         {
@@ -49,6 +55,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             Assert.Equal(beforeUpdates, app.QueueUpdateCount);
         }
 
+        /// <summary>
+        /// Проверяет, что стрим нельзя завершить при наличии заказа в работе.
+        /// </summary>
         [Fact]
         public async Task Complete_Throws_WhenOrderIsInProgress()
         {
@@ -70,6 +79,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                     services.GetRequiredService<ComposerStreamService>().Complete(stream.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что завершение блокируется, если любой заказ остается в работе даже на другом стриме.
+        /// </summary>
         [Fact]
         public async Task Complete_Throws_WhenAnyOrderIsInProgress_EvenOnAnotherStream()
         {
@@ -98,6 +110,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                     services.GetRequiredService<ComposerStreamService>().Complete(liveStream.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что завершение недоступно для стрима в недопустимом статусе.
+        /// </summary>
         [Theory]
         [InlineData(ComposerStreamStatus.Planned)]
         [InlineData(ComposerStreamStatus.Canceled)]
@@ -114,6 +129,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                     services.GetRequiredService<ComposerStreamService>().Complete(stream.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что завершение несуществующего стрима завершается ошибкой.
+        /// </summary>
         [Fact]
         public async Task Complete_Throws_WhenStreamDoesNotExist()
         {

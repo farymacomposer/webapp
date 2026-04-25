@@ -7,6 +7,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
 {
     public sealed class StartStreamTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что запуск переводит запланированный стрим в статус Live.
+        /// </summary>
         [Fact]
         public async Task Start_TransitionsPlannedStreamToLive()
         {
@@ -27,6 +30,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             Assert.Equal(app.FixedNow, persisted.StartedAt);
         }
 
+        /// <summary>
+        /// Проверяет, что повторный запуск уже активного стрима ничего не меняет.
+        /// </summary>
         [Fact]
         public async Task Start_ReturnsCurrentStream_WhenAlreadyLive()
         {
@@ -50,6 +56,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             Assert.Equal(beforeUpdates, app.QueueUpdateCount);
         }
 
+        /// <summary>
+        /// Проверяет, что нельзя запустить стрим, пока уже существует другой активный стрим.
+        /// </summary>
         [Fact]
         public async Task Start_Throws_WhenAnotherLiveStreamExists()
         {
@@ -68,6 +77,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                     services.GetRequiredService<ComposerStreamService>().Start(stream.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что запуск недоступен для стрима в недопустимом статусе.
+        /// </summary>
         [Theory]
         [InlineData(ComposerStreamStatus.Completed)]
         [InlineData(ComposerStreamStatus.Canceled)]
@@ -85,6 +97,9 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                     services.GetRequiredService<ComposerStreamService>().Start(stream.Id)));
         }
 
+        /// <summary>
+        /// Проверяет, что запуск несуществующего стрима завершается ошибкой.
+        /// </summary>
         [Fact]
         public async Task Start_Throws_WhenStreamDoesNotExist()
         {

@@ -9,6 +9,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 {
     public sealed class AddTrackUrlTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что добавление ссылки переводит предзаказ в статус Pending.
+        /// </summary>
         [Fact]
         public async Task AddTrackUrl_MovesPreorderToPending()
         {
@@ -33,6 +36,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal("https://example.com/new-track", persisted.TrackUrl);
         }
 
+        /// <summary>
+        /// Проверяет, что ссылка обновляется без смены допустимого статуса заказа.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.Pending)]
         [InlineData(ReviewOrderStatus.InProgress)]
@@ -59,6 +65,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal("https://example.com/updated-track", persisted.TrackUrl);
         }
 
+        /// <summary>
+        /// Проверяет, что у завершенного или отмененного заказа ссылку менять нельзя.
+        /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.Completed)]
         [InlineData(ReviewOrderStatus.Canceled)]
@@ -83,6 +92,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     })));
         }
 
+        /// <summary>
+        /// Проверяет, что для несуществующего заказа выбрасывается ошибка.
+        /// </summary>
         [Fact]
         public async Task AddTrackUrl_Throws_WhenOrderDoesNotExist()
         {

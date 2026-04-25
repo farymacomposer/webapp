@@ -5,11 +5,17 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.Infrastructure
 {
+    /// <summary>
+    /// Готовит тестовые данные для сценариев application-слоя.
+    /// </summary>
     public sealed class TestDataBuilder(ApplicationTestHost app)
     {
         private const string _defaultTrackUrl = "https://example.com/track";
         private int _streamSequence;
 
+        /// <summary>
+        /// Создает пользователя для проверки сценариев, завязанных на автора действий.
+        /// </summary>
         public Task<UserEntity> CreateUserAsync(string? userName = null) => app.RunScopeAsync(async services =>
         {
             UserManager<UserEntity> userManager = services.GetRequiredService<UserManager<UserEntity>>();
@@ -31,6 +37,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             return user;
         });
 
+        /// <summary>
+        /// Создает стрим с нужным состоянием для подготовки проверки.
+        /// </summary>
         public Task<ComposerStreamEntity> CreateStreamAsync(
             Guid? createdByUserId = null,
             DateOnly? eventDate = null,
@@ -58,6 +67,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 return stream;
             });
 
+        /// <summary>
+        /// Создает заказ с заданными атрибутами, чтобы проверить нужный бизнес-сценарий.
+        /// </summary>
         public Task<ReviewOrderEntity> CreateReviewOrderAsync(
             Guid? createdByUserId = null,
             long? creationStreamId = null,
