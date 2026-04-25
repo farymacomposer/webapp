@@ -1,0 +1,171 @@
+.button {
+  align-items: center;
+  border-radius: 10px;
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.withAddon {
+  padding: 0 16px;
+}
+
+.addonLeft,
+.addonRight {
+  display: flex;
+}
+
+.addonRight svg,
+.addonLeft svg {
+  color: var(--text-color);
+}
+
+.clear {
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+}
+
+.filled {
+  border: none;
+  outline: none;
+
+  &.orange {
+    background: var(--orange);
+  }
+
+  &.deep-orange {
+    background: var(--deep-orange);
+  }
+
+  &.magenta {
+    background: var(--magenta);
+  }
+
+  &.magenta-pink {
+    background: var(--magenta-pink);
+  }
+
+  &.deep-magenta {
+    background: var(--deep-magenta);
+  }
+
+  &.purple {
+    background: var(--purple);
+  }
+
+  &.violet {
+    background: var(--violet);
+  }
+
+  &.neon-indigo {
+    background: var(--neon-indigo);
+  }
+
+  &.nickel {
+    background: var(--nickel);
+  }
+
+  &.deep-blue {
+    background: var(--deep-blue);
+  }
+
+  &.sky-blue {
+    background: var(--sky-blue);
+  }
+
+  &.cyan-blue {
+    background: var(--cyan-blue);
+  }
+
+  &.inactive-color {
+    background: var(--inactive-color);
+  }
+}
+
+.outline {
+  background: none;
+
+  &.orange {
+    border: 2px solid var(--orange);
+  }
+
+  &.deep-orange {
+    border: 2px solid var(--deep-orange);
+  }
+
+  &.magenta {
+    border: 2px solid var(--magenta);
+  }
+
+  &.magenta-pink {
+    border: 2px solid var(--magenta-pink);
+  }
+
+  &.deep-magenta {
+    border: 2px solid var(--deep-magenta);
+  }
+
+  &.purple {
+    border: 2px solid var(--purple);
+  }
+
+  &.violet {
+    border: 2px solid var(--violet);
+  }
+
+  &.neon-indigo {
+    border: 2px solid var(--neon-indigo);
+  }
+
+  &.nickel {
+    border: 2px solid var(--nickel);
+  }
+
+  &.deep-blue {
+    border: 2px solid var(--deep-blue);
+  }
+
+  &.sky-blue {
+    border: 2px solid var(--sky-blue);
+  }
+
+  &.cyan-blue {
+    border: 2px solid var(--cyan-blue);
+  }
+
+  &.inactive-color {
+    border: 2px solid var(--inactive-color);
+  }
+}
+
+.m {
+  font: var(--font-16);
+  height: 34px;
+  width: 120px;
+}
+
+.l {
+  font: var(--font-18);
+  font-weight: 600;
+  height: 34px;
+  width: 192px;
+}
+
+.xl {
+  font: var(--font-20);
+  font-weight: 500;
+  height: 56px;
+  width: 426px;
+}
+
+.disabled {
+  opacity: 0.5;
+}
+
+.fullWidth {
+  width: 100%;
+}
