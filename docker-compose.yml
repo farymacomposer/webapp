@@ -5,8 +5,8 @@ services:
       context: .
       dockerfile: frontend.Dockerfile
     container_name: composer-frontend
-    expose:
-      - "3000"
+    ports:
+      - "3000:3000"
     networks:
       - composer-net
     depends_on:
@@ -46,22 +46,6 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  proxy:
-    image: caddy:2-alpine
-    container_name: composer-proxy
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    networks:
-      - composer-net
-    depends_on:
-      - frontend
-      - webapi
-    restart: unless-stopped
-
   db:
     image: postgres:18
     container_name: composer-db
@@ -83,7 +67,3 @@ services:
 networks:
   composer-net:
     driver: bridge
-
-volumes:
-  caddy_data:
-  caddy_config:
