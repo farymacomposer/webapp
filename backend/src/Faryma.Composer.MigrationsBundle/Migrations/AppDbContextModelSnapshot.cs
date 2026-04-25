@@ -20,7 +20,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("app")
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "AccountTopUpProvider", new[] { "unspecified", "donationalerts", "donatty", "twitch_channel_points", "manual" });
