@@ -1,4 +1,4 @@
-using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 

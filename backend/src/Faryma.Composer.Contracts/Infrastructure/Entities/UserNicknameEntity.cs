@@ -1,4 +1,4 @@
-using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities.Abstractions;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 
 namespace Faryma.Composer.Contracts.Infrastructure.Entities
