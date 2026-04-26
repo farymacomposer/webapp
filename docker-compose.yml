@@ -53,8 +53,8 @@ services:
       POSTGRES_DB: ${POSTGRES__DATABASE}
       POSTGRES_USER: ${POSTGRES__USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES__PASSWORD}
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     networks:
       - composer-net
     healthcheck:
