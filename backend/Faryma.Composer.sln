@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{5B9664
 		..\.env = ..\.env
 		..\backend.Dockerfile = ..\backend.Dockerfile
 		..\.github\workflows\backend.yml = ..\.github\workflows\backend.yml
-		..\.github\workflows\desktop-zip-release.yml = ..\.github\workflows\desktop-zip-release.yml
+		..\.github\workflows\desktop-zip-artifact.yml = ..\.github\workflows\desktop-zip-artifact.yml
 		..\docker-compose.yml = ..\docker-compose.yml
 		entrypoint.sh = entrypoint.sh
 	EndProjectSection
