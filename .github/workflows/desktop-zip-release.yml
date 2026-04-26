@@ -1,0 +1,85 @@
+name: Desktop ZIP Release
+
+on:
+  push:
+    tags:
+      - 'desktop-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    env:
+      DESKTOP_PROJECT: backend/src/Faryma.Composer.Desktop/Faryma.Composer.Desktop.csproj
+      RUNTIME_IDENTIFIER: win-x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve release version from tag
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if ($tag -notmatch '^desktop-v(?<version>\d+\.\d+\.\d+(?:\.\d+)?)$') {
+            throw "Tag '$tag' must look like desktop-v1.2.3 or desktop-v1.2.3.4"
+          }
+
+          $version = $Matches.version
+          "RELEASE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Restore desktop project
+        run: dotnet restore $env:DESKTOP_PROJECT
+
+      - name: Publish unpackaged self-contained app
+        run: >
+          dotnet publish $env:DESKTOP_PROJECT
+          -c Release
+          -r $env:RUNTIME_IDENTIFIER
+          --self-contained true
+          -p:WindowsAppSDKSelfContained=true
+          -p:WindowsPackageType=None
+          -p:PublishDir="$env:RUNNER_TEMP\desktop-publish\\"
+
+      - name: Create release archive
+        run: |
+          $publishDir = Join-Path $env:RUNNER_TEMP "desktop-publish"
+          if (-not (Test-Path $publishDir)) {
+            throw "Publish output directory was not produced."
+          }
+
+          $exe = Get-ChildItem -Path $publishDir -Filter *.exe -Recurse | Select-Object -First 1
+          if (-not $exe) {
+            throw "Published output does not contain an executable."
+          }
+
+          $archiveDir = Join-Path $env:RUNNER_TEMP "desktop-release"
+          New-Item -ItemType Directory -Force -Path $archiveDir | Out-Null
+
+          $archiveName = "Faryma.Composer.Desktop-$env:RELEASE_VERSION-win-x64.zip"
+          $archivePath = Join-Path $archiveDir $archiveName
+
+          Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $archivePath -Force
+
+      - name: Upload release assets artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-zip-release
+          path: ${{ runner.temp }}/desktop-release/*.zip
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: ${{ runner.temp }}/desktop-release/*.zip
