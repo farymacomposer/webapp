@@ -29,6 +29,9 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
       - name: Resolve release version from tag
         run: |
           $tag = "${{ github.ref_name }}"
@@ -39,18 +42,18 @@ jobs:
           $version = $Matches.version
           "RELEASE_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Restore desktop project
-        run: dotnet restore $env:DESKTOP_PROJECT
-
-      - name: Publish unpackaged self-contained app
+      - name: Publish unpackaged self-contained app with MSBuild
         run: >
-          dotnet publish $env:DESKTOP_PROJECT
-          -c Release
-          -r $env:RUNTIME_IDENTIFIER
-          --self-contained true
-          -p:WindowsAppSDKSelfContained=true
-          -p:WindowsPackageType=None
-          -p:PublishDir="$env:RUNNER_TEMP\desktop-publish\\"
+          msbuild $env:DESKTOP_PROJECT
+          /restore
+          /t:Publish
+          /p:Configuration=Release
+          /p:Platform=x64
+          /p:RuntimeIdentifier=$env:RUNTIME_IDENTIFIER
+          /p:SelfContained=true
+          /p:WindowsAppSDKSelfContained=true
+          /p:WindowsPackageType=None
+          /p:PublishDir="$env:RUNNER_TEMP\desktop-publish\\"
 
       - name: Create release archive
         run: |
