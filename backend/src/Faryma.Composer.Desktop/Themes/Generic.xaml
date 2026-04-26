@@ -7,7 +7,7 @@
 
     <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     <localUI:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
-    <localUI:OrderCategoryHighlightConverter x:Key="OrderCategoryHighlightConverter" />
+    <localUI:QueueCategoryHighlightConverter x:Key="QueueCategoryHighlightConverter" />
     <localUI:StringHashHighlightConverter x:Key="StringHashHighlightConverter" />
     <localUI:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
     <localUI:ComposerStreamStatusHighlightConverter x:Key="ComposerStreamStatusHighlightConverter" />

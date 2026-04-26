@@ -1,8 +1,10 @@
 ﻿namespace Faryma.Composer.Application.Utils
 {
-    public sealed class SemaphoreLocker
+    public sealed class SemaphoreLocker : IDisposable
     {
         private readonly SemaphoreSlim _semaphore = new(1, 1);
+
+        public void Dispose() => _semaphore.Dispose();
 
         public async Task<T> Lock<T>(Func<T> action)
         {

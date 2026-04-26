@@ -1,0 +1,122 @@
+.card {
+  background: var(--gradient-bg-color);
+}
+
+.small {
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+  height: 100%;
+
+  .iconsBlock {
+    padding: 16px;
+  }
+
+  .imgWrapper {
+    position: relative;
+    width: 100%;
+
+    .transparent {
+      filter: brightness(40%);
+      opacity: 0.2;
+    }
+  }
+
+  .img {
+    height: auto;
+    width: 100%;
+  }
+
+  .commentWrapper {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+  }
+
+  .comment {
+    height: 100%;
+    overflow-y: auto;
+    padding: 16px;
+    scrollbar-color: var(--inactive-color) transparent;
+    scrollbar-width: thin;
+  }
+
+  .textBlock {
+    padding: 16px;
+  }
+
+  .youtubeLink,
+  .messageLink,
+  .spotifyLink {
+    color: var(--light-gray);
+    cursor: pointer;
+    display: block;
+  }
+
+  .messageLink.show {
+    color: var(--text-color);
+  }
+
+  .name {
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.big {
+  background: var(--gradient-accent-bg-color);
+  border-radius: 10px;
+  height: auto;
+  padding: 4px 22px 4px 4px;
+  width: 100%;
+
+  .textBlock,
+  .priceBlock {
+    padding: 8px 0;
+  }
+
+  .textBlock {
+    width: calc(100% - 240px);
+  }
+
+  .name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+  }
+
+  .priceBlock {
+    padding: 10px 0;
+  }
+
+  .youtubeLink {
+    color: var(--error-color);
+    display: block;
+  }
+
+  .messageLink {
+    color: var(--inactive-color);
+    display: block;
+  }
+
+  .iconsBlock {
+    margin: auto 0 0 auto;
+
+    .show {
+      color: var(--text-color);
+    }
+  }
+
+  .comment {
+    display: none;
+    width: 100%;
+  }
+
+  .comment.show {
+    display: block;
+  }
+}

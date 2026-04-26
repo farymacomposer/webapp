@@ -1,4 +1,6 @@
-﻿using Faryma.Composer.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -8,6 +10,8 @@ namespace Faryma.Composer.Infrastructure
 {
     public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<UserEntity, IdentityRole<Guid>, Guid>(options), IDataProtectionKeyContext
     {
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+
         /// <summary>
         /// Настройки приложения
         /// </summary>
@@ -22,11 +26,6 @@ namespace Faryma.Composer.Infrastructure
         /// Результаты разборов треков
         /// </summary>
         public DbSet<ReviewEntity> Reviews { get; set; }
-
-        /// <summary>
-        /// Заказы разборов треков
-        /// </summary>
-        public DbSet<ReviewOrderEntity> ReviewOrders { get; set; }
 
         /// <summary>
         /// Музыкальные треки
@@ -54,14 +53,9 @@ namespace Faryma.Composer.Infrastructure
         public DbSet<TransactionEntity> Transactions { get; set; }
 
         /// <summary>
-        /// Пользователи
-        /// </summary>
-        public DbSet<UserEntity> User { get; set; }
-
-        /// <summary>
         /// Счета пользователей
         /// </summary>
-        public DbSet<UserAccountEntity> UserAccounts { get; set; }
+        public DbSet<UserNicknameAccountEntity> UserNicknameAccounts { get; set; }
 
         /// <summary>
         /// Псевдонимы пользователей
@@ -73,51 +67,51 @@ namespace Faryma.Composer.Infrastructure
         /// </summary>
         public DbSet<UserTrackRatingEntity> UserTrackRatings { get; set; }
 
-        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
+        /// <summary>
+        /// Refresh токены пользователей
+        /// </summary>
+        public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
+
+        // TransactionSources
+
+        /// <summary>
+        /// Пополнения счетов пользователей
+        /// </summary>
+        public DbSet<AccountTopUpEntity> AccountTopUps { get; set; }
+
+        /// <summary>
+        /// Заказы разборов треков
+        /// </summary>
+        public DbSet<ReviewOrderEntity> ReviewOrders { get; set; }
+
+        /// <summary>
+        /// Отмены транзакций
+        /// </summary>
+        public DbSet<TransactionReversalEntity> TransactionReversals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.HasDefaultSchema(DbContextHelper.SchemaName);
             base.OnModelCreating(builder);
+            builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
             builder.HasPostgresEnum();
-
-            builder.Entity<ComposerStreamEntity>()
-                .HasMany(cs => cs.CreatedReviewOrders)
-                .WithOne(ro => ro.CreationStream)
-                .HasForeignKey(ro => ro.CreationStreamId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<ComposerStreamEntity>()
-                .HasMany(cs => cs.ProcessedReviewOrders)
-                .WithOne(ro => ro.ProcessingStream)
-                .HasForeignKey(ro => ro.ProcessingStreamId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<TrackEntity>()
-                .OwnsMany(x => x.Tags, x => x.ToJson());
+            builder.Entity<TransactionSourceEntity>().UseTptMappingStrategy();
 
             builder.Entity<IdentityRole<Guid>>().HasData(
                 new IdentityRole<Guid>
                 {
-                    Id = Guid.Parse("9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD"),
-                    Name = "Composer",
-                    NormalizedName = "COMPOSER",
-                    ConcurrencyStamp = "9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD"
-                },
-                new IdentityRole<Guid>
-                {
                     Id = Guid.Parse("AC0B9E85-A06F-4655-822B-9C125D8D7BB4"),
-                    Name = "Moderator",
-                    NormalizedName = "MODERATOR",
+                    Name = AppRoles.Moderator,
+                    NormalizedName = AppRoles.Moderator.ToUpper(),
                     ConcurrencyStamp = "AC0B9E85-A06F-4655-822B-9C125D8D7BB4"
                 },
                 new IdentityRole<Guid>
                 {
-                    Id = Guid.Parse("910C6755-4833-4C62-8DF7-4241A159A8D2"),
-                    Name = "User",
-                    NormalizedName = "USER",
-                    ConcurrencyStamp = "910C6755-4833-4C62-8DF7-4241A159A8D2"
+                    Id = Guid.Parse("9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD"),
+                    Name = AppRoles.Composer,
+                    NormalizedName = AppRoles.Composer.ToUpper(),
+                    ConcurrencyStamp = "9C3DDCDE-24E7-458C-8D9C-1E5F424D3DDD"
                 }
             );
 

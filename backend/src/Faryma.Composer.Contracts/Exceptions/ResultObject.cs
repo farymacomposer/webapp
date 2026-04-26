@@ -1,0 +1,12 @@
+﻿using System.Collections;
+
+namespace Faryma.Composer.Contracts.Exceptions
+{
+    public sealed record ResultObject
+    {
+        public required string ExceptionType { get; init; }
+        public required string Method { get; init; }
+        public required string Message { get; init; }
+        public required IDictionary Data { get; init; }
+    }
+}

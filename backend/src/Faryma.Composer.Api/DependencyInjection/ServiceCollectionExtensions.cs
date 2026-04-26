@@ -1,19 +1,19 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Api.Auth.Options;
-using Faryma.Composer.Api.Features.OrderQueueFeature;
-using Faryma.Composer.Api.Features.TrackFeature;
-using Faryma.Composer.Application.Features.OrderQueueFeature.Contracts;
+using Faryma.Composer.Api.Auth.Services;
+using Faryma.Composer.Api.Features.OrderQueue;
+using Faryma.Composer.Contracts.Api.Auth.Options;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
-using Faryma.Composer.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using Saunter;
 using Saunter.AsyncApiSchema.v2;
 
@@ -29,8 +29,18 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .ValidateDataAnnotations();
 
             services
+                .AddOptionsWithValidateOnStart<TwitchOptions>()
+                .Bind(configuration.GetRequiredSection("TWITCH"))
+                .ValidateDataAnnotations();
+
+            services
                 .AddOptionsWithValidateOnStart<PostgreOptions>()
                 .Bind(configuration.GetRequiredSection("POSTGRES"))
+                .ValidateDataAnnotations();
+
+            services
+                .AddOptionsWithValidateOnStart<AdminBootstrapOptions>()
+                .Bind(configuration.GetRequiredSection("ADMIN_BOOTSTRAP"))
                 .ValidateDataAnnotations();
 
             return services;
@@ -39,8 +49,9 @@ namespace Faryma.Composer.Api.DependencyInjection
         public static IServiceCollection AddPersistenceAndIdentity(this IServiceCollection services, IConfiguration configuration)
         {
             services
+                .AddScoped<AdminBootstrapService>()
                 .AddPersistence(configuration)
-                .AddIdentityCore<UserEntity>(options => options.Password.RequiredLength = 12)
+                .AddIdentityCore<UserEntity>()
                 .AddRoles<IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
@@ -51,7 +62,11 @@ namespace Faryma.Composer.Api.DependencyInjection
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services
-                .AddScoped<AuthService>()
+                .AddHttpClient<TwitchAuthClient>()
+                .Services
+                .AddScoped<AuthTokenService>()
+                .AddScoped<TwitchAuthStateService>()
+                .AddScoped<TwitchAuthService>()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -76,12 +91,28 @@ namespace Faryma.Composer.Api.DependencyInjection
             services
                 .AddProblemDetails()
                 .AddMemoryCache()
-                .ConfigureSwagger(environment)
+                .AddRateLimiter(options =>
+                {
+                    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                    options.AddPolicy("auth-login", context =>
+                    {
+                        string partitionKey = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+                        return RateLimitPartition.GetFixedWindowLimiter(partitionKey, _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 10,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
+                            AutoReplenishment = true
+                        });
+                    });
+                })
+                .AddOpenApi()
                 .AddAsyncApiSpecification(environment);
 
             services
-                .AddSingleton<GlobalExceptionFilter>()
-                .AddControllers(options => options.Filters.AddService<GlobalExceptionFilter>())
+                .AddSingleton<AppExceptionFilter>()
+                .AddControllers(options => options.Filters.AddService<AppExceptionFilter>())
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             services
@@ -89,36 +120,7 @@ namespace Faryma.Composer.Api.DependencyInjection
                 .AddSignalR()
                 .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            services
-                .AddGraphQLServer()
-                .AddQueryType<TrackQuery>()
-                .AddFiltering()
-                .AddSorting();
-
             return services;
-        }
-
-        private static IServiceCollection ConfigureSwagger(this IServiceCollection services, IWebHostEnvironment environment)
-        {
-            return services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = environment.ApplicationName,
-                    Version = "v1",
-                });
-
-                foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    string xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
-                    if (File.Exists(xmlPath))
-                    {
-                        options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
-                    }
-                }
-
-                options.UseAllOfToExtendReferenceSchemas();
-            });
         }
 
         private static IServiceCollection AddAsyncApiSpecification(this IServiceCollection services, IWebHostEnvironment environment)
@@ -131,7 +133,7 @@ namespace Faryma.Composer.Api.DependencyInjection
                     Info = new Info(environment.ApplicationName, "v1"),
                     Servers =
                     {
-                        [OrderQueueNotificationHub.HubServerName] = new Server(OrderQueueNotificationHub.RoutePattern, "signalr")
+                        [IOrderQueueNotificationServer.HubServerName] = new Server(IOrderQueueNotificationServer.RoutePattern, "signalr")
                         {
                             Description = "Очередь заказов"
                         }

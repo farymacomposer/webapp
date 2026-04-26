@@ -1,11 +1,11 @@
-﻿using Faryma.Composer.Api.Auth;
+﻿using Faryma.Composer.Api.Auth.Services;
 using Faryma.Composer.Api.DependencyInjection;
 using Faryma.Composer.Api.Extensions;
-using Faryma.Composer.Api.Features.OrderQueueFeature;
+using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;
-using Faryma.Composer.Application.Features.OrderQueueFeature;
-using Microsoft.AspNetCore.Authorization;
+using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Serilog;
 
 namespace Faryma.Composer.Api
@@ -22,43 +22,34 @@ namespace Faryma.Composer.Api
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder();
 
-            builder.Host
-                .UseSerilog((context, config) =>
-                    config.ReadFrom.Configuration(context.Configuration))
-                .ConfigureServices((context, services) =>
-                {
-                    services
-                        .AddConfiguration(context.Configuration)
-                        .AddPersistenceAndIdentity(context.Configuration)
-                        .AddJwtAuthentication(context.Configuration)
-                        .AddAuthorization()
-                        .AddCoreServices();
+            builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration));
 
-                    if (builder.Environment.IsDevelopment())
-                    {
-                        services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
-                    }
+            builder.Services
+                .AddConfiguration(builder.Configuration)
+                .AddPersistenceAndIdentity(builder.Configuration)
+                .AddJwtAuthentication(builder.Configuration)
+                .AddAuthorization()
+                .AddCoreServices();
 
-                    services.AddPresentationLayer(builder.Environment);
-                });
+            builder.Services.AddPresentationLayer(builder.Environment);
 
             WebApplication app = builder.Build();
 
             app.UseRouting();
             app.UseApiDocumentation();
 
-            app.UseCors(config => config
-                .AllowAnyOrigin()
-                .WithMethods("GET", "POST")
-                .AllowAnyHeader());
-
             app.UseHttpsRedirection();
+            app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
-            app.MapGraphQL();
-            app.MapHub<OrderQueueNotificationHub>(OrderQueueNotificationHub.RoutePattern);
+            app.MapHub<OrderQueueNotificationHub>(IOrderQueueNotificationServer.RoutePattern);
+
+            await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
+            {
+                await scope.ServiceProvider.GetRequiredService<AdminBootstrapService>().Initialize();
+            }
 
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();

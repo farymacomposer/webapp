@@ -14,6 +14,6 @@ namespace Faryma.Composer.Desktop.UI
             InitializeComponent();
         }
 
-        private void List_GotFocus(object _, RoutedEventArgs __) => SemanticZoomControl.StartBringIntoView();
+        private void ListView_GotFocus(object _, RoutedEventArgs __) => SemanticZoomControl.StartBringIntoView();
     }
 }

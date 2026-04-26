@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Faryma.Composer.Desktop.Api.Shared.Dto;
-using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Desktop.ViewModels
 {

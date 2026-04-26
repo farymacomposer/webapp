@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
-using Faryma.Composer.Desktop.Api.ReviewOrder.Requests;
 using Faryma.Composer.Desktop.Navigation;
 using Faryma.Composer.Desktop.Validation;
-using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Desktop.UI
 {
@@ -82,6 +82,7 @@ namespace Faryma.Composer.Desktop.UI
                 OrderType = OrderType,
                 TrackUrl = string.IsNullOrWhiteSpace(TrackUrl) ? null : TrackUrl,
                 PaymentAmount = paymentAmount,
+                TopUpProvider = AccountTopUpProvider.Manual,
                 UserComment = string.IsNullOrWhiteSpace(UserComment) ? null : UserComment,
             };
 

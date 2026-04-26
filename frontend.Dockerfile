@@ -1,25 +1,19 @@
-# Base stage
-FROM node:jod-alpine AS base
-WORKDIR /src
-COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
-RUN apk add --no-cache libc6-compat && \
-    corepack enable pnpm && \
-    pnpm install --frozen-lockfile
-
 # Build stage
-FROM base AS build
+FROM node:22-alpine AS build
+WORKDIR /app
+
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
 COPY frontend/ .
-RUN pnpm run build
+RUN npm run build
 
 # Runtime stage
-FROM node:jod-alpine AS final
-WORKDIR /app
+FROM nginx:1.29-alpine AS final
+
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+
 EXPOSE 3000
 
-USER node
-
-COPY --from=build /src/public ./public
-COPY --from=build --chown=node:node /src/.next/standalone ./
-COPY --from=build --chown=node:node /src/.next/static ./.next/static
-
-CMD ["node", "server.js"]
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,24 +1,21 @@
-version: '3.8'
-
 services:
 
   frontend:
     build:
+      context: .
       dockerfile: frontend.Dockerfile
     container_name: composer-frontend
-    environment:
-      NODE_ENV: ${NODE_ENV}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     ports:
       - "3000:3000"
     networks:
       - composer-net
     depends_on:
       - webapi
-    restart: no
+    restart: unless-stopped
 
   webapi:
     build:
+      context: .
       dockerfile: backend.Dockerfile
     container_name: composer-webapi
     environment:
@@ -33,6 +30,13 @@ services:
       JWT__AUDIENCE: ${JWT__AUDIENCE}
       JWT__SECRET_KEY: ${JWT__SECRET_KEY}
       JWT__EXPIRY_IN_MINUTES: ${JWT__EXPIRY_IN_MINUTES}
+      TWITCH__CLIENT_ID: ${TWITCH__CLIENT_ID}
+      TWITCH__CLIENT_SECRET: ${TWITCH__CLIENT_SECRET}
+      TWITCH__REDIRECT_URI: ${TWITCH__REDIRECT_URI}
+      ADMIN_BOOTSTRAP__COMPOSER__USERNAME: ${ADMIN_BOOTSTRAP__COMPOSER__USERNAME}
+      ADMIN_BOOTSTRAP__COMPOSER__PASSWORD: ${ADMIN_BOOTSTRAP__COMPOSER__PASSWORD}
+      ADMIN_BOOTSTRAP__MODERATOR__USERNAME: ${ADMIN_BOOTSTRAP__MODERATOR__USERNAME}
+      ADMIN_BOOTSTRAP__MODERATOR__PASSWORD: ${ADMIN_BOOTSTRAP__MODERATOR__PASSWORD}
     ports:
       - "8080:8080"
     networks:
@@ -40,17 +44,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    restart: no
+    restart: unless-stopped
 
   db:
-    image: postgres:17
+    image: postgres:18
     container_name: composer-db
     environment:
       POSTGRES_DB: ${POSTGRES__DATABASE}
       POSTGRES_USER: ${POSTGRES__USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES__PASSWORD}
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     networks:
       - composer-net
     healthcheck:

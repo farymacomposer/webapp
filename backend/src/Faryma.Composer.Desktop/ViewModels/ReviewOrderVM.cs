@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Faryma.Composer.Application.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Desktop.Api.OrderQueue.Dto;
-using Faryma.Composer.Desktop.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Desktop.UI;
-using Faryma.Composer.Infrastructure.Enums;
 
 namespace Faryma.Composer.Desktop.ViewModels
 {
@@ -39,11 +39,6 @@ namespace Faryma.Composer.Desktop.ViewModels
         public ReviewOrderType Type { get; } = dto.Type;
 
         /// <summary>
-        /// Тип категории заказа
-        /// </summary>
-        public OrderCategoryType CategoryType { get; } = dto.CategoryType;
-
-        /// <summary>
         /// Статус заказа
         /// </summary>
         public ReviewOrderStatus Status { get; } = dto.Status;
@@ -76,7 +71,7 @@ namespace Faryma.Composer.Desktop.ViewModels
         /// <summary>
         /// Общая стоимость заказа (номинал + платежи)
         /// </summary>
-        public decimal TotalAmount { get; } = dto.TotalAmount;
+        public long TotalAmount { get; } = dto.TotalAmount;
 
         /// <summary>
         /// Позиция заказа в очереди
@@ -89,9 +84,9 @@ namespace Faryma.Composer.Desktop.ViewModels
         public OrderActivityStatus ActivityStatus { get; } = currentPosition.ActivityStatus;
 
         /// <summary>
-        /// Тип категории заказа
+        /// Категория заказа в очереди
         /// </summary>
-        public OrderCategoryType CurrentCategoryType { get; } = currentPosition.CategoryType;
+        public QueueCategory CurrentQueueCategory { get; } = currentPosition.QueueCategory;
 
         /// <summary>
         /// Номер категории, если заказ относится к долговой категории
@@ -117,6 +112,12 @@ namespace Faryma.Composer.Desktop.ViewModels
         /// Тип стрима
         /// </summary>
         public ComposerStreamType StreamType { get; } = dto.CreationStream.Type;
+
+        /// <summary>
+        /// Выбран
+        /// </summary>
+        [ObservableProperty]
+        public partial bool IsSelected { get; set; }
 
         [RelayCommand]
         private void Select() => App.GetService<OrderQueuePageVM>().SelectedOrder = this;

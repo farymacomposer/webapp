@@ -1,25 +1,15 @@
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "swagger": {
+    "scalar": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/swagger",
+      "launchUrl": "scalar",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7166;http://localhost:5190"
-    },
-    "redoc": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "api/redoc",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7166;http://localhost:5190"
+      "applicationUrl": "https://localhost:7166;http://localhost:7000"
     },
     "asyncapi": {
       "commandName": "Project",
@@ -29,17 +19,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7166;http://localhost:5190"
-    },
-    "graphql": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "graphql",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7166;http://localhost:5190"
+      "applicationUrl": "https://localhost:7166;http://localhost:7000"
     }
   }
 }

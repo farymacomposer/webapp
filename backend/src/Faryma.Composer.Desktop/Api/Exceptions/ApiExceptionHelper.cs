@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using Faryma.Composer.Contracts.Exceptions;
 
 namespace Faryma.Composer.Desktop.Api.Exceptions
 {
@@ -10,7 +11,7 @@ namespace Faryma.Composer.Desktop.Api.Exceptions
             {
                 responseMessage.EnsureSuccessStatusCode();
             }
-            catch (HttpRequestException ex) when ((int?)ex.StatusCode == 666)
+            catch (HttpRequestException ex) when ((int?)ex.StatusCode == AppException.StatusCode)
             {
                 ResultObject? result = await responseMessage.Content.ReadFromJsonAsync<ResultObject>();
 
@@ -18,7 +19,7 @@ namespace Faryma.Composer.Desktop.Api.Exceptions
                 {
                     string message = await responseMessage.Content.ReadAsStringAsync();
 
-                    throw new(message, ex);
+                    throw new InvalidOperationException(message, ex);
                 }
 
                 throw new ApiException(result, ex);
@@ -27,7 +28,7 @@ namespace Faryma.Composer.Desktop.Api.Exceptions
             {
                 string message = await responseMessage.Content.ReadAsStringAsync();
 
-                throw new(message, ex);
+                throw new InvalidOperationException(message, ex);
             }
         }
     }

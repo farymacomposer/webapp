@@ -23,9 +23,9 @@ namespace Faryma.Composer.Desktop.Navigation
 
         private void NavigationViewLoaded(object sender, RoutedEventArgs _)
         {
-            if (sender is NavigationView navigationView)
+            if (sender is NavigationView navigationView && navigationView.MenuItemsSource is IList menuItems && menuItems.Count > 0)
             {
-                navigationView.SelectedItem = ((IList)navigationView.MenuItemsSource)[0];
+                navigationView.SelectedItem = menuItems[0];
             }
         }
 

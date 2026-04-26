@@ -1,0 +1,92 @@
+.modal {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 100;
+}
+
+.content {
+  background: var(--accent-bg-color);
+  max-width: 60%;
+  padding: 20px;
+  transform: scale(0.5);
+  transition: 0.3s transform;
+  z-index: var(--modal-z-index);
+}
+
+.left {
+  justify-content: flex-start;
+
+  .content {
+    transform: translateX(-100%);
+    transition: 0.3s transform;
+  }
+}
+
+.right {
+  justify-content: flex-end;
+
+  .content {
+    transform: translateX(100%);
+    transition: 0.3s transform;
+  }
+}
+
+.fullHeight {
+  .content {
+    height: 100vh;
+  }
+}
+
+.opened {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: var(--modal-z-index);
+
+  .content {
+    transform: scale(1);
+  }
+}
+
+.isClosing {
+  .content {
+    transform: scale(0.2);
+  }
+}
+
+.opened.left,
+.opened.right {
+  .content {
+    transform: translateX(0);
+  }
+}
+
+.isClosing.left {
+  .content {
+    transform: translateX(-100%);
+  }
+}
+
+.isClosing.right {
+  .content {
+    transform: translateX(100%);
+  }
+}
+
+.closeIcon {
+  position: absolute;
+  right: 1px;
+  top: 11px;
+  z-index: var(--modal-z-index);
+
+  @include xxl {
+    right: 9px;
+  }
+}

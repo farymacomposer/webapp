@@ -1,9 +1,10 @@
 ﻿using System.Globalization;
-using Faryma.Composer.Application.Features.OrderQueueFeature.Enums;
-using Faryma.Composer.Application.Features.OrderQueueFeature.Models;
-using Faryma.Composer.Application.Features.OrderQueueFeature.PriorityAlgorithm;
-using Faryma.Composer.Infrastructure.Entities;
-using Faryma.Composer.Infrastructure.Enums;
+using Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test
@@ -938,7 +939,7 @@ namespace Faryma.Composer.Application.Test
         {
             OrderQueuePosition position = queueManager.GetCurrentQueuePosition(order);
 
-            order.CategoryType = position.Category.Type;
+            order.QueueCategory = position.Category.QueueCategory;
             order.Status = ReviewOrderStatus.InProgress;
 
             queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderTaken);
@@ -981,44 +982,62 @@ namespace Faryma.Composer.Application.Test
 
         private ReviewOrderEntity GetDonation(string eventDate, long id, string name, int amount, bool isFrozen = false)
         {
-            return new()
+            UserEntity user = new()
+            {
+                UserName = name,
+                CreatedAt = DateTime.Now,
+            };
+
+            return new ReviewOrderEntity
             {
                 Id = id,
                 CreatedAt = DateTime.Now,
                 IsFrozen = isFrozen,
                 Status = ReviewOrderStatus.Pending,
+                QueueCategory = QueueCategory.Unspecified,
                 Type = ReviewOrderType.Donation,
-                CategoryType = OrderCategoryType.Unspecified,
                 NominalAmount = amount,
+                PayableAmount = amount,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
+                CreatedByUser = user,
                 CreationStream = new ComposerStreamEntity
                 {
                     EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,
                     Status = ComposerStreamStatus.Live,
+                    CreatedByUser = user,
                 }
             };
         }
 
         private ReviewOrderEntity GetOutOfQueue(string eventDate, long id, string name)
         {
-            return new()
+            UserEntity user = new()
+            {
+                UserName = name,
+                CreatedAt = DateTime.Now,
+            };
+
+            return new ReviewOrderEntity
             {
                 Id = id,
                 CreatedAt = DateTime.Now,
                 IsFrozen = false,
                 Status = ReviewOrderStatus.Pending,
+                QueueCategory = QueueCategory.Unspecified,
                 Type = ReviewOrderType.OutOfQueue,
-                CategoryType = OrderCategoryType.Unspecified,
                 NominalAmount = 0,
+                PayableAmount = 0,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
+                CreatedByUser = user,
                 CreationStream = new ComposerStreamEntity
                 {
                     EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
                     Type = ComposerStreamType.Donation,
                     Status = ComposerStreamStatus.Live,
+                    CreatedByUser = user,
                 }
             };
         }

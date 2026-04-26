@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Infrastructure.Enums;
+﻿using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -9,13 +9,13 @@ namespace Faryma.Composer.Infrastructure
     public static class DbContextHelper
     {
         public const string SchemaName = "app";
-
-        public const string ComposerStreamStatusEnum = "app.composer_stream_status";
-        public const string ComposerStreamTypeEnum = "app.composer_stream_type";
-        public const string OrderCategoryTypeEnum = "app.order_category_type";
-        public const string ReviewOrderStatusEnum = "app.review_order_status";
-        public const string ReviewOrderTypeEnum = "app.review_order_type";
-        public const string TransactionTypeEnum = "app.transaction_type";
+        public const string ComposerStreamStatusEnum = SchemaName + "." + nameof(ComposerStreamStatus);
+        public const string ComposerStreamTypeEnum = SchemaName + "." + nameof(ComposerStreamType);
+        public const string QueueCategoryEnum = SchemaName + "." + nameof(QueueCategory);
+        public const string ReviewOrderStatusEnum = SchemaName + "." + nameof(ReviewOrderStatus);
+        public const string ReviewOrderTypeEnum = SchemaName + "." + nameof(ReviewOrderType);
+        public const string TransactionKindEnum = SchemaName + "." + nameof(TransactionKind);
+        public const string AccountTopUpProviderEnum = SchemaName + "." + nameof(AccountTopUpProvider);
 
         public static string? GetConnectionString(IConfiguration configuration)
         {
@@ -24,26 +24,30 @@ namespace Faryma.Composer.Infrastructure
             return options?.GetConnectionString();
         }
 
+        // Основной способ добавления enum в БД
         public static NpgsqlDbContextOptionsBuilder MapEnum(this NpgsqlDbContextOptionsBuilder builder)
         {
             return builder
-                .MapEnum<ComposerStreamStatus>("composer_stream_status", SchemaName)
-                .MapEnum<ComposerStreamType>("composer_stream_type", SchemaName)
-                .MapEnum<OrderCategoryType>("order_category_type", SchemaName)
-                .MapEnum<ReviewOrderStatus>("review_order_status", SchemaName)
-                .MapEnum<ReviewOrderType>("review_order_type", SchemaName)
-                .MapEnum<TransactionType>("transaction_type", SchemaName);
+                .MapEnum<ComposerStreamStatus>(nameof(ComposerStreamStatus), SchemaName)
+                .MapEnum<ComposerStreamType>(nameof(ComposerStreamType), SchemaName)
+                .MapEnum<QueueCategory>(nameof(QueueCategory), SchemaName)
+                .MapEnum<ReviewOrderStatus>(nameof(ReviewOrderStatus), SchemaName)
+                .MapEnum<ReviewOrderType>(nameof(ReviewOrderType), SchemaName)
+                .MapEnum<TransactionKind>(nameof(TransactionKind), SchemaName)
+                .MapEnum<AccountTopUpProvider>(nameof(AccountTopUpProvider), SchemaName);
         }
 
+        // Вспомогательный метод для выравнивания enum в БД по номеру, а не по названию
         public static void HasPostgresEnum(this ModelBuilder builder)
         {
             builder
-                .HasPostgresEnum<ComposerStreamStatus>(SchemaName, "composer_stream_status")
-                .HasPostgresEnum<ComposerStreamType>(SchemaName, "composer_stream_type")
-                .HasPostgresEnum<OrderCategoryType>(SchemaName, "order_category_type")
-                .HasPostgresEnum<ReviewOrderStatus>(SchemaName, "review_order_status")
-                .HasPostgresEnum<ReviewOrderType>(SchemaName, "review_order_type")
-                .HasPostgresEnum<TransactionType>(SchemaName, "transaction_type");
+                .HasPostgresEnum<ComposerStreamStatus>(SchemaName, nameof(ComposerStreamStatus))
+                .HasPostgresEnum<ComposerStreamType>(SchemaName, nameof(ComposerStreamType))
+                .HasPostgresEnum<QueueCategory>(SchemaName, nameof(QueueCategory))
+                .HasPostgresEnum<ReviewOrderStatus>(SchemaName, nameof(ReviewOrderStatus))
+                .HasPostgresEnum<ReviewOrderType>(SchemaName, nameof(ReviewOrderType))
+                .HasPostgresEnum<TransactionKind>(SchemaName, nameof(TransactionKind))
+                .HasPostgresEnum<AccountTopUpProvider>(SchemaName, nameof(AccountTopUpProvider));
         }
     }
 }

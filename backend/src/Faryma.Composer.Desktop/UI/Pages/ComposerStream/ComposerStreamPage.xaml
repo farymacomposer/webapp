@@ -4,7 +4,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Faryma.Composer.Desktop.UI"
-    xmlns:test="using:Microsoft.UI.Xaml"
     xmlns:vm="using:Faryma.Composer.Desktop.ViewModels">
     <Page.Resources>
         <local:BindingProxy x:Key="BindingProxy" ViewModel="{x:Bind ViewModel}" />
