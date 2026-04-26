@@ -6,6 +6,7 @@ using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
+using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
 namespace Faryma.Composer.Api
@@ -31,6 +32,8 @@ namespace Faryma.Composer.Api
                 .AddAuthorization()
                 .AddCoreServices();
 
+            builder.Services.AddSingleton<IAuthorizationHandler, DisableAuthorizationHandler>();
+
             builder.Services.AddPresentationLayer(builder.Environment);
 
             WebApplication app = builder.Build();
@@ -54,6 +57,19 @@ namespace Faryma.Composer.Api
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();
             await app.RunAsync();
+        }
+    }
+
+    internal sealed class DisableAuthorizationHandler : IAuthorizationHandler
+    {
+        public Task HandleAsync(AuthorizationHandlerContext context)
+        {
+            foreach (IAuthorizationRequirement requirement in context.Requirements)
+            {
+                context.Succeed(requirement);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

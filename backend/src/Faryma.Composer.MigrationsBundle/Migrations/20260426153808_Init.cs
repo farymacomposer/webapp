@@ -469,6 +469,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     QueueCategory = table.Column<QueueCategory>(type: "app.\"QueueCategory\"", nullable: false),
                     IsFrozen = table.Column<bool>(type: "boolean", nullable: false),
                     TrackUrl = table.Column<string>(type: "text", nullable: true),
+                    TrackDurationSeconds = table.Column<int>(type: "integer", nullable: true),
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
                     NominalAmount = table.Column<long>(type: "bigint", nullable: false),
                     PayableAmount = table.Column<long>(type: "bigint", nullable: false),

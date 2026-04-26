@@ -52,6 +52,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
+                    TrackDurationSeconds = request.TrackDurationSeconds,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
                 }, ct),
@@ -59,6 +60,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
+                    TrackDurationSeconds = request.TrackDurationSeconds,
                     UserComment = request.UserComment,
                     PaymentAmount = request.PaymentAmount!.Value,
                     TopUpProvider = request.TopUpProvider!.Value,
@@ -68,6 +70,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
+                    TrackDurationSeconds = request.TrackDurationSeconds,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
                 }, ct),
@@ -75,6 +78,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
+                    TrackDurationSeconds = request.TrackDurationSeconds,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
                 }, ct),

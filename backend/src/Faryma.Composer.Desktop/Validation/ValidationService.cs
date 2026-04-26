@@ -8,10 +8,14 @@ namespace Faryma.Composer.Desktop.Validation
     {
         public async Task<bool> Check(CreateReviewOrderRequest request)
         {
+            bool hasUrl = !string.IsNullOrWhiteSpace(request.TrackUrl);
+            bool hasDuration = request.TrackDurationSeconds > 0;
+
             SimpleValidator validator = new SimpleValidator()
                 .WarnIf(string.IsNullOrWhiteSpace(request.Nickname), "Не задан никнейм пользователя")
                 .WarnIf(request.OrderType == ReviewOrderType.Donation && request.PaymentAmount == 0, "Не задана сумма платежа")
-                .RequireUrlIfProvided(request.TrackUrl, "Некорректная ссылка на трек");
+                .RequireUrlIfProvided(request.TrackUrl, "Некорректная ссылка на трек")
+                .WarnIf(hasUrl != hasDuration, "Если указаны ссылка на трек или длительность, должны быть заполнены оба поля");
 
             if (validator.HasWarnings)
             {

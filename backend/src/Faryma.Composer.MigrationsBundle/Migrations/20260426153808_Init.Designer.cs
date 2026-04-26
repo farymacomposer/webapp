@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260425172637_Init")]
+    [Migration("20260426153808_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -904,6 +904,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     b.Property<ReviewOrderStatus>("Status")
                         .HasColumnType("app.ReviewOrderStatus");
+
+                    b.Property<int?>("TrackDurationSeconds")
+                        .HasColumnType("integer");
 
                     b.Property<long?>("TrackId")
                         .HasColumnType("bigint");

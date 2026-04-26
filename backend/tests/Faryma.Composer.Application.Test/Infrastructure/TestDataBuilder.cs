@@ -99,6 +99,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 UserNicknameEntity userNickname = await GetOrCreateNicknameAsync(uow, nickname);
 
                 string? initialTrackUrl = trackUrl ?? (status == ReviewOrderStatus.Preorder ? null : _defaultTrackUrl);
+                int? trackDurationSeconds = initialTrackUrl is null ? null : 60;
                 int initialPayableAmount = (type is ReviewOrderType.Donation or ReviewOrderType.Free)
                     ? payableAmount
                     : 0;
@@ -107,6 +108,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                     nominalAmount,
                     initialPayableAmount,
                     initialTrackUrl,
+                    trackDurationSeconds,
                     userComment: "test-comment",
                     type,
                     creationStream,

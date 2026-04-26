@@ -65,6 +65,11 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// </summary>
         public string? TrackUrl { get; set; }
 
+        /// <summary>
+        /// Длительность трека в секундах
+        /// </summary>
+        public int? TrackDurationSeconds { get; set; }
+
         public long? TrackId { get; set; }
 
         /// <summary>

@@ -130,6 +130,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-Strong",
                     TrackUrl = "https://example.com/strong",
+                    TrackDurationSeconds = 60,
                     UserComment = null,
                     PaymentAmount = 1_000,
                     TopUpProvider = AccountTopUpProvider.Manual,
@@ -142,6 +143,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-Candidate",
                     TrackUrl = "https://example.com/candidate",
+                    TrackDurationSeconds = 60,
                     UserComment = null,
                     PaymentAmount = 700,
                     TopUpProvider = AccountTopUpProvider.Manual,

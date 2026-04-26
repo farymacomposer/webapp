@@ -57,6 +57,14 @@
                             Text="{x:Bind ViewModel.TrackUrl, Mode=TwoWay}" />
                     </local:TitledContentRow>
 
+                    <local:TitledContentRow Title="Длительность трека">
+                        <TextBox
+                            Width="{StaticResource TitledContentWidth}"
+                            MaxLength="5"
+                            PlaceholderText="мм:сс"
+                            Text="{x:Bind ViewModel.TrackDuration, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" />
+                    </local:TitledContentRow>
+
                     <local:TitledContentRow Title="Комментарий">
                         <TextBox
                             Width="{StaticResource TitledContentWidth}"

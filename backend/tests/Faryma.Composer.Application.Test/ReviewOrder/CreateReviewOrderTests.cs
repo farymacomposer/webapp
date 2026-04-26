@@ -27,6 +27,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-Donation",
                     TrackUrl = "https://example.com/track",
+                    TrackDurationSeconds = 60,
                     UserComment = "comment",
                     PaymentAmount = 1_200,
                     TopUpProvider = AccountTopUpProvider.Manual,
@@ -77,6 +78,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-Preorder",
                     TrackUrl = null,
+                    TrackDurationSeconds = null,
                     UserComment = null,
                     PaymentAmount = 900,
                     TopUpProvider = AccountTopUpProvider.Manual,
@@ -112,6 +114,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-NewDonation",
                     TrackUrl = withTrackUrl ? "https://example.com/new-donation" : null,
+                    TrackDurationSeconds = withTrackUrl ? 60 : null,
                     UserComment = null,
                     PaymentAmount = 800,
                     TopUpProvider = AccountTopUpProvider.Manual,
@@ -152,6 +155,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-Free",
                     TrackUrl = "https://example.com/free",
+                    TrackDurationSeconds = 60,
                     UserComment = null,
                     CreatedByUserId = user.Id,
                 }));
@@ -191,6 +195,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-DonationHistory",
                     TrackUrl = "https://example.com/donation-repeat",
+                    TrackDurationSeconds = 60,
                     UserComment = null,
                     PaymentAmount = 600,
                     TopUpProvider = AccountTopUpProvider.Manual,
@@ -224,6 +229,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-NewFree",
                     TrackUrl = "https://example.com/free",
+                    TrackDurationSeconds = 60,
                     UserComment = null,
                     CreatedByUserId = user.Id,
                 }));
@@ -254,6 +260,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-OOQ",
                     TrackUrl = null,
+                    TrackDurationSeconds = null,
                     UserComment = null,
                     CreatedByUserId = user.Id,
                 }));
@@ -284,6 +291,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-Charity",
                     TrackUrl = "https://example.com/charity",
+                    TrackDurationSeconds = 60,
                     UserComment = null,
                     CreatedByUserId = user.Id,
                 }));
@@ -314,6 +322,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         Nickname = "Nick-Charity",
                         TrackUrl = "https://example.com/charity",
+                        TrackDurationSeconds = 60,
                         UserComment = null,
                         CreatedByUserId = user.Id,
                     })));
@@ -338,6 +347,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         Nickname = "Nick-NoStream",
                         TrackUrl = "https://example.com/donation",
+                        TrackDurationSeconds = 60,
                         UserComment = null,
                         PaymentAmount = 700,
                         TopUpProvider = AccountTopUpProvider.Manual,
@@ -348,6 +358,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         Nickname = "Nick-NoStream",
                         TrackUrl = "https://example.com/free",
+                        TrackDurationSeconds = 60,
                         UserComment = null,
                         CreatedByUserId = user.Id,
                     })),
@@ -356,6 +367,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         Nickname = "Nick-NoStream",
                         TrackUrl = null,
+                        TrackDurationSeconds = null,
                         UserComment = null,
                         CreatedByUserId = user.Id,
                     })),

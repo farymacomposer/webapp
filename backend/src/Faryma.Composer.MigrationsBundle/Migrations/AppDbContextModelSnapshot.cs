@@ -902,6 +902,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Property<ReviewOrderStatus>("Status")
                         .HasColumnType("app.ReviewOrderStatus");
 
+                    b.Property<int?>("TrackDurationSeconds")
+                        .HasColumnType("integer");
+
                     b.Property<long?>("TrackId")
                         .HasColumnType("bigint");
 

@@ -20,7 +20,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities
         public required string Title { get; set; }
 
         /// <summary>
-        /// Длительность трека
+        /// Длительность трека в секундах
         /// </summary>
         public required int DurationSeconds { get; set; }
 

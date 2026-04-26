@@ -28,6 +28,11 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create
         public string? TrackUrl { get; init; }
 
         /// <summary>
+        /// Длительность трека в секундах
+        /// </summary>
+        public int? TrackDurationSeconds { get; init; }
+
+        /// <summary>
         /// Сумма платежа
         /// </summary>
         public long? PaymentAmount { get; init; }
@@ -58,6 +63,19 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create
             if (PaymentAmount is < 0)
             {
                 yield return new ValidationResult("Сумма платежа не может быть отрицательной");
+            }
+
+            if (TrackDurationSeconds.HasValue && TrackDurationSeconds <= 0)
+            {
+                yield return new ValidationResult("Длительность трека должна быть больше нуля");
+            }
+
+            bool hasUrl = !string.IsNullOrWhiteSpace(TrackUrl);
+            bool hasDuration = TrackDurationSeconds > 0;
+
+            if (hasUrl != hasDuration)
+            {
+                yield return new ValidationResult("Если указаны ссылка на трек или длительность, оба поля должны быть заполнены");
             }
 
             if (OrderType == ReviewOrderType.Donation)

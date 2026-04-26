@@ -28,6 +28,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 {
                     Nickname = "Nick-Take",
                     TrackUrl = "https://example.com/take",
+                    TrackDurationSeconds = 60,
                     UserComment = null,
                     PaymentAmount = 1_000,
                     TopUpProvider = AccountTopUpProvider.Manual,

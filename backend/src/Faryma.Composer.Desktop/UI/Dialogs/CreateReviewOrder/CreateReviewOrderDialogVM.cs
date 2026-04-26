@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
@@ -54,6 +55,22 @@ namespace Faryma.Composer.Desktop.UI
         public partial string? TrackUrl { get; set; }
 
         /// <summary>
+        /// Длительность трека
+        /// </summary>
+        public string? TrackDuration
+        {
+            get => field;
+            set
+            {
+                field = (TimeSpan.TryParseExact(value, "mm\\:ss", CultureInfo.InvariantCulture, out TimeSpan trackDuration) && trackDuration > TimeSpan.Zero)
+                    ? trackDuration.ToString("mm\\:ss")
+                    : null;
+
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Комментарий пользователя
         /// </summary>
         [ObservableProperty]
@@ -76,11 +93,19 @@ namespace Faryma.Composer.Desktop.UI
         {
             _ = int.TryParse(PaymentAmount, out int paymentAmount);
 
+            int? trackDurationSeconds = null;
+            if (TrackDuration is not null)
+            {
+                TimeSpan.TryParseExact(TrackDuration, "mm\\:ss", CultureInfo.InvariantCulture, out TimeSpan trackDuration);
+                trackDurationSeconds = (int)trackDuration.TotalSeconds;
+            }
+
             CreateReviewOrderRequest request = new()
             {
-                Nickname = Nickname,
+                Nickname = Nickname?.Trim() ?? string.Empty,
                 OrderType = OrderType,
                 TrackUrl = string.IsNullOrWhiteSpace(TrackUrl) ? null : TrackUrl,
+                TrackDurationSeconds = trackDurationSeconds,
                 PaymentAmount = paymentAmount,
                 TopUpProvider = AccountTopUpProvider.Manual,
                 UserComment = string.IsNullOrWhiteSpace(UserComment) ? null : UserComment,
@@ -104,6 +129,7 @@ namespace Faryma.Composer.Desktop.UI
             Nickname = null;
             PaymentAmount = null;
             TrackUrl = null;
+            TrackDuration = null;
             UserComment = null;
         }
     }

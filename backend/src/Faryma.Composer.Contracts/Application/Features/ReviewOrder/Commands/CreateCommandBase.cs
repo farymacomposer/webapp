@@ -16,6 +16,11 @@
         public required string? TrackUrl { get; init; }
 
         /// <summary>
+        /// Длительность трека в секундах
+        /// </summary>
+        public required int? TrackDurationSeconds { get; init; }
+
+        /// <summary>
         /// Комментарий пользователя
         /// </summary>
         public required string? UserComment { get; init; }
