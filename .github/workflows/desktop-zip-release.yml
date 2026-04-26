@@ -56,6 +56,9 @@ jobs:
           /p:WindowsAppSDKSelfContained=true
           /p:WindowsPackageType=None
           /p:PublishDir="$env:RUNNER_TEMP\desktop-publish\\"
+          /nologo
+          /verbosity:minimal
+          /clp:Summary
 
       - name: Create release archive
         run: |
