@@ -1,4 +1,4 @@
-name: Desktop ZIP Release
+name: Desktop ZIP Artifact
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      - name: Resolve release version from tag
+      - name: Resolve artifact version from tag
         run: |
           $tag = "${{ github.ref_name }}"
           if ($tag -notmatch '^desktop-v(?<version>\d+\.\d+\.\d+(?:\.\d+)?)$') {
@@ -60,7 +60,7 @@ jobs:
           /verbosity:minimal
           /clp:Summary
 
-      - name: Create release archive
+      - name: Create artifact archive
         run: |
           $publishDir = Join-Path $env:RUNNER_TEMP "desktop-publish"
           if (-not (Test-Path $publishDir)) {
@@ -80,13 +80,8 @@ jobs:
 
           Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $archivePath -Force
 
-      - name: Upload release assets artifact
+      - name: Upload ZIP artifact
         uses: actions/upload-artifact@v4
         with:
           name: desktop-zip-release
           path: ${{ runner.temp }}/desktop-release/*.zip
-
-      - name: Publish GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ${{ runner.temp }}/desktop-release/*.zip
