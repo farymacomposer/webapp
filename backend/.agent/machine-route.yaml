@@ -63,7 +63,7 @@ features:
   auth:
     paths:
       - src/Faryma.Composer.Api/Features/Auth
-      - src/Faryma.Composer.Contracts/Api/Auth
+      - src/Faryma.Composer.Contracts/Api/Features/Auth
   review_order:
     paths:
       - src/Faryma.Composer.Api/Features/ReviewOrder
@@ -87,8 +87,15 @@ features:
   order_queue:
     paths:
       - src/Faryma.Composer.Api/Features/OrderQueue
+      - src/Faryma.Composer.Api/Features/OrderQueue/OrderQueueNotificationHub.cs
+      - src/Faryma.Composer.Api/Features/OrderQueue/OrderQueueNotificationService.cs
       - src/Faryma.Composer.Application/Features/OrderQueue
+      - src/Faryma.Composer.Application/Features/OrderQueue/OrderQueueService.cs
+      - src/Faryma.Composer.Application/Features/OrderQueue/OrderQueueEventChannel.cs
+      - src/Faryma.Composer.Application/Features/OrderQueue/OrderQueueBackgroundWorker.cs
       - src/Faryma.Composer.Application/Features/OrderQueue/PriorityAlgorithm
+      - src/Faryma.Composer.Application/Features/OrderQueue/PriorityAlgorithm/OrderQueueManager.cs
+      - src/Faryma.Composer.Application/Features/OrderQueue/PriorityAlgorithm/OrderPriorityManager.cs
       - src/Faryma.Composer.Contracts/Api/Features/OrderQueue
       - src/Faryma.Composer.Contracts/Application/Features/OrderQueue
       - tests/Faryma.Composer.Application.Test/OrderQueue
