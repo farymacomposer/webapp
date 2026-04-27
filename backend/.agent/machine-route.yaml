@@ -13,17 +13,26 @@ layers:
     path: src/Faryma.Composer.Api
     entry:
       - src/Faryma.Composer.Api/Program.cs
+      - src/Faryma.Composer.Api/appsettings.json
+      - src/Faryma.Composer.Api/appsettings.Development.json
+      - src/Faryma.Composer.Api/Common
+      - src/Faryma.Composer.Api/Common/DependencyInjection/ServiceCollectionExtensions.cs
       - src/Faryma.Composer.Api/Features
-      - src/Faryma.Composer.Api/Auth
+      - src/Faryma.Composer.Api/Features/Auth
+      - src/Faryma.Composer.Api/Common/Extensions
+      - src/Faryma.Composer.Api/Common/Filters/AppExceptionFilter.cs
   application:
     path: src/Faryma.Composer.Application
     entry:
+      - src/Faryma.Composer.Application/Common
       - src/Faryma.Composer.Application/Features
       - src/Faryma.Composer.Application/DependencyInjection/ServiceCollectionExtensions.cs
+      - src/Faryma.Composer.Application/Features/OrderQueue/OrderQueueBackgroundWorker.cs
   infrastructure:
     path: src/Faryma.Composer.Infrastructure
     entry:
       - src/Faryma.Composer.Infrastructure/AppDbContext.cs
+      - src/Faryma.Composer.Infrastructure/DependencyInjection/ServiceCollectionExtensions.cs
       - src/Faryma.Composer.Infrastructure/Persistence
   contracts:
     path: src/Faryma.Composer.Contracts
@@ -45,9 +54,15 @@ layers:
       - use-cases/order-queue
 
 features:
+  app_settings:
+    paths:
+      - src/Faryma.Composer.Api/Features/AppSettings
+      - src/Faryma.Composer.Application/Features/AppSettings
+      - src/Faryma.Composer.Contracts/Api/Features/AppSettings
+      - src/Faryma.Composer.Contracts/Application/Features/AppSettings
   auth:
     paths:
-      - src/Faryma.Composer.Api/Auth
+      - src/Faryma.Composer.Api/Features/Auth
       - src/Faryma.Composer.Contracts/Api/Auth
   review_order:
     paths:
@@ -76,5 +91,5 @@ features:
       - src/Faryma.Composer.Application/Features/OrderQueue/PriorityAlgorithm
       - src/Faryma.Composer.Contracts/Api/Features/OrderQueue
       - src/Faryma.Composer.Contracts/Application/Features/OrderQueue
-      - tests/Faryma.Composer.Application.Test/OrderQueueManagerTest.cs
+      - tests/Faryma.Composer.Application.Test/OrderQueue
       - use-cases/order-queue

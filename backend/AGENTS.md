@@ -12,6 +12,13 @@ Help agents work safely and predictably in the `Faryma.Composer` backend solutio
 - Supporting projects include `Faryma.Composer.MigrationsBundle` for EF Core migrations and `Faryma.Composer.Desktop` for the WinUI client that shares contracts with the backend.
 - Business behavior is additionally described in `use-cases/*`, but code remains the final source of truth.
 
+## ASP.NET Navigation Notes
+
+- For backend tasks, start navigation from the ASP.NET Core composition root: `Program.cs`, API `DependencyInjection`, `appsettings*.json`, auth, filters, middleware/extensions, and hosted/background services.
+- Treat `.agent/machine-route.yaml` as the canonical navigation map for feature folders and key runtime entry points.
+- Prefer feature-first navigation, then layer-specific traversal only when the change crosses `Api`, `Application`, `Infrastructure`, or `Contracts` boundaries.
+- Do not enter `src/Faryma.Composer.Desktop` or `use-cases/*` unless the user request explicitly involves those areas or the backend change cannot be completed safely without them.
+
 ## Source Of Truth
 
 Before any substantial task, agents should read:

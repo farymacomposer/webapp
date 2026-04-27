@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Api.Extensions;
+﻿using Faryma.Composer.Api.Common.Extensions;
+using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Application.Features.ComposerStream;
 using Faryma.Composer.Contracts.Api.Features.ComposerStream.Cancel;
 using Faryma.Composer.Contracts.Api.Features.ComposerStream.Complete;

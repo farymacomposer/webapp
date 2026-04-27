@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
-using Faryma.Composer.Contracts.Api.Auth.Features.Login;
-using Faryma.Composer.Contracts.Api.Auth.Features.RefreshToken;
+using Faryma.Composer.Contracts.Api.Features.Auth.Login;
+using Faryma.Composer.Contracts.Api.Features.Auth.RefreshToken;
 
 namespace Faryma.Composer.Desktop.Auth
 {

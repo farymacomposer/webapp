@@ -2,9 +2,9 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Faryma.Composer.Contracts.Api.Auth.Features.Login;
-using Faryma.Composer.Contracts.Api.Auth.Features.Logout;
-using Faryma.Composer.Contracts.Api.Auth.Features.RefreshToken;
+using Faryma.Composer.Contracts.Api.Features.Auth.Login;
+using Faryma.Composer.Contracts.Api.Features.Auth.Logout;
+using Faryma.Composer.Contracts.Api.Features.Auth.RefreshToken;
 
 namespace Faryma.Composer.Desktop.Auth
 {

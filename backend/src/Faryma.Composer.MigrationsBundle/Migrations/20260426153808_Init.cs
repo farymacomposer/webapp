@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -37,10 +35,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ReviewOrderNominalAmount = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_app_settings", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_app_settings", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
@@ -52,10 +47,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_AspNetRoles", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
@@ -81,10 +73,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_AspNetUsers", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "DataProtectionKeys",
@@ -96,10 +85,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     FriendlyName = table.Column<string>(type: "text", nullable: true),
                     Xml = table.Column<string>(type: "text", nullable: true)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DataProtectionKeys", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_DataProtectionKeys", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "track_artists",
@@ -111,10 +97,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     NormalizedName = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_track_artists", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_track_artists", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "track_countries",
@@ -125,10 +108,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_track_countries", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_track_countries", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "track_genres",
@@ -139,10 +119,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_track_genres", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_track_genres", x => x.Id));
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",

@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Api.Auth.Services;
-using Faryma.Composer.Api.DependencyInjection;
-using Faryma.Composer.Api.Extensions;
+﻿using Faryma.Composer.Api.Common.DependencyInjection;
+using Faryma.Composer.Api.Common.Extensions;
+using Faryma.Composer.Api.Features.Auth.Services;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;

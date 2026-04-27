@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
+using Faryma.Composer.Application.Common;
 using Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm;
-using Faryma.Composer.Application.Utils;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Events;

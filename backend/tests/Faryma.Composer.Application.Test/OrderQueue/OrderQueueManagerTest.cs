@@ -1,0 +1,1045 @@
+﻿using System.Globalization;
+using Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
+using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Microsoft.AspNetCore.Identity;
+
+namespace Faryma.Composer.Application.Test.OrderQueue
+{
+    public class OrderQueueManagerTest
+    {
+        private readonly UpperInvariantLookupNormalizer _normalizer = new();
+
+        [Fact]
+        public void Donat()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick2", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick3", 700));
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"),
+                (2, "Nick2"),
+                (3, "Nick3"),
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Alt()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick1", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick2", 700));
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"),
+                (3, "Nick2"),
+                (2, "Nick1"),
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick2", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick3", 700));
+
+            Create(queueManager, GetDonation("09.01.2000", 4, "Nick4", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 5, "Nick5", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 6, "Nick6", 700)); // долг x1
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"),
+                (4, "Nick4"), // долг x1
+                (2, "Nick2"),
+                (5, "Nick5"), // долг x1
+                (3, "Nick3"),
+                (6, "Nick6"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt_Alt()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick1", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick2", 700));
+
+            Create(queueManager, GetDonation("09.01.2000", 4, "Nick1", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 5, "Nick1", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 6, "Nick2", 700)); // долг x1
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"),
+                (6, "Nick2"), // долг x1
+                (2, "Nick1"),
+                (3, "Nick2"),
+                (4, "Nick1"), // долг x1
+                (5, "Nick1"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt_Alt1()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick2", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick1", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick1", 700));
+
+            Create(queueManager, GetDonation("09.01.2000", 4, "Nick2", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 5, "Nick1", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 6, "Nick1", 700)); // долг x1
+
+            (long id, string nick)[] expected = [
+                (1, "Nick2"),
+                (5, "Nick1"), // долг x1
+                (4, "Nick2"), // долг x1
+                (2, "Nick1"),
+                (3, "Nick1"),
+                (6, "Nick1"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt_IsOnlyNicknameLeft()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick1", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick1", 700));
+
+            Create(queueManager, GetDonation("09.01.2000", 4, "Nick1", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 5, "Nick1", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 6, "Nick1", 700)); // долг x1
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"),
+                (2, "Nick1"),
+                (3, "Nick1"),
+                (4, "Nick1"), // долг x1
+                (5, "Nick1"), // долг x1
+                (6, "Nick1"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt_X2()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick2", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick3", 700));
+
+            Create(queueManager, GetDonation("09.01.2000", 4, "Nick4", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 5, "Nick5", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 6, "Nick6", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 7, "Nick7", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 8, "Nick8", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 9, "Nick9", 700)); // долг x2
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"),
+                (7, "Nick7"), // долг x2
+                (2, "Nick2"),
+                (4, "Nick4"), // долг x1
+                (3, "Nick3"),
+                (8, "Nick8"), // долг x2
+                (5, "Nick5"), // долг x1
+                (9, "Nick9"), // долг x2
+                (6, "Nick6"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt_X2_Alt()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick1", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick2", 700));
+
+            Create(queueManager, GetDonation("09.01.2000", 4, "Nick1", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 5, "Nick1", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 6, "Nick2", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 7, "Nick1", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 8, "Nick1", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 9, "Nick2", 700)); // долг x2
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"),
+                (9, "Nick2"), // долг x2
+                (2, "Nick1"),
+                (6, "Nick2"), // долг x1
+                (7, "Nick1"), // долг x2
+                (3, "Nick2"),
+                (4, "Nick1"), // долг x1
+                (8, "Nick1"), // долг x2
+                (5, "Nick1"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt_X2_Alt1()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick2", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick1", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick1", 700));
+
+            Create(queueManager, GetDonation("09.01.2000", 4, "Nick2", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 5, "Nick1", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 6, "Nick1", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 7, "Nick2", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 8, "Nick1", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 9, "Nick1", 700)); // долг x2
+
+            (long id, string nick)[] expected = [
+                (1, "Nick2"),
+                (8, "Nick1"), // долг x2
+                (4, "Nick2"), // долг x1
+                (2, "Nick1"),
+                (7, "Nick2"), // долг x2
+                (3, "Nick1"),
+                (5, "Nick1"), // долг x1
+                (9, "Nick1"), // долг x2
+                (6, "Nick1"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt_X2_Alt2()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick1", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick1", 700));
+            Create(queueManager, GetDonation("10.01.2000", 4, "Nick1", 600));
+            Create(queueManager, GetDonation("10.01.2000", 5, "Nick1", 500));
+            Create(queueManager, GetDonation("10.01.2000", 6, "Nick1", 400));
+
+            Create(queueManager, GetDonation("09.01.2000", 7, "Nick1", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 8, "Nick2", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 9, "Nick3", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 10, "Nick1", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 11, "Nick4", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 12, "Nick5", 700)); // долг x2
+
+            (long id, string nick)[] expected = [
+                (1,  "Nick1"),
+                (11, "Nick4"), // долг x2
+                (2,  "Nick1"),
+                (8,  "Nick2"), // долг x1
+                (3,  "Nick1"),
+                (12, "Nick5"), // долг x2
+                (4,  "Nick1"),
+                (9,  "Nick3"), // долг x1
+                (5,  "Nick1"),
+                (6,  "Nick1"),
+                (10, "Nick1"), // долг x2
+                (7,  "Nick1"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt_X3()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick1", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick1", 700));
+            Create(queueManager, GetDonation("10.01.2000", 4, "Nick1", 600));
+            Create(queueManager, GetDonation("10.01.2000", 5, "Nick1", 500));
+            Create(queueManager, GetDonation("10.01.2000", 6, "Nick1", 400));
+
+            Create(queueManager, GetDonation("09.01.2000", 7, "Nick2", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 8, "Nick3", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 9, "Nick4", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 10, "Nick5", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 11, "Nick6", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 12, "Nick7", 700)); // долг x2
+
+            Create(queueManager, GetDonation("07.01.2000", 13, "Nick8", 900)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 14, "Nick9", 800)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 15, "Nick10", 700)); // долг x3
+
+            (long id, string nick)[] expected = [
+                (1,  "Nick1"),
+                (13, "Nick8"),  // долг x3
+                (2,  "Nick1"),
+                (10, "Nick5"),  // долг x2
+                (3,  "Nick1"),
+                (7,  "Nick2"),  // долг x1
+                (4,  "Nick1"),
+                (14, "Nick9"),  // долг x3
+                (5,  "Nick1"),
+                (11, "Nick6"),  // долг x2
+                (6,  "Nick1"),
+                (8,  "Nick3"),  // долг x1
+                (15, "Nick10"), // долг x3
+                (12, "Nick7"),  // долг x2
+                (9,  "Nick4"),  // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Donat_Debt_X3_Alt()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick10", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick10", 800));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick11", 700));
+            Create(queueManager, GetDonation("10.01.2000", 4, "Nick11", 600));
+            Create(queueManager, GetDonation("10.01.2000", 5, "Nick12", 500));
+            Create(queueManager, GetDonation("10.01.2000", 6, "Nick12", 400));
+
+            Create(queueManager, GetDonation("09.01.2000", 7, "Nick1", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 8, "Nick2", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 9, "Nick3", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 10, "Nick4", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 11, "Nick5", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 12, "Nick6", 700)); // долг x2
+
+            Create(queueManager, GetDonation("07.01.2000", 13, "Nick7", 900)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 14, "Nick8", 800)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 15, "Nick9", 700)); // долг x3
+
+            (long id, string nick)[] expected = [
+                (1,  "Nick10"),
+                (13, "Nick7"), // долг x3
+                (3,  "Nick11"),
+                (10, "Nick4"), // долг x2
+                (2,  "Nick10"),
+                (7,  "Nick1"), // долг x1
+                (4,  "Nick11"),
+                (14, "Nick8"), // долг x3
+                (5,  "Nick12"),
+                (11, "Nick5"), // долг x2
+                (6,  "Nick12"),
+                (8,  "Nick2"), // долг x1
+                (15, "Nick9"), // долг x3
+                (12, "Nick6"), // долг x2
+                (9,  "Nick3"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Debt_X2()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("09.01.2000", 4, "Nick4", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 5, "Nick5", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 6, "Nick6", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 7, "Nick7", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 8, "Nick8", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 9, "Nick9", 700)); // долг x2
+
+            (long id, string nick)[] expected = [
+                (7, "Nick7"), // долг x2
+                (4, "Nick4"), // долг x1
+                (8, "Nick8"), // долг x2
+                (5, "Nick5"), // долг x1
+                (9, "Nick9"), // долг x2
+                (6, "Nick6"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Debt_X3()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("09.01.2000", 1, "Nick4", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 2, "Nick5", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 3, "Nick6", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 4, "Nick1", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 5, "Nick1", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 6, "Nick1", 700)); // долг x2
+
+            Create(queueManager, GetDonation("07.01.2000", 7, "Nick7", 900)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 8, "Nick8", 800)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 9, "Nick9", 700)); // долг x3
+
+            (long id, string nick)[] expected = [
+                (7, "Nick7"), // долг x3
+                (4, "Nick1"), // долг x2
+                (1, "Nick4"), // долг x1
+                (8, "Nick8"), // долг x3
+                (5, "Nick1"), // долг x2
+                (2, "Nick5"), // долг x1
+                (9, "Nick9"), // долг x3
+                (6, "Nick1"), // долг x2
+                (3, "Nick6"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Debt_X4()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("09.01.2000", 1, "Nick4", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 2, "Nick5", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 3, "Nick6", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 4, "Nick1", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 5, "Nick1", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 6, "Nick1", 700)); // долг x2
+
+            Create(queueManager, GetDonation("07.01.2000", 7, "Nick1", 900)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 8, "Nick1", 800)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 9, "Nick1", 700)); // долг x3
+
+            Create(queueManager, GetDonation("06.01.2000", 10, "Nick7", 900)); // долг x4
+            Create(queueManager, GetDonation("06.01.2000", 11, "Nick8", 800)); // долг x4
+            Create(queueManager, GetDonation("06.01.2000", 12, "Nick9", 700)); // долг x4
+
+            (long id, string nick)[] expected = [
+                (10, "Nick7"), // долг x4
+                (7,  "Nick1"), // долг x3
+                (1,  "Nick4"), // долг x1
+                (11, "Nick8"), // долг x4
+                (8,  "Nick1"), // долг x3
+                (2,  "Nick5"), // долг x1
+                (12, "Nick9"), // долг x4
+                (9,  "Nick1"), // долг x3
+                (3,  "Nick6"), // долг x1
+                (4,  "Nick1"), // долг x2
+                (5,  "Nick1"), // долг x2
+                (6,  "Nick1"), // долг x2
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Debt_X4_Alt()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("09.01.2000", 1, "Nick4", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 2, "Nick5", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 3, "Nick6", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 4, "Nick1", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 5, "Nick1", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 6, "Nick1", 700)); // долг x2
+
+            Create(queueManager, GetDonation("07.01.2000", 7, "Nick7", 900)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 8, "Nick8", 800)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 9, "Nick9", 700)); // долг x3
+
+            Create(queueManager, GetDonation("06.01.2000", 10, "Nick1", 900)); // долг x4
+            Create(queueManager, GetDonation("06.01.2000", 11, "Nick1", 800)); // долг x4
+            Create(queueManager, GetDonation("06.01.2000", 12, "Nick1", 700)); // долг x4
+
+            (long id, string nick)[] expected = [
+                (10, "Nick1"), // долг x4
+                (7,  "Nick7"), // долг x3
+                (4,  "Nick1"), // долг x2
+                (1,  "Nick4"), // долг x1
+
+                (11, "Nick1"), // долг x4
+                (8,  "Nick8"), // долг x3
+                (5,  "Nick1"), // долг x2
+                (2,  "Nick5"), // долг x1
+
+                (12, "Nick1"), // долг x4
+                (9,  "Nick9"), // долг x3
+                (6,  "Nick1"), // долг x2
+                (3,  "Nick6"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Debt_X4_Alt1()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("09.01.2000", 1, "Nick4", 900)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 4, "Nick1", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 5, "Nick1", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 6, "Nick1", 700)); // долг x2
+
+            Create(queueManager, GetDonation("07.01.2000", 7, "Nick7", 900)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 8, "Nick8", 800)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 9, "Nick9", 700)); // долг x3
+
+            Create(queueManager, GetDonation("06.01.2000", 10, "Nick1", 900)); // долг x4
+            Create(queueManager, GetDonation("06.01.2000", 11, "Nick1", 800)); // долг x4
+            Create(queueManager, GetDonation("06.01.2000", 12, "Nick1", 700)); // долг x4
+
+            (long id, string nick)[] expected = [
+                (10, "Nick1"), // долг x4
+                (7,  "Nick7"), // долг x3
+                (4,  "Nick1"), // долг x2
+                (1,  "Nick4"), // долг x1
+
+                (11, "Nick1"), // долг x4
+                (8,  "Nick8"), // долг x3
+                (5,  "Nick1"), // долг x2
+
+                (9,  "Nick9"), // долг x3
+                (6,  "Nick1"), // долг x2
+                (12, "Nick1"), // долг x4
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void Debt_X4_Alt2()
+        {
+            OrderQueueManager queueManager = GetManager("04.10.2025");
+
+            Create(queueManager, GetDonation("01.10.2025", 60, "Nick60", 700)); // долг x1
+            Create(queueManager, GetDonation("01.10.2025", 59, "Nick59", 700)); // долг x1
+            Create(queueManager, GetDonation("01.10.2025", 55, "Nick55", 700)); // долг x1
+
+            Create(queueManager, GetDonation("30.09.2025", 51, "Nick51", 700)); // долг x2
+            Create(queueManager, GetDonation("30.09.2025", 48, "Nick48", 700)); // долг x2
+            Create(queueManager, GetDonation("30.09.2025", 47, "Nick47", 700)); // долг x2
+
+            Create(queueManager, GetDonation("29.09.2025", 38, "Nick38", 700)); // долг x3
+            Create(queueManager, GetDonation("29.09.2025", 40, "Nick40", 700)); // долг x3
+
+            Create(queueManager, GetDonation("26.09.2025", 7, "Nick7", 900)); // долг x4
+            Create(queueManager, GetDonation("26.09.2025", 9, "Nick9", 900)); // долг x4
+            Create(queueManager, GetDonation("26.09.2025", 3, "Nick3", 900)); // долг x4
+
+            (long id, string nick)[] expected = [
+                (7,  "Nick7"),  // долг x4
+                (38, "Nick38"), // долг x3
+                (51, "Nick51"), // долг x2
+                (60, "Nick60"), // долг x1
+
+                (9,  "Nick9"),  // долг x4
+                (40, "Nick40"), // долг x3
+                (48, "Nick48"), // долг x2
+                (59, "Nick59"), // долг x1
+
+                (3,  "Nick3"),  // долг x4
+                (47, "Nick47"), // долг x2
+                (55, "Nick55"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void OutOfQueue()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetOutOfQueue("01.01.2000", 1, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("01.01.2000", 2, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("01.01.2000", 3, "Nick1")); // ВНЕ ОЧЕРЕДИ
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (3, "Nick1"), // ВНЕ ОЧЕРЕДИ
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void OutOfQueue_Donat()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetOutOfQueue("01.01.2000", 1, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("01.01.2000", 2, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("01.01.2000", 3, "Nick2")); // ВНЕ ОЧЕРЕДИ
+
+            Create(queueManager, GetDonation("10.01.2000", 4, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 5, "Nick1", 800));
+            Create(queueManager, GetDonation("10.01.2000", 6, "Nick2", 700));
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (3, "Nick2"), // ВНЕ ОЧЕРЕДИ
+                (2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (6, "Nick2"),
+                (4, "Nick1"),
+                (5, "Nick1"),
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void OutOfQueue_Donat_Alt()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetOutOfQueue("01.01.2000", 1, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("01.01.2000", 2, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("01.01.2000", 3, "Nick1")); // ВНЕ ОЧЕРЕДИ
+
+            Create(queueManager, GetDonation("10.01.2000", 4, "Nick2", 900));
+            Create(queueManager, GetDonation("10.01.2000", 5, "Nick3", 800));
+            Create(queueManager, GetDonation("10.01.2000", 6, "Nick4", 700));
+
+            (long id, string nick)[] expected = [
+                (1, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (4, "Nick2"),
+                (2, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (5, "Nick3"),
+                (3, "Nick1"), // ВНЕ ОЧЕРЕДИ
+                (6, "Nick4"),
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void OutOfQueue_Debt_X3()
+        {
+            OrderQueueManager queueManager = GetManager("20.01.2000");
+
+            Create(queueManager, GetOutOfQueue("10.01.2000", 1, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 2, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 3, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 4, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 5, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 6, "Nick1")); // ВНЕ ОЧЕРЕДИ
+
+            Create(queueManager, GetDonation("09.01.2000", 7, "Nick2", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 8, "Nick3", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 9, "Nick4", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 10, "Nick5", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 11, "Nick6", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 12, "Nick7", 700)); // долг x2
+
+            Create(queueManager, GetDonation("07.01.2000", 13, "Nick8", 900)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 14, "Nick9", 800)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 15, "Nick10", 700)); // долг x3
+
+            (long id, string nick)[] expected = [
+                (1,  "Nick1"),
+                (13, "Nick8"), // долг x3
+                (2,  "Nick1"),
+                (10, "Nick5"), // долг x2
+                (3,  "Nick1"),
+                (7,  "Nick2"), // долг x1
+                (4,  "Nick1"),
+                (14, "Nick9"), // долг x3
+                (5,  "Nick1"),
+                (11, "Nick6"), // долг x2
+                (6,  "Nick1"),
+                (8,  "Nick3"), // долг x1
+                (15, "Nick10"), // долг x3
+                (12, "Nick7"), // долг x2
+                (9,  "Nick4"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void OutOfQueue_Debt_X3_Alt()
+        {
+            OrderQueueManager queueManager = GetManager("20.01.2000");
+
+            Create(queueManager, GetOutOfQueue("10.01.2000", 1, "Nick10")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 2, "Nick10")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 3, "Nick11")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 4, "Nick11")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 5, "Nick12")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("10.01.2000", 6, "Nick12")); // ВНЕ ОЧЕРЕДИ
+
+            Create(queueManager, GetDonation("09.01.2000", 7, "Nick1", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 8, "Nick2", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 9, "Nick3", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 10, "Nick4", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 11, "Nick5", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 12, "Nick6", 700)); // долг x2
+
+            Create(queueManager, GetDonation("07.01.2000", 13, "Nick7", 900)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 14, "Nick8", 800)); // долг x3
+            Create(queueManager, GetDonation("07.01.2000", 15, "Nick9", 700)); // долг x3
+
+            (long id, string nick)[] expected = [
+                (1,  "Nick10"),
+                (3,  "Nick11"),
+                (2,  "Nick10"),
+                (4,  "Nick11"),
+                (5,  "Nick12"),
+                (13, "Nick7"), // долг x3
+                (6,  "Nick12"),
+                (10, "Nick4"), // долг x2
+                (7,  "Nick1"), // долг x1
+                (14, "Nick8"), // долг x3
+                (11, "Nick5"), // долг x2
+                (8,  "Nick2"), // долг x1
+                (15, "Nick9"), // долг x3
+                (12, "Nick6"), // долг x2
+                (9,  "Nick3"), // долг x1
+            ];
+
+            Check(expected, queueManager);
+            ProcessActiveOrders(queueManager);
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void OutOfQueue_FutureDonat_Debt_X2_Inactive()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetOutOfQueue("01.01.2000", 1, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("01.01.2000", 2, "Nick1")); // ВНЕ ОЧЕРЕДИ
+            Create(queueManager, GetOutOfQueue("01.01.2000", 3, "Nick2")); // ВНЕ ОЧЕРЕДИ
+
+            Create(queueManager, GetDonation("20.01.2000", 4, "Nick1", 900));
+            Create(queueManager, GetDonation("20.01.2000", 5, "Nick1", 800));
+            Create(queueManager, GetDonation("20.01.2000", 6, "Nick2", 700));
+
+            Create(queueManager, GetDonation("09.01.2000", 7, "Nick2", 900)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 8, "Nick2", 800)); // долг x1
+            Create(queueManager, GetDonation("09.01.2000", 9, "Nick6", 700)); // долг x1
+
+            Create(queueManager, GetDonation("08.01.2000", 10, "Nick1", 900)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 11, "Nick2", 800)); // долг x2
+            Create(queueManager, GetDonation("08.01.2000", 12, "Nick9", 700)); // долг x2
+
+            Create(queueManager, GetDonation("20.01.2000", 13, "Nick2", 900, true));
+            Create(queueManager, GetDonation("10.01.2000", 14, "Nick2", 800, true));
+            Create(queueManager, GetDonation("08.01.2000", 15, "Nick9", 700, true));
+
+            (int index, long id, OrderActivityStatus status, string nick)[] expected = [
+                (0, 4, OrderActivityStatus.Scheduled, "Nick1"),
+                (1, 5, OrderActivityStatus.Scheduled, "Nick1"),
+                (2, 6, OrderActivityStatus.Scheduled, "Nick2"),
+
+                (0, 1, OrderActivityStatus.Active,  "Nick1"),
+                (1, 3, OrderActivityStatus.Active,  "Nick2"),
+                (2, 2, OrderActivityStatus.Active,  "Nick1"),
+                (3, 11, OrderActivityStatus.Active, "Nick2"), // долг x2
+                (4, 9, OrderActivityStatus.Active,  "Nick6"), // долг x1
+                (5, 10, OrderActivityStatus.Active, "Nick1"), // долг x2
+                (6, 7, OrderActivityStatus.Active,  "Nick2"), // долг x1
+                (7, 12, OrderActivityStatus.Active, "Nick9"), // долг x2
+                (8, 8, OrderActivityStatus.Active,  "Nick2"), // долг x1
+
+                (0, 13, OrderActivityStatus.Frozen, "Nick2"),
+                (1, 14, OrderActivityStatus.Frozen, "Nick2"),
+                (2, 15, OrderActivityStatus.Frozen, "Nick9"),
+            ];
+
+            Check(expected, queueManager);
+
+            ProcessActiveOrders(queueManager);
+
+            expected = [
+                (0, 4, OrderActivityStatus.Scheduled, "Nick1"),
+                (1, 5, OrderActivityStatus.Scheduled, "Nick1"),
+                (2, 6, OrderActivityStatus.Scheduled, "Nick2"),
+
+                (0, 1, OrderActivityStatus.Completed,  "Nick1"),
+                (1, 3, OrderActivityStatus.Completed,  "Nick2"),
+                (2, 2, OrderActivityStatus.Completed,  "Nick1"),
+                (3, 11, OrderActivityStatus.Completed, "Nick2"), // долг x2
+                (4, 9, OrderActivityStatus.Completed,  "Nick6"), // долг x1
+                (5, 10, OrderActivityStatus.Completed, "Nick1"), // долг x2
+                (6, 7, OrderActivityStatus.Completed,  "Nick2"), // долг x1
+                (7, 12, OrderActivityStatus.Completed, "Nick9"), // долг x2
+                (8, 8, OrderActivityStatus.Completed,  "Nick2"), // долг x1
+
+                (0, 13, OrderActivityStatus.Frozen, "Nick2"),
+                (1, 14, OrderActivityStatus.Frozen, "Nick2"),
+                (2, 15, OrderActivityStatus.Frozen, "Nick9"),
+            ];
+
+            Check(expected, queueManager);
+        }
+
+        [Fact]
+        public void TakeOrderOutOfTurn()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            ReviewOrderEntity order1 = Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 1000));
+            ReviewOrderEntity order2 = Create(queueManager, GetDonation("10.01.2000", 2, "Nick2", 1000));
+            ReviewOrderEntity order3 = Create(queueManager, GetDonation("10.01.2000", 3, "Nick1", 1000));
+            ReviewOrderEntity order4 = Create(queueManager, GetDonation("10.01.2000", 4, "Nick2", 1000));
+
+            TakeInProgress(queueManager, order2);
+            Complete(queueManager, order2);
+            TakeInProgress(queueManager, order1);
+
+            Check([
+                (0, 2, OrderActivityStatus.Completed, "Nick2"),
+
+                (0, 1, OrderActivityStatus.InProgress, "Nick1"),
+
+                (0, 4, OrderActivityStatus.Active, "Nick2"),
+                (1, 3, OrderActivityStatus.Active, "Nick1"),
+            ], queueManager);
+        }
+
+        private static void ProcessActiveOrders(OrderQueueManager queueManager)
+        {
+            while (true)
+            {
+                OrderPosition? current = queueManager.OrderPositionsById
+                    .Select(x => x.Value)
+                    .Where(x => x.PositionHistory.Current.ActivityStatus == OrderActivityStatus.Active)
+                    .OrderBy(x => x.PositionHistory.Current.QueueIndex)
+                    .FirstOrDefault();
+
+                if (current is null)
+                {
+                    break;
+                }
+
+                ProcessOrder(queueManager, current.Order);
+            }
+        }
+
+        private static OrderQueueManager GetManager(string currentStreamDate)
+        {
+            return new()
+            {
+                NearestStreamDate = DateOnly.Parse(currentStreamDate, CultureInfo.GetCultureInfo("ru-RU")),
+                OrderPositionsById = new Dictionary<long, OrderPosition>(),
+                PriorityManagerState = new OrderPriorityManagerState
+                {
+                    LastPriorityManagerState = CategoryState.Initial,
+                    LastIssuedNickname = null,
+                    LastDebtCategoryDate = null,
+                    LastOutOfQueueNickname = null,
+                    LastNicknamesByStreamDate = new Dictionary<DateOnly, string>(),
+                }
+            };
+        }
+
+        private static ReviewOrderEntity Create(OrderQueueManager queueManager, ReviewOrderEntity order)
+        {
+            queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCreated);
+
+            return order;
+        }
+
+        private static void ProcessOrder(OrderQueueManager queueManager, ReviewOrderEntity order)
+        {
+            TakeInProgress(queueManager, order);
+            Complete(queueManager, order);
+        }
+
+        private static void TakeInProgress(OrderQueueManager queueManager, ReviewOrderEntity order)
+        {
+            OrderQueuePosition position = queueManager.GetCurrentQueuePosition(order);
+
+            order.QueueCategory = position.Category.QueueCategory;
+            order.Status = ReviewOrderStatus.InProgress;
+
+            queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderTaken);
+        }
+
+        private static void Complete(OrderQueueManager queueManager, ReviewOrderEntity order)
+        {
+            order.CompletedAt = DateTime.Now;
+            order.Status = ReviewOrderStatus.Completed;
+
+            queueManager.UpdateOrder(order, OrderQueueUpdateType.OrderCompleted);
+        }
+
+        private void Check((long id, string nick)[] values, OrderQueueManager queueManager)
+        {
+            int index = 0;
+            foreach ((long id, string nick) in values)
+            {
+                OrderPosition item = queueManager.OrderPositionsById[id];
+
+                Assert.Equal(
+                    (index, id, _normalizer.NormalizeName(nick)),
+                    (item.PositionHistory.Current.QueueIndex, id, item.Order.MainNormalizedNickname));
+
+                index++;
+            }
+        }
+
+        private void Check((int index, long id, OrderActivityStatus status, string nick)[] values, OrderQueueManager queueManager)
+        {
+            foreach ((int index, long id, OrderActivityStatus status, string nick) in values)
+            {
+                OrderPosition item = queueManager.OrderPositionsById[id];
+
+                Assert.Equal(
+                    (index, id, status, _normalizer.NormalizeName(nick)),
+                    (item.PositionHistory.Current.QueueIndex, id, item.PositionHistory.Current.ActivityStatus, item.Order.MainNormalizedNickname));
+            }
+        }
+
+        private ReviewOrderEntity GetDonation(string eventDate, long id, string name, int amount, bool isFrozen = false)
+        {
+            UserEntity user = new()
+            {
+                UserName = name,
+                CreatedAt = DateTime.Now,
+            };
+
+            return new ReviewOrderEntity
+            {
+                Id = id,
+                CreatedAt = DateTime.Now,
+                IsFrozen = isFrozen,
+                Status = ReviewOrderStatus.Pending,
+                QueueCategory = QueueCategory.Unspecified,
+                Type = ReviewOrderType.Donation,
+                NominalAmount = amount,
+                PayableAmount = amount,
+                MainNickname = name,
+                MainNormalizedNickname = _normalizer.NormalizeName(name),
+                CreatedByUser = user,
+                CreationStream = new ComposerStreamEntity
+                {
+                    EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
+                    Type = ComposerStreamType.Donation,
+                    Status = ComposerStreamStatus.Live,
+                    CreatedByUser = user,
+                }
+            };
+        }
+
+        private ReviewOrderEntity GetOutOfQueue(string eventDate, long id, string name)
+        {
+            UserEntity user = new()
+            {
+                UserName = name,
+                CreatedAt = DateTime.Now,
+            };
+
+            return new ReviewOrderEntity
+            {
+                Id = id,
+                CreatedAt = DateTime.Now,
+                IsFrozen = false,
+                Status = ReviewOrderStatus.Pending,
+                QueueCategory = QueueCategory.Unspecified,
+                Type = ReviewOrderType.OutOfQueue,
+                NominalAmount = 0,
+                PayableAmount = 0,
+                MainNickname = name,
+                MainNormalizedNickname = _normalizer.NormalizeName(name),
+                CreatedByUser = user,
+                CreationStream = new ComposerStreamEntity
+                {
+                    EventDate = DateOnly.Parse(eventDate, CultureInfo.GetCultureInfo("ru-RU")),
+                    Type = ComposerStreamType.Donation,
+                    Status = ComposerStreamStatus.Live,
+                    CreatedByUser = user,
+                }
+            };
+        }
+    }
+}
