@@ -42,6 +42,14 @@ layers:
       - src/Faryma.Composer.Contracts/Infrastructure
   desktop:
     path: src/Faryma.Composer.Desktop
+    entry:
+      - src/Faryma.Composer.Desktop/App.xaml
+      - src/Faryma.Composer.Desktop/App.xaml.cs
+      - src/Faryma.Composer.Desktop/ServiceCollectionExtensions.cs
+      - src/Faryma.Composer.Desktop/Navigation
+      - src/Faryma.Composer.Desktop/Auth
+      - src/Faryma.Composer.Desktop/Services
+      - src/Faryma.Composer.Desktop/Api
   tests:
     path: tests
     entry:

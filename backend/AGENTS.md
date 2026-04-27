@@ -14,10 +14,17 @@ Help agents work safely and predictably in the `Faryma.Composer` backend solutio
 
 ## ASP.NET Navigation Notes
 
-- For backend tasks, start navigation from the ASP.NET Core composition root: `Program.cs`, API `DependencyInjection`, `appsettings*.json`, auth, filters, middleware/extensions, and hosted/background services.
+- Treat `src/Faryma.Composer.Api` as the ASP.NET Core app bootstrap and start navigation from `Program.cs`, API `DependencyInjection`, `appsettings*.json`, auth, filters, middleware/extensions, and hosted/background services.
 - Treat `.agent/machine-route.yaml` as the canonical navigation map for feature folders and key runtime entry points.
-- Prefer feature-first navigation, then layer-specific traversal only when the change crosses `Api`, `Application`, `Infrastructure`, or `Contracts` boundaries.
-- Do not enter `src/Faryma.Composer.Desktop` or `use-cases/*` unless the user request explicitly involves those areas or the backend change cannot be completed safely without them.
+- Enter neighboring layers only when the change crosses `Api`, `Application`, `Infrastructure`, or `Contracts` boundaries.
+- When a task crosses backend and desktop boundaries, inspect the shared `Contracts` slice first, then open only the affected consumer applications.
+
+## Desktop Navigation Notes
+
+- Treat `src/Faryma.Composer.Desktop` as the desktop app bootstrap and start navigation from `App.xaml`, `App.xaml.cs`, desktop `ServiceCollectionExtensions`, `Navigation`, `Auth`, `Services`, and `Api`.
+- Treat `.agent/machine-route.yaml` as the canonical navigation map for feature folders and key runtime entry points.
+- Enter `src/Faryma.Composer.Desktop` only for WinUI/UI/client-side tasks, desktop auth/session flow, desktop navigation/dialog/page behavior, desktop API client changes, or when shared `Contracts` changes explicitly affect the desktop app. Do not enter `src/Faryma.Composer.Desktop` or `use-cases/*` unless the user request explicitly involves those areas or the backend change cannot be completed safely without them.
+- When a task crosses backend and desktop boundaries, inspect the shared `Contracts` slice first, then open only the affected consumer applications.
 
 ## Source Of Truth
 
