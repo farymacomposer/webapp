@@ -4,67 +4,59 @@
 
 Help agents work safely and predictably in the `Faryma.Composer` backend solution.
 
-## Project Snapshot
+## Repository Shape
 
 - The repository is a `.NET 10` solution rooted at `Faryma.Composer.sln`.
 - The main server runtime lives in `src/Faryma.Composer.Api`.
-- The backend follows layered separation across `Api`, `Application`, `Infrastructure`, and `Contracts`.
-- Supporting projects include `Faryma.Composer.MigrationsBundle` for EF Core migrations and `Faryma.Composer.Desktop` for the WinUI client that shares contracts with the backend.
-- Business behavior is additionally described in `use-cases/*`, but code remains the final source of truth.
+- The backend is organized across `Api`, `Application`, `Infrastructure`, and `Contracts`.
+- Supporting projects include `Faryma.Composer.MigrationsBundle` and `Faryma.Composer.Desktop`.
+- Business behavior may be described in `use-cases/*`, but code remains the source of truth.
 
-## ASP.NET Navigation Notes
+## Guidance Precedence
 
-- Treat `src/Faryma.Composer.Api` as the ASP.NET Core app bootstrap and start navigation from `Program.cs`, API `DependencyInjection`, `appsettings*.json`, auth, filters, middleware/extensions, and hosted/background services.
-- Treat `.agent/machine-route.yaml` as the canonical navigation map for feature folders and key runtime entry points.
-- Enter neighboring layers only when the change crosses `Api`, `Application`, `Infrastructure`, or `Contracts` boundaries.
+- Code is primary. If guidance disagrees with code, follow code and update the stale guidance only when the task requires it.
+- This root file defines repository-wide expectations.
+- Nested `AGENTS.md` files provide local instructions for their directories and take precedence within that scope.
+- Treat `.agent/machine-route.yaml` as the canonical navigation map for feature paths and entry points, not as a substitute for reading code.
+
+## Navigation Summary
+
+- Start from the smallest relevant scope instead of pre-reading the entire repository.
+- For API work, begin with the local guidance under `src/Faryma.Composer.Api`.
+- For desktop work, begin with the local guidance under `src/Faryma.Composer.Desktop`.
 - When a task crosses backend and desktop boundaries, inspect the shared `Contracts` slice first, then open only the affected consumer applications.
-
-## Desktop Navigation Notes
-
-- Treat `src/Faryma.Composer.Desktop` as the desktop app bootstrap and start navigation from `App.xaml`, `App.xaml.cs`, desktop `ServiceCollectionExtensions`, `Navigation`, `Auth`, `Services`, and `Api`.
-- Treat `.agent/machine-route.yaml` as the canonical navigation map for feature folders and key runtime entry points.
-- Enter `src/Faryma.Composer.Desktop` only for WinUI/UI/client-side tasks, desktop auth/session flow, desktop navigation/dialog/page behavior, desktop API client changes, or when shared `Contracts` changes explicitly affect the desktop app. Do not enter `src/Faryma.Composer.Desktop` or `use-cases/*` unless the user request explicitly involves those areas or the backend change cannot be completed safely without them.
-- When a task crosses backend and desktop boundaries, inspect the shared `Contracts` slice first, then open only the affected consumer applications.
-
-## Source Of Truth
-
-Before any substantial task, agents should read:
-
-1. `AGENTS.md`
-2. `.agent/machine-route.yaml`
-
-If documents disagree with code, treat code as primary and update the stale document only when the task requires it.
+- Use `.agent/machine-route.yaml` to locate relevant features, neighboring layers, and key bootstrapping files.
 
 ## Working Agreement
 
-- Keep changes incremental and shippable.
+- Keep changes incremental, shippable, and limited to the requested outcome.
 - Default to the smallest change that fully satisfies the user's request.
-- Use `.agent/machine-route.yaml` as navigation context only; it may contain both directory-level routes and a small number of key entry files. Do not expand scope just because related areas exist.
-- Keep work inside the affected feature and layer boundaries unless the change truly requires crossing them.
-- Follow the existing project shape: feature-oriented folders in `Api` and `Application`, shared DTOs/contracts in `Contracts`, persistence concerns in `Infrastructure`.
-- Do not broaden a task into extra refactors, cleanup, documentation, route updates, or architecture changes unless the user asked for it or the change cannot be completed safely without it.
+- Stay inside the affected feature and layer boundaries unless the change truly requires crossing them.
+- Do not broaden a task into extra refactors, cleanup, route updates, or architecture changes unless the user asked for it or the change cannot be completed safely without it.
 - When multiple valid scopes exist, choose the smaller one first and ask before expanding.
-- Do not create, update, or delete tests without explicit user approval.
-- Do not create or update documentation or use-case documents without explicit user approval.
-- Preserve a runnable project at all times.
-- Ask before introducing major dependencies, persistence changes, or architecture pivots.
+- Follow the existing project shape: feature-oriented folders in `Api` and `Application`, shared DTOs and contracts in `Contracts`, and persistence concerns in `Infrastructure`.
+- Ask before introducing major dependencies, persistence changes, migration changes, or architecture pivots.
+- Do not create or update documentation or use-case documents unless the user explicitly asked for that work.
 - If you notice adjacent issues, mention them briefly after finishing instead of folding them into the same change.
 
 ## Agent Workflow
 
-1. Read the current route from `.agent/machine-route.yaml`.
-2. Confirm the user's requested scope and use the route as a lookup guide for relevant folders and entry points, not as a reason to broaden the task.
-3. Identify the smallest affected slice of the solution.
-4. Implement only that slice.
-5. Run the smallest meaningful verification first, then expand only if the risk justifies it.
-6. Update `AGENTS.md` or `.agent/machine-route.yaml` only when the repository guidance has actually changed.
+1. Confirm the user's requested scope.
+2. Open the nearest relevant guidance file and use `.agent/machine-route.yaml` to locate the smallest affected slice.
+3. Read the code required to complete the task safely.
+4. Implement only the affected slice.
+5. Run proportionate verification and perform an explicit validation pass before declaring the task done.
+6. Update guidance files only when repository guidance has actually changed.
 
 ## Verification
 
 - Prefer targeted verification over full-solution verification when a project- or feature-scoped check is sufficient.
-- Start with the affected project, then expand to neighboring projects if the change crosses boundaries.
-- For API startup, auth, persistence, or migration changes, use proportionally stronger verification because those areas have wider blast radius.
+- Start with the affected project or feature, then expand only if the change crosses boundaries or the risk justifies it.
+- Agents may add or update targeted tests in the affected slice when that is the smallest reliable way to verify the requested change.
+- Ask before adding large new test suites, broad test rewrites, or unrelated coverage expansion.
+- For API startup, auth, persistence, migration, or shared contract changes, use proportionally stronger verification.
+- Preserve a runnable repository state at all times.
 
 ## Definition Of Done
 
-A task is done when the requested change is complete, the relevant verification has been run, and the guidance files reflect the current repository shape when they were part of the requested scope.
+A task is done when the requested change is complete, the relevant verification has been run, the result has been explicitly validated, and the guidance files reflect the current repository shape when they were part of the requested scope.

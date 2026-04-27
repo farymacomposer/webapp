@@ -12,6 +12,7 @@ layers:
   api:
     path: src/Faryma.Composer.Api
     entry:
+      - src/Faryma.Composer.Api/AGENTS.md
       - src/Faryma.Composer.Api/Program.cs
       - src/Faryma.Composer.Api/appsettings.json
       - src/Faryma.Composer.Api/appsettings.Development.json
@@ -43,6 +44,7 @@ layers:
   desktop:
     path: src/Faryma.Composer.Desktop
     entry:
+      - src/Faryma.Composer.Desktop/AGENTS.md
       - src/Faryma.Composer.Desktop/App.xaml
       - src/Faryma.Composer.Desktop/App.xaml.cs
       - src/Faryma.Composer.Desktop/ServiceCollectionExtensions.cs
