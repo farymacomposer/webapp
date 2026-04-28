@@ -1,15 +1,12 @@
 import { OrderCategoriesList } from '@entities/Order';
 import { HStack, VStack } from '@shared/ui/Stack';
 import { Text } from '@shared/ui/Text';
-import { FC, memo, useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import cls from './SideQueueHeader.module.scss';
 
-interface ISideQueueHeaderProps {}
-
-export const SideQueueHeader: FC<ISideQueueHeaderProps> = memo(({}) => {
+export const SideQueueHeader = memo(() => {
   const onClick = useCallback(
     (id: string) => () => {
-      console.log(1);
       document?.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
     [],

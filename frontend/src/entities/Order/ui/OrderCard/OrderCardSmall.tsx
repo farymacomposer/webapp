@@ -2,7 +2,6 @@ import Message from '@shared/assets/icons/message.svg';
 import Spotify from '@shared/assets/icons/spotify.svg';
 import Youtube from '@shared/assets/icons/youtube.svg';
 import { classNames } from '@shared/lib/classNames/classNames.ts';
-import { useModal } from '@shared/lib/hooks/useModal';
 import { AppImage } from '@shared/ui/AppImage';
 import { Icon } from '@shared/ui/Icon';
 import { HStack, VStack } from '@shared/ui/Stack';
