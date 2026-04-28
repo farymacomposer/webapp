@@ -1,5 +1,5 @@
 import { HStack } from '@shared/ui/Stack';
-import { FC, memo } from 'react';
+import { type FC, memo } from 'react';
 import { orderCategories } from '../../model/consts/orderCategoriesConsts.ts';
 import { OrderCategory } from '../OrderCategory/OrderCategory';
 import cls from './OrderCategoriesList.module.scss';
