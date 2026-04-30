@@ -85,6 +85,7 @@ namespace Faryma.Composer.Api.Features.Auth
         public async Task<IActionResult> BrowserLogout()
         {
             await HttpContext.SignOutAsync(AppAuthenticationSchemes.BrowserCookieScheme);
+
             return NoContent();
         }
 

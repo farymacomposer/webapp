@@ -203,6 +203,7 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
 
             services
                 .AddSingleton<AppExceptionFilter>()
+                .AddScoped<IdempotentFilter>()
                 .AddControllers(options => options.Filters.AddService<AppExceptionFilter>())
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
