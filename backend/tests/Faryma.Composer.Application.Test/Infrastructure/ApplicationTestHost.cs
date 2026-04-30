@@ -61,21 +61,14 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         /// </summary>
         public static async Task<ApplicationTestHost> CreateAsync(PostgreSqlFixture fixture)
         {
-            string databaseName = await fixture.CreateDatabaseAsync();
+            string databaseName = await fixture.CreateDatabaseAsync("app_test");
             DateTime fixedNow = new(2030, 1, 10, 12, 0, 0, DateTimeKind.Utc);
             IHost? host = null;
 
             try
             {
                 HostApplicationBuilder builder = Host.CreateApplicationBuilder();
-                builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-                {
-                    ["POSTGRES:HOST"] = fixture.Host,
-                    ["POSTGRES:PORT"] = fixture.Port.ToString(),
-                    ["POSTGRES:DATABASE"] = databaseName,
-                    ["POSTGRES:USERNAME"] = fixture.Username,
-                    ["POSTGRES:PASSWORD"] = fixture.Password,
-                });
+                builder.Configuration.AddInMemoryCollection(PostgreSqlTestConfiguration.CreatePostgreSqlSettings(fixture, databaseName));
 
                 builder.Services.AddSingleton<IOrderQueueNotificationService, TestOrderQueueNotificationService>();
                 builder.Services.AddPersistence(builder.Configuration);

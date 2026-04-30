@@ -1,10 +1,9 @@
-﻿using Npgsql;
 using Testcontainers.PostgreSql;
 
-namespace Faryma.Composer.Api.Test.Infrastructure
+namespace Faryma.Composer.Testing.Infrastructure
 {
     /// <summary>
-    /// Поднимает временный PostgreSQL-контейнер для API integration tests.
+    /// Поднимает временный PostgreSQL-контейнер для интеграционных тестов.
     /// </summary>
     public sealed class PostgreSqlFixture : IAsyncLifetime
     {
@@ -26,16 +25,12 @@ namespace Faryma.Composer.Api.Test.Infrastructure
 
         public Task DisposeAsync() => _container.DisposeAsync().AsTask();
 
-        public async Task<string> CreateDatabaseAsync()
+        public async Task<string> CreateDatabaseAsync(string prefix)
         {
-            string databaseName = $"api_test_{Guid.NewGuid():N}";
+            ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
 
-            await using NpgsqlConnection connection = new(_container.GetConnectionString());
-            await connection.OpenAsync();
-
-            await using NpgsqlCommand command = connection.CreateCommand();
-            command.CommandText = $"""CREATE DATABASE "{databaseName}";""";
-            await command.ExecuteNonQueryAsync();
+            string databaseName = $"{prefix}_{Guid.NewGuid():N}";
+            await _container.ExecScriptAsync($"""CREATE DATABASE "{databaseName}";""");
 
             return databaseName;
         }

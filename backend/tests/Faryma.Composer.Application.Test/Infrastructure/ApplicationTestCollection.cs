@@ -12,9 +12,6 @@
     [Collection(nameof(ApplicationTestCollection))]
     public abstract class ApplicationTestBase(PostgreSqlFixture fixture)
     {
-        /// <summary>
-        /// Создает готовый тестовый host для конкретной проверки.
-        /// </summary>
         protected Task<ApplicationTestHost> CreateAppAsync() => ApplicationTestHost.CreateAsync(fixture);
     }
 }

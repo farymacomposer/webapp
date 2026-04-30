@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using Faryma.Composer.Api;
 using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -24,7 +23,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure
         public string DatabaseName { get; }
 
         private CustomWebApplicationFactory(
-                    IReadOnlyDictionary<string, string?> configuration,
+            IReadOnlyDictionary<string, string?> configuration,
             string databaseName,
             Action<IWebHostBuilder>? configureWebHost = null)
         {
@@ -35,7 +34,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure
 
         public static async Task<CustomWebApplicationFactory> CreateAsync(PostgreSqlFixture fixture)
         {
-            string databaseName = await fixture.CreateDatabaseAsync();
+            string databaseName = await fixture.CreateDatabaseAsync("api_test");
             IReadOnlyDictionary<string, string?> configuration = TestConfiguration.Create(fixture, databaseName);
 
             await EnsureDatabaseCreatedAsync(configuration);

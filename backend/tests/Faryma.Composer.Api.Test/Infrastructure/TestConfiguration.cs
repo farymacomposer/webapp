@@ -4,14 +4,8 @@
     {
         public static IReadOnlyDictionary<string, string?> Create(PostgreSqlFixture fixture, string databaseName)
         {
-            return new Dictionary<string, string?>
+            Dictionary<string, string?> configuration = new(PostgreSqlTestConfiguration.CreatePostgreSqlSettings(fixture, databaseName))
             {
-                ["POSTGRES:HOST"] = fixture.Host,
-                ["POSTGRES:PORT"] = fixture.Port.ToString(),
-                ["POSTGRES:DATABASE"] = databaseName,
-                ["POSTGRES:USERNAME"] = fixture.Username,
-                ["POSTGRES:PASSWORD"] = fixture.Password,
-
                 ["JWT:ISSUER"] = "https://tests.faryma.local",
                 ["JWT:AUDIENCE"] = "https://tests.faryma.local/api",
                 ["JWT:SECRET_KEY"] = "test-secret-key-with-enough-length-123456",
@@ -29,6 +23,8 @@
                 ["ADMIN_BOOTSTRAP:MODERATOR:USERNAME"] = "moderator_test_admin",
                 ["ADMIN_BOOTSTRAP:MODERATOR:PASSWORD"] = "ModeratorPass123!",
             };
+
+            return configuration;
         }
     }
 }
