@@ -6,14 +6,13 @@ using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
-using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
 namespace Faryma.Composer.Api
 {
-    public static class Program
+    public partial class Program
     {
-        public static async Task Main()
+        public static async Task Main(string[]? args = null)
         {
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             {
@@ -21,7 +20,7 @@ namespace Faryma.Composer.Api
                 Environment.Exit(1);
             };
 
-            WebApplicationBuilder builder = WebApplication.CreateBuilder();
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args ?? []);
 
             builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration));
 
@@ -31,8 +30,6 @@ namespace Faryma.Composer.Api
                 .AddJwtAuthentication(builder.Configuration)
                 .AddAuthorization()
                 .AddCoreServices();
-
-            builder.Services.AddSingleton<IAuthorizationHandler, DisableAuthorizationHandler>();
 
             builder.Services.AddPresentationLayer(builder.Environment);
 
@@ -57,19 +54,6 @@ namespace Faryma.Composer.Api
             await app.Services.GetRequiredService<AppSettingsService>().Initialize();
             await app.Services.GetRequiredService<OrderQueueService>().Initialize();
             await app.RunAsync();
-        }
-    }
-
-    internal sealed class DisableAuthorizationHandler : IAuthorizationHandler
-    {
-        public Task HandleAsync(AuthorizationHandlerContext context)
-        {
-            foreach (IAuthorizationRequirement requirement in context.Requirements)
-            {
-                context.Succeed(requirement);
-            }
-
-            return Task.CompletedTask;
         }
     }
 }

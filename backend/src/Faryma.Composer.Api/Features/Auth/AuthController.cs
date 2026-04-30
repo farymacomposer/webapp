@@ -2,14 +2,16 @@
 using Faryma.Composer.Api.Features.Auth.Services;
 using Faryma.Composer.Contracts.Api.Features.Auth.Login;
 using Faryma.Composer.Contracts.Api.Features.Auth.Logout;
+using Faryma.Composer.Contracts.Api.Features.Auth.Options;
 using Faryma.Composer.Contracts.Api.Features.Auth.RefreshToken;
-using Faryma.Composer.Contracts.Api.Features.Auth.TwitchLogin;
-using Faryma.Composer.Contracts.Api.Features.Auth.TwitchLoginState;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Api.Features.Auth
 {
@@ -21,8 +23,7 @@ namespace Faryma.Composer.Api.Features.Auth
     [Produces("application/json")]
     public sealed class AuthController(
         AuthTokenService authTokenService,
-        TwitchAuthService twitchAuthService,
-        TwitchAuthStateService twitchAuthStateService,
+        IOptions<TwitchOptions> twitchOptions,
         UserManager<UserEntity> userManager) : ControllerBase
     {
         /// <summary>
@@ -46,51 +47,29 @@ namespace Faryma.Composer.Api.Features.Auth
         }
 
         /// <summary>
-        /// Выдает state и nonce для Twitch OAuth
+        /// Инициирует вход пользователя через Twitch OIDC
         /// </summary>
-        [HttpGet(nameof(TwitchLoginState))]
+        [HttpGet("BrowserLogin")]
         [EnableRateLimiting("auth-login")]
-        public ActionResult<TwitchLoginStateResponse> TwitchLoginState()
+        public IActionResult BrowserLogin()
         {
-            (string state, string browserNonce) = twitchAuthStateService.IssueState();
-
-            Response.Cookies.Append(
-                TwitchAuthStateService.BrowserNonceCookieName,
-                browserNonce,
-                new CookieOptions
+            return Challenge(
+                new AuthenticationProperties
                 {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Lax,
-                    IsEssential = true,
-                    MaxAge = TwitchAuthStateService.StateLifetime,
-                    Path = "/api/Auth/TwitchLogin"
-                });
-
-            return Ok(new TwitchLoginStateResponse { State = state });
+                    RedirectUri = twitchOptions.Value.LoginSuccessRedirectUri
+                },
+                AppAuthenticationSchemes.TwitchOidcScheme);
         }
 
         /// <summary>
-        /// Выполняет вход пользователя через Twitch OAuth и возвращает JWT токен
+        /// Выполняет локальный выход браузерной сессии
         /// </summary>
-        [HttpPost(nameof(TwitchLogin))]
+        [HttpPost("BrowserLogout")]
         [EnableRateLimiting("auth-login")]
-        public async Task<ActionResult<TwitchLoginResponse>> TwitchLogin(TwitchLoginRequest request, CancellationToken ct)
+        public async Task<IActionResult> BrowserLogout()
         {
-            Request.Cookies.TryGetValue(TwitchAuthStateService.BrowserNonceCookieName, out string? browserNonce);
-            Response.Cookies.Delete(TwitchAuthStateService.BrowserNonceCookieName, new CookieOptions
-            {
-                Path = "/api/Auth/TwitchLogin"
-            });
-
-            (string accessToken, string refreshToken) = await twitchAuthService.Login(
-                request.Code,
-                request.CodeVerifier,
-                request.State,
-                browserNonce,
-                ct);
-
-            return Ok(new TwitchLoginResponse { AccessToken = accessToken, RefreshToken = refreshToken });
+            await HttpContext.SignOutAsync(AppAuthenticationSchemes.BrowserCookieScheme);
+            return NoContent();
         }
 
         /// <summary>
@@ -109,7 +88,7 @@ namespace Faryma.Composer.Api.Features.Auth
         /// Выполняет выход пользователя из системы
         /// </summary>
         [HttpPost(nameof(Logout))]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableRateLimiting("auth-login")]
         public async Task<IActionResult> Logout(LogoutRequest request)
         {
@@ -123,7 +102,7 @@ namespace Faryma.Composer.Api.Features.Auth
         /// Выполняет выход пользователя из всех сессий
         /// </summary>
         [HttpPost(nameof(LogoutAll))]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableRateLimiting("auth-login")]
         public async Task<IActionResult> LogoutAll()
         {

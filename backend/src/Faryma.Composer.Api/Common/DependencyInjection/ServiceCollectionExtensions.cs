@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Faryma.Composer.Api.Common.Filters;
@@ -12,8 +13,12 @@ using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
 using Faryma.Composer.Infrastructure.Options;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Saunter;
 using Saunter.AsyncApiSchema.v2;
@@ -22,6 +27,8 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
+        private const string _twitchPreferredUserNameClaimsParameter = """{"id_token":{"preferred_username":null}}""";
+
         public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services
@@ -62,16 +69,47 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
 
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
+            JwtOptions jwtOptions = configuration.GetRequiredSection("JWT").Get<JwtOptions>()!;
+            TwitchOptions twitchOptions = configuration.GetRequiredSection("TWITCH").Get<TwitchOptions>()!;
+            PathString twitchCallbackPath = new(new Uri(twitchOptions.RedirectUri, UriKind.Absolute).AbsolutePath);
+
             services
-                .AddHttpClient<TwitchAuthClient>()
-                .Services
                 .AddScoped<AuthTokenService>()
-                .AddScoped<TwitchAuthStateService>()
                 .AddScoped<TwitchAuthService>()
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+                .AddAuthentication(options =>
                 {
-                    JwtOptions jwtOptions = configuration.GetRequiredSection("JWT").Get<JwtOptions>()!;
+                    options.DefaultScheme = AppAuthenticationSchemes.DynamicScheme;
+                    options.DefaultAuthenticateScheme = AppAuthenticationSchemes.DynamicScheme;
+                    options.DefaultChallengeScheme = AppAuthenticationSchemes.DynamicScheme;
+                    options.DefaultSignInScheme = AppAuthenticationSchemes.BrowserCookieScheme;
+                    options.DefaultSignOutScheme = AppAuthenticationSchemes.BrowserCookieScheme;
+                })
+                .AddPolicyScheme(AppAuthenticationSchemes.DynamicScheme, "Selects cookie or bearer auth", options =>
+                {
+                    options.ForwardDefaultSelector = context =>
+                    {
+                        string authorization = context.Request.Headers.Authorization.ToString();
+                        return authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                            ? JwtBearerDefaults.AuthenticationScheme
+                            : AppAuthenticationSchemes.BrowserCookieScheme;
+                    };
+                })
+                .AddCookie(AppAuthenticationSchemes.BrowserCookieScheme, options =>
+                {
+                    options.Cookie.Name = "faryma_browser_auth";
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.Cookie.SameSite = SameSiteMode.Lax;
+                    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+                    options.SlidingExpiration = true;
+                    options.Events = new CookieAuthenticationEvents
+                    {
+                        OnRedirectToLogin = context => HandleApiCookieRedirect(context, StatusCodes.Status401Unauthorized),
+                        OnRedirectToAccessDenied = context => HandleApiCookieRedirect(context, StatusCodes.Status403Forbidden)
+                    };
+                })
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -81,6 +119,57 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                         ValidIssuer = jwtOptions.Issuer,
                         ValidAudience = jwtOptions.Audience,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+                    };
+                })
+                .AddOpenIdConnect(AppAuthenticationSchemes.TwitchOidcScheme, options =>
+                {
+                    options.SignInScheme = AppAuthenticationSchemes.BrowserCookieScheme;
+                    options.Authority = TwitchOptions.OidcAuthority;
+                    options.MetadataAddress = TwitchOptions.OidcMetadataAddress;
+                    options.RequireHttpsMetadata = true;
+                    options.ClientId = twitchOptions.ClientId;
+                    options.ClientSecret = twitchOptions.ClientSecret;
+                    options.CallbackPath = twitchCallbackPath;
+                    options.ResponseType = OpenIdConnectResponseType.Code;
+                    options.ResponseMode = OpenIdConnectResponseMode.Query;
+                    options.UsePkce = true;
+                    options.MapInboundClaims = false;
+                    options.SaveTokens = false;
+                    options.GetClaimsFromUserInfoEndpoint = false;
+                    options.Scope.Clear();
+                    options.Scope.Add("openid");
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        NameClaimType = "preferred_username",
+                        RoleClaimType = ClaimTypes.Role,
+                        ValidateIssuer = true,
+                        ValidIssuer = TwitchOptions.OidcAuthority,
+                    };
+                    options.Events = new OpenIdConnectEvents
+                    {
+                        OnRedirectToIdentityProvider = context =>
+                        {
+                            context.ProtocolMessage.RedirectUri = twitchOptions.RedirectUri;
+                            context.ProtocolMessage.SetParameter("claims", _twitchPreferredUserNameClaimsParameter);
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = async context =>
+                        {
+                            TwitchAuthService twitchAuthService = context.HttpContext.RequestServices.GetRequiredService<TwitchAuthService>();
+                            context.Principal = await twitchAuthService.CreateBrowserPrincipal(context.Principal!, context.HttpContext.RequestAborted);
+                        },
+                        OnRemoteFailure = context =>
+                        {
+                            context.HandleResponse();
+                            context.Response.Redirect(twitchOptions.LoginFailureRedirectUri);
+                            return Task.CompletedTask;
+                        },
+                        OnAuthenticationFailed = context =>
+                        {
+                            context.HandleResponse();
+                            context.Response.Redirect(twitchOptions.LoginFailureRedirectUri);
+                            return Task.CompletedTask;
+                        }
                     };
                 });
 
@@ -142,5 +231,19 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                 };
             });
         }
+
+        private static Task HandleApiCookieRedirect(RedirectContext<CookieAuthenticationOptions> context, int statusCode)
+        {
+            if (IsApiRequest(context.Request))
+            {
+                context.Response.StatusCode = statusCode;
+                return Task.CompletedTask;
+            }
+
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        }
+
+        private static bool IsApiRequest(HttpRequest request) => request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase);
     }
 }
