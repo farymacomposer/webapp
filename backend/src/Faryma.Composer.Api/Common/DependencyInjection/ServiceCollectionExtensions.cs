@@ -75,6 +75,7 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
 
             services
                 .AddScoped<AuthTokenService>()
+                .AddScoped<AdminAuthService>()
                 .AddScoped<TwitchAuthService>()
                 .AddAuthentication(options =>
                 {

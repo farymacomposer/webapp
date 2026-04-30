@@ -13,7 +13,7 @@ namespace Faryma.Composer.Desktop.Auth
         public Task<LoginResponse> Login(string userName, string password)
         {
             return Post<LoginRequest, LoginResponse>(
-                "/api/Auth/Login",
+                "/api/auth/sessions/desktop-admin",
                 new LoginRequest
                 {
                     UserName = userName,
@@ -25,7 +25,7 @@ namespace Faryma.Composer.Desktop.Auth
         public Task<RefreshTokenResponse> RefreshToken(string refreshToken, CancellationToken ct)
         {
             return Post<RefreshTokenRequest, RefreshTokenResponse>(
-                "/api/Auth/RefreshToken",
+                "/api/auth/tokens/refresh",
                 new RefreshTokenRequest
                 {
                     RefreshToken = refreshToken
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Desktop.Auth
 
         public async Task Logout(string refreshToken, string accessToken)
         {
-            using HttpRequestMessage request = new(HttpMethod.Post, "/api/Auth/Logout")
+            using HttpRequestMessage request = new(HttpMethod.Post, "/api/auth/tokens/revoke")
             {
                 Content = JsonContent.Create(new LogoutRequest
                 {

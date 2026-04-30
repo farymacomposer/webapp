@@ -7,7 +7,7 @@ namespace Faryma.Composer.Api.Test.Auth
 {
     public sealed class AdminAccessTests(PostgreSqlFixture fixture) : ApiTestBase(fixture)
     {
-        private const string _appSettingsRoute = "/api/AppSettings/GetAppSettings";
+        private const string _appSettingsRoute = "/api/app-settings";
 
         [Fact]
         public async Task Anonymous_request_gets_401_for_admin_only_endpoint()

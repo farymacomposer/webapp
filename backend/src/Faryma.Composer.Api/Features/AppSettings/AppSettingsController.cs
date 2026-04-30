@@ -11,21 +11,21 @@ namespace Faryma.Composer.Api.Features.AppSettings
     /// Управление настройками приложения
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/app-settings")]
     [Produces("application/json")]
     public sealed class AppSettingsController(AppSettingsService appSettingsService) : ControllerBase
     {
         /// <summary>
         /// Возвращает текущие настройки
         /// </summary>
-        [HttpGet(nameof(GetAppSettings))]
+        [HttpGet]
         [AuthorizeAdmins]
         public ActionResult<AppSettingsDto> GetAppSettings() => Ok(AppSettingsDto.Map(appSettingsService.Settings));
 
         /// <summary>
         /// Обновляет настройки
         /// </summary>
-        [HttpPost(nameof(UpdateAppSettings))]
+        [HttpPost("update")]
         [AuthorizeAdmins]
         public async Task<ActionResult<AppSettingsDto>> UpdateAppSettings(AppSettingsDto dto, CancellationToken ct)
         {
