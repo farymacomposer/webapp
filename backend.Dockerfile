@@ -7,13 +7,13 @@ WORKDIR "/src/src/Faryma.Composer.Api"
 
 # Publish stage
 FROM build AS publish
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+RUN --mount=type=cache,id=nuget-publish,target=/root/.nuget/packages \
     dotnet publish "Faryma.Composer.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Migration bundle stage
 FROM build AS migrations
 WORKDIR "/src/src/Faryma.Composer.MigrationsBundle"
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+RUN --mount=type=cache,id=nuget-migrations,target=/root/.nuget/packages \
     dotnet restore "Faryma.Composer.MigrationsBundle.csproj" && \
     dotnet new tool-manifest && \
     dotnet tool install dotnet-ef -v d --version 10.0.* && \
