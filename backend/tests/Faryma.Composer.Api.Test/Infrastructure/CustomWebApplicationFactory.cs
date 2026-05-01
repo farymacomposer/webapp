@@ -1,12 +1,10 @@
-﻿using System.Globalization;
-using Faryma.Composer.Infrastructure;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Npgsql;
 
 namespace Faryma.Composer.Api.Test.Infrastructure
 {
@@ -104,21 +102,10 @@ namespace Faryma.Composer.Api.Test.Infrastructure
 
         private static async Task EnsureDatabaseCreatedAsync(IReadOnlyDictionary<string, string?> configuration)
         {
-            NpgsqlConnectionStringBuilder connectionStringBuilder = new()
-            {
-                Host = configuration["POSTGRES:HOST"],
-                Port = int.Parse(configuration["POSTGRES:PORT"]!, CultureInfo.InvariantCulture),
-                Database = configuration["POSTGRES:DATABASE"],
-                Username = configuration["POSTGRES:USERNAME"],
-                Password = configuration["POSTGRES:PASSWORD"],
-            };
+            ConfigurationManager configurationManager = new();
+            configurationManager.AddInMemoryCollection(configuration);
 
-            DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseNpgsql(connectionStringBuilder.ConnectionString, npgsql => npgsql.MapEnum())
-                .Options;
-
-            await using AppDbContext context = new(options);
-            await context.Database.EnsureCreatedAsync();
+            await PostgreSqlSchemaInitializer.EnsureCreatedAsync(configurationManager);
         }
 
         private static void RestoreEnvironmentVariables(IReadOnlyDictionary<string, string?> previousValues)

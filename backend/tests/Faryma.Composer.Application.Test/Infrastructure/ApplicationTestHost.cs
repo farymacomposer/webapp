@@ -83,7 +83,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
 
                 host = builder.Build();
 
-                await EnsureDatabaseCreatedAsync(host);
+                await PostgreSqlSchemaInitializer.EnsureCreatedAsync(builder.Configuration);
                 await host.StartAsync();
                 await host.Services.GetRequiredService<AppSettingsService>().Initialize();
                 await host.Services.GetRequiredService<OrderQueueService>().Initialize();
@@ -183,14 +183,6 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         {
             await _host.StopAsync();
             _host.Dispose();
-        }
-
-        private static async Task EnsureDatabaseCreatedAsync(IHost host)
-        {
-            await using AsyncServiceScope scope = host.Services.CreateAsyncScope();
-            IDbContextFactory<AppDbContext> factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
-            await using AppDbContext context = await factory.CreateDbContextAsync();
-            await context.Database.EnsureCreatedAsync();
         }
     }
 }
