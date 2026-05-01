@@ -4,7 +4,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
 {
     public sealed class StartStreamSpecificationTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
-        [Fact(Skip = "Use case requires rejecting stream start on a non-current date, but ComposerStreamService still has a TODO for this rule.")]
+        [Fact(Skip = "Сценарий требует отклонять старт стрима не за текущую дату, но в ComposerStreamService для этого правила пока TODO.")]
         public Task Start_ShouldRejectPlannedStream_WhenEventDateDoesNotMatchToday() => Task.CompletedTask;
     }
 }

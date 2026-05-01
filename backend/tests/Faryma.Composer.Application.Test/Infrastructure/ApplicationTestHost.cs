@@ -136,7 +136,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
 
             return await uow.ReviewOrderStore.FindById(orderId)
-                ?? throw new InvalidOperationException($"Order {orderId} not found.");
+                ?? throw new InvalidOperationException($"Заказ {orderId} не найден");
         });
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
 
             return await uow.ComposerStreamStore.FindById(streamId)
-                ?? throw new InvalidOperationException($"Stream {streamId} not found.");
+                ?? throw new InvalidOperationException($"Стрим {streamId} не найден");
         });
 
         /// <summary>

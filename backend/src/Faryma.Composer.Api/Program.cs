@@ -1,10 +1,8 @@
 ﻿using Faryma.Composer.Api.Common.DependencyInjection;
 using Faryma.Composer.Api.Common.Extensions;
-using Faryma.Composer.Api.Features.Auth.Services;
+using Faryma.Composer.Api.Common.Startup;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
-using Faryma.Composer.Application.Features.AppSettings;
-using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Serilog;
 
@@ -53,13 +51,7 @@ namespace Faryma.Composer.Api
             app.MapControllers();
             app.MapHub<OrderQueueNotificationHub>(IOrderQueueNotificationServer.RoutePattern);
 
-            await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
-            {
-                await scope.ServiceProvider.GetRequiredService<AdminBootstrapService>().Initialize();
-            }
-
-            await app.Services.GetRequiredService<AppSettingsService>().Initialize();
-            await app.Services.GetRequiredService<OrderQueueService>().Initialize();
+            await app.Services.GetRequiredService<IApplicationStartupInitializer>().Initialize(app.Services);
             await app.RunAsync();
         }
     }

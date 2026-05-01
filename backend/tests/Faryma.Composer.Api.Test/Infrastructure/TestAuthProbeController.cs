@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Api.Features.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Faryma.Composer.Api.Test.Infrastructure
 {
@@ -26,6 +27,13 @@ namespace Faryma.Composer.Api.Test.Infrastructure
             {
                 User.Identity?.Name,
             });
+        }
+
+        [HttpPost("rate-limited-login")]
+        [EnableRateLimiting("auth-login")]
+        public IActionResult RateLimitedLogin()
+        {
+            return Unauthorized();
         }
     }
 }

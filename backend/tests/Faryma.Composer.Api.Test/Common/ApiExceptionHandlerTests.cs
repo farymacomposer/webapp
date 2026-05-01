@@ -5,12 +5,12 @@ using Faryma.Composer.Contracts.Exceptions;
 
 namespace Faryma.Composer.Api.Test.Common
 {
-    public sealed class ApiExceptionHandlerTests(PostgreSqlFixture fixture) : TestBase(fixture)
+    public sealed class ApiExceptionHandlerTests : TestBase
     {
         [Fact]
         public async Task AppException_IsMappedToLegacyApiErrorPayload()
         {
-            await using CustomWebApplicationFactory app = await CreateAppAsync();
+            await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
             using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/app");
@@ -24,7 +24,7 @@ namespace Faryma.Composer.Api.Test.Common
         [Fact]
         public async Task AuthenticationException_IsMappedToUnauthorizedPayload()
         {
-            await using CustomWebApplicationFactory app = await CreateAppAsync();
+            await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
             using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/authentication");
@@ -37,7 +37,7 @@ namespace Faryma.Composer.Api.Test.Common
         [Fact]
         public async Task UnhandledException_IsMappedToProblemDetails()
         {
-            await using CustomWebApplicationFactory app = await CreateAppAsync();
+            await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
             using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/unhandled");

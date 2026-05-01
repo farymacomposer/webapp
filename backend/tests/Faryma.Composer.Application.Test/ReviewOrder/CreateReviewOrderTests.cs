@@ -28,7 +28,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     Nickname = "Nick-Donation",
                     TrackUrl = "https://example.com/track",
                     TrackDurationSeconds = 60,
-                    UserComment = "comment",
+                    UserComment = "комментарий",
                     PaymentAmount = 1_200,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
@@ -371,7 +371,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         UserComment = null,
                         CreatedByUserId = user.Id,
                     })),
-                _ => throw new InvalidOperationException($"Unsupported kind: {kind}")
+                _ => throw new InvalidOperationException($"Неподдерживаемый тип: {kind}")
             };
 
             await Assert.ThrowsAsync<ReviewOrderException>(() => action);

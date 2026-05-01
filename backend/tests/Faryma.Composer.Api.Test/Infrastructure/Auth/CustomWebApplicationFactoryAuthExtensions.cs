@@ -1,10 +1,14 @@
-﻿using System.Net.Http.Headers;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
 using Faryma.Composer.Api.Features.Auth.Services;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Faryma.Composer.Api.Test.Infrastructure.Auth
 {
@@ -30,17 +34,28 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
         {
             seed ??= new AuthTestSeedOptions().Admin;
 
+            if (!app.UsesDatabase)
+            {
+                HttpClient noDatabaseClient = app.CreateAnonymousClient();
+                noDatabaseClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                    "Bearer",
+                    CreateAccessToken(seed));
+
+                return noDatabaseClient;
+            }
+
             SeededAuthUser admin = await app.EnsureUserAsync(seed, ct);
             if (string.IsNullOrWhiteSpace(admin.Password))
             {
-                throw new InvalidOperationException("Admin bearer helper requires a seeded password.");
+                throw new InvalidOperationException("Для вспомогательного метода создания bearer-клиента администратора требуется тестовый пароль");
             }
 
             await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
             AuthTokenService authTokenService = scope.ServiceProvider.GetRequiredService<AuthTokenService>();
             UserManager<UserEntity> userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
             UserEntity user = await userManager.FindByIdAsync(admin.UserId.ToString())
-                ?? throw new InvalidOperationException($"Failed to load seeded admin user '{admin.UserName}'.");
+                ?? throw new InvalidOperationException($"Не удалось загрузить тестового администратора '{admin.UserName}'");
+
             (string accessToken, _) = await authTokenService.IssueForUser(user, ct);
 
             HttpClient client = app.CreateAnonymousClient();
@@ -69,14 +84,15 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
                             authenticationOptions.DefaultAuthenticateScheme = BrowserUserTestAuthHandler.SchemeName;
                             authenticationOptions.DefaultChallengeScheme = BrowserUserTestAuthHandler.SchemeName;
                         })
-                        .AddScheme<AuthenticationSchemeOptions, BrowserUserTestAuthHandler>(
-                            BrowserUserTestAuthHandler.SchemeName,
-                            _ => { });
+                        .AddScheme<AuthenticationSchemeOptions, BrowserUserTestAuthHandler>(BrowserUserTestAuthHandler.SchemeName, _ => { });
                 });
             });
 
             HttpClient client = browserApp.CreateAnonymousClient();
-            SeededAuthUser seededUser = await browserApp.EnsureUserAsync(seed, ct);
+            SeededAuthUser seededUser = browserApp.UsesDatabase
+                ? await browserApp.EnsureUserAsync(seed, ct)
+                : CreateSeededUser(seed);
+
             stateHolder.State = new BrowserUserAuthenticationState(
                 seededUser.UserId,
                 seededUser.UserName,
@@ -85,6 +101,39 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
                 seededUser.Roles);
 
             return client;
+        }
+
+        private static string CreateAccessToken(TestAuthUserSeed seed)
+        {
+            List<Claim> claims =
+            [
+                new(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                new(ClaimTypes.Name, seed.TwitchLogin ?? seed.UserName),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            ];
+
+            claims.AddRange(seed.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+            SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(TestConfiguration.JwtSecretKey));
+            JwtSecurityToken token = new(
+                issuer: TestConfiguration.JwtIssuer,
+                audience: TestConfiguration.JwtAudience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(60),
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private static SeededAuthUser CreateSeededUser(TestAuthUserSeed seed)
+        {
+            return new SeededAuthUser(
+                Guid.NewGuid(),
+                seed.UserName,
+                seed.Password,
+                seed.TwitchUserId,
+                seed.TwitchLogin,
+                seed.Roles);
         }
 
         private static async Task<SeededAuthUser> EnsureUserAsync(
@@ -114,7 +163,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
                     CreatedAt = DateTime.UtcNow,
                 };
 
-                await EnsureSuccess(await userManager.CreateAsync(user), $"Failed to create test user '{seed.UserName}'.");
+                await EnsureSuccess(await userManager.CreateAsync(user), $"Не удалось создать тестового пользователя '{seed.UserName}'");
             }
             else
             {
@@ -141,7 +190,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
 
                 if (changed)
                 {
-                    await EnsureSuccess(await userManager.UpdateAsync(user), $"Failed to update test user '{seed.UserName}'.");
+                    await EnsureSuccess(await userManager.UpdateAsync(user), $"Не удалось обновить тестового пользователя '{seed.UserName}'");
                 }
             }
 
@@ -169,14 +218,14 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
                 string resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
                 await EnsureSuccess(
                     await userManager.ResetPasswordAsync(user, resetToken, password),
-                    $"Failed to reset password for test user '{user.UserName}'.");
+                    $"Не удалось сбросить пароль тестового пользователя '{user.UserName}'");
 
                 return;
             }
 
             await EnsureSuccess(
                 await userManager.AddPasswordAsync(user, password),
-                $"Failed to set password for test user '{user.UserName}'.");
+                $"Не удалось установить пароль тестового пользователя '{user.UserName}'");
         }
 
         private static async Task<IReadOnlyCollection<string>> SyncRolesAsync(
@@ -205,7 +254,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
 
                 await EnsureSuccess(
                     await roleManager.CreateAsync(identityRole),
-                    $"Failed to create role '{role}' for test user '{user.UserName}'.");
+                    $"Не удалось создать роль '{role}' для тестового пользователя '{user.UserName}'");
             }
 
             IList<string> currentRoles = await userManager.GetRolesAsync(user);
@@ -214,7 +263,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
             {
                 await EnsureSuccess(
                     await userManager.RemoveFromRolesAsync(user, rolesToRemove),
-                    $"Failed to remove roles from test user '{user.UserName}'.");
+                    $"Не удалось удалить роли у тестового пользователя '{user.UserName}'");
             }
 
             string[] rolesToAdd = desiredRoles.Except(currentRoles, StringComparer.Ordinal).ToArray();
@@ -222,7 +271,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
             {
                 await EnsureSuccess(
                     await userManager.AddToRolesAsync(user, rolesToAdd),
-                    $"Failed to assign roles to test user '{user.UserName}'.");
+                    $"Не удалось назначить роли тестовому пользователю '{user.UserName}'");
             }
 
             return desiredRoles;

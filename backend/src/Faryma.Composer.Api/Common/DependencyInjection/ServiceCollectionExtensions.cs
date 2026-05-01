@@ -6,6 +6,7 @@ using System.Threading.RateLimiting;
 using Faryma.Composer.Api.Common.Errors;
 using Faryma.Composer.Api.Common.Filters;
 using Faryma.Composer.Api.Common.Options;
+using Faryma.Composer.Api.Common.Startup;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Api.Features.Auth.Services;
 using Faryma.Composer.Api.Features.OrderQueue;
@@ -224,6 +225,7 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
         public static IServiceCollection AddPresentationLayer(this IServiceCollection services, IWebHostEnvironment environment)
         {
             services
+                .AddSingleton<IApplicationStartupInitializer, ApplicationStartupInitializer>()
                 .AddExceptionHandler<ApiExceptionHandler>()
                 .AddProblemDetails()
                 .AddMemoryCache()

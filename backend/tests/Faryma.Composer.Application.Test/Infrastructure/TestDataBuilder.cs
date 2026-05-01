@@ -32,7 +32,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             IdentityResult result = await userManager.CreateAsync(user);
             Assert.True(
                 result.Succeeded,
-                $"Failed to create test user: {string.Join(", ", result.Errors.Select(x => x.Description))}");
+                $"Не удалось создать тестового пользователя: {string.Join(", ", result.Errors.Select(x => x.Description))}");
 
             return user;
         });
@@ -109,7 +109,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                     initialPayableAmount,
                     initialTrackUrl,
                     trackDurationSeconds,
-                    userComment: "test-comment",
+                    userComment: "тестовый комментарий",
                     type,
                     creationStream,
                     userNickname,
@@ -191,7 +191,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             IdentityResult result = await userManager.CreateAsync(user);
             Assert.True(
                 result.Succeeded,
-                $"Failed to create test user: {string.Join(", ", result.Errors.Select(x => x.Description))}");
+                $"Не удалось создать тестового пользователя: {string.Join(", ", result.Errors.Select(x => x.Description))}");
 
             return user;
         }
@@ -204,7 +204,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             if (creationStreamId is long existingStreamId)
             {
                 return await uow.ComposerStreamStore.FindById(existingStreamId)
-                    ?? throw new InvalidOperationException($"Creation stream {existingStreamId} not found.");
+                    ?? throw new InvalidOperationException($"Стрим создания {existingStreamId} не найден");
             }
 
             ComposerStreamEntity stream = uow.ComposerStreamStore.Create(GetNextStreamDate(), ComposerStreamType.Donation, createdByUser);
@@ -222,7 +222,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             if (processingStreamId is long existingStreamId)
             {
                 return await uow.ComposerStreamStore.FindById(existingStreamId)
-                    ?? throw new InvalidOperationException($"Processing stream {existingStreamId} not found.");
+                    ?? throw new InvalidOperationException($"Стрим обработки {existingStreamId} не найден");
             }
 
             if (status is not (ReviewOrderStatus.InProgress or ReviewOrderStatus.Completed))

@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Faryma.Composer.Api.Test.Smoke
 {
-    public sealed class ApiSmokeTests(PostgreSqlFixture fixture) : TestBase(fixture)
+    public sealed class ApiSmokeTests : TestBase
     {
         [Fact]
         public async Task Host_starts_and_openapi_endpoint_is_available()
         {
-            await using CustomWebApplicationFactory app = await CreateAppAsync();
+            await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateClient(new WebApplicationFactoryClientOptions
             {
                 BaseAddress = new Uri("http://localhost"),

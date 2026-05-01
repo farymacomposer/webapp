@@ -4,8 +4,13 @@
     public sealed class CollectionFixture : ICollectionFixture<PostgreSqlFixture>;
 
     [Collection(nameof(CollectionFixture))]
-    public abstract class TestBase(PostgreSqlFixture fixture)
+    public abstract class DatabaseTestBase(PostgreSqlFixture fixture)
     {
         protected Task<CustomWebApplicationFactory> CreateAppAsync() => CustomWebApplicationFactory.CreateAsync(fixture);
+    }
+
+    public abstract class TestBase
+    {
+        protected CustomWebApplicationFactory CreateApp() => CustomWebApplicationFactory.Create();
     }
 }

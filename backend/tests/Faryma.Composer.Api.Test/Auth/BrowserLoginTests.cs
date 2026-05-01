@@ -9,12 +9,12 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace Faryma.Composer.Api.Test.Auth
 {
-    public sealed class BrowserLoginTests(PostgreSqlFixture fixture) : TestBase(fixture)
+    public sealed class BrowserLoginTests : TestBase
     {
         [Fact]
         public async Task Browser_login_challenges_twitch_oidc_authorize_endpoint()
         {
-            await using CustomWebApplicationFactory app = await CreateAppAsync();
+            await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = CreateBrowserLoginClient(app);
 
             using HttpResponseMessage response = await client.GetAsync("/api/auth/oauth/twitch");

@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using System.Net.Http.Json;
 using Faryma.Composer.Api.Test.Infrastructure;
-using Faryma.Composer.Contracts.Api.Features.Auth.Login;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -10,15 +8,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Faryma.Composer.Api.Test.Auth
 {
-    public sealed class AuthRateLimitForwardedHeadersTests(PostgreSqlFixture fixture) : TestBase(fixture)
+    public sealed class AuthRateLimitForwardedHeadersTests : TestBase
     {
         private const int _loginPermitLimit = 10;
-        private const string _jwtLoginRoute = "/api/auth/sessions/desktop-admin";
+        private const string _loginRateLimitedRoute = "/api/_test/auth/rate-limited-login";
 
         [Fact]
         public async Task Trusted_forwarded_for_partitions_auth_login_rate_limit_by_client_ip()
         {
-            await using CustomWebApplicationFactory app = await CreateAppAsync();
+            await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = CreateForwardedHeadersClient(
                 app,
                 IPAddress.Parse("192.0.2.10"),
@@ -44,7 +42,7 @@ namespace Faryma.Composer.Api.Test.Auth
         [Fact]
         public async Task Untrusted_forwarded_for_does_not_partition_auth_login_rate_limit()
         {
-            await using CustomWebApplicationFactory app = await CreateAppAsync();
+            await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = CreateForwardedHeadersClient(
                 app,
                 IPAddress.Parse("192.0.2.10"),
@@ -83,14 +81,9 @@ namespace Faryma.Composer.Api.Test.Auth
 
         private static async Task<HttpResponseMessage> PostInvalidLogin(HttpClient client, string forwardedFor)
         {
-            using HttpRequestMessage request = new(HttpMethod.Post, _jwtLoginRoute);
+            using HttpRequestMessage request = new(HttpMethod.Post, _loginRateLimitedRoute);
             request.Headers.Add("X-Forwarded-For", forwardedFor);
             request.Headers.Add("X-Forwarded-Proto", "https");
-            request.Content = JsonContent.Create(new LoginRequest
-            {
-                UserName = "missing_admin",
-                Password = "WrongPassword123!",
-            });
 
             return await client.SendAsync(request);
         }

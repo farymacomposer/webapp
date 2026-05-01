@@ -7,7 +7,7 @@ using Faryma.Composer.Contracts.Infrastructure;
 
 namespace Faryma.Composer.Api.Test.Auth
 {
-    public sealed class BrowserAdminLoginTests(PostgreSqlFixture fixture) : TestBase(fixture)
+    public sealed class BrowserAdminLoginTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
     {
         private const string _adminRoute = "/api/app-settings";
         private const string _browserAdminLoginRoute = "/api/auth/sessions/browser-admin";
@@ -86,7 +86,7 @@ namespace Faryma.Composer.Api.Test.Auth
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             LoginResponse login = await response.Content.ReadFromJsonAsync<LoginResponse>()
-                ?? throw new InvalidOperationException("Login response was empty.");
+                ?? throw new InvalidOperationException("Ответ входа оказался пустым");
             Assert.False(string.IsNullOrWhiteSpace(login.AccessToken));
             Assert.False(string.IsNullOrWhiteSpace(login.RefreshToken));
         }
@@ -113,7 +113,7 @@ namespace Faryma.Composer.Api.Test.Auth
                 new LoginRequest
                 {
                     UserName = user.UserName,
-                    Password = user.Password ?? throw new InvalidOperationException("Seeded user has no password."),
+                    Password = user.Password ?? throw new InvalidOperationException("У тестового пользователя нет пароля"),
                 });
         }
 

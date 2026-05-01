@@ -18,7 +18,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             BrowserUserAuthenticationState state = stateHolder.State
-                ?? throw new InvalidOperationException("Browser user auth state was not initialized.");
+                ?? throw new InvalidOperationException("Состояние аутентификации браузерного пользователя не инициализировано");
 
             List<Claim> claims =
             [

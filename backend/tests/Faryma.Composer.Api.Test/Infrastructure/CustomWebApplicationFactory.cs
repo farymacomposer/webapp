@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Faryma.Composer.Api.Common.Startup;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
@@ -19,25 +21,36 @@ namespace Faryma.Composer.Api.Test.Infrastructure
         private bool _ownedFactoriesDisposed;
 
         public string DatabaseName { get; }
+        public bool UsesDatabase { get; }
 
         private CustomWebApplicationFactory(
             IReadOnlyDictionary<string, string?> configuration,
             string databaseName,
+            bool usesDatabase,
             Action<IWebHostBuilder>? configureWebHost = null)
         {
             _configuration = configuration;
             DatabaseName = databaseName;
+            UsesDatabase = usesDatabase;
             _configureWebHost = configureWebHost;
+        }
+
+        public static CustomWebApplicationFactory Create()
+        {
+            return new CustomWebApplicationFactory(
+                TestConfiguration.CreateNoDatabase(),
+                databaseName: "none",
+                usesDatabase: false);
         }
 
         public static async Task<CustomWebApplicationFactory> CreateAsync(PostgreSqlFixture fixture)
         {
             string databaseName = await fixture.CreateDatabaseAsync("api_test");
-            IReadOnlyDictionary<string, string?> configuration = TestConfiguration.Create(fixture, databaseName);
+            IReadOnlyDictionary<string, string?> configuration = TestConfiguration.CreatePostgreSql(fixture, databaseName);
 
             await EnsureDatabaseCreatedAsync(configuration);
 
-            return new CustomWebApplicationFactory(configuration, databaseName);
+            return new CustomWebApplicationFactory(configuration, databaseName, usesDatabase: true);
         }
 
         public HttpClient CreateAnonymousClient() => CreateClient(new WebApplicationFactoryClientOptions
@@ -56,7 +69,11 @@ namespace Faryma.Composer.Api.Test.Infrastructure
         {
             ObjectDisposedException.ThrowIf(_ownedFactoriesDisposed, this);
 
-            CustomWebApplicationFactory child = new(_configuration, DatabaseName, CombineConfigureActions(_configureWebHost, configureWebHost));
+            CustomWebApplicationFactory child = new(
+                _configuration,
+                DatabaseName,
+                UsesDatabase,
+                CombineConfigureActions(_configureWebHost, configureWebHost));
             _ownedFactories.Add(child);
 
             return child;
@@ -71,6 +88,13 @@ namespace Faryma.Composer.Api.Test.Infrastructure
                 // Фоновый worker не нужен для smoke tests и добавляет лишнюю недетерминированность startup.
                 services.RemoveAll<IHostedService>();
                 services.AddControllers().AddApplicationPart(typeof(TestAuthProbeController).Assembly);
+
+                if (!UsesDatabase)
+                {
+                    services.RemoveAll<IApplicationStartupInitializer>();
+                    services.AddSingleton<IApplicationStartupInitializer, NoDatabaseStartupInitializer>();
+                    services.AddDataProtection().UseEphemeralDataProtectionProvider();
+                }
             });
 
             _configureWebHost?.Invoke(builder);
@@ -100,6 +124,11 @@ namespace Faryma.Composer.Api.Test.Infrastructure
             configurationManager.AddInMemoryCollection(configuration);
 
             await PostgreSqlSchemaInitializer.EnsureCreatedAsync(configurationManager);
+        }
+
+        private sealed class NoDatabaseStartupInitializer : IApplicationStartupInitializer
+        {
+            public Task Initialize(IServiceProvider services) => Task.CompletedTask;
         }
 
         private static Action<IWebHostBuilder> CombineConfigureActions(
