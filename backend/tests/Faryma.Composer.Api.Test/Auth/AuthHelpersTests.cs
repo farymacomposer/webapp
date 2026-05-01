@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
+using Faryma.Composer.Contracts.Infrastructure;
 
 namespace Faryma.Composer.Api.Test.Auth
 {
@@ -54,15 +55,12 @@ namespace Faryma.Composer.Api.Test.Auth
         public async Task Browser_user_client_with_admin_role_can_access_admin_endpoint()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync(new BrowserUserClientOptions
+            using HttpClient client = await app.CreateBrowserUserClientAsync(new TestAuthUserSeed
             {
-                User = new TestAuthUserSeed
-                {
-                    UserName = "browser_admin_user",
-                    TwitchUserId = "browser-admin-user-id",
-                    TwitchLogin = "browser_admin_user",
-                    Roles = [TestAuthRoles.Admin],
-                },
+                UserName = "browser_admin_user",
+                TwitchUserId = "browser-admin-user-id",
+                TwitchLogin = "browser_admin_user",
+                Roles = [AppRoles.Composer],
             });
 
             using HttpResponseMessage response = await client.GetAsync("/api/_test/auth/admin");

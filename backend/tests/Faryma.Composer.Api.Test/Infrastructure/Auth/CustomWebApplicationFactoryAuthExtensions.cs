@@ -25,12 +25,12 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
 
         public static async Task<HttpClient> CreateAdminBearerClientAsync(
             this CustomWebApplicationFactory app,
-            AdminBearerClientOptions? options = null,
+            TestAuthUserSeed? seed = null,
             CancellationToken ct = default)
         {
-            options ??= new AdminBearerClientOptions();
+            seed ??= new AuthTestSeedOptions().Admin;
 
-            SeededAuthUser admin = await app.EnsureUserAsync(options.User, ct);
+            SeededAuthUser admin = await app.EnsureUserAsync(seed, ct);
             if (string.IsNullOrWhiteSpace(admin.Password))
             {
                 throw new InvalidOperationException("Admin bearer helper requires a seeded password.");
@@ -50,10 +50,10 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
 
         public static async Task<HttpClient> CreateBrowserUserClientAsync(
             this CustomWebApplicationFactory app,
-            BrowserUserClientOptions? options = null,
+            TestAuthUserSeed? seed = null,
             CancellationToken ct = default)
         {
-            options ??= new BrowserUserClientOptions();
+            seed ??= new AuthTestSeedOptions().Browser;
 
             BrowserUserAuthenticationStateHolder stateHolder = new();
 
@@ -76,13 +76,13 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
             });
 
             HttpClient client = browserApp.CreateAnonymousClient();
-            SeededAuthUser user = await browserApp.EnsureUserAsync(options.User, ct);
+            SeededAuthUser seededUser = await browserApp.EnsureUserAsync(seed, ct);
             stateHolder.State = new BrowserUserAuthenticationState(
-                user.UserId,
-                user.UserName,
-                user.TwitchUserId,
-                user.TwitchLogin,
-                user.Roles);
+                seededUser.UserId,
+                seededUser.UserName,
+                seededUser.TwitchUserId,
+                seededUser.TwitchLogin,
+                seededUser.Roles);
 
             return client;
         }

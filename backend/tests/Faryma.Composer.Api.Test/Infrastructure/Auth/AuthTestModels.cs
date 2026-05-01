@@ -1,10 +1,7 @@
-﻿namespace Faryma.Composer.Api.Test.Infrastructure.Auth
-{
-    public static class TestAuthRoles
-    {
-        public const string Admin = "TestAuthAdmin";
-    }
+﻿using Faryma.Composer.Contracts.Infrastructure;
 
+namespace Faryma.Composer.Api.Test.Infrastructure.Auth
+{
     public sealed record TestAuthUserSeed
     {
         public required string UserName { get; init; }
@@ -28,7 +25,7 @@
         {
             UserName = "test_composer_admin",
             Password = "TestComposerPass123!",
-            Roles = [TestAuthRoles.Admin],
+            Roles = [AppRoles.Composer],
         };
 
         public TestAuthUserSeed Browser { get; init; } = new()
@@ -40,24 +37,4 @@
     }
 
     public sealed record SeededAuthUsers(SeededAuthUser Admin, SeededAuthUser Browser);
-
-    public sealed record AdminBearerClientOptions
-    {
-        public TestAuthUserSeed User { get; init; } = new()
-        {
-            UserName = "test_composer_admin",
-            Password = "TestComposerPass123!",
-            Roles = [TestAuthRoles.Admin],
-        };
-    }
-
-    public sealed record BrowserUserClientOptions
-    {
-        public TestAuthUserSeed User { get; init; } = new()
-        {
-            UserName = "test_browser_user",
-            TwitchUserId = "test-browser-user-id",
-            TwitchLogin = "test_browser_user",
-        };
-    }
 }

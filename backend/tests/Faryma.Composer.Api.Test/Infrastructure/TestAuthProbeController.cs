@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Api.Test.Infrastructure.Auth;
+﻿using Faryma.Composer.Api.Features.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +19,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure
         }
 
         [HttpGet("admin")]
-        [Authorize(Roles = TestAuthRoles.Admin)]
+        [AuthorizeAdmins]
         public ActionResult<object> Admin()
         {
             return Ok(new
