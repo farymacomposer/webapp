@@ -11,7 +11,7 @@ namespace Faryma.Composer.Api.Test.Smoke
             await using CustomWebApplicationFactory app = await CreateAppAsync();
             using HttpClient client = app.CreateClient(new WebApplicationFactoryClientOptions
             {
-                BaseAddress = new Uri("https://localhost"),
+                BaseAddress = new Uri("http://localhost"),
                 AllowAutoRedirect = false,
             });
 

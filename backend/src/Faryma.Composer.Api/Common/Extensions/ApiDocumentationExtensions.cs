@@ -5,6 +5,15 @@ namespace Faryma.Composer.Api.Common.Extensions
 {
     public static class ApiDocumentationExtensions
     {
+        private static readonly PathString[] _apiDocumentationPaths =
+        [
+            new("/asyncapi"),
+            new("/openapi"),
+            new("/redoc"),
+            new("/scalar"),
+            new("/swagger"),
+        ];
+
         public static void UseApiDocumentation(this WebApplication app)
         {
             if (app.Environment.IsDevelopment())
@@ -29,6 +38,19 @@ namespace Faryma.Composer.Api.Common.Extensions
                 app.MapAsyncApiDocuments();
                 app.MapAsyncApiUi();
             }
+        }
+
+        public static void UseHttpsRedirectionExceptApiDocumentation(this WebApplication app)
+        {
+            app.UseWhen(
+                context => !app.Environment.IsDevelopment() || !IsApiDocumentationRequest(context.Request),
+                branch => branch.UseHttpsRedirection());
+        }
+
+        private static bool IsApiDocumentationRequest(HttpRequest request)
+        {
+            return _apiDocumentationPaths.Any(path =>
+                request.Path.StartsWithSegments(path, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

@@ -78,16 +78,10 @@ namespace Faryma.Composer.Api.Test.Infrastructure
 
         protected override IHost CreateHost(IHostBuilder builder)
         {
-            Dictionary<string, string?> previousValues = SetEnvironmentVariables();
+            builder.ConfigureAppConfiguration((_, configurationBuilder) =>
+                configurationBuilder.AddInMemoryCollection(_configuration));
 
-            try
-            {
-                return base.CreateHost(builder);
-            }
-            finally
-            {
-                RestoreEnvironmentVariables(previousValues);
-            }
+            return base.CreateHost(builder);
         }
 
         protected override void Dispose(bool disposing)
@@ -108,20 +102,6 @@ namespace Faryma.Composer.Api.Test.Infrastructure
             await PostgreSqlSchemaInitializer.EnsureCreatedAsync(configurationManager);
         }
 
-        private static void RestoreEnvironmentVariables(IReadOnlyDictionary<string, string?> previousValues)
-        {
-            foreach ((string key, string? value) in previousValues)
-            {
-                Environment.SetEnvironmentVariable(key, value);
-            }
-        }
-
-        private static void SetEnvironmentVariable(Dictionary<string, string?> previousValues, string key, string? value)
-        {
-            previousValues[key] = Environment.GetEnvironmentVariable(key);
-            Environment.SetEnvironmentVariable(key, value);
-        }
-
         private static Action<IWebHostBuilder> CombineConfigureActions(
             Action<IWebHostBuilder>? first,
             Action<IWebHostBuilder> second)
@@ -131,22 +111,6 @@ namespace Faryma.Composer.Api.Test.Infrastructure
                 first?.Invoke(builder);
                 second(builder);
             };
-        }
-
-        private static string ToEnvironmentKey(string configurationKey) => configurationKey.Replace(":", "__", StringComparison.Ordinal);
-
-        private Dictionary<string, string?> SetEnvironmentVariables()
-        {
-            Dictionary<string, string?> previousValues = new(_configuration.Count + 1, StringComparer.Ordinal);
-
-            SetEnvironmentVariable(previousValues, "ASPNETCORE_ENVIRONMENT", Environments.Development);
-
-            foreach ((string key, string? value) in _configuration)
-            {
-                SetEnvironmentVariable(previousValues, ToEnvironmentKey(key), value);
-            }
-
-            return previousValues;
         }
 
         private void DisposeOwnedFactories()

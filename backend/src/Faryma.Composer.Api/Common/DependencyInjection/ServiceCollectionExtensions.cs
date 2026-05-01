@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Faryma.Composer.Api.Common.Errors;
 using Faryma.Composer.Api.Common.Filters;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Api.Features.Auth.Services;
@@ -12,12 +13,12 @@ using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
-using Faryma.Composer.Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Saunter;
@@ -42,11 +43,6 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                 .ValidateDataAnnotations();
 
             services
-                .AddOptionsWithValidateOnStart<PostgreOptions>()
-                .Bind(configuration.GetRequiredSection("POSTGRES"))
-                .ValidateDataAnnotations();
-
-            services
                 .AddOptionsWithValidateOnStart<AdminBootstrapOptions>()
                 .Bind(configuration.GetRequiredSection("ADMIN_BOOTSTRAP"))
                 .ValidateDataAnnotations();
@@ -67,12 +63,8 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services)
         {
-            JwtOptions jwtOptions = configuration.GetRequiredSection("JWT").Get<JwtOptions>()!;
-            TwitchOptions twitchOptions = configuration.GetRequiredSection("TWITCH").Get<TwitchOptions>()!;
-            PathString twitchCallbackPath = new(new Uri(twitchOptions.RedirectUri, UriKind.Absolute).AbsolutePath);
-
             services
                 .AddScoped<AuthTokenService>()
                 .AddScoped<AdminAuthService>()
@@ -109,8 +101,15 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                         OnRedirectToAccessDenied = context => HandleApiCookieRedirect(context, StatusCodes.Status403Forbidden)
                     };
                 })
-                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme)
+                .AddOpenIdConnect(AppAuthenticationSchemes.TwitchOidcScheme, _ => { });
+
+            services
+                .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+                .Configure<IOptions<JwtOptions>>((options, jwtOptionsAccessor) =>
                 {
+                    JwtOptions jwtOptions = jwtOptionsAccessor.Value;
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -121,9 +120,15 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                         ValidAudience = jwtOptions.Audience,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
                     };
-                })
-                .AddOpenIdConnect(AppAuthenticationSchemes.TwitchOidcScheme, options =>
+                });
+
+            services
+                .AddOptions<OpenIdConnectOptions>(AppAuthenticationSchemes.TwitchOidcScheme)
+                .Configure<IOptions<TwitchOptions>>((options, twitchOptionsAccessor) =>
                 {
+                    TwitchOptions twitchOptions = twitchOptionsAccessor.Value;
+                    PathString twitchCallbackPath = new(new Uri(twitchOptions.RedirectUri, UriKind.Absolute).AbsolutePath);
+
                     options.SignInScheme = AppAuthenticationSchemes.BrowserCookieScheme;
                     options.Authority = TwitchOptions.OidcAuthority;
                     options.MetadataAddress = TwitchOptions.OidcMetadataAddress;
@@ -180,6 +185,7 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
         public static IServiceCollection AddPresentationLayer(this IServiceCollection services, IWebHostEnvironment environment)
         {
             services
+                .AddExceptionHandler<ApiExceptionHandler>()
                 .AddProblemDetails()
                 .AddMemoryCache()
                 .AddRateLimiter(options =>
@@ -202,9 +208,8 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                 .AddAsyncApiSpecification(environment);
 
             services
-                .AddSingleton<AppExceptionFilter>()
                 .AddScoped<IdempotentFilter>()
-                .AddControllers(options => options.Filters.AddService<AppExceptionFilter>())
+                .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             services

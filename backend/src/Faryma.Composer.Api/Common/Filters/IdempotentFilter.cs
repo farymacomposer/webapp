@@ -89,7 +89,7 @@ namespace Faryma.Composer.Api.Common.Filters
             {
                 await transaction.RollbackAsync(ct);
 
-                throw new InvalidOperationException("Атрибут [Idempotent] поддерживает только успешные JSON ObjectResult ответы.");
+                throw new InvalidOperationException("Атрибут [Idempotent] поддерживает только успешные JSON ObjectResult ответы");
             }
 
             record.StatusCode = statusCode;

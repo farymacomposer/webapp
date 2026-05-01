@@ -172,7 +172,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         {
             if (OrderPositionsById.Count(x => x.Value.Order.Status == ReviewOrderStatus.InProgress) > 1)
             {
-                throw new UnreachableException("Обнаружено более одного заказа со статусом `InProgress`");
+                throw new UnreachableException("Обнаружено более одного заказа со статусом 'InProgress'");
             }
 
             KeyValuePair<long, OrderPosition> kvp = OrderPositionsById

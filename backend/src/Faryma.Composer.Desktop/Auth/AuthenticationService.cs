@@ -90,7 +90,7 @@ namespace Faryma.Composer.Desktop.Auth
             string[] segments = accessToken.Split('.');
             if (segments.Length < 2)
             {
-                throw new InvalidOperationException("Некорректный access token.");
+                throw new InvalidOperationException("Некорректный access token");
             }
 
             string payload = segments[1]

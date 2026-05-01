@@ -30,7 +30,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
 
             ComposerStreamEntity? nearestStream = await uow.ComposerStreamStore.FindNearest(ct)
-                ?? throw new ReviewOrderException("Нет доступного стрима.");
+                ?? throw new ReviewOrderException("Нет доступного стрима");
 
             ReviewOrderEntity order = uow.ReviewOrderStore.Create(
                 appSettingsService.Settings.ReviewOrderNominalAmount,
@@ -55,7 +55,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
             ComposerStreamEntity nearestStream = await FindNearestStream(userNickname, ct)
-                ?? throw new ReviewOrderException("Нет доступного стрима.");
+                ?? throw new ReviewOrderException("Нет доступного стрима");
 
             TransactionEntity topUp = uow.TransactionStore.CreateAccountTopUp(
                 command.TopUpProvider,
@@ -91,7 +91,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
             ComposerStreamEntity nearestStream = await FindNearestStream(userNickname, ct)
-                ?? throw new ReviewOrderException("Нет доступного стрима.");
+                ?? throw new ReviewOrderException("Нет доступного стрима");
 
             ReviewOrderEntity order = uow.ReviewOrderStore.Create(
                 appSettingsService.Settings.ReviewOrderNominalAmount,
@@ -117,7 +117,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             ComposerStreamEntity? liveStream = await uow.ComposerStreamStore.FindLive(ct);
             if (liveStream is null || liveStream.Type != ComposerStreamType.Charity)
             {
-                throw new ReviewOrderException("Не запущен благотворительный стрим.");
+                throw new ReviewOrderException("Не запущен благотворительный стрим");
             }
 
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
@@ -340,13 +340,13 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         private async Task<ReviewOrderEntity> GetOrder(long orderId, CancellationToken ct)
         {
             return await uow.ReviewOrderStore.FindById(orderId, ct)
-                ?? throw new ReviewOrderException("Заказ не найден.");
+                ?? throw new ReviewOrderException("Заказ не найден");
         }
 
         private async Task<UserEntity> GetUser(Guid userId, CancellationToken ct)
         {
             return await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId, ct)
-                ?? throw new ReviewOrderException("Пользователь не найден.");
+                ?? throw new ReviewOrderException("Пользователь не найден");
         }
 
         private async Task<ComposerStreamEntity?> FindNearestStream(UserNicknameEntity userNickname, CancellationToken ct)
