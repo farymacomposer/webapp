@@ -1,13 +1,12 @@
 ﻿using System.Net;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
-using Faryma.Composer.Contracts.Infrastructure;
 
 namespace Faryma.Composer.Api.Test.Auth
 {
-    public sealed class AdminAccessTests(PostgreSqlFixture fixture) : ApiTestBase(fixture)
+    public sealed class AdminAccessTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
-        private const string _appSettingsRoute = "/api/app-settings";
+        private const string _adminProbeRoute = "/api/_test/auth/admin";
 
         [Fact]
         public async Task Anonymous_request_gets_401_for_admin_only_endpoint()
@@ -15,7 +14,7 @@ namespace Faryma.Composer.Api.Test.Auth
             await using CustomWebApplicationFactory app = await CreateAppAsync();
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.GetAsync(_appSettingsRoute);
+            using HttpResponseMessage response = await client.GetAsync(_adminProbeRoute);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
@@ -26,7 +25,7 @@ namespace Faryma.Composer.Api.Test.Auth
             await using CustomWebApplicationFactory app = await CreateAppAsync();
             using HttpClient client = await app.CreateBrowserUserClientAsync();
 
-            using HttpResponseMessage response = await client.GetAsync(_appSettingsRoute);
+            using HttpResponseMessage response = await client.GetAsync(_adminProbeRoute);
 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
@@ -41,11 +40,11 @@ namespace Faryma.Composer.Api.Test.Auth
                 {
                     UserName = "composer_admin_access",
                     Password = "TestComposerPass123!",
-                    Roles = [AppRoles.Composer],
+                    Roles = [TestAuthRoles.Admin],
                 },
             });
 
-            using HttpResponseMessage response = await client.GetAsync(_appSettingsRoute);
+            using HttpResponseMessage response = await client.GetAsync(_adminProbeRoute);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }

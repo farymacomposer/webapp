@@ -5,7 +5,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ComposerStream
 {
-    public sealed class CancelStreamTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class CancelStreamTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что отмена переводит запланированный стрим в статус Canceled.

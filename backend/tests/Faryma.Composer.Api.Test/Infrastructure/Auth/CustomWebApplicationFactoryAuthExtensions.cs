@@ -170,6 +170,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
                 await EnsureSuccess(
                     await userManager.ResetPasswordAsync(user, resetToken, password),
                     $"Failed to reset password for test user '{user.UserName}'.");
+
                 return;
             }
 
@@ -235,6 +236,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
             }
 
             string details = string.Join("; ", result.Errors.Select(error => error.Description));
+
             throw new InvalidOperationException($"{message} {details}");
         }
     }

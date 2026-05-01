@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Faryma.Composer.Api.Test.Common
 {
-    public sealed class IdempotentAttributeTests(PostgreSqlFixture fixture) : ApiTestBase(fixture)
+    public sealed class IdempotentAttributeTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         private const string _route = "/api/_test/idempotency";
 

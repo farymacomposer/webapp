@@ -60,6 +60,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure
 
             CustomWebApplicationFactory child = new(_configuration, DatabaseName, CombineConfigureActions(_configureWebHost, configureWebHost));
             _ownedFactories.Add(child);
+
             return child;
         }
 

@@ -6,7 +6,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ComposerStream
 {
-    public sealed class CreateStreamTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class CreateStreamTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что создание стрима сохраняет его в статусе Planned.

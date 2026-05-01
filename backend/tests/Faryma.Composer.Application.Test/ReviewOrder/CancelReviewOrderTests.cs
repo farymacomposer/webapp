@@ -7,7 +7,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
-    public sealed class CancelReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class CancelReviewOrderTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что отмена заказа в работе очищает поля обработки.

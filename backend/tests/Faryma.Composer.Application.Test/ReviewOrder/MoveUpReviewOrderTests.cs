@@ -9,7 +9,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
-    public sealed class MoveUpReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class MoveUpReviewOrderTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что доплата по заказу создает платеж для допустимого статуса.

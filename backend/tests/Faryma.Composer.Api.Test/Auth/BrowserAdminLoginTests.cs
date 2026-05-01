@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
@@ -7,7 +7,7 @@ using Faryma.Composer.Contracts.Infrastructure;
 
 namespace Faryma.Composer.Api.Test.Auth
 {
-    public sealed class BrowserAdminLoginTests(PostgreSqlFixture fixture) : ApiTestBase(fixture)
+    public sealed class BrowserAdminLoginTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         private const string _adminRoute = "/api/app-settings";
         private const string _browserAdminLoginRoute = "/api/auth/sessions/browser-admin";

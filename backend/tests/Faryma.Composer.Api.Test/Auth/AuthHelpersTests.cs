@@ -4,7 +4,7 @@ using Faryma.Composer.Api.Test.Infrastructure.Auth;
 
 namespace Faryma.Composer.Api.Test.Auth
 {
-    public sealed class AuthHelpersTests(PostgreSqlFixture fixture) : ApiTestBase(fixture)
+    public sealed class AuthHelpersTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         [Fact]
         public async Task Anonymous_client_gets_401_for_admin_endpoint()

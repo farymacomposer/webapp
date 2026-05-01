@@ -8,13 +8,9 @@
     public sealed record TestAuthUserSeed
     {
         public required string UserName { get; init; }
-
         public string? Password { get; init; }
-
         public string? TwitchUserId { get; init; }
-
         public string? TwitchLogin { get; init; }
-
         public IReadOnlyCollection<string> Roles { get; init; } = [];
     }
 

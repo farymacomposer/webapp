@@ -7,7 +7,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
-    public sealed class TakeOrderInProgressTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class TakeOrderInProgressTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что pending-заказ переводится в статус InProgress.

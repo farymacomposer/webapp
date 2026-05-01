@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace Faryma.Composer.Api.Test.Auth
 {
-    public sealed class BrowserLoginTests(PostgreSqlFixture fixture) : ApiTestBase(fixture)
+    public sealed class BrowserLoginTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         [Fact]
         public async Task Browser_login_challenges_twitch_oidc_authorize_endpoint()
@@ -22,7 +23,7 @@ namespace Faryma.Composer.Api.Test.Auth
             Assert.NotNull(response.Headers.Location);
 
             Uri location = response.Headers.Location!;
-            Dictionary<string, Microsoft.Extensions.Primitives.StringValues> query = QueryHelpers.ParseQuery(location.Query);
+            Dictionary<string, StringValues> query = QueryHelpers.ParseQuery(location.Query);
 
             Assert.Equal("https", location.Scheme);
             Assert.Equal("id.twitch.tv", location.Host);

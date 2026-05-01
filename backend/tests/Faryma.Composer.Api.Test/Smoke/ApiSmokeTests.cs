@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Faryma.Composer.Api.Test.Smoke
 {
-    public sealed class ApiSmokeTests(PostgreSqlFixture fixture) : ApiTestBase(fixture)
+    public sealed class ApiSmokeTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         [Fact]
         public async Task Host_starts_and_openapi_endpoint_is_available()

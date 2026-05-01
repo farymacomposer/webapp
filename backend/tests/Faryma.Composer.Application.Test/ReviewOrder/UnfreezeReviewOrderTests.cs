@@ -6,7 +6,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
-    public sealed class UnfreezeReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class UnfreezeReviewOrderTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что для допустимых статусов снимается флаг заморозки.

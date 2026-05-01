@@ -7,7 +7,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
-    public sealed class CreateReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class CreateReviewOrderTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что donation-заказ со ссылкой создается сразу в Pending и с платежом.

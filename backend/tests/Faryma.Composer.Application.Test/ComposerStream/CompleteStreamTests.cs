@@ -5,7 +5,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ComposerStream
 {
-    public sealed class CompleteStreamTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class CompleteStreamTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что завершение переводит активный стрим в статус Completed.

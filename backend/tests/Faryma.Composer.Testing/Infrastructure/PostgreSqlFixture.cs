@@ -1,10 +1,7 @@
-using Testcontainers.PostgreSql;
+﻿using Testcontainers.PostgreSql;
 
 namespace Faryma.Composer.Testing.Infrastructure
 {
-    /// <summary>
-    /// Поднимает временный PostgreSQL-контейнер для интеграционных тестов.
-    /// </summary>
     public sealed class PostgreSqlFixture : IAsyncLifetime
     {
         private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:18-alpine")
@@ -14,15 +11,11 @@ namespace Faryma.Composer.Testing.Infrastructure
             .Build();
 
         public string Host => _container.Hostname;
-
         public int Port => _container.GetMappedPublicPort(PostgreSqlBuilder.PostgreSqlPort);
-
         public string Username => PostgreSqlBuilder.DefaultUsername;
-
         public string Password => PostgreSqlBuilder.DefaultPassword;
 
         public Task InitializeAsync() => _container.StartAsync();
-
         public Task DisposeAsync() => _container.DisposeAsync().AsTask();
 
         public async Task<string> CreateDatabaseAsync(string prefix)
