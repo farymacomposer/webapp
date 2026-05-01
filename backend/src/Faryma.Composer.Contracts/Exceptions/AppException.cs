@@ -8,7 +8,7 @@
         {
             return new()
             {
-                ExceptionType = GetType().FullName!,
+                ExceptionType = GetType().Name,
                 Method = callerMemberName,
                 Message = Message,
                 Data = Data

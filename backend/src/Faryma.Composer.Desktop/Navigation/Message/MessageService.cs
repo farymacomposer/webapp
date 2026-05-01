@@ -28,7 +28,7 @@ namespace Faryma.Composer.Desktop.Navigation
             }
             catch (ApiException ex)
             {
-                logger.LogWarning(ex, "{errorMessage}\n{@Result}", errorMessage, ex.Result);
+                logger.LogWarning(ex, "{@Result}", ex.Result);
 
                 await ShowMessage(new MessageOptions
                 {
