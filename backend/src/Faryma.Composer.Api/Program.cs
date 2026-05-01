@@ -27,7 +27,7 @@ namespace Faryma.Composer.Api
             builder.Services
                 .AddConfiguration(builder.Configuration)
                 .AddPersistenceAndIdentity(builder.Configuration)
-                .AddJwtAuthentication()
+                .AddApiAuthentication()
                 .AddAuthorization()
                 .AddCoreServices();
 
@@ -36,7 +36,13 @@ namespace Faryma.Composer.Api
             WebApplication app = builder.Build();
 
             app.UseExceptionHandler();
+            app.UseForwardedHeaders();
             app.UseApiDocumentation();
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHsts();
+            }
+
             app.UseHttpsRedirectionExceptApiDocumentation();
 
             app.UseRouting();

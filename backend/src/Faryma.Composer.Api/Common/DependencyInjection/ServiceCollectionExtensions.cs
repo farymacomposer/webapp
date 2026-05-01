@@ -1,9 +1,11 @@
-﻿using System.Security.Claims;
+﻿using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Faryma.Composer.Api.Common.Errors;
 using Faryma.Composer.Api.Common.Filters;
+using Faryma.Composer.Api.Common.Options;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Api.Features.Auth.Services;
 using Faryma.Composer.Api.Features.OrderQueue;
@@ -17,6 +19,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -47,6 +50,41 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                 .Bind(configuration.GetRequiredSection("ADMIN_BOOTSTRAP"))
                 .ValidateDataAnnotations();
 
+            services
+                .AddOptionsWithValidateOnStart<ForwardedHeadersSettings>()
+                .Bind(configuration.GetRequiredSection("FORWARDED_HEADERS"))
+                .Validate<IWebHostEnvironment>(
+                    (options, environment) => environment.IsDevelopment() || options.HasTrustedForwarders,
+                    "Вне окружения Development должен быть настроен хотя бы один доверенный прокси или сеть")
+                .Validate(ForwardedHeadersSettings.HasValidKnownProxies, "Доверенные прокси должны быть валидными IP-адресами")
+                .Validate(ForwardedHeadersSettings.HasValidKnownNetworks, "Доверенные сети должны быть валидными CIDR-диапазонами");
+
+            services
+                .AddOptions<ForwardedHeadersOptions>()
+                .Configure<IOptions<ForwardedHeadersSettings>>((options, settingsAccessor) =>
+                {
+                    ForwardedHeadersSettings settings = settingsAccessor.Value;
+
+                    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                    if (!settings.HasTrustedForwarders)
+                    {
+                        return;
+                    }
+
+                    options.KnownProxies.Clear();
+                    options.KnownIPNetworks.Clear();
+
+                    foreach (string knownProxy in settings.KnownProxies)
+                    {
+                        options.KnownProxies.Add(IPAddress.Parse(knownProxy));
+                    }
+
+                    foreach (string knownNetwork in settings.KnownNetworks)
+                    {
+                        options.KnownIPNetworks.Add(ForwardedHeadersSettings.ParseKnownNetwork(knownNetwork));
+                    }
+                });
+
             return services;
         }
 
@@ -63,7 +101,7 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services)
+        public static IServiceCollection AddApiAuthentication(this IServiceCollection services)
         {
             services
                 .AddScoped<AuthTokenService>()
@@ -82,6 +120,7 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                     options.ForwardDefaultSelector = context =>
                     {
                         string authorization = context.Request.Headers.Authorization.ToString();
+
                         return authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
                             ? JwtBearerDefaults.AuthenticationScheme
                             : AppAuthenticationSchemes.BrowserCookieScheme;
