@@ -1,0 +1,204 @@
+Table composer_streams [note: 'Стрим композитора'] {
+  Id long [pk]
+  EventDate DateOnly [note: 'Дата проведения стрима']
+  Type ComposerStreamType [note: 'Тип стрима']
+  Status ComposerStreamStatus [note: 'Статус стрима']
+  StartedAt DateTime [null, note: 'Дата и время начала стрима']
+  CompletedAt DateTime [null, note: 'Дата и время завершения стрима']
+  CreatedByUserId Guid [ref: > AspNetUsers.Id, note: 'Пользователь, создавший стрим']
+}
+
+Table reviews [note: 'Результат разбора трека композитором'] {
+  Id long [pk]
+  RatingValue int [note: 'Оценка']
+  CreatedAt DateTime [note: 'Дата и время создания разбора']
+  UpdatedAt DateTime [note: 'Дата и время последнего обновления']
+  TimestampUrl string [null, note: 'Ссылка на видео разбора']
+  ReviewOrderId long [null, ref: - review_orders.Id, note: 'Связанный заказ']
+  TrackId long [null, ref: > tracks.Id, note: 'Связанный музыкальный трек']
+  CreatedByUserId Guid [ref: > AspNetUsers.Id, note: 'Пользователь, создавший разбор']
+}
+
+Table tracks [note: 'Музыкальный трек'] {
+  Id long [pk]
+  AddedAt DateTime [note: 'Дата и время добавления трека']
+  Title string [note: 'Название трека']
+  DurationSeconds int [note: 'Длительность трека']
+  Url string [note: 'Ссылка на трек']
+  ReleaseDate DateOnly [null, note: 'Дата выпуска трека']
+  CoverUrl string [null, note: 'Ссылка на обложку']
+  ExtendedGenres List(string) [note: 'Расширенные жанры']
+  Tags List(TrackTag) [note: 'Тэги JSON массив TrackTag: { Name: string, Meta?: string }']
+  AddedByUserNicknameId Guid [ref: > user_nicknames.Id, note: 'Пользователь, загрузивший трек']
+  CountryId long [null, ref: > track_countries.Id, note: 'Страна производства']
+  CreatedByUserId Guid [ref: > AspNetUsers.Id, note: 'Пользователь, создавший трек']
+}
+
+Table track_artists [note: 'Исполнитель музыкального трека'] {
+  Id long [pk]
+  Name string [note: 'Имя исполнителя']
+  NormalizedName string [unique, note: 'Нормализованное имя исполнителя']
+}
+
+Table track_countries [note: 'Страна производства музыкального трека'] {
+  Id long [pk]
+  Name string [note: 'Название страны']
+}
+
+Table track_genres [note: 'Музыкальный жанр трека'] {
+  Id long [pk]
+  Name string [note: 'Название жанра']
+}
+
+Table transactions [note: 'Операция по счету'] {
+  Id long [pk, note: 'Идентификатор']
+  CreatedAt DateTime [note: 'Дата и время создания']
+  Kind TransactionKind [note: 'Тип транзакции']
+  Credit long [note: 'Зачисление']
+  Debit long [note: 'Списание']
+  UserNicknameAccountId Guid [ref: > user_nickname_accounts.Id, note: 'Счет псевдонима пользователя']
+  TransactionSourceId long [ref: > transaction_sources.Id, note: 'Источник транзакции']
+}
+
+Table AspNetUsers [note: 'Пользователь системы'] {
+  Id Guid [pk]
+  UserName string [note: 'Имя пользователя']
+  CreatedAt DateTime [note: 'Дата и время регистрации']
+}
+
+Table user_nicknames [note: 'Псевдоним пользователя'] {
+  Id Guid [pk]
+  Nickname string [note: 'Псевдоним']
+  NormalizedNickname string [unique, note: 'Нормализованный псевдоним']
+  UserId Guid [null, ref: > AspNetUsers.Id, note: 'Пользователь системы']
+}
+
+Table user_nickname_accounts [note: 'Счет псевдонима пользователя'] {
+  Id Guid [pk]
+  Version uint [note: 'Версия записи']
+  Balance long [note: 'Текущий баланс']
+  UserNicknameId Guid [ref: - user_nicknames.Id, note: 'Идентификатор псевдонима пользователя']
+}
+
+Table user_track_ratings [note: 'Пользовательская оценка трека'] {
+  Id long [pk]
+  RatingValue int [note: 'Оценка']
+  Comment string [null, note: 'Комментарий']
+  CreatedAt DateTime [note: 'Дата и время создания оценки']
+  UpdatedAt DateTime [note: 'Дата и время обновления оценки']
+  TrackId long [ref: > tracks.Id, note: 'Идентификатор трека']
+  CreatedByUserId Guid [ref: > AspNetUsers.Id, note: 'Идентификатор пользователя, создавшего оценку']
+}
+
+// TransactionSources
+
+Table transaction_sources [note: 'Базовый источник транзакции (TPT стратегия)'] {
+  Id long [pk]
+  CreatedAt DateTime [note: 'Дата и время создания']
+  CreatedByUserId Guid [ref: > AspNetUsers.Id, note: 'Идентификатор пользователя, создавшего источник транзакции']
+}
+
+Table account_top_ups [note: 'Пополнение счета пользователя'] {
+  Id long [pk, ref: > transaction_sources.Id]
+  Provider AccountTopUpProvider [note: 'Провайдер/канал пополнения счета пользователя']
+  UserNicknameAccountId Guid [ref: > user_nickname_accounts.Id, note: 'Идентификатор счета псевдонима пользователя']
+}
+
+Table review_orders [note: 'Заказ разбора трека'] {
+  Id long [pk, ref: > transaction_sources.Id]
+  MainNickname string [note: 'Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа']
+  MainNormalizedNickname string [note: 'Нормализованный основной ник пользователя']
+  CreationStreamId long [ref: > composer_streams.Id, note: 'Связанный стрим, где создан заказ']
+  ProcessingStreamId long [null, ref: > composer_streams.Id, note: 'Связанный стрим, где заказ взят в работу']
+  InProgressAt DateTime [null, note: 'Дата и время взятия заказа в работу']
+  CompletedAt DateTime [null, note: 'Дата и время выполнения заказа']
+  CanceledAt DateTime [null, note: 'Дата и время отмены заказа']
+  CancelReason string [null, note: 'Причина отмены заказа']
+  Type ReviewOrderType [note: 'Тип заказа']
+  Status ReviewOrderStatus [note: 'Статус заказа']
+  QueueCategory QueueCategory [note: 'Категория заказа в очереди (записывается при взятии заказа в работу)']
+  IsFrozen bool [note: 'Заказ заморожен']
+  TrackUrl string [null, note: 'Ссылка на трек']
+  TrackDurationSeconds int [null, note: 'Длительность трека в секундах']
+  TrackId long [null, ref: > tracks.Id, note: 'Ссылка на трек (ID)']
+  NominalAmount long [note: 'Номинальная стоимость заказа']
+  PayableAmount long [note: 'Сумма к оплате']
+  PricingComment string [null, note: 'Комментарий к цене']
+  UserComment string [null, note: 'Комментарий пользователя']
+}
+
+Table transaction_reversals [note: 'Отмена транзакции'] {
+  Id long [pk, ref: > transaction_sources.Id]
+  Reason string [note: 'Причина отмены']
+  ReversedTransactionId long [unique, ref: > transactions.Id, note: 'Транзакция, которую отменили']
+  ReversalTransactionId long [unique, ref: > transactions.Id, note: 'Транзакция отмены']
+}
+
+Ref UserNicknameReviewOrder: user_nicknames.Id <> review_orders.Id // Связь псевдонимов и заказов
+Ref TrackArtist: tracks.Id <> track_artists.Id // Связь треков и исполнителей
+Ref TrackGenre: tracks.Id <> track_genres.Id // Связь треков и жанров
+Ref UserArtist: AspNetUsers.Id <> track_artists.Id // Связь пользователей и исполнителей
+
+// Enums
+
+// Тип транзакции
+Enum TransactionKind {
+  Unspecified [note: 'Не задан']
+  AccountTopUp [note: 'Пополнение счета']
+  Payment [note: 'Оплата заказа/услуги']
+  Reversal [note: 'Отмена транзакции']
+}
+
+// Тип заказа разбора трека
+Enum ReviewOrderType {
+  Unspecified [note: 'Не задан']
+  OutOfQueue [note: 'Вне очереди']
+  Donation [note: 'Донат']
+  Free [note: 'Бесплатный']
+  Charity [note: 'Благотворительный']
+  Custom [note: 'Заказной']
+}
+
+// Статус заказа разбора трека
+Enum ReviewOrderStatus {
+  Unspecified [note: 'Не задан']
+  Preorder [note: 'Предзаказ']
+  Pending [note: 'Ожидает взятия в работу']
+  InProgress [note: 'В работе']
+  Completed [note: 'Выполнен']
+  Canceled [note: 'Отменен']
+}
+
+// Категория заказа в очереди
+Enum QueueCategory {
+  Unspecified [note: 'Не задан']
+  OutOfQueue [note: 'Вне очереди']
+  Donation [note: 'Донат']
+  Debt [note: 'Долг']
+}
+
+// Тип стрима
+Enum ComposerStreamType {
+  Unspecified [note: 'Не задан']
+  Donation [note: 'Донатный']
+  Debt [note: 'Долговой']
+  Charity [note: 'Благотворительный']
+}
+
+// Статус стрима
+Enum ComposerStreamStatus {
+  Unspecified [note: 'Не задан']
+  Planned [note: 'Запланирован']
+  Live [note: 'Запущен']
+  Completed [note: 'Завершен']
+  Canceled [note: 'Отменен']
+}
+
+// Провайдер/канал пополнения счета пользователя
+Enum AccountTopUpProvider {
+  Unspecified [note: 'Не задан']
+  Donationalerts [note: 'DonationAlerts']
+  Donatty [note: 'Donatty']
+  TwitchChannelPoints [note: 'Баллы канала Twitch']
+  Manual [note: 'Ручное пополнение']
+}

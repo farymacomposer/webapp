@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Faryma.Composer.sln",
+                "${workspaceFolder}/Faryma.Composer.slnx",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Faryma.Composer.sln",
+                "${workspaceFolder}/Faryma.Composer.slnx",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/Faryma.Composer.sln"
+                "${workspaceFolder}/Faryma.Composer.slnx"
             ],
             "problemMatcher": "$msCompile"
         }
