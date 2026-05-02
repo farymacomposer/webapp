@@ -27,7 +27,7 @@
                                 ItemsStretch="Fill"
                                 MaximumRowsOrColumns="1"
                                 MinItemHeight="64"
-                                Orientation="Vertical" />
+                                Orientation="Horizontal" />
                         </ItemsRepeater.Layout>
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate x:DataType="local:ReviewOrderTypeOptionVM">

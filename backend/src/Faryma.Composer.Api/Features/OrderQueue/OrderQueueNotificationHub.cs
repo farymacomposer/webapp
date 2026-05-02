@@ -10,7 +10,11 @@ namespace Faryma.Composer.Api.Features.OrderQueue
     [AsyncApi]
     public sealed class OrderQueueNotificationHub(OrderQueueService orderQueueService) : Hub<IClient>, IOrderQueueNotificationServer
     {
-        public override Task OnConnectedAsync() => GetSnapshot();
+        public override async Task OnConnectedAsync()
+        {
+            await GetSnapshot();
+            await base.OnConnectedAsync();
+        }
 
         [Channel(nameof(GetSnapshot), Servers = new[] { IOrderQueueNotificationServer.HubServerName })]
         [SubscribeOperation(typeof(object), Description = "Запрос полного снимка очереди")]
