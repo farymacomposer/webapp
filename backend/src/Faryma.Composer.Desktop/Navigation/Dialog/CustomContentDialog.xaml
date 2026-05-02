@@ -32,7 +32,7 @@
                     Margin="24,-6,-6,0"
                     Padding="6"
                     Command="{x:Bind CloseButtonCommand}"
-                    Style="{StaticResource ButtonFlatStyle}"
+                    Style="{StaticResource AnimatedFlatButtonStyle}"
                     Visibility="{x:Bind IsCloseButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <SymbolIcon Symbol="Cancel" />
                 </Button>

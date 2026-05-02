@@ -6,7 +6,7 @@ using Faryma.Composer.Contracts.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Faryma.Composer.Api.Common.Errors
+namespace Faryma.Composer.Api.Common.Exceptions
 {
     public sealed class ApiExceptionHandler(
         IProblemDetailsService problemDetailsService,
@@ -14,8 +14,7 @@ namespace Faryma.Composer.Api.Common.Errors
     {
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
-            WriteIndented = true
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
         };
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)

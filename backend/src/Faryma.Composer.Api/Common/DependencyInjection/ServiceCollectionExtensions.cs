@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
-using Faryma.Composer.Api.Common.Errors;
+using Faryma.Composer.Api.Common.Exceptions;
 using Faryma.Composer.Api.Common.Filters;
 using Faryma.Composer.Api.Common.Options;
 using Faryma.Composer.Api.Common.Startup;
