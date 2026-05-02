@@ -12,7 +12,7 @@ This file applies to `src/Faryma.Composer.Desktop`.
 ## Desktop Bootstrap
 
 - Treat this project as the desktop app bootstrap.
-- Start navigation from `App.xaml`, `App.xaml.cs`, `ServiceCollectionExtensions.cs`, `Navigation`, `Auth`, `Services`, and `Api`.
+- Start navigation from `App.xaml`, `App.xaml.cs`, `ServiceCollectionExtensions.cs`, `Navigation`, `Auth`, `Services`, `Api`, `UI`, `ViewModels`, and `Validation`.
 - Use `.agent/machine-route.yaml` to find the relevant shared feature paths before widening scope.
 
 ## Navigation Rules

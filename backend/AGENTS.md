@@ -6,10 +6,10 @@ Help agents work safely and predictably in the `Faryma.Composer` backend solutio
 
 ## Repository Shape
 
-- The repository is a `.NET 10` solution rooted at `Faryma.Composer.sln`.
+- The repository is a `.NET 10` solution rooted at `Faryma.Composer.slnx`.
 - The main server runtime lives in `src/Faryma.Composer.Api`.
 - The backend is organized across `Api`, `Application`, `Infrastructure`, and `Contracts`.
-- Supporting projects include `Faryma.Composer.MigrationsBundle` and `Faryma.Composer.Desktop`.
+- Supporting projects include `Faryma.Composer.MigrationsBundle`, `Faryma.Composer.Desktop`, and the `Api`, `Application`, and shared testing projects under `tests`.
 - Business behavior may be described in `use-cases/*`, but code remains the source of truth.
 
 ## Guidance Precedence
