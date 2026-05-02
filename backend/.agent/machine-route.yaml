@@ -32,6 +32,7 @@ layers:
       - src/Faryma.Composer.Infrastructure/AppDbContext.cs
       - src/Faryma.Composer.Infrastructure/DependencyInjection/ServiceCollectionExtensions.cs
       - src/Faryma.Composer.Infrastructure/Persistence
+      - docs/database/schema.dbml
   contracts:
     path: src/Faryma.Composer.Contracts
     entry:

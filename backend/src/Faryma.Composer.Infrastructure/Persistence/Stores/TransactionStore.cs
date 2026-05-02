@@ -55,7 +55,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             }).Entity;
         }
 
-        public TransactionEntity CreateReversal(UserEntity createdByUser, TransactionEntity reversedTransaction)
+        public TransactionEntity CreateReversal(string reason, UserEntity createdByUser, TransactionEntity reversedTransaction)
         {
             if (reversedTransaction.Kind == TransactionKind.Reversal)
             {
@@ -64,6 +64,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             TransactionReversalEntity source = new()
             {
+                Reason = reason,
                 CreatedAt = dateTimeService.Now,
                 CreatedByUser = createdByUser,
                 ReversedTransaction = reversedTransaction,

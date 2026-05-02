@@ -1,6 +1,11 @@
+// Business database schema for the app domain.
+// This document intentionally omits infrastructure-only tables such as ASP.NET Identity,
+// refresh tokens, idempotency records, data protection keys, and other persistence plumbing.
+// PostgreSQL schema: app
+
 Table composer_streams [note: 'Стрим композитора'] {
   Id long [pk]
-  EventDate DateOnly [note: 'Дата проведения стрима']
+  EventDate DateOnly [unique, note: 'Дата проведения стрима']
   Type ComposerStreamType [note: 'Тип стрима']
   Status ComposerStreamStatus [note: 'Статус стрима']
   StartedAt DateTime [null, note: 'Дата и время начала стрима']
@@ -62,8 +67,11 @@ Table transactions [note: 'Операция по счету'] {
 
 Table AspNetUsers [note: 'Пользователь системы'] {
   Id Guid [pk]
-  UserName string [note: 'Имя пользователя']
+  UserName varchar(256) [null, note: 'Имя пользователя']
+  NormalizedUserName varchar(256) [null, unique]
   CreatedAt DateTime [note: 'Дата и время регистрации']
+  TwitchUserId varchar(50) [null, unique, note: 'Идентификатор пользователя в Twitch']
+  TwitchLogin varchar(100) [null, note: 'Логин пользователя в Twitch']
 }
 
 Table user_nicknames [note: 'Псевдоним пользователя'] {
@@ -75,7 +83,7 @@ Table user_nicknames [note: 'Псевдоним пользователя'] {
 
 Table user_nickname_accounts [note: 'Счет псевдонима пользователя'] {
   Id Guid [pk]
-  Version uint [note: 'Версия записи']
+  xmin uint [note: 'Версия записи PostgreSQL rowversion']
   Balance long [note: 'Текущий баланс']
   UserNicknameId Guid [ref: - user_nicknames.Id, note: 'Идентификатор псевдонима пользователя']
 }
@@ -88,6 +96,10 @@ Table user_track_ratings [note: 'Пользовательская оценка �
   UpdatedAt DateTime [note: 'Дата и время обновления оценки']
   TrackId long [ref: > tracks.Id, note: 'Идентификатор трека']
   CreatedByUserId Guid [ref: > AspNetUsers.Id, note: 'Идентификатор пользователя, создавшего оценку']
+
+  indexes {
+    (TrackId, CreatedByUserId) [unique]
+  }
 }
 
 // TransactionSources
@@ -129,15 +141,15 @@ Table review_orders [note: 'Заказ разбора трека'] {
 
 Table transaction_reversals [note: 'Отмена транзакции'] {
   Id long [pk, ref: > transaction_sources.Id]
-  Reason string [note: 'Причина отмены']
+  Reason varchar(100) [note: 'Причина отмены']
   ReversedTransactionId long [unique, ref: > transactions.Id, note: 'Транзакция, которую отменили']
   ReversalTransactionId long [unique, ref: > transactions.Id, note: 'Транзакция отмены']
 }
 
-Ref UserNicknameReviewOrder: user_nicknames.Id <> review_orders.Id // Связь псевдонимов и заказов
-Ref TrackArtist: tracks.Id <> track_artists.Id // Связь треков и исполнителей
-Ref TrackGenre: tracks.Id <> track_genres.Id // Связь треков и жанров
-Ref UserArtist: AspNetUsers.Id <> track_artists.Id // Связь пользователей и исполнителей
+Ref ReviewOrderEntityUserNicknameEntity: review_orders.Id <> user_nicknames.Id // Связь заказов и псевдонимов
+Ref TrackArtistEntityTrackEntity: track_artists.Id <> tracks.Id // Связь исполнителей и треков
+Ref TrackEntityTrackGenreEntity: tracks.Id <> track_genres.Id // Связь треков и жанров
+Ref TrackArtistEntityUserEntity: track_artists.Id <> AspNetUsers.Id // Связь исполнителей и пользователей
 
 // Enums
 

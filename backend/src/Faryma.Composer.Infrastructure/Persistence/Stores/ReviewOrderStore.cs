@@ -28,6 +28,14 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             UserNicknameEntity userNickname,
             UserEntity createdByUser)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(nominalAmount);
+            ArgumentOutOfRangeException.ThrowIfNegative(payableAmount);
+
+            if (!Enum.IsDefined(type) || type == ReviewOrderType.Unspecified)
+            {
+                throw new ArgumentException("Тип заказа должен быть указан");
+            }
+
             return context.Add(new ReviewOrderEntity
             {
                 CreatedAt = dateTimeService.Now,

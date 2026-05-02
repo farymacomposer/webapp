@@ -8,7 +8,7 @@
         /// <summary>
         /// Причина отмены
         /// </summary>
-        public string? Reason { get; set; }
+        public required string Reason { get; set; }
 
         public long ReversedTransactionId { get; set; }
         public long ReversalTransactionId { get; set; }

@@ -749,7 +749,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false),
-                    Reason = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Reason = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     ReversedTransactionId = table.Column<long>(type: "bigint", nullable: false),
                     ReversalTransactionId = table.Column<long>(type: "bigint", nullable: false)
                 },

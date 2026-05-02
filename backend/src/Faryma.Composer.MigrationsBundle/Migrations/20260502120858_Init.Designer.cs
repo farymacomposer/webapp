@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260430160628_Init")]
+    [Migration("20260502120858_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -981,6 +981,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
 
                     b.Property<string>("Reason")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 

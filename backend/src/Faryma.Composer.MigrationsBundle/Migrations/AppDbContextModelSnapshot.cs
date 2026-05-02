@@ -978,6 +978,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
 
                     b.Property<string>("Reason")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
