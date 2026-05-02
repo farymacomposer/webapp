@@ -16,7 +16,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             if (!Enum.IsDefined(topUpProvider) || topUpProvider == AccountTopUpProvider.Unspecified)
             {
-                throw new ArgumentException("Тип пополнения должен быть указан");
+                throw new ArgumentException("Тип пополнения должен быть указан", nameof(topUpProvider));
             }
 
             AccountTopUpEntity source = new()

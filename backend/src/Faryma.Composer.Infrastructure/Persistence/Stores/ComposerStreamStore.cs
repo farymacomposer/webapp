@@ -10,7 +10,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
         {
             if (!Enum.IsDefined(type) || type == ComposerStreamType.Unspecified)
             {
-                throw new ArgumentException("Тип стрима должен быть указан");
+                throw new ArgumentException("Тип стрима должен быть указан", nameof(type));
             }
 
             return context.Add(new ComposerStreamEntity

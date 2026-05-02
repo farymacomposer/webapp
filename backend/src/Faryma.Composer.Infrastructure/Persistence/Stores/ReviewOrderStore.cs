@@ -33,7 +33,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
             if (!Enum.IsDefined(type) || type == ReviewOrderType.Unspecified)
             {
-                throw new ArgumentException("Тип заказа должен быть указан");
+                throw new ArgumentException("Тип заказа должен быть указан", nameof(type));
             }
 
             return context.Add(new ReviewOrderEntity

@@ -131,7 +131,7 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
                 ReviewOrderType.Free => NominalAmount + Transactions.Where(x => x.Kind == TransactionKind.Payment).Sum(x => x.Debit),
                 ReviewOrderType.Charity => 0,
                 ReviewOrderType.Custom => throw new NotSupportedException("Неподдерживаемый тип заказа"),
-                _ => throw new UnreachableException("Неподдерживаемый тип заказа"),
+                _ => throw new InvalidOperationException("Неподдерживаемый тип заказа"),
             };
 
             return result;

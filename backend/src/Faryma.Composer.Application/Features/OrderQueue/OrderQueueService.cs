@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Faryma.Composer.Application.Common;
+﻿using Faryma.Composer.Application.Common;
 using Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
@@ -70,7 +69,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
                     await HandleStreamChanged(streamChanged);
                     break;
                 default:
-                    throw new UnreachableException($"Неподдерживаемый тип события: {evt.GetType().Name}");
+                    throw new InvalidOperationException($"Неподдерживаемый тип события: {evt.GetType().Name}");
             }
 
             _syncVersion++;
