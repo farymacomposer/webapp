@@ -3,12 +3,6 @@ project:
   solution: Faryma.Composer.slnx
   runtime: .NET 10
 
-commands:
-  build: dotnet build Faryma.Composer.slnx
-  run_api: dotnet run --project src/Faryma.Composer.Api/Faryma.Composer.Api.csproj
-  test_app: dotnet test tests/Faryma.Composer.Application.Test/Faryma.Composer.Application.Test.csproj
-  test_api: dotnet test tests/Faryma.Composer.Api.Test/Faryma.Composer.Api.Test.csproj
-
 layers:
   api:
     path: src/Faryma.Composer.Api
@@ -93,6 +87,11 @@ features:
       - src/Faryma.Composer.Contracts/Application/Features/ReviewOrder
       - src/Faryma.Composer.Infrastructure/Persistence/Stores/ReviewOrderStore.cs
       - src/Faryma.Composer.Infrastructure/Persistence/Queries/ReviewOrderQueries.cs
+      - src/Faryma.Composer.Desktop/Api/ReviewOrder
+      - src/Faryma.Composer.Desktop/UI/Pages/ReviewOrder
+      - src/Faryma.Composer.Desktop/UI/Dialogs/CreateReviewOrder
+      - src/Faryma.Composer.Desktop/ViewModels/ReviewOrderVM.cs
+      - src/Faryma.Composer.Desktop/ViewModels/ReviewOrderGroup.cs
       - tests/Faryma.Composer.Application.Test/ReviewOrder
       - use-cases/review-order
   composer_stream:
@@ -103,6 +102,11 @@ features:
       - src/Faryma.Composer.Contracts/Application/Features/ComposerStream
       - src/Faryma.Composer.Infrastructure/Persistence/Stores/ComposerStreamStore.cs
       - src/Faryma.Composer.Infrastructure/Persistence/Queries/ComposerStreamQueries.cs
+      - src/Faryma.Composer.Desktop/Api/ComposerStream
+      - src/Faryma.Composer.Desktop/UI/Pages/ComposerStream
+      - src/Faryma.Composer.Desktop/ViewModels/ComposerStreamVM.cs
+      - src/Faryma.Composer.Desktop/ViewModels/ComposerStreamDaySlotVM.cs
+      - src/Faryma.Composer.Desktop/ViewModels/StreamContainerVM.cs
       - tests/Faryma.Composer.Application.Test/ComposerStream
       - use-cases/composer-stream
   order_queue:
@@ -119,5 +123,9 @@ features:
       - src/Faryma.Composer.Application/Features/OrderQueue/PriorityAlgorithm/OrderPriorityManager.cs
       - src/Faryma.Composer.Contracts/Api/Features/OrderQueue
       - src/Faryma.Composer.Contracts/Application/Features/OrderQueue
+      - src/Faryma.Composer.Desktop/Api/OrderQueue
+      - src/Faryma.Composer.Desktop/Services/OrderQueueService.cs
+      - src/Faryma.Composer.Desktop/ViewModels/ReviewOrderGroup.cs
+      - src/Faryma.Composer.Desktop/ViewModels/ReviewOrderVM.cs
       - tests/Faryma.Composer.Application.Test/OrderQueue
       - use-cases/order-queue
