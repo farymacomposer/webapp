@@ -152,7 +152,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
                     break;
                 }
                 default:
-                    throw new UnreachableException($"Неподдерживаемый тип обновления стрима: {evt.UpdateType}");
+                    throw new InvalidOperationException($"Неподдерживаемый тип обновления стрима: {evt.UpdateType}");
             }
         }
     }

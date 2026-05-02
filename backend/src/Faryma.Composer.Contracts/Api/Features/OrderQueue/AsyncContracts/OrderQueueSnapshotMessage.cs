@@ -88,6 +88,9 @@ namespace Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts
                         result.FrozenOrders.Add(dto);
                         break;
 
+                    case OrderActivityStatus.Removed:
+                        break;
+
                     default:
                         throw new UnreachableException($"Неподдерживаемый статус активности заказа '{position.PositionHistory.Current.ActivityStatus}'");
                 }

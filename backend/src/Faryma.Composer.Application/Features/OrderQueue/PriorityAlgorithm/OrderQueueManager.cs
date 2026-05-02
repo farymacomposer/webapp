@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
@@ -99,7 +98,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 case OrderQueueUpdateType.OrderCanceled:
                     break;
                 default:
-                    throw new UnreachableException($"Неподдерживаемый тип обновления очереди '{updateType}'");
+                    throw new ArgumentException($"Неподдерживаемый тип обновления очереди '{updateType}'", nameof(updateType));
             }
 
             SaveCurrentPositionsToPrevious();
@@ -172,7 +171,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         {
             if (OrderPositionsById.Count(x => x.Value.Order.Status == ReviewOrderStatus.InProgress) > 1)
             {
-                throw new UnreachableException("Обнаружено более одного заказа со статусом 'InProgress'");
+                throw new InvalidOperationException("Обнаружено более одного заказа со статусом 'InProgress'");
             }
 
             KeyValuePair<long, OrderPosition> kvp = OrderPositionsById

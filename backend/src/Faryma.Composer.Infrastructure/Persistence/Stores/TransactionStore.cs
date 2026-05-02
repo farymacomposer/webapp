@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
@@ -13,6 +12,13 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             UserNicknameAccountEntity account,
             UserEntity createdByUser)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
+
+            if (!Enum.IsDefined(topUpProvider) || topUpProvider == AccountTopUpProvider.Unspecified)
+            {
+                throw new ArgumentException("Тип пополнения должен быть указан");
+            }
+
             AccountTopUpEntity source = new()
             {
                 CreatedAt = dateTimeService.Now,
@@ -39,9 +45,11 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             UserNicknameAccountEntity account,
             TransactionSourceEntity source)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
+
             if (source is not ReviewOrderEntity)
             {
-                throw new UnreachableException($"Недопустимый источник платежа '{source.GetType().Name}'");
+                throw new ArgumentException($"Недопустимый источник платежа '{source.GetType().Name}'", nameof(source));
             }
 
             return context.Add(new TransactionEntity
@@ -57,9 +65,11 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 
         public TransactionEntity CreateReversal(string reason, UserEntity createdByUser, TransactionEntity reversedTransaction)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+
             if (reversedTransaction.Kind == TransactionKind.Reversal)
             {
-                throw new UnreachableException("Невозможно отменить транзакцию отмены");
+                throw new InvalidOperationException("Невозможно отменить транзакцию отмены");
             }
 
             TransactionReversalEntity source = new()

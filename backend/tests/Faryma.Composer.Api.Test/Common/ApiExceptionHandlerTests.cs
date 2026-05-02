@@ -17,7 +17,7 @@ namespace Faryma.Composer.Api.Test.Common
 
             Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-            Assert.Equal(typeof(TestApiException).FullName, json.RootElement.GetProperty("ExceptionType").GetString());
+            Assert.Equal(nameof(TestApiException), json.RootElement.GetProperty("ExceptionType").GetString());
             Assert.Equal("Тестовая ошибка API", json.RootElement.GetProperty("Message").GetString());
         }
 

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
+﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 
@@ -35,19 +34,14 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
         /// </summary>
         public required DateOnly? LastDebtCategoryDate { get; set; }
 
-        public static CategoryState MapCategoryState(QueueCategory? queueCategory)
+        public static CategoryState MapCategoryState(QueueCategory queueCategory)
         {
-            if (!queueCategory.HasValue)
-            {
-                throw new UnreachableException("Категория заказа не определена");
-            }
-
-            return queueCategory.Value switch
+            return queueCategory switch
             {
                 QueueCategory.OutOfQueue => CategoryState.OutOfQueue,
                 QueueCategory.Donation => CategoryState.Donation,
                 QueueCategory.Debt => CategoryState.Debt,
-                _ => throw new UnreachableException($"Неподдерживаемая категория заказа '{queueCategory}'")
+                _ => throw new ArgumentException($"Неподдерживаемая категория заказа '{queueCategory}'", nameof(queueCategory))
             };
         }
 
