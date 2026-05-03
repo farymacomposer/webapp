@@ -24,5 +24,9 @@ This file applies to `src/Faryma.Composer.Desktop`.
 ## Verification
 
 - Prefer the smallest desktop-scoped verification that confirms the requested behavior.
+- Run verification commands from the `backend` workspace root.
 - Use stronger verification when auth, app startup, service registration, or API client behavior changes.
 - Build this WinUI project with Visual Studio MSBuild, not `dotnet build`, so XAML compilation runs in the supported environment.
+- Use this exact command for desktop verification:
+  `& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" "src\Faryma.Composer.Desktop\Faryma.Composer.Desktop.csproj" /restore /p:Configuration=Debug /p:Platform=x64`
+- Do not replace it with `vswhere`, omit `/p:Platform=x64`, or use `dotnet build` unless the user explicitly asks for a different verification command.

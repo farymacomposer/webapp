@@ -30,7 +30,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ReviewOrderStatus", new[] { "unspecified", "preorder", "awaiting_payment", "pending", "in_progress", "completed", "canceled" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ReviewOrderType", new[] { "unspecified", "out_of_queue", "donation", "free", "charity", "custom" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "TransactionKind", new[] { "unspecified", "account_top_up", "payment", "reversal" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "UserEntitlementKind", new[] { "unspecified", "amount_coupon", "service_token" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "UserEntitlementKind", new[] { "unspecified", "service_token" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "UserEntitlementTarget", new[] { "unspecified", "review_order", "out_of_queue_review_order", "detailed_review" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 

@@ -27,7 +27,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 .Annotation("Npgsql:Enum:app.ReviewOrderStatus", "unspecified,preorder,awaiting_payment,pending,in_progress,completed,canceled")
                 .Annotation("Npgsql:Enum:app.ReviewOrderType", "unspecified,out_of_queue,donation,free,charity,custom")
                 .Annotation("Npgsql:Enum:app.TransactionKind", "unspecified,account_top_up,payment,reversal")
-                .Annotation("Npgsql:Enum:app.UserEntitlementKind", "unspecified,amount_coupon,service_token")
+                .Annotation("Npgsql:Enum:app.UserEntitlementKind", "unspecified,service_token")
                 .Annotation("Npgsql:Enum:app.UserEntitlementTarget", "unspecified,review_order,out_of_queue_review_order,detailed_review");
 
             migrationBuilder.CreateTable(

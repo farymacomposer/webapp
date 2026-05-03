@@ -11,10 +11,8 @@ layers:
       - src/Faryma.Composer.Api/Program.cs
       - src/Faryma.Composer.Api/appsettings.json
       - src/Faryma.Composer.Api/appsettings.Development.json
-      - src/Faryma.Composer.Api/Common
       - src/Faryma.Composer.Api/Common/DependencyInjection/ServiceCollectionExtensions.cs
       - src/Faryma.Composer.Api/Features
-      - src/Faryma.Composer.Api/Features/Auth
       - src/Faryma.Composer.Api/Common/Extensions
       - src/Faryma.Composer.Api/Common/Exceptions/ApiExceptionHandler.cs
       - src/Faryma.Composer.Api/Common/Startup/ApplicationStartupInitializer.cs
@@ -25,7 +23,6 @@ layers:
       - src/Faryma.Composer.Application/Common
       - src/Faryma.Composer.Application/Features
       - src/Faryma.Composer.Application/DependencyInjection/ServiceCollectionExtensions.cs
-      - src/Faryma.Composer.Application/Features/OrderQueue/OrderQueueBackgroundWorker.cs
   infrastructure:
     path: src/Faryma.Composer.Infrastructure
     entry:
@@ -113,20 +110,10 @@ features:
   order_queue:
     paths:
       - src/Faryma.Composer.Api/Features/OrderQueue
-      - src/Faryma.Composer.Api/Features/OrderQueue/OrderQueueNotificationHub.cs
-      - src/Faryma.Composer.Api/Features/OrderQueue/OrderQueueNotificationService.cs
       - src/Faryma.Composer.Application/Features/OrderQueue
-      - src/Faryma.Composer.Application/Features/OrderQueue/OrderQueueService.cs
-      - src/Faryma.Composer.Application/Features/OrderQueue/OrderQueueEventChannel.cs
-      - src/Faryma.Composer.Application/Features/OrderQueue/OrderQueueBackgroundWorker.cs
-      - src/Faryma.Composer.Application/Features/OrderQueue/PriorityAlgorithm
-      - src/Faryma.Composer.Application/Features/OrderQueue/PriorityAlgorithm/OrderQueueManager.cs
-      - src/Faryma.Composer.Application/Features/OrderQueue/PriorityAlgorithm/OrderPriorityManager.cs
       - src/Faryma.Composer.Contracts/Api/Features/OrderQueue
       - src/Faryma.Composer.Contracts/Application/Features/OrderQueue
       - src/Faryma.Composer.Desktop/Api/OrderQueue
       - src/Faryma.Composer.Desktop/Services/OrderQueueService.cs
-      - src/Faryma.Composer.Desktop/ViewModels/ReviewOrderGroup.cs
-      - src/Faryma.Composer.Desktop/ViewModels/ReviewOrderVM.cs
       - tests/Faryma.Composer.Application.Test/OrderQueue
       - use-cases/order-queue
