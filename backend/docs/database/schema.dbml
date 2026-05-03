@@ -95,13 +95,13 @@ Table user_nickname_accounts [note: 'Счет псевдонима пользо�
   UserNicknameId Guid [ref: - user_nicknames.Id, note: 'Идентификатор псевдонима пользователя']
 }
 
-Table user_entitlements [note: 'Пользовательское право на неденежное покрытие стоимости: купон или жетон'] {
+Table user_entitlements [note: 'Пользовательское право на неденежное покрытие стоимости: жетон'] {
   Id long [pk]
   CreatedAt DateTime [note: 'Дата и время выдачи']
   Code string [null, unique, note: 'Внешний или ручной код права']
   Kind UserEntitlementKind [note: 'Тип права']
   Target UserEntitlementTarget [note: 'Услуга или стоимость, которую право может покрывать']
-  Amount long [note: 'Номинал суммового купона. Для жетонов сумма покрытия фиксируется при погашении']
+  Amount long [note: 'Сумма покрытия не хранится на жетоне и фиксируется при погашении']
   ExpiresAt DateTime [null, note: 'Дата и время истечения срока действия']
   RedeemedAt DateTime [null, note: 'Дата и время погашения']
   CanceledAt DateTime [null, note: 'Дата и время отмены']
@@ -269,7 +269,6 @@ Enum AccountTopUpProvider {
 // Тип пользовательского права на неденежное покрытие стоимости
 Enum UserEntitlementKind {
   Unspecified [note: 'Не задан']
-  AmountCoupon [note: 'Суммовой купон']
   ServiceToken [note: 'Типовой жетон']
 }
 

@@ -93,6 +93,73 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         }
 
         /// <summary>
+        /// Проверяет, что доплата разрешена только для денежных типов заказов.
+        /// </summary>
+        [Theory]
+        [InlineData(ReviewOrderType.Donation)]
+        [InlineData(ReviewOrderType.Free)]
+        public async Task PayOrder_AddsPayment_WhenOrderTypeAcceptsPayments(ReviewOrderType orderType)
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                type: orderType,
+                status: ReviewOrderStatus.Pending,
+                trackUrl: "https://example.com/track");
+
+            TransactionEntity payment = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                {
+                    ReviewOrderId = order.Id,
+                    Nickname = "Nick-PayableType",
+                    PaymentAmount = 500,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    CreatedByUserId = user.Id,
+                }));
+
+            List<TransactionEntity> orderTransactions = await app.GetOrderTransactionsAsync(order.Id);
+
+            Assert.Equal(TransactionKind.Payment, payment.Kind);
+            Assert.Equal(order.Id, payment.TransactionSourceId);
+            Assert.Single(orderTransactions);
+            Assert.Equal(500, orderTransactions[0].Debit);
+        }
+
+        /// <summary>
+        /// Проверяет, что доплата запрещена для типов заказов без денежных платежей.
+        /// </summary>
+        [Theory]
+        [InlineData(ReviewOrderType.OutOfQueue)]
+        [InlineData(ReviewOrderType.Charity)]
+        [InlineData(ReviewOrderType.Custom)]
+        public async Task PayOrder_Throws_WhenOrderTypeDoesNotAcceptPayments(ReviewOrderType orderType)
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                type: orderType,
+                status: ReviewOrderStatus.Pending,
+                trackUrl: "https://example.com/track");
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                    {
+                        ReviewOrderId = order.Id,
+                        Nickname = "Nick-NonPayableType",
+                        PaymentAmount = 500,
+                        TopUpProvider = AccountTopUpProvider.Manual,
+                        CreatedByUserId = user.Id,
+                    })));
+
+            List<TransactionEntity> orderTransactions = await app.GetOrderTransactionsAsync(order.Id);
+
+            Assert.Empty(orderTransactions);
+        }
+
+        /// <summary>
         /// Проверяет, что заморозка заказа не блокирует оплату.
         /// </summary>
         [Fact]

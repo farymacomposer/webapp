@@ -6,93 +6,93 @@ using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
     public sealed class CreateReviewOrderTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
-        /// Проверяет, что нулевой платеж в API-запросе считается отсутствующим платежом, если есть покрытие.
+        /// Проверяет, что donation DTO требует денежный платеж.
         /// </summary>
         [Fact]
-        public void CreateDonationReviewOrderRequest_AllowsZeroPayment_WhenDonationHasCouponCoverage()
+        public void CreateDonationReviewOrderRequest_RejectsMissingPayment()
         {
             CreateDonationReviewOrderRequest request = new()
             {
-                Nickname = "Nick-Coupon",
+                Nickname = "Nick-NoPayment",
                 TrackUrl = "https://example.com/track",
                 TrackDurationSeconds = 60,
                 PaymentAmount = 0,
-                CouponAmount = 750,
                 TopUpProvider = null,
+                UserComment = null,
+            };
+
+            List<ValidationResult> results = Validate(request);
+
+            Assert.Contains(results, x => x.ErrorMessage == "Для донатных заказов требуется платеж");
+        }
+
+        /// <summary>
+        /// Проверяет, что donation DTO больше не принимает купонное покрытие.
+        /// </summary>
+        [Fact]
+        public void CreateDonationReviewOrderRequest_DoesNotExposeCouponAmount()
+        {
+            CreateDonationReviewOrderRequest request = new()
+            {
+                Nickname = "Nick-Donation",
+                TrackUrl = "https://example.com/track",
+                TrackDurationSeconds = 60,
+                PaymentAmount = 1_000,
+                TopUpProvider = AccountTopUpProvider.Manual,
                 UserComment = null,
             };
 
             List<ValidationResult> results = Validate(request);
 
             Assert.Empty(results);
+            Assert.Null(typeof(CreateDonationReviewOrderRequest).GetProperty("CouponAmount"));
         }
 
         /// <summary>
-        /// Проверяет, что donation DTO требует платеж или покрытие.
+        /// Проверяет, что out-of-queue DTO больше не принимает сумму покрытия.
         /// </summary>
         [Fact]
-        public void CreateDonationReviewOrderRequest_RejectsMissingCoverage()
-        {
-            CreateDonationReviewOrderRequest request = new()
-            {
-                Nickname = "Nick-NoCoverage",
-                TrackUrl = "https://example.com/track",
-                TrackDurationSeconds = 60,
-                PaymentAmount = 0,
-                CouponAmount = null,
-                TopUpProvider = null,
-                UserComment = null,
-            };
-
-            List<ValidationResult> results = Validate(request);
-
-            Assert.Contains(results, x => x.ErrorMessage == "Для донатных заказов требуется платеж, купон или жетон");
-        }
-
-        /// <summary>
-        /// Проверяет, что out-of-queue DTO требует положительное покрытие.
-        /// </summary>
-        [Fact]
-        public void CreateOutOfQueueReviewOrderRequest_RejectsMissingCoverage()
+        public void CreateOutOfQueueReviewOrderRequest_DoesNotExposeCouponAmount()
         {
             CreateOutOfQueueReviewOrderRequest request = new()
             {
                 Nickname = "Nick-OOQ",
                 TrackUrl = "https://example.com/track",
                 TrackDurationSeconds = 60,
-                CouponAmount = 0,
                 UserComment = null,
             };
 
             List<ValidationResult> results = Validate(request);
 
-            Assert.Contains(results, x => x.ErrorMessage == "Для внеочередных заказов требуется купон, жетон или админское покрытие");
+            Assert.Empty(results);
+            Assert.Null(typeof(CreateOutOfQueueReviewOrderRequest).GetProperty("CouponAmount"));
         }
 
         /// <summary>
-        /// Проверяет, что free DTO требует положительное покрытие.
+        /// Проверяет, что free DTO больше не принимает сумму покрытия.
         /// </summary>
         [Fact]
-        public void CreateFreeReviewOrderRequest_RejectsMissingCoverage()
+        public void CreateFreeReviewOrderRequest_DoesNotExposeCouponAmount()
         {
             CreateFreeReviewOrderRequest request = new()
             {
                 Nickname = "Nick-Free",
                 TrackUrl = "https://example.com/track",
                 TrackDurationSeconds = 60,
-                CouponAmount = 0,
                 UserComment = null,
             };
 
             List<ValidationResult> results = Validate(request);
 
-            Assert.Contains(results, x => x.ErrorMessage == "Для бесплатных заказов требуется купон, жетон или админское покрытие");
+            Assert.Empty(results);
+            Assert.Null(typeof(CreateFreeReviewOrderRequest).GetProperty("CouponAmount"));
         }
 
         /// <summary>
@@ -264,7 +264,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = "https://example.com/free",
                     TrackDurationSeconds = 60,
                     UserComment = null,
-                    CouponAmount = 1_000,
                     CreatedByUserId = user.Id,
                 }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
@@ -276,6 +275,17 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
             Assert.Equal(UserEntitlementTarget.ReviewOrder, redemption.Target);
             Assert.Equal(1_000, redemption.CoveredAmount);
+            UserEntitlementEntity entitlement = await app.RunScopeAsync(async services =>
+            {
+                IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
+                await using AppDbContext context = await factory.CreateDbContextAsync();
+
+                return await context.UserEntitlements
+                    .AsNoTracking()
+                    .SingleAsync(x => x.Id == redemption.UserEntitlementId);
+            });
+            Assert.Equal(UserEntitlementKind.ServiceToken, entitlement.Kind);
+            Assert.Equal(0, entitlement.Amount);
         }
 
         /// <summary>
@@ -344,7 +354,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = "https://example.com/free",
                     TrackDurationSeconds = 60,
                     UserComment = null,
-                    CouponAmount = 1_000,
                     CreatedByUserId = user.Id,
                 }));
 
@@ -376,7 +385,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = null,
                     TrackDurationSeconds = null,
                     UserComment = null,
-                    CouponAmount = 1_000,
                     CreatedByUserId = user.Id,
                 }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
@@ -389,6 +397,130 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
             Assert.Equal(UserEntitlementTarget.OutOfQueueReviewOrder, redemption.Target);
             Assert.Equal(1_000, redemption.CoveredAmount);
+        }
+
+        /// <summary>
+        /// Проверяет, что пользовательский жетон обычного заказа создает бесплатный заказ и сразу погашается.
+        /// </summary>
+        [Fact]
+        public async Task CreateWithToken_CreatesFreeOrderAndRedeemsReviewOrderToken()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("user-token-free");
+            await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+            long tokenId = await CreateServiceToken(app, user, "Nick-UserFree", UserEntitlementTarget.ReviewOrder);
+
+            ReviewOrderEntity order = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateWithToken(new CreateTokenOrderCommand
+                {
+                    Nickname = "Nick-UserFree",
+                    TrackUrl = "https://example.com/user-free",
+                    TrackDurationSeconds = 60,
+                    UserComment = null,
+                    UserEntitlementId = tokenId,
+                    CreatedByUserId = user.Id,
+                }));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
+
+            Assert.Equal(ReviewOrderType.Free, persisted.Type);
+            Assert.Equal(ReviewOrderStatus.Pending, persisted.Status);
+            Assert.Equal(1_000, persisted.PayableAmount);
+            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
+            Assert.Equal(tokenId, redemption.UserEntitlementId);
+            Assert.Equal(UserEntitlementTarget.ReviewOrder, redemption.Target);
+            Assert.Equal(1_000, redemption.CoveredAmount);
+            Assert.NotNull(await GetTokenRedeemedAt(app, tokenId));
+        }
+
+        /// <summary>
+        /// Проверяет, что пользовательский жетон внеочередного заказа сам выбирает тип OutOfQueue.
+        /// </summary>
+        [Fact]
+        public async Task CreateWithToken_CreatesOutOfQueueOrderFromOutOfQueueToken()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("user-token-ooq");
+            await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today,
+                type: ComposerStreamType.Charity);
+            long tokenId = await CreateServiceToken(app, user, "Nick-UserOOQ", UserEntitlementTarget.OutOfQueueReviewOrder);
+
+            ReviewOrderEntity order = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateWithToken(new CreateTokenOrderCommand
+                {
+                    Nickname = "Nick-UserOOQ",
+                    TrackUrl = null,
+                    TrackDurationSeconds = null,
+                    UserComment = null,
+                    UserEntitlementId = tokenId,
+                    CreatedByUserId = user.Id,
+                }));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
+
+            Assert.Equal(ReviewOrderType.OutOfQueue, persisted.Type);
+            Assert.Equal(ReviewOrderStatus.Preorder, persisted.Status);
+            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
+            Assert.Equal(UserEntitlementTarget.OutOfQueueReviewOrder, redemption.Target);
+            Assert.Equal(tokenId, redemption.UserEntitlementId);
+        }
+
+        /// <summary>
+        /// Проверяет, что пользовательский сценарий не принимает жетон подробного разбора для создания заказа.
+        /// </summary>
+        [Fact]
+        public async Task CreateWithToken_Throws_WhenTokenTargetIsDetailedReview()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("user-token-detailed");
+            await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+            long tokenId = await CreateServiceToken(app, user, "Nick-UserDetailed", UserEntitlementTarget.DetailedReview);
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().CreateWithToken(new CreateTokenOrderCommand
+                    {
+                        Nickname = "Nick-UserDetailed",
+                        TrackUrl = "https://example.com/user-detailed",
+                        TrackDurationSeconds = 60,
+                        UserComment = null,
+                        UserEntitlementId = tokenId,
+                        CreatedByUserId = user.Id,
+                    })));
+        }
+
+        /// <summary>
+        /// Проверяет, что пользовательский сценарий не принимает жетон другого пользователя.
+        /// </summary>
+        [Fact]
+        public async Task CreateWithToken_Throws_WhenTokenBelongsToAnotherUser()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity owner = await app.Data.CreateUserAsync("user-token-owner");
+            UserEntity requester = await app.Data.CreateUserAsync("user-token-requester");
+            await app.Data.CreateStreamAsync(
+                createdByUserId: owner.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+            long tokenId = await CreateServiceToken(app, owner, "Nick-OtherOwner", UserEntitlementTarget.ReviewOrder);
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().CreateWithToken(new CreateTokenOrderCommand
+                    {
+                        Nickname = "Nick-OtherOwner",
+                        TrackUrl = "https://example.com/other-owner",
+                        TrackDurationSeconds = 60,
+                        UserComment = null,
+                        UserEntitlementId = tokenId,
+                        CreatedByUserId = requester.Id,
+                    })));
         }
 
         /// <summary>
@@ -421,7 +553,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         }
 
         /// <summary>
-        /// Проверяет, что donation-заказ нельзя создать без платежа или купона.
+        /// Проверяет, что donation-заказ нельзя создать без платежа.
         /// </summary>
         [Fact]
         public async Task CreateDonation_Throws_WhenCoverageIsMissing()
@@ -443,55 +575,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         UserComment = null,
                         CreatedByUserId = user.Id,
                     })));
-        }
-
-        /// <summary>
-        /// Проверяет, что купон покрывает готовность заказа без денежного платежа.
-        /// </summary>
-        [Fact]
-        public async Task CreateDonation_CreatesPendingWithoutPayment_WhenCouponCoversRequiredAmount()
-        {
-            await using ApplicationTestHost app = await CreateAppAsync();
-            UserEntity user = await app.Data.CreateUserAsync("admin");
-            await app.Data.CreateStreamAsync(
-                createdByUserId: user.Id,
-                eventDate: app.Today.AddDays(1),
-                type: ComposerStreamType.Donation);
-
-            ReviewOrderEntity order = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
-                {
-                    Nickname = "Nick-Coupon",
-                    TrackUrl = "https://example.com/coupon",
-                    TrackDurationSeconds = 60,
-                    UserComment = null,
-                    CouponAmount = 1_000,
-                    CreatedByUserId = user.Id,
-                }));
-
-            List<TransactionEntity> orderTransactions = await app.GetOrderTransactionsAsync(order.Id);
-            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
-
-            Assert.Equal(ReviewOrderStatus.Pending, order.Status);
-            Assert.Equal(0, persisted.NonPaymentCoverageAmount);
-            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
-            UserEntitlementEntity entitlement = await app.RunScopeAsync(async services =>
-            {
-                IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
-                await using AppDbContext context = await factory.CreateDbContextAsync();
-
-                return await context.UserEntitlements
-                    .AsNoTracking()
-                    .SingleAsync(x => x.Id == redemption.UserEntitlementId);
-            });
-
-            Assert.Equal(UserEntitlementKind.AmountCoupon, entitlement.Kind);
-            Assert.Equal(UserEntitlementTarget.ReviewOrder, entitlement.Target);
-            Assert.Equal(1_000, entitlement.Amount);
-            Assert.NotNull(entitlement.RedeemedAt);
-            Assert.Equal(UserEntitlementTarget.ReviewOrder, redemption.Target);
-            Assert.Equal(1_000, redemption.CoveredAmount);
-            Assert.Empty(orderTransactions);
         }
 
         /// <summary>
@@ -583,7 +666,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         TrackUrl = "https://example.com/free",
                         TrackDurationSeconds = 60,
                         UserComment = null,
-                        CouponAmount = 1_000,
                         CreatedByUserId = user.Id,
                     })),
                 "OutOfQueue" => app.RunScopeAsync(services =>
@@ -593,7 +675,6 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         TrackUrl = null,
                         TrackDurationSeconds = null,
                         UserComment = null,
-                        CouponAmount = 1_000,
                         CreatedByUserId = user.Id,
                     })),
                 _ => throw new InvalidOperationException($"Неподдерживаемый тип: {kind}")
@@ -601,6 +682,43 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() => action);
         }
+
+        private static Task<long> CreateServiceToken(
+            ApplicationTestHost app,
+            UserEntity owner,
+            string nickname,
+            UserEntitlementTarget target) =>
+            app.RunScopeAsync(async services =>
+            {
+                UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
+                UserEntity actualUser = await services.GetRequiredService<UserManager<UserEntity>>()
+                    .FindByIdAsync(owner.Id.ToString())
+                    ?? throw new InvalidOperationException("Пользователь не найден");
+                UserNicknameEntity userNickname = await uow.UserNicknameStore.FindByNickname(nickname)
+                    ?? uow.UserNicknameStore.Create(nickname);
+                userNickname.UserId = owner.Id;
+
+                UserEntitlementEntity token = uow.UserEntitlementStore.CreateServiceToken(
+                    userNickname,
+                    target,
+                    actualUser);
+
+                await uow.SaveChanges();
+
+                return token.Id;
+            });
+
+        private static Task<DateTime?> GetTokenRedeemedAt(ApplicationTestHost app, long tokenId) =>
+            app.RunScopeAsync(async services =>
+            {
+                IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
+                await using AppDbContext context = await factory.CreateDbContextAsync();
+                return await context.UserEntitlements
+                    .AsNoTracking()
+                    .Where(x => x.Id == tokenId)
+                    .Select(x => x.RedeemedAt)
+                    .SingleAsync();
+            });
 
         private static List<ValidationResult> Validate(object request)
         {

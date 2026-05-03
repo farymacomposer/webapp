@@ -205,10 +205,10 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         }
 
         /// <summary>
-        /// Проверяет, что купон увеличивает покрытие, но не денежный приоритет.
+        /// Проверяет, что жетон увеличивает покрытие, но не денежный приоритет.
         /// </summary>
         [Fact]
-        public async Task CalculatePricing_IncludesCouponCoverageWithoutIncreasingPaidPriority()
+        public async Task CalculatePricing_IncludesTokenCoverageWithoutIncreasingPaidPriority()
         {
             await using ApplicationTestHost app = await CreateAppAsync();
             UserEntity user = await app.Data.CreateUserAsync("admin");
@@ -220,13 +220,12 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderPricing pricing = await app.RunScopeAsync(async services =>
             {
                 ReviewOrderEntity order = await services.GetRequiredService<ReviewOrderService>()
-                    .CreateDonation(new CreateDonationOrderCommand
+                    .CreateFree(new CreateFreeOrderCommand
                     {
-                        Nickname = "Nick-CouponPricing",
-                        TrackUrl = "https://example.com/coupon-pricing",
+                        Nickname = "Nick-TokenPricing",
+                        TrackUrl = "https://example.com/token-pricing",
                         TrackDurationSeconds = 60,
                         UserComment = null,
-                        CouponAmount = 1_000,
                         CreatedByUserId = user.Id,
                     });
 
@@ -254,13 +253,12 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 type: ComposerStreamType.Donation);
 
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                services.GetRequiredService<ReviewOrderService>().CreateFree(new CreateFreeOrderCommand
                 {
                     Nickname = "Nick-QueueCoverage",
                     TrackUrl = "https://example.com/queue-coverage",
                     TrackDurationSeconds = 60,
                     UserComment = null,
-                    CouponAmount = 1_000,
                     CreatedByUserId = user.Id,
                 }));
 
@@ -282,7 +280,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         }
 
         /// <summary>
-        /// Проверяет, что погашение купона увеличивает покрытие, но не денежный приоритет и не суммируется с legacy-полем.
+        /// Проверяет, что погашение жетона увеличивает покрытие, но не денежный приоритет и не суммируется с legacy-полем.
         /// </summary>
         [Fact]
         public async Task CalculatePricing_IncludesEntitlementRedemptionCoverageWithoutIncreasingPaidPriority()
@@ -308,14 +306,13 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     ?? throw new InvalidOperationException("Псевдоним не найден");
 
                 actualOrder.NonPaymentCoverageAmount = 600;
-                UserEntitlementEntity coupon = uow.UserEntitlementStore.CreateAmountCoupon(
+                UserEntitlementEntity token = uow.UserEntitlementStore.CreateServiceToken(
                     userNickname,
                     UserEntitlementTarget.ReviewOrder,
-                    amount: 600,
                     actualUser);
 
                 uow.UserEntitlementStore.Redeem(
-                    coupon,
+                    token,
                     UserEntitlementTarget.ReviewOrder,
                     coveredAmount: 600,
                     actualUser,

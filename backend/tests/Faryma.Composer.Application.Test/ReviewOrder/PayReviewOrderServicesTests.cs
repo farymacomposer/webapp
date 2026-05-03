@@ -1,11 +1,15 @@
+using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.PayDetailedReview;
 using Faryma.Composer.Contracts.Application.Features.AppSettings;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
+using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
@@ -21,7 +25,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             UserEntity user = await app.Data.CreateUserAsync("admin");
             ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(createdByUserId: user.Id);
 
-            TransactionEntity payment = await app.RunScopeAsync(async services =>
+            PayDetailedReviewResult result = await app.RunScopeAsync(async services =>
             {
                 await ConfigurePricing(services, extraTimeAmountPerSecond: 3, detailedReviewAmount: 650);
 
@@ -53,6 +57,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     return (source, accountTransactions);
                 });
 
+            TransactionEntity payment = Assert.IsType<TransactionEntity>(result.PaymentTransaction);
+            Assert.Null(result.UserEntitlementRedemption);
+            Assert.Equal(order.Id, result.ReviewOrder.Id);
             Assert.Equal(TransactionKind.Payment, payment.Kind);
             Assert.Equal(source.Id, payment.TransactionSourceId);
             Assert.Equal(650, source.Amount);
@@ -61,6 +68,133 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(
                 [TransactionKind.AccountTopUp, TransactionKind.Payment],
                 accountTransactions.Select(x => x.Kind).ToArray());
+        }
+
+        /// <summary>
+        /// Проверяет, что подробный разбор можно оплатить жетоном без денежных транзакций.
+        /// </summary>
+        [Fact]
+        public async Task PayDetailedReview_RedeemsServiceTokenWithoutPayment()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(createdByUserId: user.Id);
+            long tokenId = await app.RunScopeAsync(async services =>
+            {
+                UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
+                UserEntity actualUser = await services.GetRequiredService<UserManager<UserEntity>>()
+                    .FindByIdAsync(user.Id.ToString())
+                    ?? throw new InvalidOperationException("Пользователь не найден");
+                UserNicknameEntity userNickname = await uow.UserNicknameStore.FindByNickname("Nick-DetailedToken")
+                    ?? uow.UserNicknameStore.Create("Nick-DetailedToken");
+
+                UserEntitlementEntity token = uow.UserEntitlementStore.CreateServiceToken(
+                    userNickname,
+                    UserEntitlementTarget.DetailedReview,
+                    actualUser);
+
+                await uow.SaveChanges();
+
+                return token.Id;
+            });
+
+            PayDetailedReviewResult result = await app.RunScopeAsync(async services =>
+            {
+                await ConfigurePricing(services, extraTimeAmountPerSecond: 3, detailedReviewAmount: 650);
+
+                return await services.GetRequiredService<ReviewOrderService>().PayDetailedReview(new PayDetailedReviewCommand
+                {
+                    ReviewOrderId = order.Id,
+                    Nickname = "Nick-DetailedToken",
+                    UserEntitlementId = tokenId,
+                    CreatedByUserId = user.Id,
+                });
+            });
+
+            (ReviewOrderDetailedReviewPaymentEntity source, UserEntitlementRedemptionEntity redemption, int transactionCount) =
+                await app.RunScopeAsync(async services =>
+                {
+                    IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
+                    await using AppDbContext context = await factory.CreateDbContextAsync();
+                    ReviewOrderDetailedReviewPaymentEntity source = await context.ReviewOrderDetailedReviewPayments
+                        .AsNoTracking()
+                        .SingleAsync(x => x.ReviewOrderId == order.Id);
+                    UserEntitlementRedemptionEntity redemption = await context.UserEntitlementRedemptions
+                        .AsNoTracking()
+                        .SingleAsync(x => x.ReviewOrderDetailedReviewPaymentId == source.Id);
+                    int transactionCount = await context.Transactions
+                        .AsNoTracking()
+                        .Where(x => x.TransactionSource is ReviewOrderDetailedReviewPaymentEntity)
+                        .CountAsync(x => ((ReviewOrderDetailedReviewPaymentEntity)x.TransactionSource).ReviewOrderId == order.Id);
+
+                    return (source, redemption, transactionCount);
+                });
+
+            Assert.Null(result.PaymentTransaction);
+            Assert.NotNull(result.UserEntitlementRedemption);
+            Assert.Equal(result.UserEntitlementRedemption.Id, redemption.Id);
+            Assert.Equal(order.Id, result.ReviewOrder.Id);
+            Assert.Equal(650, source.Amount);
+            Assert.Equal(UserEntitlementTarget.DetailedReview, redemption.Target);
+            Assert.Equal(650, redemption.CoveredAmount);
+            Assert.Equal(tokenId, redemption.UserEntitlementId);
+            Assert.Equal(0, transactionCount);
+        }
+
+        /// <summary>
+        /// Проверяет, что DTO оплаты подробного разбора принимает строго один способ оплаты.
+        /// </summary>
+        [Theory]
+        [InlineData(null, null, false)]
+        [InlineData(AccountTopUpProvider.Manual, 10L, false)]
+        [InlineData(AccountTopUpProvider.Manual, null, true)]
+        [InlineData(null, 10L, true)]
+        public void PayDetailedReviewOrderRequest_ValidatesMoneyOrTokenExclusivity(
+            AccountTopUpProvider? topUpProvider,
+            long? userEntitlementId,
+            bool isValid)
+        {
+            PayDetailedReviewOrderRequest request = new()
+            {
+                ReviewOrderId = 1,
+                Nickname = "Nick-Detailed",
+                TopUpProvider = topUpProvider,
+                UserEntitlementId = userEntitlementId,
+            };
+
+            List<ValidationResult> results = Validate(request);
+
+            Assert.Equal(isValid, results.Count == 0);
+        }
+
+        /// <summary>
+        /// Проверяет, что application-сервис также не принимает смешанную или пустую оплату.
+        /// </summary>
+        [Theory]
+        [InlineData(null, null)]
+        [InlineData(AccountTopUpProvider.Manual, 10L)]
+        public async Task PayDetailedReview_Throws_WhenPaymentModeIsMissingOrMixed(
+            AccountTopUpProvider? topUpProvider,
+            long? userEntitlementId)
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(createdByUserId: user.Id);
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(async services =>
+                {
+                    await ConfigurePricing(services, extraTimeAmountPerSecond: 3, detailedReviewAmount: 650);
+
+                    await services.GetRequiredService<ReviewOrderService>().PayDetailedReview(new PayDetailedReviewCommand
+                    {
+                        ReviewOrderId = order.Id,
+                        Nickname = "Nick-Detailed",
+                        TopUpProvider = topUpProvider,
+                        UserEntitlementId = userEntitlementId,
+                        CreatedByUserId = user.Id,
+                    });
+                }));
         }
 
         /// <summary>
@@ -171,6 +305,18 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 ReviewOrderExtraTimeAmountPerSecond = extraTimeAmountPerSecond,
                 ReviewOrderDetailedReviewAmount = detailedReviewAmount,
             }, CancellationToken.None);
+        }
+
+        private static List<ValidationResult> Validate(object request)
+        {
+            List<ValidationResult> results = [];
+            Validator.TryValidateObject(
+                request,
+                new ValidationContext(request),
+                results,
+                validateAllProperties: true);
+
+            return results;
         }
     }
 }
