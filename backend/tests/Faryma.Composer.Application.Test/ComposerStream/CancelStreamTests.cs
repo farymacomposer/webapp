@@ -77,6 +77,7 @@ namespace Faryma.Composer.Application.Test.ComposerStream
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]
+        [InlineData(ReviewOrderStatus.AwaitingPayment)]
         public async Task Cancel_Throws_WhenPlannedStreamHasActiveCreatedOrders(ReviewOrderStatus orderStatus)
         {
             await using ApplicationTestHost app = await CreateAppAsync();

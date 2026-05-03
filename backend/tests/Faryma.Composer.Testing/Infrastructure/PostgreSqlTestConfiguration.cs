@@ -13,6 +13,7 @@ namespace Faryma.Composer.Testing.Infrastructure
                 ["POSTGRES:DATABASE"] = databaseName,
                 ["POSTGRES:USERNAME"] = fixture.Username,
                 ["POSTGRES:PASSWORD"] = fixture.Password,
+                ["POSTGRES:POOLING"] = false.ToString(),
             };
         }
     }

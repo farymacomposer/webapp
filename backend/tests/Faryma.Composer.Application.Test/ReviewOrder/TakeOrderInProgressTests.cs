@@ -186,6 +186,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         /// Проверяет, что в работу можно взять только заказ в статусе Pending.
         /// </summary>
         [Theory]
+        [InlineData(ReviewOrderStatus.AwaitingPayment)]
         [InlineData(ReviewOrderStatus.Completed)]
         [InlineData(ReviewOrderStatus.Canceled)]
         public async Task TakeInProgress_Throws_WhenOrderIsNotPending(ReviewOrderStatus status)

@@ -79,6 +79,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]
+        [InlineData(ReviewOrderStatus.AwaitingPayment)]
         [InlineData(ReviewOrderStatus.Canceled)]
         public async Task Complete_Throws_WhenOrderIsNotInProgress(ReviewOrderStatus status)
         {

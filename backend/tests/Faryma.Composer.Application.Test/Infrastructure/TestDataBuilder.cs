@@ -79,6 +79,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             ReviewOrderStatus status = ReviewOrderStatus.Pending,
             bool isFrozen = false,
             string? trackUrl = null,
+            int? trackDurationSeconds = null,
             int nominalAmount = 750,
             int payableAmount = 750,
             long totalPaymentAmount = 0,
@@ -99,7 +100,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 UserNicknameEntity userNickname = await GetOrCreateNicknameAsync(uow, nickname);
 
                 string? initialTrackUrl = trackUrl ?? (status == ReviewOrderStatus.Preorder ? null : _defaultTrackUrl);
-                int? trackDurationSeconds = initialTrackUrl is null ? null : 60;
+                int? initialTrackDurationSeconds = initialTrackUrl is null ? null : trackDurationSeconds ?? 60;
                 int initialPayableAmount = (type is ReviewOrderType.Donation or ReviewOrderType.Free)
                     ? payableAmount
                     : 0;
@@ -108,7 +109,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                     nominalAmount,
                     initialPayableAmount,
                     initialTrackUrl,
-                    trackDurationSeconds,
+                    initialTrackDurationSeconds,
                     userComment: "тестовый комментарий",
                     type,
                     creationStream,

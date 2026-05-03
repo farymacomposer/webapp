@@ -3,6 +3,13 @@
 // refresh tokens, idempotency records, data protection keys, and other persistence plumbing.
 // PostgreSQL schema: app
 
+Table app_settings [note: 'Настройки приложения'] {
+  Id long [pk]
+  ReviewOrderNominalAmount int [note: 'Номинальная стоимость заказа']
+  ReviewOrderExtraTimeAmountPerSecond long [note: 'Стоимость одной дополнительной секунды трека для заказа разбора']
+  ReviewOrderDetailedReviewAmount long [note: 'Стоимость услуги подробного разбора заказа']
+}
+
 Table composer_streams [note: 'Стрим композитора'] {
   Id long [pk]
   EventDate DateOnly [unique, note: 'Дата проведения стрима']
@@ -88,6 +95,33 @@ Table user_nickname_accounts [note: 'Счет псевдонима пользо�
   UserNicknameId Guid [ref: - user_nicknames.Id, note: 'Идентификатор псевдонима пользователя']
 }
 
+Table user_entitlements [note: 'Пользовательское право на неденежное покрытие стоимости: купон или жетон'] {
+  Id long [pk]
+  CreatedAt DateTime [note: 'Дата и время выдачи']
+  Code string [null, unique, note: 'Внешний или ручной код права']
+  Kind UserEntitlementKind [note: 'Тип права']
+  Target UserEntitlementTarget [note: 'Услуга или стоимость, которую право может покрывать']
+  Amount long [note: 'Номинал суммового купона. Для жетонов сумма покрытия фиксируется при погашении']
+  ExpiresAt DateTime [null, note: 'Дата и время истечения срока действия']
+  RedeemedAt DateTime [null, note: 'Дата и время погашения']
+  CanceledAt DateTime [null, note: 'Дата и время отмены']
+  Comment string [null, note: 'Комментарий к выдаче или отмене права']
+  UserNicknameId Guid [ref: > user_nicknames.Id, note: 'Псевдоним пользователя, которому выдано право']
+  CreatedByUserId Guid [ref: > AspNetUsers.Id, note: 'Пользователь, выдавший право']
+}
+
+Table user_entitlement_redemptions [note: 'Погашение пользовательского права на заказ или услугу'] {
+  Id long [pk]
+  CreatedAt DateTime [note: 'Дата и время погашения']
+  Target UserEntitlementTarget [note: 'Стоимость или услуга, покрытая при погашении']
+  CoveredAmount long [note: 'Сумма неденежного покрытия, зафиксированная на момент погашения']
+  Comment string [null, note: 'Комментарий к погашению']
+  UserEntitlementId long [unique, ref: - user_entitlements.Id, note: 'Погашенное пользовательское право']
+  RedeemedByUserId Guid [ref: > AspNetUsers.Id, note: 'Пользователь, выполнивший погашение']
+  ReviewOrderId long [null, ref: > review_orders.Id, note: 'Заказ разбора, стоимость которого покрыта']
+  ReviewOrderDetailedReviewPaymentId long [null, ref: > review_order_detailed_review_payments.Id, note: 'Оплата услуги подробного разбора, покрытая жетоном']
+}
+
 Table user_track_ratings [note: 'Пользовательская оценка трека'] {
   Id long [pk]
   RatingValue int [note: 'Оценка']
@@ -134,9 +168,25 @@ Table review_orders [note: 'Заказ разбора трека'] {
   TrackDurationSeconds int [null, note: 'Длительность трека в секундах']
   TrackId long [null, ref: > tracks.Id, note: 'Ссылка на трек (ID)']
   NominalAmount long [note: 'Номинальная стоимость заказа']
-  PayableAmount long [note: 'Сумма к оплате']
+  PayableAmount long [note: 'Snapshot обязательной стоимости заказа: номинал плюс доплата за длительность']
+  NonPaymentCoverageAmount long [note: 'Legacy-поле неденежного покрытия. Новые flow считают покрытие через user_entitlement_redemptions']
   PricingComment string [null, note: 'Комментарий к цене']
   UserComment string [null, note: 'Комментарий пользователя']
+}
+
+Table review_order_extra_time_payments [note: 'Legacy-оплата дополнительной длительности трека. Новые checkout-flow покрывают длительность платежом на review_orders'] {
+  Id long [pk, ref: > transaction_sources.Id]
+  ReviewOrderId long [unique, ref: - review_orders.Id, note: 'Заказ разбора, для которого оплачена дополнительная длительность']
+  TrackDurationSeconds int [note: 'Длительность трека в секундах на момент оплаты услуги']
+  IncludedDurationSeconds int [note: 'Длительность, включенная в базовую стоимость заказа, в секундах']
+  ExtraDurationSeconds int [note: 'Дополнительно оплаченная длительность в секундах']
+  AmountPerSecond long [note: 'Стоимость одной дополнительной секунды на момент оплаты']
+}
+
+Table review_order_detailed_review_payments [note: 'Оплата подробного разбора заказа'] {
+  Id long [pk, ref: > transaction_sources.Id]
+  ReviewOrderId long [unique, ref: - review_orders.Id, note: 'Заказ разбора, для которого оплачена услуга подробного разбора']
+  Amount long [note: 'Стоимость подробного разбора на момент оплаты']
 }
 
 Table transaction_reversals [note: 'Отмена транзакции'] {
@@ -175,6 +225,7 @@ Enum ReviewOrderType {
 Enum ReviewOrderStatus {
   Unspecified [note: 'Не задан']
   Preorder [note: 'Предзаказ']
+  AwaitingPayment [note: 'Ожидает оплаты']
   Pending [note: 'Ожидает взятия в работу']
   InProgress [note: 'В работе']
   Completed [note: 'Выполнен']
@@ -213,4 +264,19 @@ Enum AccountTopUpProvider {
   Donatty [note: 'Donatty']
   TwitchChannelPoints [note: 'Баллы канала Twitch']
   Manual [note: 'Ручное пополнение']
+}
+
+// Тип пользовательского права на неденежное покрытие стоимости
+Enum UserEntitlementKind {
+  Unspecified [note: 'Не задан']
+  AmountCoupon [note: 'Суммовой купон']
+  ServiceToken [note: 'Типовой жетон']
+}
+
+// Услуга или стоимость, которую может покрывать пользовательское право
+Enum UserEntitlementTarget {
+  Unspecified [note: 'Не задано']
+  ReviewOrder [note: 'Обычный заказ разбора']
+  OutOfQueueReviewOrder [note: 'Заказ вне очереди']
+  DetailedReview [note: 'Подробный разбор']
 }

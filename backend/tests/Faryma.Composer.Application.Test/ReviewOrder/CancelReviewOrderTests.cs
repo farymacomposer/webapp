@@ -104,6 +104,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]
+        [InlineData(ReviewOrderStatus.AwaitingPayment)]
         public async Task Cancel_ClearsProcessingFields_WhenOrderHasAllowedNonProcessingStatus(ReviewOrderStatus status)
         {
             await using ApplicationTestHost app = await CreateAppAsync();

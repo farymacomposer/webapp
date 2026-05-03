@@ -23,13 +23,17 @@ namespace Faryma.Composer.Application.Features.AppSettings
 
         public async Task<AppSettingsEntity> Update(AppSettingsModel item, CancellationToken ct)
         {
-            if (Settings.ReviewOrderNominalAmount == item.ReviewOrderNominalAmount)
+            if (Settings.ReviewOrderNominalAmount == item.ReviewOrderNominalAmount
+                && Settings.ReviewOrderExtraTimeAmountPerSecond == item.ReviewOrderExtraTimeAmountPerSecond
+                && Settings.ReviewOrderDetailedReviewAmount == item.ReviewOrderDetailedReviewAmount)
             {
                 return Settings;
             }
 
             AppSettingsEntity entity = Clone(Settings);
             entity.ReviewOrderNominalAmount = item.ReviewOrderNominalAmount;
+            entity.ReviewOrderExtraTimeAmountPerSecond = item.ReviewOrderExtraTimeAmountPerSecond;
+            entity.ReviewOrderDetailedReviewAmount = item.ReviewOrderDetailedReviewAmount;
 
             await Save(entity, ct);
             Settings = entity;
@@ -43,6 +47,8 @@ namespace Faryma.Composer.Application.Features.AppSettings
             {
                 Id = item.Id,
                 ReviewOrderNominalAmount = item.ReviewOrderNominalAmount,
+                ReviewOrderExtraTimeAmountPerSecond = item.ReviewOrderExtraTimeAmountPerSecond,
+                ReviewOrderDetailedReviewAmount = item.ReviewOrderDetailedReviewAmount,
             };
         }
 

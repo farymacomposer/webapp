@@ -24,9 +24,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 .Annotation("Npgsql:Enum:app.ComposerStreamStatus", "unspecified,planned,live,completed,canceled")
                 .Annotation("Npgsql:Enum:app.ComposerStreamType", "unspecified,donation,debt,charity")
                 .Annotation("Npgsql:Enum:app.QueueCategory", "unspecified,out_of_queue,donation,debt")
-                .Annotation("Npgsql:Enum:app.ReviewOrderStatus", "unspecified,preorder,pending,in_progress,completed,canceled")
+                .Annotation("Npgsql:Enum:app.ReviewOrderStatus", "unspecified,preorder,awaiting_payment,pending,in_progress,completed,canceled")
                 .Annotation("Npgsql:Enum:app.ReviewOrderType", "unspecified,out_of_queue,donation,free,charity,custom")
-                .Annotation("Npgsql:Enum:app.TransactionKind", "unspecified,account_top_up,payment,reversal");
+                .Annotation("Npgsql:Enum:app.TransactionKind", "unspecified,account_top_up,payment,reversal")
+                .Annotation("Npgsql:Enum:app.UserEntitlementKind", "unspecified,amount_coupon,service_token")
+                .Annotation("Npgsql:Enum:app.UserEntitlementTarget", "unspecified,review_order,out_of_queue_review_order,detailed_review");
 
             migrationBuilder.CreateTable(
                 name: "app_settings",
@@ -35,7 +37,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ReviewOrderNominalAmount = table.Column<int>(type: "integer", nullable: false)
+                    ReviewOrderNominalAmount = table.Column<long>(type: "bigint", nullable: false),
+                    ReviewOrderExtraTimeAmountPerSecond = table.Column<long>(type: "bigint", nullable: false),
+                    ReviewOrderDetailedReviewAmount = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -450,6 +454,44 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "user_entitlements",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Code = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Kind = table.Column<UserEntitlementKind>(type: "app.\"UserEntitlementKind\"", nullable: false),
+                    Target = table.Column<UserEntitlementTarget>(type: "app.\"UserEntitlementTarget\"", nullable: false),
+                    Amount = table.Column<long>(type: "bigint", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    RedeemedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CanceledAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Comment = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    UserNicknameId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_user_entitlements", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_user_entitlements_AspNetUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalSchema: "app",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_user_entitlements_user_nicknames_UserNicknameId",
+                        column: x => x.UserNicknameId,
+                        principalSchema: "app",
+                        principalTable: "user_nicknames",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "user_nickname_accounts",
                 schema: "app",
                 columns: table => new
@@ -494,6 +536,7 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     TrackId = table.Column<long>(type: "bigint", nullable: true),
                     NominalAmount = table.Column<long>(type: "bigint", nullable: false),
                     PayableAmount = table.Column<long>(type: "bigint", nullable: false),
+                    NonPaymentCoverageAmount = table.Column<long>(type: "bigint", nullable: false),
                     PricingComment = table.Column<string>(type: "text", nullable: true),
                     UserComment = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true)
                 },
@@ -678,6 +721,65 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "review_order_detailed_review_payments",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    ReviewOrderId = table.Column<long>(type: "bigint", nullable: false),
+                    Amount = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_review_order_detailed_review_payments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_review_order_detailed_review_payments_review_orders_ReviewO~",
+                        column: x => x.ReviewOrderId,
+                        principalSchema: "app",
+                        principalTable: "review_orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_review_order_detailed_review_payments_transaction_sources_Id",
+                        column: x => x.Id,
+                        principalSchema: "app",
+                        principalTable: "transaction_sources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "review_order_extra_time_payments",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    ReviewOrderId = table.Column<long>(type: "bigint", nullable: false),
+                    TrackDurationSeconds = table.Column<int>(type: "integer", nullable: false),
+                    IncludedDurationSeconds = table.Column<int>(type: "integer", nullable: false),
+                    ExtraDurationSeconds = table.Column<int>(type: "integer", nullable: false),
+                    AmountPerSecond = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_review_order_extra_time_payments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_review_order_extra_time_payments_review_orders_ReviewOrderId",
+                        column: x => x.ReviewOrderId,
+                        principalSchema: "app",
+                        principalTable: "review_orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_review_order_extra_time_payments_transaction_sources_Id",
+                        column: x => x.Id,
+                        principalSchema: "app",
+                        principalTable: "transaction_sources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ReviewOrderEntityUserNicknameEntity",
                 schema: "app",
                 columns: table => new
@@ -779,6 +881,55 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "user_entitlement_redemptions",
+                schema: "app",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Target = table.Column<UserEntitlementTarget>(type: "app.\"UserEntitlementTarget\"", nullable: false),
+                    CoveredAmount = table.Column<long>(type: "bigint", nullable: false),
+                    Comment = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    UserEntitlementId = table.Column<long>(type: "bigint", nullable: false),
+                    RedeemedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReviewOrderId = table.Column<long>(type: "bigint", nullable: true),
+                    ReviewOrderDetailedReviewPaymentId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_user_entitlement_redemptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_user_entitlement_redemptions_AspNetUsers_RedeemedByUserId",
+                        column: x => x.RedeemedByUserId,
+                        principalSchema: "app",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_user_entitlement_redemptions_review_order_detailed_review_p~",
+                        column: x => x.ReviewOrderDetailedReviewPaymentId,
+                        principalSchema: "app",
+                        principalTable: "review_order_detailed_review_payments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_user_entitlement_redemptions_review_orders_ReviewOrderId",
+                        column: x => x.ReviewOrderId,
+                        principalSchema: "app",
+                        principalTable: "review_orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_user_entitlement_redemptions_user_entitlements_UserEntitlem~",
+                        column: x => x.UserEntitlementId,
+                        principalSchema: "app",
+                        principalTable: "user_entitlements",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 schema: "app",
                 table: "AspNetRoles",
@@ -792,8 +943,8 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
             migrationBuilder.InsertData(
                 schema: "app",
                 table: "app_settings",
-                columns: new[] { "Id", "ReviewOrderNominalAmount" },
-                values: new object[] { 1L, 750 });
+                columns: new[] { "Id", "ReviewOrderDetailedReviewAmount", "ReviewOrderExtraTimeAmountPerSecond", "ReviewOrderNominalAmount" },
+                values: new object[] { 1L, 1000L, 3L, 1000L });
 
             migrationBuilder.InsertData(
                 schema: "app",
@@ -925,6 +1076,20 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_review_order_detailed_review_payments_ReviewOrderId",
+                schema: "app",
+                table: "review_order_detailed_review_payments",
+                column: "ReviewOrderId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_review_order_extra_time_payments_ReviewOrderId",
+                schema: "app",
+                table: "review_order_extra_time_payments",
+                column: "ReviewOrderId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_review_orders_CreationStreamId",
                 schema: "app",
                 table: "review_orders",
@@ -1043,6 +1208,51 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 column: "UserNicknameAccountId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_user_entitlement_redemptions_RedeemedByUserId",
+                schema: "app",
+                table: "user_entitlement_redemptions",
+                column: "RedeemedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_entitlement_redemptions_ReviewOrderDetailedReviewPayme~",
+                schema: "app",
+                table: "user_entitlement_redemptions",
+                column: "ReviewOrderDetailedReviewPaymentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_entitlement_redemptions_ReviewOrderId",
+                schema: "app",
+                table: "user_entitlement_redemptions",
+                column: "ReviewOrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_entitlement_redemptions_UserEntitlementId",
+                schema: "app",
+                table: "user_entitlement_redemptions",
+                column: "UserEntitlementId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_entitlements_Code",
+                schema: "app",
+                table: "user_entitlements",
+                column: "Code",
+                unique: true,
+                filter: "\"Code\" IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_entitlements_CreatedByUserId",
+                schema: "app",
+                table: "user_entitlements",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_entitlements_UserNicknameId",
+                schema: "app",
+                table: "user_entitlements",
+                column: "UserNicknameId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_user_nickname_accounts_UserNicknameId",
                 schema: "app",
                 table: "user_nickname_accounts",
@@ -1120,6 +1330,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 schema: "app");
 
             migrationBuilder.DropTable(
+                name: "review_order_extra_time_payments",
+                schema: "app");
+
+            migrationBuilder.DropTable(
                 name: "ReviewOrderEntityUserNicknameEntity",
                 schema: "app");
 
@@ -1144,15 +1358,15 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 schema: "app");
 
             migrationBuilder.DropTable(
+                name: "user_entitlement_redemptions",
+                schema: "app");
+
+            migrationBuilder.DropTable(
                 name: "user_track_ratings",
                 schema: "app");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles",
-                schema: "app");
-
-            migrationBuilder.DropTable(
-                name: "review_orders",
                 schema: "app");
 
             migrationBuilder.DropTable(
@@ -1168,6 +1382,22 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                 schema: "app");
 
             migrationBuilder.DropTable(
+                name: "review_order_detailed_review_payments",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "user_entitlements",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "user_nickname_accounts",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "review_orders",
+                schema: "app");
+
+            migrationBuilder.DropTable(
                 name: "composer_streams",
                 schema: "app");
 
@@ -1177,10 +1407,6 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
             migrationBuilder.DropTable(
                 name: "transaction_sources",
-                schema: "app");
-
-            migrationBuilder.DropTable(
-                name: "user_nickname_accounts",
                 schema: "app");
 
             migrationBuilder.DropTable(

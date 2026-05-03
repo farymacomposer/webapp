@@ -14,6 +14,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         [Theory]
         [InlineData(ReviewOrderStatus.Preorder)]
         [InlineData(ReviewOrderStatus.Pending)]
+        [InlineData(ReviewOrderStatus.AwaitingPayment)]
         public async Task Unfreeze_ClearsFrozenFlag_ForAllowedStatuses(ReviewOrderStatus status)
         {
             await using ApplicationTestHost app = await CreateAppAsync();

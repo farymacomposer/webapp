@@ -1,5 +1,7 @@
-﻿using Faryma.Composer.Application.Features.ReviewOrder;
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
@@ -9,6 +11,111 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 {
     public sealed class CreateReviewOrderTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
+        /// <summary>
+        /// Проверяет, что нулевой платеж в API-запросе считается отсутствующим платежом, если есть покрытие.
+        /// </summary>
+        [Fact]
+        public void CreateDonationReviewOrderRequest_AllowsZeroPayment_WhenDonationHasCouponCoverage()
+        {
+            CreateDonationReviewOrderRequest request = new()
+            {
+                Nickname = "Nick-Coupon",
+                TrackUrl = "https://example.com/track",
+                TrackDurationSeconds = 60,
+                PaymentAmount = 0,
+                CouponAmount = 750,
+                TopUpProvider = null,
+                UserComment = null,
+            };
+
+            List<ValidationResult> results = Validate(request);
+
+            Assert.Empty(results);
+        }
+
+        /// <summary>
+        /// Проверяет, что donation DTO требует платеж или покрытие.
+        /// </summary>
+        [Fact]
+        public void CreateDonationReviewOrderRequest_RejectsMissingCoverage()
+        {
+            CreateDonationReviewOrderRequest request = new()
+            {
+                Nickname = "Nick-NoCoverage",
+                TrackUrl = "https://example.com/track",
+                TrackDurationSeconds = 60,
+                PaymentAmount = 0,
+                CouponAmount = null,
+                TopUpProvider = null,
+                UserComment = null,
+            };
+
+            List<ValidationResult> results = Validate(request);
+
+            Assert.Contains(results, x => x.ErrorMessage == "Для донатных заказов требуется платеж, купон или жетон");
+        }
+
+        /// <summary>
+        /// Проверяет, что out-of-queue DTO требует положительное покрытие.
+        /// </summary>
+        [Fact]
+        public void CreateOutOfQueueReviewOrderRequest_RejectsMissingCoverage()
+        {
+            CreateOutOfQueueReviewOrderRequest request = new()
+            {
+                Nickname = "Nick-OOQ",
+                TrackUrl = "https://example.com/track",
+                TrackDurationSeconds = 60,
+                CouponAmount = 0,
+                UserComment = null,
+            };
+
+            List<ValidationResult> results = Validate(request);
+
+            Assert.Contains(results, x => x.ErrorMessage == "Для внеочередных заказов требуется купон, жетон или админское покрытие");
+        }
+
+        /// <summary>
+        /// Проверяет, что free DTO требует положительное покрытие.
+        /// </summary>
+        [Fact]
+        public void CreateFreeReviewOrderRequest_RejectsMissingCoverage()
+        {
+            CreateFreeReviewOrderRequest request = new()
+            {
+                Nickname = "Nick-Free",
+                TrackUrl = "https://example.com/track",
+                TrackDurationSeconds = 60,
+                CouponAmount = 0,
+                UserComment = null,
+            };
+
+            List<ValidationResult> results = Validate(request);
+
+            Assert.Contains(results, x => x.ErrorMessage == "Для бесплатных заказов требуется купон, жетон или админское покрытие");
+        }
+
+        /// <summary>
+        /// Проверяет, что charity DTO не принимает платежные поля.
+        /// </summary>
+        [Fact]
+        public void CreateCharityReviewOrderRequest_DoesNotExposePaymentOrCouponFields()
+        {
+            CreateCharityReviewOrderRequest request = new()
+            {
+                Nickname = "Nick-Charity",
+                TrackUrl = "https://example.com/track",
+                TrackDurationSeconds = 60,
+                UserComment = null,
+            };
+
+            List<ValidationResult> results = Validate(request);
+
+            Assert.Empty(results);
+            Assert.Null(typeof(CreateCharityReviewOrderRequest).GetProperty("PaymentAmount"));
+            Assert.Null(typeof(CreateCharityReviewOrderRequest).GetProperty("CouponAmount"));
+        }
+
         /// <summary>
         /// Проверяет, что donation-заказ со ссылкой создается сразу в Pending и с платежом.
         /// </summary>
@@ -116,7 +223,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = withTrackUrl ? "https://example.com/new-donation" : null,
                     TrackDurationSeconds = withTrackUrl ? 60 : null,
                     UserComment = null,
-                    PaymentAmount = 800,
+                    PaymentAmount = 1_000,
                     TopUpProvider = AccountTopUpProvider.Manual,
                     CreatedByUserId = user.Id,
                 }));
@@ -157,12 +264,18 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = "https://example.com/free",
                     TrackDurationSeconds = 60,
                     UserComment = null,
+                    CouponAmount = 1_000,
                     CreatedByUserId = user.Id,
                 }));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.NotEqual(nearerCharity.Id, order.CreationStreamId);
             Assert.Equal(donationStream.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderType.Free, order.Type);
+            Assert.Equal(0, persisted.NonPaymentCoverageAmount);
+            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
+            Assert.Equal(UserEntitlementTarget.ReviewOrder, redemption.Target);
+            Assert.Equal(1_000, redemption.CoveredAmount);
         }
 
         /// <summary>
@@ -231,6 +344,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = "https://example.com/free",
                     TrackDurationSeconds = 60,
                     UserComment = null,
+                    CouponAmount = 1_000,
                     CreatedByUserId = user.Id,
                 }));
 
@@ -262,13 +376,122 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     TrackUrl = null,
                     TrackDurationSeconds = null,
                     UserComment = null,
+                    CouponAmount = 1_000,
                     CreatedByUserId = user.Id,
                 }));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(nearest.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderType.OutOfQueue, order.Type);
             Assert.Equal(ReviewOrderStatus.Preorder, order.Status);
-            Assert.Equal(0, order.PayableAmount);
+            Assert.Equal(1_000, order.PayableAmount);
+            Assert.Equal(0, persisted.NonPaymentCoverageAmount);
+            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
+            Assert.Equal(UserEntitlementTarget.OutOfQueueReviewOrder, redemption.Target);
+            Assert.Equal(1_000, redemption.CoveredAmount);
+        }
+
+        /// <summary>
+        /// Проверяет, что donation-заказ с частичным покрытием создается в ожидании оплаты.
+        /// </summary>
+        [Fact]
+        public async Task CreateDonation_CreatesAwaitingPayment_WhenKnownTrackIsPartiallyCovered()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+
+            ReviewOrderEntity order = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = "Nick-Partial",
+                    TrackUrl = "https://example.com/partial",
+                    TrackDurationSeconds = 60,
+                    UserComment = null,
+                    PaymentAmount = 600,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    CreatedByUserId = user.Id,
+                }));
+
+            Assert.Equal(ReviewOrderStatus.AwaitingPayment, order.Status);
+            Assert.Equal(600, order.GetTotalAmount());
+        }
+
+        /// <summary>
+        /// Проверяет, что donation-заказ нельзя создать без платежа или купона.
+        /// </summary>
+        [Fact]
+        public async Task CreateDonation_Throws_WhenCoverageIsMissing()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+
+            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+                app.RunScopeAsync(services =>
+                    services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                    {
+                        Nickname = "Nick-NoCoverage",
+                        TrackUrl = "https://example.com/no-coverage",
+                        TrackDurationSeconds = 60,
+                        UserComment = null,
+                        CreatedByUserId = user.Id,
+                    })));
+        }
+
+        /// <summary>
+        /// Проверяет, что купон покрывает готовность заказа без денежного платежа.
+        /// </summary>
+        [Fact]
+        public async Task CreateDonation_CreatesPendingWithoutPayment_WhenCouponCoversRequiredAmount()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            await app.Data.CreateStreamAsync(
+                createdByUserId: user.Id,
+                eventDate: app.Today.AddDays(1),
+                type: ComposerStreamType.Donation);
+
+            ReviewOrderEntity order = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                {
+                    Nickname = "Nick-Coupon",
+                    TrackUrl = "https://example.com/coupon",
+                    TrackDurationSeconds = 60,
+                    UserComment = null,
+                    CouponAmount = 1_000,
+                    CreatedByUserId = user.Id,
+                }));
+
+            List<TransactionEntity> orderTransactions = await app.GetOrderTransactionsAsync(order.Id);
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
+
+            Assert.Equal(ReviewOrderStatus.Pending, order.Status);
+            Assert.Equal(0, persisted.NonPaymentCoverageAmount);
+            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
+            UserEntitlementEntity entitlement = await app.RunScopeAsync(async services =>
+            {
+                IDbContextFactory<AppDbContext> factory = services.GetRequiredService<IDbContextFactory<AppDbContext>>();
+                await using AppDbContext context = await factory.CreateDbContextAsync();
+
+                return await context.UserEntitlements
+                    .AsNoTracking()
+                    .SingleAsync(x => x.Id == redemption.UserEntitlementId);
+            });
+
+            Assert.Equal(UserEntitlementKind.AmountCoupon, entitlement.Kind);
+            Assert.Equal(UserEntitlementTarget.ReviewOrder, entitlement.Target);
+            Assert.Equal(1_000, entitlement.Amount);
+            Assert.NotNull(entitlement.RedeemedAt);
+            Assert.Equal(UserEntitlementTarget.ReviewOrder, redemption.Target);
+            Assert.Equal(1_000, redemption.CoveredAmount);
+            Assert.Empty(orderTransactions);
         }
 
         /// <summary>
@@ -360,6 +583,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         TrackUrl = "https://example.com/free",
                         TrackDurationSeconds = 60,
                         UserComment = null,
+                        CouponAmount = 1_000,
                         CreatedByUserId = user.Id,
                     })),
                 "OutOfQueue" => app.RunScopeAsync(services =>
@@ -369,12 +593,25 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                         TrackUrl = null,
                         TrackDurationSeconds = null,
                         UserComment = null,
+                        CouponAmount = 1_000,
                         CreatedByUserId = user.Id,
                     })),
                 _ => throw new InvalidOperationException($"Неподдерживаемый тип: {kind}")
             };
 
             await Assert.ThrowsAsync<ReviewOrderException>(() => action);
+        }
+
+        private static List<ValidationResult> Validate(object request)
+        {
+            List<ValidationResult> results = [];
+            Validator.TryValidateObject(
+                request,
+                new ValidationContext(request),
+                results,
+                validateAllProperties: true);
+
+            return results;
         }
     }
 }

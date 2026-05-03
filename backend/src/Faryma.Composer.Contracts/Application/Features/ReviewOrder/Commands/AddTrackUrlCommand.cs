@@ -14,5 +14,10 @@
         /// Ссылка на трек
         /// </summary>
         public required string TrackUrl { get; init; }
+
+        /// <summary>
+        /// Длительность трека в секундах
+        /// </summary>
+        public required int TrackDurationSeconds { get; init; }
     }
 }

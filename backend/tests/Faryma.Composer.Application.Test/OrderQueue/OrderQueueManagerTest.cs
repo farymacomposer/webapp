@@ -34,6 +34,22 @@ namespace Faryma.Composer.Application.Test.OrderQueue
         }
 
         [Fact]
+        public void Donat_AwaitingPayment_IsActiveInQueue()
+        {
+            OrderQueueManager queueManager = GetManager("10.01.2000");
+
+            Create(queueManager, GetDonation("10.01.2000", 1, "Nick1", 900));
+            Create(queueManager, GetDonation("10.01.2000", 2, "Nick2", 800, status: ReviewOrderStatus.AwaitingPayment));
+            Create(queueManager, GetDonation("10.01.2000", 3, "Nick3", 700));
+
+            Check([
+                (0, 1, OrderActivityStatus.Active, "Nick1"),
+                (1, 2, OrderActivityStatus.Active, "Nick2"),
+                (2, 3, OrderActivityStatus.Active, "Nick3"),
+            ], queueManager);
+        }
+
+        [Fact]
         public void Donat_Alt()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -980,7 +996,13 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             }
         }
 
-        private ReviewOrderEntity GetDonation(string eventDate, long id, string name, int amount, bool isFrozen = false)
+        private ReviewOrderEntity GetDonation(
+            string eventDate,
+            long id,
+            string name,
+            int amount,
+            bool isFrozen = false,
+            ReviewOrderStatus status = ReviewOrderStatus.Pending)
         {
             UserEntity user = new()
             {
@@ -993,11 +1015,12 @@ namespace Faryma.Composer.Application.Test.OrderQueue
                 Id = id,
                 CreatedAt = DateTime.Now,
                 IsFrozen = isFrozen,
-                Status = ReviewOrderStatus.Pending,
+                Status = status,
                 QueueCategory = QueueCategory.Unspecified,
                 Type = ReviewOrderType.Donation,
                 NominalAmount = amount,
                 PayableAmount = amount,
+                NonPaymentCoverageAmount = 0,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreatedByUser = user,
@@ -1029,6 +1052,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
                 Type = ReviewOrderType.OutOfQueue,
                 NominalAmount = 0,
                 PayableAmount = 0,
+                NonPaymentCoverageAmount = 0,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreatedByUser = user,

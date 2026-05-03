@@ -37,6 +37,8 @@ stateDiagram
 - текущего `NearestStreamDate`
 - состояния `ProcessingStream`
 
+`ReviewOrder.Status = AwaitingPayment` участвует в очереди так же, как `Preorder` и `Pending`: позиция может быть `Active`, `Scheduled` или `Frozen`. При этом взять такой заказ в работу нельзя, пока обязательная стоимость не покрыта и persisted-статус не станет `Pending`.
+
 ## Правила переходов
 - `Unspecified` не показывается на графе: это внутреннее промежуточное состояние позиции до пересчета очереди.
 - При создании заказа возможны только `Active` или `Scheduled`.

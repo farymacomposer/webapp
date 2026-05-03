@@ -1,5 +1,7 @@
-﻿using Faryma.Composer.Application.Features.ReviewOrder;
+﻿using Faryma.Composer.Application.Features.AppSettings;
+using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
+using Faryma.Composer.Contracts.Application.Features.AppSettings;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
@@ -10,30 +12,136 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
     public sealed class AddTrackUrlTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
-        /// Проверяет, что добавление ссылки переводит предзаказ в статус Pending.
+        /// Проверяет, что добавление ссылки и длительности переводит покрытый предзаказ в статус Pending.
         /// </summary>
         [Fact]
-        public async Task AddTrackUrl_MovesPreorderToPending()
+        public async Task AddTrackUrl_MovesCoveredPreorderToPending()
         {
             await using ApplicationTestHost app = await CreateAppAsync();
             UserEntity user = await app.Data.CreateUserAsync("admin");
             ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
                 createdByUserId: user.Id,
                 status: ReviewOrderStatus.Preorder,
-                trackUrl: null);
+                trackUrl: null,
+                totalPaymentAmount: 750);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
                 {
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/new-track",
+                    TrackDurationSeconds = 60,
                 }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(ReviewOrderStatus.Pending, result.Status);
             Assert.Equal("https://example.com/new-track", result.TrackUrl);
+            Assert.Equal(60, result.TrackDurationSeconds);
             Assert.Equal(ReviewOrderStatus.Pending, persisted.Status);
             Assert.Equal("https://example.com/new-track", persisted.TrackUrl);
+            Assert.Equal(60, persisted.TrackDurationSeconds);
+        }
+
+        /// <summary>
+        /// Проверяет, что добавление длинного трека переводит частично покрытый предзаказ в ожидание оплаты.
+        /// </summary>
+        [Fact]
+        public async Task AddTrackUrl_MovesPartiallyCoveredPreorderToAwaitingPayment()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                status: ReviewOrderStatus.Preorder,
+                trackUrl: null,
+                totalPaymentAmount: 750);
+
+            ReviewOrderEntity result = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                {
+                    ReviewOrderId = order.Id,
+                    TrackUrl = "https://example.com/long-track",
+                    TrackDurationSeconds = 420,
+                }));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
+
+            Assert.Equal(ReviewOrderStatus.AwaitingPayment, result.Status);
+            Assert.Equal("https://example.com/long-track", result.TrackUrl);
+            Assert.Equal(420, result.TrackDurationSeconds);
+            Assert.Equal(ReviewOrderStatus.AwaitingPayment, persisted.Status);
+            Assert.Equal("https://example.com/long-track", persisted.TrackUrl);
+            Assert.Equal(420, persisted.TrackDurationSeconds);
+        }
+
+        /// <summary>
+        /// Проверяет, что snapshot обязательной стоимости обновляется при изменении длительности трека.
+        /// </summary>
+        [Fact]
+        public async Task AddTrackUrl_UpdatesPayableAmountSnapshot_WhenDurationChanges()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                status: ReviewOrderStatus.Pending,
+                trackDurationSeconds: 60,
+                payableAmount: 750,
+                totalPaymentAmount: 1_200);
+
+            ReviewOrderEntity result = await app.RunScopeAsync(services =>
+                services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                {
+                    ReviewOrderId = order.Id,
+                    TrackUrl = "https://example.com/longer-track",
+                    TrackDurationSeconds = 420,
+                }));
+            ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
+
+            Assert.Equal(1_110, result.PayableAmount);
+            Assert.Equal(1_110, persisted.PayableAmount);
+        }
+
+        /// <summary>
+        /// Проверяет, что AddTrackUrl фиксирует новый snapshot стоимости по настройкам на момент добавления трека.
+        /// </summary>
+        [Fact]
+        public async Task AddTrackUrl_SnapshotsPayableAmountUsingCurrentSettings()
+        {
+            await using ApplicationTestHost app = await CreateAppAsync();
+            UserEntity user = await app.Data.CreateUserAsync("admin");
+            ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
+                createdByUserId: user.Id,
+                status: ReviewOrderStatus.Preorder,
+                trackUrl: null,
+                nominalAmount: 750,
+                payableAmount: 750,
+                totalPaymentAmount: 1_350);
+
+            ReviewOrderEntity result = await app.RunScopeAsync(async services =>
+            {
+                await ConfigurePricing(services, extraTimeAmountPerSecond: 5, detailedReviewAmount: 1_000);
+
+                return await services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                {
+                    ReviewOrderId = order.Id,
+                    TrackUrl = "https://example.com/snapshot-track",
+                    TrackDurationSeconds = 420,
+                });
+            });
+
+            ReviewOrderEntity persistedAfterSettingsChange = await app.RunScopeAsync(async services =>
+            {
+                await ConfigurePricing(services, extraTimeAmountPerSecond: 1, detailedReviewAmount: 1_000);
+
+                return await services.GetRequiredService<UnitOfWork>()
+                    .ReviewOrderStore
+                    .FindById(order.Id)
+                    ?? throw new InvalidOperationException("Заказ не найден");
+            });
+
+            Assert.Equal(ReviewOrderStatus.Pending, result.Status);
+            Assert.Equal(1_350, result.PayableAmount);
+            Assert.Equal(1_350, persistedAfterSettingsChange.PayableAmount);
         }
 
         /// <summary>
@@ -41,7 +149,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         /// </summary>
         [Theory]
         [InlineData(ReviewOrderStatus.Pending)]
-        [InlineData(ReviewOrderStatus.InProgress)]
+        [InlineData(ReviewOrderStatus.AwaitingPayment)]
         public async Task AddTrackUrl_UpdatesUrlWithoutChangingStatus(ReviewOrderStatus status)
         {
             await using ApplicationTestHost app = await CreateAppAsync();
@@ -49,26 +157,30 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
                 createdByUserId: user.Id,
                 status: status,
-                inProgressAt: status == ReviewOrderStatus.InProgress ? app.FixedNow : null);
+                totalPaymentAmount: status == ReviewOrderStatus.Pending ? 750 : 0);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
                 {
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/updated-track",
+                    TrackDurationSeconds = 60,
                 }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(status, result.Status);
             Assert.Equal("https://example.com/updated-track", result.TrackUrl);
+            Assert.Equal(60, result.TrackDurationSeconds);
             Assert.Equal(status, persisted.Status);
             Assert.Equal("https://example.com/updated-track", persisted.TrackUrl);
+            Assert.Equal(60, persisted.TrackDurationSeconds);
         }
 
         /// <summary>
-        /// Проверяет, что у завершенного или отмененного заказа ссылку менять нельзя.
+        /// Проверяет, что у заказа в работе, завершенного или отмененного заказа ссылку менять нельзя.
         /// </summary>
         [Theory]
+        [InlineData(ReviewOrderStatus.InProgress)]
         [InlineData(ReviewOrderStatus.Completed)]
         [InlineData(ReviewOrderStatus.Canceled)]
         public async Task AddTrackUrl_Throws_WhenOrderHasInvalidStatus(ReviewOrderStatus status)
@@ -78,6 +190,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.Data.CreateReviewOrderAsync(
                 createdByUserId: user.Id,
                 status: status,
+                inProgressAt: status == ReviewOrderStatus.InProgress ? app.FixedNow : null,
                 completedAt: status == ReviewOrderStatus.Completed ? app.FixedNow : null,
                 canceledAt: status == ReviewOrderStatus.Canceled ? app.FixedNow : null,
                 cancelReason: status == ReviewOrderStatus.Canceled ? "reason" : null,
@@ -89,6 +202,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         ReviewOrderId = order.Id,
                         TrackUrl = "https://example.com/fail-track",
+                        TrackDurationSeconds = 60,
                     })));
         }
 
@@ -106,7 +220,22 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     {
                         ReviewOrderId = long.MaxValue,
                         TrackUrl = "https://example.com/missing-track",
+                        TrackDurationSeconds = 60,
                     })));
+        }
+
+        private static async Task ConfigurePricing(
+            IServiceProvider services,
+            long extraTimeAmountPerSecond,
+            long detailedReviewAmount)
+        {
+            AppSettingsService appSettingsService = services.GetRequiredService<AppSettingsService>();
+            await appSettingsService.Update(new AppSettingsModel
+            {
+                ReviewOrderNominalAmount = appSettingsService.Settings.ReviewOrderNominalAmount,
+                ReviewOrderExtraTimeAmountPerSecond = extraTimeAmountPerSecond,
+                ReviewOrderDetailedReviewAmount = detailedReviewAmount,
+            }, CancellationToken.None);
         }
     }
 }

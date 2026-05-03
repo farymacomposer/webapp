@@ -3,7 +3,7 @@
 ## Эндпоинт
 
 - Метод: `POST`
-- Путь: `/api/ReviewOrder/CompleteReviewOrder`
+- Путь: `/api/review-orders/complete`
 
 ## Что делает
 

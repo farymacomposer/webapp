@@ -8,9 +8,6 @@ alwaysApply: false
 
 - For changes in application services, feature logic, background workers, priority algorithms, or application contracts, start with application-scoped tests.
 - Run verification commands from the `backend` workspace root.
-- This test suite uses Testcontainers/PostgreSQL.
-- Before running tests, check Docker with `docker info`.
-- If Docker is unavailable, try to start Docker Desktop and wait until `docker info` succeeds. If it cannot be started automatically, stop and ask the user to start Docker before running the tests.
 - Use:
   `dotnet test tests/Faryma.Composer.Application.Test/Faryma.Composer.Application.Test.csproj`
 - Expand to API or desktop verification only when the changed contract or behavior crosses those boundaries.

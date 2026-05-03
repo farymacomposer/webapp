@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Faryma.Composer.MigrationsBundle.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260502120858_Init")]
+    [Migration("20260503103759_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -30,9 +30,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ComposerStreamStatus", new[] { "unspecified", "planned", "live", "completed", "canceled" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ComposerStreamType", new[] { "unspecified", "donation", "debt", "charity" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "QueueCategory", new[] { "unspecified", "out_of_queue", "donation", "debt" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ReviewOrderStatus", new[] { "unspecified", "preorder", "pending", "in_progress", "completed", "canceled" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ReviewOrderStatus", new[] { "unspecified", "preorder", "awaiting_payment", "pending", "in_progress", "completed", "canceled" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "ReviewOrderType", new[] { "unspecified", "out_of_queue", "donation", "free", "charity", "custom" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "TransactionKind", new[] { "unspecified", "account_top_up", "payment", "reversal" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "UserEntitlementKind", new[] { "unspecified", "amount_coupon", "service_token" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "app", "UserEntitlementTarget", new[] { "unspecified", "review_order", "out_of_queue_review_order", "detailed_review" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.AppSettingsEntity", b =>
@@ -43,8 +45,14 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<int>("ReviewOrderNominalAmount")
-                        .HasColumnType("integer");
+                    b.Property<long>("ReviewOrderDetailedReviewAmount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ReviewOrderExtraTimeAmountPerSecond")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ReviewOrderNominalAmount")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -54,7 +62,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         new
                         {
                             Id = 1L,
-                            ReviewOrderNominalAmount = 750
+                            ReviewOrderDetailedReviewAmount = 1000L,
+                            ReviewOrderExtraTimeAmountPerSecond = 3L,
+                            ReviewOrderNominalAmount = 1000L
                         });
                 });
 
@@ -489,6 +499,109 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.UseTptMappingStrategy();
                 });
 
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntitlementEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("CanceledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<UserEntitlementKind>("Kind")
+                        .HasColumnType("app.UserEntitlementKind");
+
+                    b.Property<DateTime?>("RedeemedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<UserEntitlementTarget>("Target")
+                        .HasColumnType("app.UserEntitlementTarget");
+
+                    b.Property<Guid>("UserNicknameId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasFilter("\"Code\" IS NOT NULL");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("UserNicknameId");
+
+                    b.ToTable("user_entitlements", "app");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntitlementRedemptionEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<long>("CoveredAmount")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("RedeemedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long?>("ReviewOrderDetailedReviewPaymentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ReviewOrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<UserEntitlementTarget>("Target")
+                        .HasColumnType("app.UserEntitlementTarget");
+
+                    b.Property<long>("UserEntitlementId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RedeemedByUserId");
+
+                    b.HasIndex("ReviewOrderDetailedReviewPaymentId");
+
+                    b.HasIndex("ReviewOrderId");
+
+                    b.HasIndex("UserEntitlementId")
+                        .IsUnique();
+
+                    b.ToTable("user_entitlement_redemptions", "app");
+                });
+
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -901,6 +1014,22 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.ToTable("account_top_ups", "app");
                 });
 
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderDetailedReviewPaymentEntity", b =>
+                {
+                    b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ReviewOrderId")
+                        .HasColumnType("bigint");
+
+                    b.HasIndex("ReviewOrderId")
+                        .IsUnique();
+
+                    b.ToTable("review_order_detailed_review_payments", "app");
+                });
+
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderEntity", b =>
                 {
                     b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
@@ -934,6 +1063,9 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .HasColumnType("character varying(40)");
 
                     b.Property<long>("NominalAmount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("NonPaymentCoverageAmount")
                         .HasColumnType("bigint");
 
                     b.Property<long>("PayableAmount")
@@ -974,6 +1106,31 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.HasIndex("TrackId");
 
                     b.ToTable("review_orders", "app");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderExtraTimePaymentEntity", b =>
+                {
+                    b.HasBaseType("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity");
+
+                    b.Property<long>("AmountPerSecond")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ExtraDurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IncludedDurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("ReviewOrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("TrackDurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("ReviewOrderId")
+                        .IsUnique();
+
+                    b.ToTable("review_order_extra_time_payments", "app");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionReversalEntity", b =>
@@ -1124,6 +1281,58 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedByUser");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntitlementEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "CreatedByUser")
+                        .WithMany("CreatedUserEntitlements")
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserNicknameEntity", "UserNickname")
+                        .WithMany("Entitlements")
+                        .HasForeignKey("UserNicknameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("UserNickname");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntitlementRedemptionEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", "RedeemedByUser")
+                        .WithMany("RedeemedUserEntitlements")
+                        .HasForeignKey("RedeemedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderDetailedReviewPaymentEntity", "ReviewOrderDetailedReviewPayment")
+                        .WithMany()
+                        .HasForeignKey("ReviewOrderDetailedReviewPaymentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderEntity", "ReviewOrder")
+                        .WithMany("CoverageRedemptions")
+                        .HasForeignKey("ReviewOrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntitlementEntity", "UserEntitlement")
+                        .WithOne("Redemption")
+                        .HasForeignKey("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntitlementRedemptionEntity", "UserEntitlementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RedeemedByUser");
+
+                    b.Navigation("ReviewOrder");
+
+                    b.Navigation("ReviewOrderDetailedReviewPayment");
+
+                    b.Navigation("UserEntitlement");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserNicknameAccountEntity", b =>
@@ -1293,6 +1502,23 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("UserNicknameAccount");
                 });
 
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderDetailedReviewPaymentEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity", null)
+                        .WithOne()
+                        .HasForeignKey("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderDetailedReviewPaymentEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderEntity", "ReviewOrder")
+                        .WithOne("DetailedReviewPayment")
+                        .HasForeignKey("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderDetailedReviewPaymentEntity", "ReviewOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReviewOrder");
+                });
+
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderEntity", b =>
                 {
                     b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.ComposerStreamEntity", "CreationStream")
@@ -1321,6 +1547,23 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("ProcessingStream");
 
                     b.Navigation("Track");
+                });
+
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderExtraTimePaymentEntity", b =>
+                {
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionSourceEntity", null)
+                        .WithOne()
+                        .HasForeignKey("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderExtraTimePaymentEntity", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderEntity", "ReviewOrder")
+                        .WithOne("ExtraTimePayment")
+                        .HasForeignKey("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderExtraTimePaymentEntity", "ReviewOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReviewOrder");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.TransactionReversalEntity", b =>
@@ -1374,6 +1617,11 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("Transactions");
                 });
 
+            modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntitlementEntity", b =>
+                {
+                    b.Navigation("Redemption");
+                });
+
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.UserEntity", b =>
                 {
                     b.Navigation("CreatedComposerStreams");
@@ -1383,6 +1631,10 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("CreatedTracks");
 
                     b.Navigation("CreatedTransactionSources");
+
+                    b.Navigation("CreatedUserEntitlements");
+
+                    b.Navigation("RedeemedUserEntitlements");
 
                     b.Navigation("RefreshTokens");
 
@@ -1401,11 +1653,19 @@ namespace Faryma.Composer.MigrationsBundle.Migrations
                     b.Navigation("Account")
                         .IsRequired();
 
+                    b.Navigation("Entitlements");
+
                     b.Navigation("UploadedTracks");
                 });
 
             modelBuilder.Entity("Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources.ReviewOrderEntity", b =>
                 {
+                    b.Navigation("CoverageRedemptions");
+
+                    b.Navigation("DetailedReviewPayment");
+
+                    b.Navigation("ExtraTimePayment");
+
                     b.Navigation("Review");
                 });
 #pragma warning restore 612, 618

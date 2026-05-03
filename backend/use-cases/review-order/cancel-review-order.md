@@ -3,7 +3,7 @@
 ## Эндпоинт
 
 - Метод: `POST`
-- Путь: `/api/ReviewOrder/CancelReviewOrder`
+- Путь: `/api/review-orders/cancel`
 
 ## Что делает
 
@@ -17,7 +17,7 @@
   - требует `CancelReason`.
 - Application (`ReviewOrderService`):
   - загружает заказ;
-  - допускает отмену только для `Preorder`, `Pending` и `InProgress`;
+  - допускает отмену только для `Preorder`, `Pending`, `AwaitingPayment` и `InProgress`;
   - выставляет `CanceledAt`, `CancelReason`, `QueueCategory = Unspecified`, `ProcessingStream = null`, `Status = Canceled`, `InProgressAt = null`;
   - сохраняет изменения и публикует событие.
 
@@ -34,7 +34,7 @@
 
 ## Что можно
 
-- Отменить заказ в `Preorder`, `Pending` или `InProgress`.
+- Отменить заказ в `Preorder`, `Pending`, `AwaitingPayment` или `InProgress`.
 - Повторно вызвать сценарий для уже `Canceled` заказа без побочных эффектов.
 
 ## Что нельзя

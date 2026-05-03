@@ -3,7 +3,7 @@
 ## Эндпоинт
 
 - Метод: `POST`
-- Путь: `/api/ReviewOrder/FreezeReviewOrder`
+- Путь: `/api/review-orders/freeze`
 
 ## Что делает
 
@@ -16,7 +16,7 @@
   - принимает `FreezeReviewOrderRequest`.
 - Application (`ReviewOrderService`):
   - загружает заказ;
-  - допускает заморозку только для `Preorder` и `Pending`;
+  - допускает заморозку только для `Preorder`, `Pending` и `AwaitingPayment`;
   - выставляет `IsFrozen = true`;
   - сохраняет изменения и публикует событие.
 
@@ -32,7 +32,7 @@
 
 ## Что можно
 
-- Заморозить заказ в статусе `Preorder` или `Pending`.
+- Заморозить заказ в статусе `Preorder`, `Pending` или `AwaitingPayment`.
 - Повторно вызвать сценарий для уже замороженного заказа без побочных эффектов.
 
 ## Что нельзя

@@ -18,5 +18,11 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.AddTrackUrl
         [Required]
         [Url(ErrorMessage = "Некорректная ссылка на трек")]
         public required string TrackUrl { get; init; }
+
+        /// <summary>
+        /// Длительность трека в секундах
+        /// </summary>
+        [Range(1, 60 * 15, ErrorMessage = "Длительность трека должна быть в пределах от 1 секунды до 15 минут")]
+        public required int TrackDurationSeconds { get; init; }
     }
 }

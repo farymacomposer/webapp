@@ -32,6 +32,8 @@ namespace Faryma.Composer.Api.Features.AppSettings
             AppSettingsEntity settings = await appSettingsService.Update(new AppSettingsModel
             {
                 ReviewOrderNominalAmount = dto.ReviewOrderNominalAmount,
+                ReviewOrderExtraTimeAmountPerSecond = dto.ReviewOrderExtraTimeAmountPerSecond,
+                ReviewOrderDetailedReviewAmount = dto.ReviewOrderDetailedReviewAmount,
             }, ct);
 
             return Ok(AppSettingsDto.Map(settings));

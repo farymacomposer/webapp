@@ -3,7 +3,7 @@
 ## Эндпоинт
 
 - Метод: `POST`
-- Путь: `/api/ReviewOrder/UnfreezeReviewOrder`
+- Путь: `/api/review-orders/unfreeze`
 
 ## Что делает
 
@@ -16,7 +16,7 @@
   - принимает `UnfreezeReviewOrderRequest`.
 - Application (`ReviewOrderService`):
   - загружает заказ;
-  - допускает разморозку только для `Preorder` и `Pending`;
+  - допускает разморозку только для `Preorder`, `Pending` и `AwaitingPayment`;
   - выставляет `IsFrozen = false`;
   - сохраняет изменения и публикует событие.
 
@@ -32,7 +32,7 @@
 
 ## Что можно
 
-- Разморозить заказ в статусе `Preorder` или `Pending`.
+- Разморозить заказ в статусе `Preorder`, `Pending` или `AwaitingPayment`.
 - Повторно вызвать сценарий для уже размороженного заказа без побочных эффектов.
 
 ## Что нельзя

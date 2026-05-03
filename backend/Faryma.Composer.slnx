@@ -40,7 +40,6 @@
     <File Path="use-cases/review-order/complete-review-order.md" />
     <File Path="use-cases/review-order/create-review-order.md" />
     <File Path="use-cases/review-order/freeze-review-order.md" />
-    <File Path="use-cases/review-order/move-up-review-order.md" />
     <File Path="use-cases/review-order/README.md" />
     <File Path="use-cases/review-order/review-order-status-graph.md" />
     <File Path="use-cases/review-order/take-order-in-progress.md" />
