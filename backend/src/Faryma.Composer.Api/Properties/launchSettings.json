@@ -11,6 +11,26 @@
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7166;http://localhost:7000"
     },
+    "swagger": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7166;http://localhost:7000"
+    },
+    "redoc": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "redoc",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7166;http://localhost:7000"
+    },
     "asyncapi": {
       "commandName": "Project",
       "launchBrowser": true,
