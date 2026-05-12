@@ -4,6 +4,6 @@ export enum Breakpoints {
   M = 992,
   LG = 1024,
   XL = 1200,
-  XXL = 1300,
-  XXXL = 1400,
+  XXL = 1400,
+  XXXL = 1500,
 }

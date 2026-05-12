@@ -11,13 +11,13 @@
 }
 
 @mixin xxl {
-  @media (min-width: 1200px) {
+  @media (min-width: 1400px) {
     @content;
   }
 }
 
 @mixin xxxl {
-  @media (min-width: 1400px) {
+  @media (min-width: 1500px) {
     @content;
   }
 }

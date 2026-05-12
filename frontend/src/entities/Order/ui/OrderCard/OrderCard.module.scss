@@ -64,6 +64,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .price {
+    user-select: none
+  }
 }
 
 .big {
@@ -89,8 +93,20 @@
     width: 100%;
   }
 
+  .author {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    user-select: none
+  }
+
   .priceBlock {
     padding: 10px 0;
+  }
+
+  .price {
+    user-select: none
   }
 
   .youtubeLink {

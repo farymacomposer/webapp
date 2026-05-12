@@ -17,13 +17,12 @@ export const SideQueueHeader: FC<ISideQueueHeaderProps> = memo(({}) => {
 
   return (
     <VStack className={cls.wrapper} gap="22" max>
-      <HStack justify="between" gap="20" max>
+      <HStack className={cls.row} justify="between" gap="20" max>
         <Text>50&nbsp;треков</Text>
         <OrderCategoriesList onClick={onClick} />
       </HStack>
       <HStack justify="between" max>
         <HStack gap="4">группировка</HStack>
-        поиск
       </HStack>
     </VStack>
   );

@@ -1,6 +1,11 @@
 .category {
 }
 
+.btn {
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
 .square {
   align-items: center;
   border-radius: 10px;
@@ -10,6 +15,7 @@
   height: 50px;
   justify-content: center;
   width: 50px;
+  user-select: none
 }
 
 .rectangle {
@@ -22,6 +28,7 @@
   height: 34px;
   justify-content: center;
   width: 120px;
+  user-select: none
 }
 
 .magenta {

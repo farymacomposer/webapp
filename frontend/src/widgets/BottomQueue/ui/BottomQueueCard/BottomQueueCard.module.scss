@@ -1,8 +1,9 @@
 .card {
   height: 100%;
   max-width: 374px;
-  transition: 0.3s ease-in transform;
+  transition: transform 0.3s ease-in;
   width: calc(33.3% - 10px);
+  overflow: hidden;
 
   @include xxl {
     width: calc(25% - 15px);

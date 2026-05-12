@@ -1,10 +1,16 @@
 .sidebar {
   height: 100vh;
   width: var(--size-sidebar-xl);
+  position: fixed;
+  right: 0;
 
   @include xxl {
     width: var(--size-sidebar);
   }
+}
+
+.relativeSidebar {
+  position: initial;
 }
 
 .btn {

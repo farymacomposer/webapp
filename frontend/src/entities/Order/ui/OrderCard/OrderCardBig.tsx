@@ -37,7 +37,7 @@ export const OrderCardBig = memo((props: OrderCardProps) => {
           <Text className={cls.name} size="24" weight="bold">
             {order.title}
           </Text>
-          <Text size="20" style="italic">{`от ${order.user}`}</Text>
+          <Text className={cls.author} size="20" style="italic">{`от ${order.user}`}</Text>
         </VStack>
         {order.youtubeLink && (
           <Icon

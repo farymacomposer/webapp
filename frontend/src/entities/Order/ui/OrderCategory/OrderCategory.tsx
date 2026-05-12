@@ -32,7 +32,12 @@ export const OrderCategory = memo((props: OrderCardProps) => {
     const { onClick } = props as OrderCardButtonProps;
 
     return (
-      <Button className={className} color={color} variant="filled" onClick={onClick(name)}>
+      <Button
+        className={classNames(cls.btn, {}, [className])}
+        color={color}
+        variant="filled"
+        onClick={onClick(name)}
+      >
         {name}
       </Button>
     );

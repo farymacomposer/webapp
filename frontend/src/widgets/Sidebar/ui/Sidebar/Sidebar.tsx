@@ -25,16 +25,19 @@ export const Sidebar = memo(({ className }: SidebarProps) => {
   const isMainPage = pathname === getRouteMain();
 
   return (
-    <aside data-testid="sidebar" className={classNames(cls.sidebar, {}, [className])}>
+    <aside
+      data-testid="sidebar"
+      className={classNames(cls.sidebar, { [cls.relativeSidebar]: isMainPage }, [className])}
+    >
       <VStack className={cls.sidebar}>
         <HStack className={cls.items} role="navigation" justify="between" gap="4" max>
           {itemsList}
         </HStack>
         {isMainPage && (
-          <>
-            <AddTrackButton />
+          <VStack gap="4" max maxHeight>
+            <AddTrackButton className={cls.btn} />
             <TwitchChat />
-          </>
+          </VStack>
         )}
       </VStack>
     </aside>
