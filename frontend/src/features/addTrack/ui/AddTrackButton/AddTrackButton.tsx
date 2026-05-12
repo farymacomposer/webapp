@@ -8,9 +8,7 @@ interface IProps {
 }
 
 export const AddTrackButton: FC<IProps> = memo(({ className }) => {
-  const addTrack = () => {
-    console.log(addTrack);
-  };
+  const addTrack = () => undefined;
 
   return (
     <Button

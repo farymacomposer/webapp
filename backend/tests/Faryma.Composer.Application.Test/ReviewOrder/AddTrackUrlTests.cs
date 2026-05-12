@@ -7,7 +7,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
-    public sealed class AddTrackUrlTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class AddTrackUrlTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что добавление ссылки переводит предзаказ в статус Pending.

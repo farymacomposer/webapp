@@ -65,6 +65,11 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
         /// </summary>
         public string? TrackUrl { get; set; }
 
+        /// <summary>
+        /// Длительность трека в секундах
+        /// </summary>
+        public int? TrackDurationSeconds { get; set; }
+
         public long? TrackId { get; set; }
 
         /// <summary>
@@ -125,7 +130,8 @@ namespace Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources
                 ReviewOrderType.Donation => Transactions.Where(x => x.Kind == TransactionKind.Payment).Sum(x => x.Debit),
                 ReviewOrderType.Free => NominalAmount + Transactions.Where(x => x.Kind == TransactionKind.Payment).Sum(x => x.Debit),
                 ReviewOrderType.Charity => 0,
-                _ => throw new UnreachableException("Неподдерживаемый тип заказа"),
+                ReviewOrderType.Custom => throw new NotSupportedException("Неподдерживаемый тип заказа"),
+                _ => throw new InvalidOperationException("Неподдерживаемый тип заказа"),
             };
 
             return result;

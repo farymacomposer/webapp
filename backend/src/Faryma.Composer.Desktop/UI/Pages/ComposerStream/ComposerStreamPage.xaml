@@ -83,7 +83,7 @@
                             VerticalAlignment="Stretch"
                             Command="{Binding ViewModel.SelectDaySlotCommand, Source={StaticResource BindingProxy}, Mode=OneTime}"
                             CommandParameter="{x:Bind}"
-                            Style="{StaticResource ButtonFlatStyle}">
+                            Style="{StaticResource AnimatedFlatButtonStyle}">
                             <Grid>
 
                                 <Grid

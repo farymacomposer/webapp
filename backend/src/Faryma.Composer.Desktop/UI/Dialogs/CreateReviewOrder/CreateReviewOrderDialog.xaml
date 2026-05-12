@@ -7,6 +7,7 @@
     xmlns:navigation="using:Faryma.Composer.Desktop.Navigation"
     xmlns:ui="using:CommunityToolkit.WinUI">
     <UserControl.Resources>
+        <local:BindingProxy x:Key="BindingProxy" ViewModel="{x:Bind ViewModel}" />
         <x:Double x:Key="TitledContentWidth">360</x:Double>
     </UserControl.Resources>
 
@@ -18,65 +19,120 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel Style="{StaticResource StackPanelContentDialogStyle}">
+                <Grid Width="554" Style="{StaticResource GridContentDialogStyle}">
 
-                    <local:TitledContentRow Title="Тип заказа">
-                        <ComboBox
-                            Width="{StaticResource TitledContentWidth}"
-                            HorizontalAlignment="Stretch"
-                            ItemsSource="{x:Bind ViewModel.OrderTypes}"
-                            SelectedItem="{x:Bind ViewModel.OrderType, Mode=TwoWay}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </local:TitledContentRow>
+                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.OrderTypes}" Visibility="{x:Bind ViewModel.IsOrderTypeStepVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout
+                                ItemsStretch="Fill"
+                                MaximumRowsOrColumns="1"
+                                MinItemHeight="64"
+                                Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="local:ReviewOrderTypeOptionVM">
+                                <Button
+                                    Margin="4"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding ViewModel.SelectOrderTypeCommand, Source={StaticResource BindingProxy}, Mode=OneTime}"
+                                    CommandParameter="{x:Bind}"
+                                    Style="{StaticResource AnimatedFlatButtonStyle}">
+                                    <Grid>
+                                        <Grid Style="{StaticResource GridCardStyle}">
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Text="{x:Bind Title, Mode=OneWay}" />
+                                        </Grid>
 
-                    <local:TitledContentRow Title="Никнейм">
-                        <TextBox
-                            Width="{StaticResource TitledContentWidth}"
-                            MaxLength="40"
-                            Text="{x:Bind ViewModel.Nickname, Mode=TwoWay}" />
-                    </local:TitledContentRow>
+                                        <Border
+                                            BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+                                            BorderThickness="2"
+                                            CornerRadius="4"
+                                            Visibility="{x:Bind IsSelected, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
 
-                    <local:TitledContentRow Title="Сумма платежа" IsEnabled="{x:Bind ViewModel.IsPaymentAmountEnabled, Mode=OneWay}">
-                        <TextBox
-                            Width="{StaticResource TitledContentWidth}"
-                            ui:TextBoxExtensions.ValidationMode="Dynamic"
-                            ui:TextBoxExtensions.ValidationType="Number"
-                            MaxLength="10"
-                            Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                    </local:TitledContentRow>
+                    <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsDetailsStepVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
 
-                    <local:TitledContentRow Title="Ссылка на трек" Spacing="24">
-                        <TextBox
-                            Width="{StaticResource TitledContentWidth}"
-                            MaxLength="256"
-                            Text="{x:Bind ViewModel.TrackUrl, Mode=TwoWay}" />
-                    </local:TitledContentRow>
+                        <local:TitledContentRow Title="Тип заказа">
+                            <TextBlock Width="{StaticResource TitledContentWidth}" Text="{x:Bind ViewModel.OrderType, Mode=OneWay, Converter={StaticResource EnumDescriptionConverter}}" />
+                        </local:TitledContentRow>
 
-                    <local:TitledContentRow Title="Комментарий">
-                        <TextBox
-                            Width="{StaticResource TitledContentWidth}"
-                            MaxHeight="110"
-                            AcceptsReturn="True"
-                            MaxLength="200"
-                            ScrollViewer.VerticalScrollBarVisibility="Auto"
-                            Text="{x:Bind ViewModel.UserComment, Mode=TwoWay}"
-                            TextWrapping="Wrap" />
-                    </local:TitledContentRow>
-                </StackPanel>
+                        <local:TitledContentRow Title="Никнейм">
+                            <TextBox
+                                Width="{StaticResource TitledContentWidth}"
+                                MaxLength="40"
+                                Text="{x:Bind ViewModel.Nickname, Mode=TwoWay}" />
+                        </local:TitledContentRow>
 
-                <Button
+                        <local:TitledContentRow Title="Сумма платежа" Visibility="{x:Bind ViewModel.IsPaymentAmountVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBox
+                                Width="{StaticResource TitledContentWidth}"
+                                ui:TextBoxExtensions.ValidationMode="Dynamic"
+                                ui:TextBoxExtensions.ValidationType="Number"
+                                MaxLength="10"
+                                Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        </local:TitledContentRow>
+
+                        <local:TitledContentRow Title="Ссылка на трек" Spacing="24">
+                            <TextBox
+                                Width="{StaticResource TitledContentWidth}"
+                                MaxLength="256"
+                                Text="{x:Bind ViewModel.TrackUrl, Mode=TwoWay}" />
+                        </local:TitledContentRow>
+
+                        <local:TitledContentRow Title="Длительность трека">
+                            <TextBox
+                                Width="{StaticResource TitledContentWidth}"
+                                MaxLength="5"
+                                PlaceholderText="мм:сс"
+                                Text="{x:Bind ViewModel.TrackDuration, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" />
+                        </local:TitledContentRow>
+
+                        <local:TitledContentRow Title="Комментарий">
+                            <TextBox
+                                Width="{StaticResource TitledContentWidth}"
+                                MaxHeight="110"
+                                AcceptsReturn="True"
+                                MaxLength="200"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                Text="{x:Bind ViewModel.UserComment, Mode=TwoWay}"
+                                TextWrapping="Wrap" />
+                        </local:TitledContentRow>
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel
                     Grid.Row="1"
-                    Width="130"
                     Margin="24"
                     HorizontalAlignment="Right"
-                    Command="{x:Bind ViewModel.CreateCommand}"
-                    Content="Создать"
-                    Style="{StaticResource AccentButtonStyle}" />
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <Button
+                        Width="130"
+                        Command="{x:Bind ViewModel.GoBackCommand}"
+                        Content="Назад"
+                        Visibility="{x:Bind ViewModel.IsBackButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                    <Button
+                        Width="130"
+                        Command="{x:Bind ViewModel.GoNextCommand}"
+                        Content="Далее"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Visibility="{x:Bind ViewModel.IsNextButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                    <Button
+                        Width="130"
+                        Command="{x:Bind ViewModel.CreateCommand}"
+                        Content="Создать"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Visibility="{x:Bind ViewModel.IsCreateButtonVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                </StackPanel>
             </Grid>
         </navigation:CustomContentDialog.DialogContent>
     </navigation:CustomContentDialog>

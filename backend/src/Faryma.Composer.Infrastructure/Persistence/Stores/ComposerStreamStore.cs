@@ -8,6 +8,11 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
     {
         public ComposerStreamEntity Create(DateOnly eventDate, ComposerStreamType type, UserEntity createdByUser)
         {
+            if (!Enum.IsDefined(type) || type == ComposerStreamType.Unspecified)
+            {
+                throw new ArgumentException("Тип стрима должен быть указан", nameof(type));
+            }
+
             return context.Add(new ComposerStreamEntity
             {
                 EventDate = eventDate,

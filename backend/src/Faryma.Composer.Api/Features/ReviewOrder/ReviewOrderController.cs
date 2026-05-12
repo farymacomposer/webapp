@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
-using Faryma.Composer.Api.Auth;
-using Faryma.Composer.Api.Extensions;
+using Faryma.Composer.Api.Common.Attributes;
+using Faryma.Composer.Api.Common.Extensions;
+using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Contracts.Api;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.AddTrackUrl;
@@ -24,7 +25,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
     /// Управление заказами разборов треков
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/review-orders")]
     [Produces("application/json")]
     public sealed class ReviewOrderController(
         ReviewOrderService reviewOrderService) : ControllerBase
@@ -35,7 +36,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос создания заказа</param>
         /// <param name="ct">Токен отмены</param>
-        [HttpPost(nameof(CreateReviewOrder))]
+        [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
@@ -52,6 +53,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
+                    TrackDurationSeconds = request.TrackDurationSeconds,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
                 }, ct),
@@ -59,6 +61,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
+                    TrackDurationSeconds = request.TrackDurationSeconds,
                     UserComment = request.UserComment,
                     PaymentAmount = request.PaymentAmount!.Value,
                     TopUpProvider = request.TopUpProvider!.Value,
@@ -68,6 +71,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
+                    TrackDurationSeconds = request.TrackDurationSeconds,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
                 }, ct),
@@ -75,6 +79,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 {
                     Nickname = request.Nickname,
                     TrackUrl = request.TrackUrl,
+                    TrackDurationSeconds = request.TrackDurationSeconds,
                     UserComment = request.UserComment,
                     CreatedByUserId = userId,
                 }, ct),
@@ -93,7 +98,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <param name="idempotencyKey">Ключ идемпотентности</param>
         /// <param name="request">Запрос поднятия заказа в очереди</param>
         /// <param name="ct">Токен отмены</param>
-        [HttpPost(nameof(MoveUpReviewOrder))]
+        [HttpPost("move-up")]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<MoveUpReviewOrderResponse>> MoveUpReviewOrder(
@@ -123,7 +128,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <summary>
         /// Добавляет или изменяет ссылку на трек
         /// </summary>
-        [HttpPost(nameof(AddTrackUrl))]
+        [HttpPost("track-url")]
         [AuthorizeAdmins]
         public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl(AddTrackUrlRequest request, CancellationToken ct)
         {
@@ -142,7 +147,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <summary>
         /// Взятие заказа в работу
         /// </summary>
-        [HttpPost(nameof(TakeOrderInProgress))]
+        [HttpPost("take-in-progress")]
         [AuthorizeAdmins]
         public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request, CancellationToken ct)
         {
@@ -157,7 +162,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <summary>
         /// Выполнение заказа
         /// </summary>
-        [HttpPost(nameof(CompleteReviewOrder))]
+        [HttpPost("complete")]
         [AuthorizeAdmins]
         public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder(CompleteReviewOrderRequest request, CancellationToken ct)
         {
@@ -180,7 +185,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <summary>
         /// Замораживает заказ
         /// </summary>
-        [HttpPost(nameof(FreezeReviewOrder))]
+        [HttpPost("freeze")]
         [AuthorizeAdmins]
         public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(FreezeReviewOrderRequest request, CancellationToken ct)
         {
@@ -195,7 +200,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <summary>
         /// Размораживает заказ
         /// </summary>
-        [HttpPost(nameof(UnfreezeReviewOrder))]
+        [HttpPost("unfreeze")]
         [AuthorizeAdmins]
         public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(UnfreezeReviewOrderRequest request, CancellationToken ct)
         {
@@ -210,7 +215,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <summary>
         /// Отменяет заказ
         /// </summary>
-        [HttpPost(nameof(CancelReviewOrder))]
+        [HttpPost("cancel")]
         [AuthorizeAdmins]
         public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request, CancellationToken ct)
         {

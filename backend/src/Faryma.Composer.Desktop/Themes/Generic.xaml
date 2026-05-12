@@ -45,6 +45,13 @@
         <Setter Property="BorderThickness" Value="0,0,0,1" />
     </Style>
 
+    <Style x:Key="GridContentDialogStyle" TargetType="Grid">
+        <Setter Property="Padding" Value="24" />
+        <Setter Property="Background" Value="{ThemeResource ContentDialogTopOverlay}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ContentDialogSeparatorBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+
     <Style x:Key="GridOverlayDialogStyle" TargetType="Grid">
         <Setter Property="Margin" Value="36" />
         <Setter Property="Background" Value="{ThemeResource ContentDialogBackground}" />
@@ -64,7 +71,7 @@
                         CornerRadius="{TemplateBinding CornerRadius}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Title}" />
@@ -130,7 +137,27 @@
         </Setter>
     </Style>
 
-    <Style x:Key="ButtonFlatStyle" TargetType="Button">
+    <Style x:Key="FlatButtonStyle" TargetType="Button">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <ContentPresenter
+                        x:Name="ContentPresenter"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="AnimatedFlatButtonStyle" TargetType="Button">
         <Setter Property="Padding" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />

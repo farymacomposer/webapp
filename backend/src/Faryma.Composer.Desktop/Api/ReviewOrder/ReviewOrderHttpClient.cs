@@ -11,37 +11,37 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder
 {
     public sealed class ReviewOrderHttpClient(HttpClient httpClient, JsonSerializerOptions serializerOptions)
     {
-        public Task<ReviewOrderDto> Create(Guid idempotencyKey, CreateReviewOrderRequest request) => Post("/api/ReviewOrder/CreateReviewOrder", idempotencyKey, request);
-        public Task<ReviewOrderDto> MoveUp(Guid idempotencyKey, MoveUpReviewOrderRequest request) => Post("/api/ReviewOrder/MoveUpReviewOrder", idempotencyKey, request);
+        public Task<ReviewOrderDto> Create(Guid idempotencyKey, CreateReviewOrderRequest request) => Post("/api/review-orders", idempotencyKey, request);
+        public Task<ReviewOrderDto> MoveUp(Guid idempotencyKey, MoveUpReviewOrderRequest request) => Post("/api/review-orders/move-up", idempotencyKey, request);
 
-        public Task<ReviewOrderDto> AddTrackUrl(long reviewOrderId, string trackUrl) => Post("/api/ReviewOrder/AddTrackUrl", new
+        public Task<ReviewOrderDto> AddTrackUrl(long reviewOrderId, string trackUrl) => Post("/api/review-orders/track-url", new
         {
             ReviewOrderId = reviewOrderId,
             TrackUrl = trackUrl,
         });
 
-        public Task<ReviewOrderDto> TakeOrderInProgress(long reviewOrderId) => Post("/api/ReviewOrder/TakeOrderInProgress", new
+        public Task<ReviewOrderDto> TakeOrderInProgress(long reviewOrderId) => Post("/api/review-orders/take-in-progress", new
         {
             ReviewOrderId = reviewOrderId,
         });
 
-        public Task<ReviewOrderDto> Complete(long reviewOrderId, int rating) => Post("/api/ReviewOrder/CompleteReviewOrder", new
+        public Task<ReviewOrderDto> Complete(long reviewOrderId, int rating) => Post("/api/review-orders/complete", new
         {
             ReviewOrderId = reviewOrderId,
             Rating = rating,
         });
 
-        public Task<ReviewOrderDto> Freeze(long reviewOrderId) => Post("/api/ReviewOrder/FreezeReviewOrder", new
+        public Task<ReviewOrderDto> Freeze(long reviewOrderId) => Post("/api/review-orders/freeze", new
         {
             ReviewOrderId = reviewOrderId,
         });
 
-        public Task<ReviewOrderDto> Unfreeze(long reviewOrderId) => Post("/api/ReviewOrder/UnfreezeReviewOrder", new
+        public Task<ReviewOrderDto> Unfreeze(long reviewOrderId) => Post("/api/review-orders/unfreeze", new
         {
             ReviewOrderId = reviewOrderId,
         });
 
-        public Task<ReviewOrderDto> Cancel(long reviewOrderId) => Post("/api/ReviewOrder/CancelReviewOrder", new
+        public Task<ReviewOrderDto> Cancel(long reviewOrderId) => Post("/api/review-orders/cancel", new
         {
             ReviewOrderId = reviewOrderId,
         });

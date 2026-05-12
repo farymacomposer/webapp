@@ -2,9 +2,9 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Faryma.Composer.Contracts.Api.Auth.Features.Login;
-using Faryma.Composer.Contracts.Api.Auth.Features.Logout;
-using Faryma.Composer.Contracts.Api.Auth.Features.RefreshToken;
+using Faryma.Composer.Contracts.Api.Features.Auth.Login;
+using Faryma.Composer.Contracts.Api.Features.Auth.Logout;
+using Faryma.Composer.Contracts.Api.Features.Auth.RefreshToken;
 
 namespace Faryma.Composer.Desktop.Auth
 {
@@ -13,7 +13,7 @@ namespace Faryma.Composer.Desktop.Auth
         public Task<LoginResponse> Login(string userName, string password)
         {
             return Post<LoginRequest, LoginResponse>(
-                "/api/Auth/Login",
+                "/api/auth/sessions/desktop-admin",
                 new LoginRequest
                 {
                     UserName = userName,
@@ -25,7 +25,7 @@ namespace Faryma.Composer.Desktop.Auth
         public Task<RefreshTokenResponse> RefreshToken(string refreshToken, CancellationToken ct)
         {
             return Post<RefreshTokenRequest, RefreshTokenResponse>(
-                "/api/Auth/RefreshToken",
+                "/api/auth/tokens/refresh",
                 new RefreshTokenRequest
                 {
                     RefreshToken = refreshToken
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Desktop.Auth
 
         public async Task Logout(string refreshToken, string accessToken)
         {
-            using HttpRequestMessage request = new(HttpMethod.Post, "/api/Auth/Logout")
+            using HttpRequestMessage request = new(HttpMethod.Post, "/api/auth/tokens/revoke")
             {
                 Content = JsonContent.Create(new LogoutRequest
                 {

@@ -5,7 +5,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ComposerStream
 {
-    public sealed class StartStreamTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class StartStreamTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что запуск переводит запланированный стрим в статус Live.

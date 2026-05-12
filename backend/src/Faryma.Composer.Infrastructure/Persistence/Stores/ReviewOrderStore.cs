@@ -21,12 +21,21 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             int nominalAmount,
             int payableAmount,
             string? trackUrl,
+            int? trackDurationSeconds,
             string? userComment,
             ReviewOrderType type,
             ComposerStreamEntity creationStream,
             UserNicknameEntity userNickname,
             UserEntity createdByUser)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(nominalAmount);
+            ArgumentOutOfRangeException.ThrowIfNegative(payableAmount);
+
+            if (!Enum.IsDefined(type) || type == ReviewOrderType.Unspecified)
+            {
+                throw new ArgumentException("Тип заказа должен быть указан", nameof(type));
+            }
+
             return context.Add(new ReviewOrderEntity
             {
                 CreatedAt = dateTimeService.Now,
@@ -37,6 +46,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 QueueCategory = QueueCategory.Unspecified,
                 IsFrozen = false,
                 TrackUrl = trackUrl,
+                TrackDurationSeconds = trackDurationSeconds,
                 NominalAmount = nominalAmount,
                 PayableAmount = payableAmount,
                 UserComment = userComment,

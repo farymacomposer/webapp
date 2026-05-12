@@ -61,21 +61,14 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         /// </summary>
         public static async Task<ApplicationTestHost> CreateAsync(PostgreSqlFixture fixture)
         {
-            string databaseName = await fixture.CreateDatabaseAsync();
+            string databaseName = await fixture.CreateDatabaseAsync("app_test");
             DateTime fixedNow = new(2030, 1, 10, 12, 0, 0, DateTimeKind.Utc);
             IHost? host = null;
 
             try
             {
                 HostApplicationBuilder builder = Host.CreateApplicationBuilder();
-                builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-                {
-                    ["POSTGRES:HOST"] = fixture.Host,
-                    ["POSTGRES:PORT"] = fixture.Port.ToString(),
-                    ["POSTGRES:DATABASE"] = databaseName,
-                    ["POSTGRES:USERNAME"] = fixture.Username,
-                    ["POSTGRES:PASSWORD"] = fixture.Password,
-                });
+                builder.Configuration.AddInMemoryCollection(PostgreSqlTestConfiguration.CreatePostgreSqlSettings(fixture, databaseName));
 
                 builder.Services.AddSingleton<IOrderQueueNotificationService, TestOrderQueueNotificationService>();
                 builder.Services.AddPersistence(builder.Configuration);
@@ -90,7 +83,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
 
                 host = builder.Build();
 
-                await EnsureDatabaseCreatedAsync(host);
+                await PostgreSqlSchemaInitializer.EnsureCreatedAsync(builder.Configuration);
                 await host.StartAsync();
                 await host.Services.GetRequiredService<AppSettingsService>().Initialize();
                 await host.Services.GetRequiredService<OrderQueueService>().Initialize();
@@ -143,7 +136,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
 
             return await uow.ReviewOrderStore.FindById(orderId)
-                ?? throw new InvalidOperationException($"Order {orderId} not found.");
+                ?? throw new InvalidOperationException($"Заказ {orderId} не найден");
         });
 
         /// <summary>
@@ -154,7 +147,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
 
             return await uow.ComposerStreamStore.FindById(streamId)
-                ?? throw new InvalidOperationException($"Stream {streamId} not found.");
+                ?? throw new InvalidOperationException($"Стрим {streamId} не найден");
         });
 
         /// <summary>
@@ -190,14 +183,6 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         {
             await _host.StopAsync();
             _host.Dispose();
-        }
-
-        private static async Task EnsureDatabaseCreatedAsync(IHost host)
-        {
-            await using AsyncServiceScope scope = host.Services.CreateAsyncScope();
-            IDbContextFactory<AppDbContext> factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
-            await using AppDbContext context = await factory.CreateDbContextAsync();
-            await context.Database.EnsureCreatedAsync();
         }
     }
 }

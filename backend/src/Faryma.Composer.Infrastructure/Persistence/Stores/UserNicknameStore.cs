@@ -8,6 +8,8 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
     {
         public UserNicknameEntity Create(string nickname)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(nickname);
+
             UserNicknameEntity result = new()
             {
                 Nickname = nickname,

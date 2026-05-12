@@ -1,0 +1,58 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/deploy/">
+    <File Path="../.env" />
+    <File Path="../.github/workflows/backend.yml" />
+    <File Path="../.github/workflows/desktop-zip-artifact.yml" />
+    <File Path="../backend.Dockerfile" />
+    <File Path="../docker-compose.yml" />
+    <File Path="entrypoint.sh" />
+  </Folder>
+  <Folder Name="/docs/" />
+  <Folder Name="/docs/database/">
+    <File Path="docs/database/schema.dbml" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/tests/">
+    <Project Path="tests/Faryma.Composer.Api.Test/Faryma.Composer.Api.Test.csproj" />
+    <Project Path="tests/Faryma.Composer.Application.Test/Faryma.Composer.Application.Test.csproj" />
+    <Project Path="tests/Faryma.Composer.Testing/Faryma.Composer.Testing.csproj" />
+  </Folder>
+  <Folder Name="/use-cases/" />
+  <Folder Name="/use-cases/composer-stream/">
+    <File Path="use-cases/composer-stream/cancel-stream.md" />
+    <File Path="use-cases/composer-stream/complete-stream.md" />
+    <File Path="use-cases/composer-stream/create-stream.md" />
+    <File Path="use-cases/composer-stream/README.md" />
+    <File Path="use-cases/composer-stream/start-stream.md" />
+  </Folder>
+  <Folder Name="/use-cases/order-queue/">
+    <File Path="use-cases/order-queue/order-activity-status-graph.md" />
+    <File Path="use-cases/order-queue/README.md" />
+  </Folder>
+  <Folder Name="/use-cases/review-order/">
+    <File Path="use-cases/review-order/add-track-url.md" />
+    <File Path="use-cases/review-order/cancel-review-order.md" />
+    <File Path="use-cases/review-order/complete-review-order.md" />
+    <File Path="use-cases/review-order/create-review-order.md" />
+    <File Path="use-cases/review-order/freeze-review-order.md" />
+    <File Path="use-cases/review-order/move-up-review-order.md" />
+    <File Path="use-cases/review-order/README.md" />
+    <File Path="use-cases/review-order/review-order-status-graph.md" />
+    <File Path="use-cases/review-order/take-order-in-progress.md" />
+    <File Path="use-cases/review-order/unfreeze-review-order.md" />
+  </Folder>
+  <Project Path="src/Faryma.Composer.Api/Faryma.Composer.Api.csproj" />
+  <Project Path="src/Faryma.Composer.Application/Faryma.Composer.Application.csproj" />
+  <Project Path="src/Faryma.Composer.Contracts/Faryma.Composer.Contracts.csproj" />
+  <Project Path="src/Faryma.Composer.Desktop/Faryma.Composer.Desktop.csproj">
+    <Platform Solution="*|Any CPU" Project="x64" />
+    <Deploy Solution="*|Any CPU" />
+  </Project>
+  <Project Path="src/Faryma.Composer.Infrastructure/Faryma.Composer.Infrastructure.csproj" />
+  <Project Path="src/Faryma.Composer.MigrationsBundle/Faryma.Composer.MigrationsBundle.csproj" />
+</Solution>

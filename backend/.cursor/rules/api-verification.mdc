@@ -1,0 +1,16 @@
+---
+description: Prefer API-scoped verification for API, auth, startup, middleware, and API contract changes.
+globs: src/Faryma.Composer.Api/**/*.cs, src/Faryma.Composer.Contracts/Api/**/*.cs, tests/Faryma.Composer.Api.Test/**/*.cs
+alwaysApply: false
+---
+
+# API Verification
+
+- For API behavior, auth, startup, middleware, filters, exception handling, or API contract changes, start with API-scoped verification.
+- Run verification commands from the `backend` workspace root.
+- This test suite uses Testcontainers/PostgreSQL for integration coverage.
+- Before running tests, check Docker with `docker info`.
+- If Docker is unavailable, try to start Docker Desktop and wait until `docker info` succeeds. If it cannot be started automatically, stop and ask the user to start Docker before running the tests.
+- Use:
+  `dotnet test tests/Faryma.Composer.Api.Test/Faryma.Composer.Api.Test.csproj`
+- If the change also affects application behavior behind the API, add the relevant application tests.

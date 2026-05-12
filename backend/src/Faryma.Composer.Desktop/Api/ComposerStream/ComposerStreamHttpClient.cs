@@ -16,7 +16,7 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
                 .Add("DateFrom", dateFrom.ToString("yyyy-MM-dd"))
                 .Add("DateTo", dateTo.ToString("yyyy-MM-dd"));
 
-            string url = $"/api/ComposerStream/FindStreams{queryBuilder}";
+            string url = $"/api/composer-streams{queryBuilder}";
 
             StreamsResponse response = await httpClient.GetFromJsonAsync<StreamsResponse>(url, serializerOptions)
                 ?? throw new InvalidOperationException("Не удалось десериализовать StreamResponse");
@@ -26,29 +26,29 @@ namespace Faryma.Composer.Desktop.Api.ComposerStream
 
         public async Task<IEnumerable<ComposerStreamDto>> FindLiveAndPlanned()
         {
-            StreamsResponse response = await httpClient.GetFromJsonAsync<StreamsResponse>("/api/ComposerStream/FindLiveAndPlanned", serializerOptions)
+            StreamsResponse response = await httpClient.GetFromJsonAsync<StreamsResponse>("/api/composer-streams/live-and-planned", serializerOptions)
                 ?? throw new InvalidOperationException("Не удалось десериализовать StreamResponse");
 
             return response.Streams;
         }
 
-        public Task<ComposerStreamDto> Create(DateOnly eventDate, ComposerStreamType type) => Post("/api/ComposerStream/CreateStream", new
+        public Task<ComposerStreamDto> Create(DateOnly eventDate, ComposerStreamType type) => Post("/api/composer-streams", new
         {
             EventDate = eventDate,
             Type = type,
         });
 
-        public Task<ComposerStreamDto> Start(long composerStreamId) => Post("/api/ComposerStream/StartStream", new
+        public Task<ComposerStreamDto> Start(long composerStreamId) => Post("/api/composer-streams/start", new
         {
             ComposerStreamId = composerStreamId,
         });
 
-        public Task<ComposerStreamDto> Complete(long composerStreamId) => Post("/api/ComposerStream/CompleteStream", new
+        public Task<ComposerStreamDto> Complete(long composerStreamId) => Post("/api/composer-streams/complete", new
         {
             ComposerStreamId = composerStreamId,
         });
 
-        public Task<ComposerStreamDto> Cancel(long composerStreamId) => Post("/api/ComposerStream/CancelStream", new
+        public Task<ComposerStreamDto> Cancel(long composerStreamId) => Post("/api/composer-streams/cancel", new
         {
             ComposerStreamId = composerStreamId,
         });

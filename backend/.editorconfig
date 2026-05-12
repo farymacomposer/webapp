@@ -1458,7 +1458,7 @@ dotnet_diagnostic.CA1069.severity = error
 dotnet_diagnostic.CA1507.severity = warning
 
 # CA1711: Идентификаторы не должны иметь неверных суффиксов
-dotnet_diagnostic.CA1711.severity = warning
+dotnet_diagnostic.CA1711.severity = suggestion
 
 # CA1713: Имена событий не должны содержать префикс "before" или "after"
 dotnet_diagnostic.CA1713.severity = warning

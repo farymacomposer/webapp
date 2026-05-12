@@ -1,0 +1,86 @@
+name: Desktop ZIP Artifact
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: ZIP version
+        required: true
+        type: string
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    env:
+      DESKTOP_PROJECT: backend/src/Faryma.Composer.Desktop/Faryma.Composer.Desktop.csproj
+      RUNTIME_IDENTIFIER: win-x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Resolve artifact version input
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          if ($version -notmatch '^\d+\.\d+\.\d+(?:\.\d+)?$') {
+            throw "Version '$version' must look like 1.2.3 or 1.2.3.4"
+          }
+
+          "ARTIFACT_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Publish unpackaged self-contained app with MSBuild
+        run: >
+          msbuild $env:DESKTOP_PROJECT
+          /restore
+          /t:Publish
+          /p:Configuration=Release
+          /p:Platform=x64
+          /p:RuntimeIdentifier=$env:RUNTIME_IDENTIFIER
+          /p:SelfContained=true
+          /p:PublishTrimmed=false
+          /p:PublishReadyToRun=false
+          /p:WindowsAppSDKSelfContained=true
+          /p:WindowsPackageType=None
+          /p:PublishDir="$env:RUNNER_TEMP\desktop-publish\\"
+          /nologo
+          /verbosity:minimal
+          /clp:Summary
+
+      - name: Create artifact archive
+        run: |
+          $publishDir = Join-Path $env:RUNNER_TEMP "desktop-publish"
+          if (-not (Test-Path $publishDir)) {
+            throw "Publish output directory was not produced."
+          }
+
+          $exe = Get-ChildItem -Path $publishDir -Filter *.exe -Recurse | Select-Object -First 1
+          if (-not $exe) {
+            throw "Published output does not contain an executable."
+          }
+
+          $archiveDir = Join-Path $env:RUNNER_TEMP "desktop-artifact"
+          New-Item -ItemType Directory -Force -Path $archiveDir | Out-Null
+
+          $archiveName = "Faryma.Composer.Desktop-$env:ARTIFACT_VERSION-win-x64.zip"
+          $archivePath = Join-Path $archiveDir $archiveName
+
+          Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $archivePath -Force
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-zip-release
+          path: ${{ runner.temp }}/desktop-artifact/*.zip

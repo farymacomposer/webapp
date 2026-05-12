@@ -13,7 +13,7 @@ interface OrderCardBaseProps {
   color?: ButtonColor;
 }
 
-interface OrderCardSquareProps extends OrderCardBaseProps {}
+type OrderCardSquareProps = OrderCardBaseProps;
 
 interface OrderCardRectangleProps extends OrderCardBaseProps {
   id: string;

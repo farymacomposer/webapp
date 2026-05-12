@@ -1,9 +1,11 @@
-﻿using Faryma.Composer.Infrastructure.Persistence.Queries;
+﻿using Faryma.Composer.Infrastructure.Options;
+using Faryma.Composer.Infrastructure.Persistence.Queries;
 using Faryma.Composer.Infrastructure.Persistence.Stores;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Faryma.Composer.Infrastructure.DependencyInjection
 {
@@ -11,9 +13,17 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
         {
-            string? connectionString = DbContextHelper.GetConnectionString(configuration);
+            services
+                .AddOptionsWithValidateOnStart<PostgreOptions>()
+                .Bind(configuration.GetRequiredSection("POSTGRES"))
+                .ValidateDataAnnotations();
 
-            services.AddDbContextFactory<AppDbContext>(options => options.UseNpgsql(connectionString, npgOptions => npgOptions.MapEnum()));
+            services.AddDbContextFactory<AppDbContext>((provider, options) =>
+            {
+                PostgreOptions postgreOptions = provider.GetRequiredService<IOptions<PostgreOptions>>().Value;
+
+                options.UseNpgsql(postgreOptions.GetConnectionString(), npgOptions => npgOptions.MapEnum());
+            });
 
             services
                 .AddDataProtection()

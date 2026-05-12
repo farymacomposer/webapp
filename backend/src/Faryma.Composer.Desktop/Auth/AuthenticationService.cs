@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
-using Faryma.Composer.Contracts.Api.Auth.Features.Login;
-using Faryma.Composer.Contracts.Api.Auth.Features.RefreshToken;
+using Faryma.Composer.Contracts.Api.Features.Auth.Login;
+using Faryma.Composer.Contracts.Api.Features.Auth.RefreshToken;
 
 namespace Faryma.Composer.Desktop.Auth
 {
@@ -90,7 +90,7 @@ namespace Faryma.Composer.Desktop.Auth
             string[] segments = accessToken.Split('.');
             if (segments.Length < 2)
             {
-                throw new InvalidOperationException("Некорректный access token.");
+                throw new InvalidOperationException("Некорректный access token");
             }
 
             string payload = segments[1]

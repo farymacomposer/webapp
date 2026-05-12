@@ -1,18 +1,16 @@
-﻿using Faryma.Composer.Api.Auth.Services;
-using Faryma.Composer.Api.DependencyInjection;
-using Faryma.Composer.Api.Extensions;
+﻿using Faryma.Composer.Api.Common.DependencyInjection;
+using Faryma.Composer.Api.Common.Extensions;
+using Faryma.Composer.Api.Common.Startup;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
-using Faryma.Composer.Application.Features.AppSettings;
-using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Serilog;
 
 namespace Faryma.Composer.Api
 {
-    public static class Program
+    public partial class Program
     {
-        public static async Task Main()
+        public static async Task Main(string[]? args = null)
         {
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
             {
@@ -20,14 +18,14 @@ namespace Faryma.Composer.Api
                 Environment.Exit(1);
             };
 
-            WebApplicationBuilder builder = WebApplication.CreateBuilder();
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args ?? []);
 
             builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration));
 
             builder.Services
                 .AddConfiguration(builder.Configuration)
                 .AddPersistenceAndIdentity(builder.Configuration)
-                .AddJwtAuthentication(builder.Configuration)
+                .AddApiAuthentication()
                 .AddAuthorization()
                 .AddCoreServices();
 
@@ -35,10 +33,17 @@ namespace Faryma.Composer.Api
 
             WebApplication app = builder.Build();
 
-            app.UseRouting();
+            app.UseExceptionHandler();
+            app.UseForwardedHeaders();
             app.UseApiDocumentation();
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHsts();
+            }
 
-            app.UseHttpsRedirection();
+            app.UseHttpsRedirectionExceptApiDocumentation();
+
+            app.UseRouting();
             app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -46,13 +51,7 @@ namespace Faryma.Composer.Api
             app.MapControllers();
             app.MapHub<OrderQueueNotificationHub>(IOrderQueueNotificationServer.RoutePattern);
 
-            await using (AsyncServiceScope scope = app.Services.CreateAsyncScope())
-            {
-                await scope.ServiceProvider.GetRequiredService<AdminBootstrapService>().Initialize();
-            }
-
-            await app.Services.GetRequiredService<AppSettingsService>().Initialize();
-            await app.Services.GetRequiredService<OrderQueueService>().Initialize();
+            await app.Services.GetRequiredService<IApplicationStartupInitializer>().Initialize(app.Services);
             await app.RunAsync();
         }
     }

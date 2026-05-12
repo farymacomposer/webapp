@@ -7,7 +7,7 @@ using Faryma.Composer.Contracts.Infrastructure.Enums;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
-    public sealed class CancelReviewOrderTests(PostgreSqlFixture fixture) : ApplicationTestBase(fixture)
+    public sealed class CancelReviewOrderTests(PostgreSqlFixture fixture) : TestBase(fixture)
     {
         /// <summary>
         /// Проверяет, что отмена заказа в работе очищает поля обработки.
@@ -33,13 +33,13 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
                 {
                     ReviewOrderId = order.Id,
-                    CancelReason = "duplicate",
+                    CancelReason = "дубликат",
                 }));
 
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
             Assert.Equal(ReviewOrderStatus.Canceled, result.Status);
             Assert.Equal(ReviewOrderStatus.Canceled, persisted.Status);
-            Assert.Equal("duplicate", persisted.CancelReason);
+            Assert.Equal("дубликат", persisted.CancelReason);
             Assert.Equal(app.FixedNow, persisted.CanceledAt);
             Assert.Null(persisted.ProcessingStreamId);
             Assert.Null(persisted.InProgressAt);
@@ -58,20 +58,20 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 createdByUserId: user.Id,
                 status: ReviewOrderStatus.Canceled,
                 canceledAt: app.FixedNow,
-                cancelReason: "reason");
+                cancelReason: "причина");
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
                 {
                     ReviewOrderId = order.Id,
-                    CancelReason = "another",
+                    CancelReason = "другая причина",
                 }));
 
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
             Assert.Equal(order.Id, result.Id);
-            Assert.Equal("reason", result.CancelReason);
+            Assert.Equal("причина", result.CancelReason);
             Assert.Equal(app.FixedNow, result.CanceledAt);
-            Assert.Equal("reason", persisted.CancelReason);
+            Assert.Equal("причина", persisted.CancelReason);
             Assert.Equal(app.FixedNow, persisted.CanceledAt);
         }
 
@@ -94,7 +94,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
                     {
                         ReviewOrderId = order.Id,
-                        CancelReason = "late",
+                        CancelReason = "поздняя отмена",
                     })));
         }
 
@@ -119,17 +119,17 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
                 {
                     ReviewOrderId = order.Id,
-                    CancelReason = "manual",
+                    CancelReason = "ручная отмена",
                 }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.Equal(ReviewOrderStatus.Canceled, result.Status);
-            Assert.Equal("manual", result.CancelReason);
+            Assert.Equal("ручная отмена", result.CancelReason);
             Assert.Equal(QueueCategory.Unspecified, result.QueueCategory);
             Assert.Null(result.ProcessingStreamId);
             Assert.Null(result.InProgressAt);
             Assert.Equal(ReviewOrderStatus.Canceled, persisted.Status);
-            Assert.Equal("manual", persisted.CancelReason);
+            Assert.Equal("ручная отмена", persisted.CancelReason);
             Assert.Equal(QueueCategory.Unspecified, persisted.QueueCategory);
             Assert.Null(persisted.ProcessingStreamId);
             Assert.Null(persisted.InProgressAt);
@@ -148,7 +148,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
                     {
                         ReviewOrderId = long.MaxValue,
-                        CancelReason = "late",
+                        CancelReason = "поздняя отмена",
                     })));
         }
     }

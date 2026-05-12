@@ -72,6 +72,11 @@ namespace Faryma.Composer.Infrastructure
         /// </summary>
         public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
 
+        /// <summary>
+        /// Идемпотентные API-запросы
+        /// </summary>
+        public DbSet<IdempotencyRecordEntity> IdempotencyRecords { get; set; }
+
         // TransactionSources
 
         /// <summary>
