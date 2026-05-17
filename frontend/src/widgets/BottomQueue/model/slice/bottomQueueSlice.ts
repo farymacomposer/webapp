@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { BottomQueueSchema } from '../types/bottomQueue.ts';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { type BottomQueueSchema } from '../types/bottomQueue.ts';
 
 const initialState: BottomQueueSchema = {
   openCardHeight: 0,

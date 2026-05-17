@@ -1,9 +1,9 @@
 import { HStack } from '@shared/ui/Stack';
 import { type FC, memo } from 'react';
+import { useQueueGroupView } from '../../../Queue';
 import { orderCategories, wavesCategories } from '../../model/consts/orderCategoriesConsts.ts';
 import { OrderCategory } from '../OrderCategory/OrderCategory';
 import cls from './OrderCategoriesList.module.scss';
-import { useQueueGroupView } from '../../../Queue';
 
 interface IOrderCategoriesListProps {
   onClick: (id: string) => () => void;

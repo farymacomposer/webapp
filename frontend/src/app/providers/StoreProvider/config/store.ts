@@ -1,5 +1,5 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { queueReducer } from '@entities/Queue';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { bottomQueueReducer } from '@widgets/BottomQueue';
 
 const rootReducer = combineReducers({

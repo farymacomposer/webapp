@@ -1,5 +1,5 @@
-import cls from './TwitchChat.module.scss';
 import { env } from '@shared/config/env.ts';
+import cls from './TwitchChat.module.scss';
 
 export const TwitchChat = () => {
   return (

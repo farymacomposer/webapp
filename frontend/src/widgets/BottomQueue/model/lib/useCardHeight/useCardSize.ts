@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useScreenSize } from '@shared/lib/hooks/useScreenSize';
 import { Breakpoints } from '@shared/const/breakpoints.ts';
+import { useScreenSize } from '@shared/lib/hooks/useScreenSize';
+import { useEffect, useState } from 'react';
 
 const sizeSidebar = 340 + 10; // size + gap
 const sizeOpenBtn = 74;

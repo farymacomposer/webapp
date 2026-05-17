@@ -1,11 +1,11 @@
 import { OrderCard } from '@entities/Order';
 import type { Order } from '@entities/Order/model/types/order.ts';
+import Arrow from '@shared/assets/icons/arrow.svg';
 import { classNames } from '@shared/lib/classNames/classNames.ts';
+import { Icon } from '@shared/ui/Icon';
 import { Overlay } from '@shared/ui/Overlay';
 import { memo } from 'react';
 import cls from './BottomQueueCard.module.scss';
-import { Icon } from '@shared/ui/Icon';
-import Arrow from '@shared/assets/icons/arrow.svg';
 
 interface IProps {
   order: Order;

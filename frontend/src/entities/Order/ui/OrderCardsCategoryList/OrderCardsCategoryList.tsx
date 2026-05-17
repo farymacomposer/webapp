@@ -1,5 +1,6 @@
 import { VStack } from '@shared/ui/Stack';
 import { memo } from 'react';
+import { useQueueGroupView } from '../../../Queue';
 import {
   orderCategoriesColorsDict,
   wavesCategoriesColorsDict,
@@ -8,7 +9,6 @@ import { type CategoryWithOrders } from '../../model/types/order.ts';
 import { OrderCard } from '../OrderCard/OrderCard.tsx';
 import { OrderCategory } from '../OrderCategory/OrderCategory';
 import cls from './OrderCardsCategoryList.module.scss';
-import { useQueueGroupView } from '../../../Queue';
 
 export interface OrderCardProps {
   orders: CategoryWithOrders[];

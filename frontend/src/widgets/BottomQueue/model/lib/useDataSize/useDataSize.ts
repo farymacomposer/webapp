@@ -1,6 +1,6 @@
 import { Breakpoints } from '@shared/const/breakpoints.ts';
-import { mockData } from '../../mockData/mockData.ts';
 import { useScreenSize } from '@shared/lib/hooks/useScreenSize';
+import { mockData } from '../../mockData/mockData.ts';
 
 export const useDataSize = () => {
   const { width } = useScreenSize();

@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { QueueGroupView, QueueSchema } from '../types/queue.ts';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { type QueueGroupView, type QueueSchema } from '../types/queue.ts';
 
 const initialState: QueueSchema = {
   groupView: 'order',

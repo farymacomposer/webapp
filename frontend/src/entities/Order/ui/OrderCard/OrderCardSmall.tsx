@@ -6,7 +6,7 @@ import { AppImage } from '@shared/ui/AppImage';
 import { Icon } from '@shared/ui/Icon';
 import { HStack, VStack } from '@shared/ui/Stack';
 import { Text } from '@shared/ui/Text';
-import { ReactElement, useCallback, useState } from 'react';
+import { type ReactElement, useCallback, useState } from 'react';
 import { type Order } from '../../model/types/order.ts';
 import { OrderCategory } from '../OrderCategory/OrderCategory.tsx';
 import cls from './OrderCard.module.scss';

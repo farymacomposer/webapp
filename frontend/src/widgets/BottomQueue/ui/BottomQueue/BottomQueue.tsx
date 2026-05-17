@@ -1,10 +1,10 @@
 import { OpenSideQueueButton } from '@features/openSideQueue';
 import { HStack } from '@shared/ui/Stack';
 import { memo, useCallback, useState } from 'react';
+import { useCardSize } from '../../model/lib/useCardHeight/useCardSize.ts';
+import { useDataSize } from '../../model/lib/useDataSize/useDataSize.ts';
 import { BottomQueueCard } from '../BottomQueueCard/BottomQueueCard.tsx';
 import cls from './BottomQueue.module.scss';
-import { useDataSize } from '../../model/lib/useDataSize/useDataSize.ts';
-import { useCardSize } from '../../model/lib/useCardHeight/useCardSize.ts';
 
 interface IProps {
   onOpenSideQueue: () => void;

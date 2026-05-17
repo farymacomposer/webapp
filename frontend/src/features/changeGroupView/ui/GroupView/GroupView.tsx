@@ -1,10 +1,10 @@
-import { FC, memo, useCallback } from 'react';
-import cls from './GroupView.module.scss';
-import { HStack } from '@shared/ui/Stack';
+import { queueActions, type QueueGroupView, useQueueGroupView } from '@entities/Queue';
 import { classNames } from '@shared/lib/classNames/classNames.ts';
-import { Button } from '@shared/ui/Button';
-import { queueActions, QueueGroupView, useQueueGroupView } from '@entities/Queue';
 import { useAppDispatch } from '@shared/lib/hooks/useAppDispatch';
+import { Button } from '@shared/ui/Button';
+import { HStack } from '@shared/ui/Stack';
+import { type FC, memo, useCallback } from 'react';
+import cls from './GroupView.module.scss';
 
 interface IProps {
   className?: string;
@@ -18,7 +18,7 @@ export const GroupView: FC<IProps> = memo(({ className }) => {
     (view: QueueGroupView) => () => {
       dispatch(queueActions.changeQueueGroupView(view));
     },
-    [],
+    [dispatch],
   );
 
   return (

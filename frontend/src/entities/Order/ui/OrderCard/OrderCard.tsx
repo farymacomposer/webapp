@@ -1,4 +1,4 @@
-import { memo, ReactElement } from 'react';
+import { memo, type ReactElement } from 'react';
 import { type Order } from '../../model/types/order.ts';
 import { OrderCardBig } from './OrderCardBig.tsx';
 import { OrderCardSmall } from './OrderCardSmall.tsx';

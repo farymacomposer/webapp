@@ -1,10 +1,10 @@
 import { OrderCardsCategoryList } from '@entities/Order';
+import { useQueueGroupView } from '@entities/Queue';
 import { Modal } from '@shared/ui/Modal';
 import { memo } from 'react';
 import { mockDataOrders, mockDataWaves } from '../../model/mockData/mockData';
 import { SideQueueHeader } from '../SideQueueHeader/SideQueueHeader.tsx';
 import cls from './SideQueue.module.scss';
-import { useQueueGroupView } from '@entities/Queue';
 
 interface IProps {
   isOpen: boolean;
