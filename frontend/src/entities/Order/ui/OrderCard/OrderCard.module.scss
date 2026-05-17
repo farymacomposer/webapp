@@ -1,11 +1,11 @@
 .card {
   background: var(--gradient-bg-color);
+  position: relative;
 }
 
 .small {
   border-radius: 10px 10px 0 0;
   cursor: pointer;
-  height: 100%;
 
   .iconsBlock {
     padding: 16px;
@@ -60,7 +60,19 @@
   .name {
     -webkit-box-orient: vertical;
     display: -webkit-box;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .openCardName {
     -webkit-line-clamp: 3;
+  }
+
+  .user {
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
     overflow: hidden;
     text-overflow: ellipsis;
   }

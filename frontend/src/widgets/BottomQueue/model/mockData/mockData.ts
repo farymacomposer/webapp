@@ -68,7 +68,7 @@ export const mockData = [
   },
   {
     id: 5,
-    title: 'Lorem ipsum dolor sit amet',
+    title: 'Lorem ipsu',
     user: 'Петр Петров',
     category: 'w2',
     img: img,

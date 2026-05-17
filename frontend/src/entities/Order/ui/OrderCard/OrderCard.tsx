@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, ReactElement } from 'react';
 import { type Order } from '../../model/types/order.ts';
 import { OrderCardBig } from './OrderCardBig.tsx';
 import { OrderCardSmall } from './OrderCardSmall.tsx';
@@ -21,6 +21,8 @@ interface SmallOrderCardProps extends OrderCardBaseProps {
   view: 'small';
   visibility: OrderSmallVisibility;
   onClick?: () => void;
+  style?: React.CSSProperties;
+  children?: ReactElement;
 }
 
 type OrderCardProps = BigOrderCardProps | SmallOrderCardProps;
@@ -36,6 +38,8 @@ export const OrderCard = memo((props: OrderCardProps) => {
         order={order}
         visibility={orderProps.visibility}
         onClick={orderProps.onClick}
+        style={orderProps.style}
+        children={orderProps.children}
       />
     );
   }

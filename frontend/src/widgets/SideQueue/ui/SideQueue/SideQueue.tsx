@@ -1,9 +1,10 @@
 import { OrderCardsCategoryList } from '@entities/Order';
 import { Modal } from '@shared/ui/Modal';
 import { memo } from 'react';
-import { mockData } from '../../model/mockData/mockData';
+import { mockDataOrders, mockDataWaves } from '../../model/mockData/mockData';
 import { SideQueueHeader } from '../SideQueueHeader/SideQueueHeader.tsx';
 import cls from './SideQueue.module.scss';
+import { useQueueGroupView } from '@entities/Queue';
 
 interface IProps {
   isOpen: boolean;
@@ -12,6 +13,9 @@ interface IProps {
 
 export const SideQueue = memo((props: IProps) => {
   const { isOpen, onClose } = props;
+  const activeView = useQueueGroupView();
+
+  const mockData = activeView === 'order' ? mockDataOrders : mockDataWaves;
 
   return (
     <Modal

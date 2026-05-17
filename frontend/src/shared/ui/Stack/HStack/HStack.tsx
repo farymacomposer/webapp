@@ -1,7 +1,8 @@
 import { Flex, type FlexProps } from '../Flex/Flex';
+import { forwardRef } from 'react';
 
 type HStackProps = Omit<FlexProps, 'direction'>;
 
-export const HStack = (props: HStackProps) => {
-  return <Flex direction="row" {...props} />;
-};
+export const HStack = forwardRef<HTMLDivElement, HStackProps>((props, ref) => {
+  return <Flex ref={ref} direction="row" {...props} />;
+});

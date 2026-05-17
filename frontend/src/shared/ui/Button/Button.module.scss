@@ -1,11 +1,18 @@
 .button {
   align-items: center;
   border-radius: 10px;
-  color: var(--text-color);
   cursor: pointer;
   display: flex;
   justify-content: center;
   text-align: center;
+
+  &.font-white {
+    color: var(--text-color);
+  }
+
+  &.font-gray {
+    color: var(--gray);
+  }
 }
 
 .withAddon {
@@ -143,9 +150,10 @@
 }
 
 .m {
-  font: var(--font-16);
-  height: 34px;
-  width: 120px;
+  font: var(--font-18);
+  font-weight: 600;
+  height: 32px;
+  width: 132px;
 }
 
 .l {

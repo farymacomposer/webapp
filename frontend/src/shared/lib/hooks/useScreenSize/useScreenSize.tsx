@@ -9,7 +9,7 @@ const debounce = (fn: () => void, delay: number) => {
   };
 };
 
-export const useScreenSize = (delay = 10) => {
+export const useScreenSize = (delay = 100) => {
   const [width, setWidth] = useState(window.innerWidth);
 
   useEffect(() => {

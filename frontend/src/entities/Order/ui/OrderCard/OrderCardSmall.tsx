@@ -6,7 +6,7 @@ import { AppImage } from '@shared/ui/AppImage';
 import { Icon } from '@shared/ui/Icon';
 import { HStack, VStack } from '@shared/ui/Stack';
 import { Text } from '@shared/ui/Text';
-import { memo, useCallback, useState } from 'react';
+import { ReactElement, useCallback, useState } from 'react';
 import { type Order } from '../../model/types/order.ts';
 import { OrderCategory } from '../OrderCategory/OrderCategory.tsx';
 import cls from './OrderCard.module.scss';
@@ -17,10 +17,12 @@ export interface OrderCardProps {
   order: Order;
   visibility: OrderSmallVisibility;
   onClick?: () => void;
+  style?: React.CSSProperties;
+  children?: ReactElement;
 }
 
-export const OrderCardSmall = memo((props: OrderCardProps) => {
-  const { className, order, visibility, onClick } = props;
+export const OrderCardSmall = (props: OrderCardProps) => {
+  const { className, order, visibility, onClick, style, children } = props;
   const [showMessage, setShowMessage] = useState(false);
 
   const onClickMessage = useCallback(() => {
@@ -43,6 +45,7 @@ export const OrderCardSmall = memo((props: OrderCardProps) => {
               width={30}
               height={25}
               target="_blank"
+              hover
             />
           )}
           {order.spotifyLink && (
@@ -54,6 +57,7 @@ export const OrderCardSmall = memo((props: OrderCardProps) => {
               width={25}
               height={25}
               target="_blank"
+              hover
             />
           )}
           {order.comment && (
@@ -64,6 +68,7 @@ export const OrderCardSmall = memo((props: OrderCardProps) => {
               width={30}
               height={25}
               onClick={onClickMessage}
+              hover
             />
           )}
         </HStack>
@@ -85,14 +90,30 @@ export const OrderCardSmall = memo((props: OrderCardProps) => {
   );
 
   return (
-    <VStack onClick={onClick} className={classNames(cls.card, {}, [className, cls.small])}>
+    <VStack
+      onClick={onClick}
+      className={classNames(cls.card, {}, [className, cls.small])}
+      style={style}
+    >
       {visibility === 'open' && openContent}
-      <HStack className={cls.textBlock} gap="14" align="start">
-        <OrderCategory name={order.category} />
-        <Text className={cls.name} size="16" weight="bold">
-          {order.title}
-        </Text>
+      <HStack className={cls.textBlock} gap="14" align="center">
+        <OrderCategory name={order.category} fullHeight={visibility === 'open'} />
+        <VStack gap="4">
+          <Text
+            className={classNames(cls.name, { [cls.openCardName]: visibility === 'open' }, [])}
+            size="18"
+            weight="bold"
+          >
+            {order.title}
+          </Text>
+          {visibility === 'open' && (
+            <Text className={cls.user} size="18" style="italic">
+              {'от ' + order.user}
+            </Text>
+          )}
+        </VStack>
       </HStack>
+      {children}
     </VStack>
   );
-});
+};

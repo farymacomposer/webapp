@@ -1,11 +1,10 @@
 import { OpenSideQueueButton } from '@features/openSideQueue';
-import { Breakpoints } from '@shared/const/breakpoints.ts';
-import { useScreenSize } from '@shared/lib/hooks/useScreenSize';
 import { HStack } from '@shared/ui/Stack';
 import { memo, useCallback, useState } from 'react';
-import { mockData } from '../../model/mockData/mockData';
 import { BottomQueueCard } from '../BottomQueueCard/BottomQueueCard.tsx';
 import cls from './BottomQueue.module.scss';
+import { useDataSize } from '../../model/lib/useDataSize/useDataSize.ts';
+import { useCardSize } from '../../model/lib/useCardHeight/useCardSize.ts';
 
 interface IProps {
   onOpenSideQueue: () => void;
@@ -13,14 +12,9 @@ interface IProps {
 
 export const BottomQueue = memo(({ onOpenSideQueue }: IProps) => {
   const [visibilityId, setVisibilityId] = useState<number | null>(null);
-  const { width } = useScreenSize();
 
-  const data =
-    width > Breakpoints.XXXL
-      ? mockData
-      : width > Breakpoints.XXL
-        ? mockData.slice(0, 4)
-        : mockData.slice(0, 3);
+  const data = useDataSize();
+  const { width, height: openHeight } = useCardSize();
 
   const onChangeVisibility = useCallback(
     (id: number | null) => () => {
@@ -30,16 +24,17 @@ export const BottomQueue = memo(({ onOpenSideQueue }: IProps) => {
   );
 
   return (
-    <HStack className={cls.wrapper} gap="20" max>
+    <HStack className={cls.wrapper} align="end" gap="20" max>
       <OpenSideQueueButton onClick={onOpenSideQueue} />
-      <HStack justify="start" className={cls.cardsRow} gap="20">
-        {data.map((el) => (
+      <HStack justify="start" align="end" className={cls.cardsRow} gap="20">
+        {data.map((el, i) => (
           <BottomQueueCard
             key={el.id}
             order={el}
             isOpen={visibilityId === el.id}
             onClick={onChangeVisibility(el.id)}
             onClose={onChangeVisibility(null)}
+            openHeight={openHeight}
           />
         ))}
       </HStack>

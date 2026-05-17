@@ -1,9 +1,8 @@
 .card {
-  height: 100%;
   max-width: 374px;
-  transition: transform 0.3s ease-in;
+  transition: height 0.3s ease-in;
   width: calc(33.3% - 10px);
-  overflow: hidden;
+  height: var(--close-bottom-queue-height);
 
   @include xxl {
     width: calc(25% - 15px);
@@ -14,17 +13,24 @@
   }
 
   &:hover {
-    transform: translateY(-30px);
-    transition: 0.2s ease-in transform;
+    transition: 0.2s ease-in height;
+    height: calc(var(--close-bottom-queue-height) + 30px);
   }
 }
 
 .open {
   height: var(--open-bottom-queue-height);
-  transform: translateY(-120px);
   z-index: var(--modal-z-index);
+  transition: height 0.2s linear;
 
   &:hover {
-    transform: translateY(-120px);
+    transition: height 0.2s linear;
+    height: var(--open-bottom-queue-height);
   }
+}
+
+.iconWrapper {
+  position: absolute;
+  bottom: 30px;
+  left: -14px;
 }

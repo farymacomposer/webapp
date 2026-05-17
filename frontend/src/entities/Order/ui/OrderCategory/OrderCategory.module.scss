@@ -15,7 +15,11 @@
   height: 50px;
   justify-content: center;
   width: 50px;
-  user-select: none
+  user-select: none;
+
+  &.fullHeight {
+    height: 94px;
+  }
 }
 
 .rectangle {
@@ -35,16 +39,40 @@
   background: var(--magenta);
 }
 
+.magenta-pink {
+  background: var(--magenta-pink);
+}
+
+.deep-magenta {
+  background: var(--deep-magenta);
+}
+
 .orange {
   background: var(--orange);
+}
+
+.cyan-blue {
+  background: var(--cyan-blue);
 }
 
 .sky-blue {
   background: var(--sky-blue);
 }
 
+.deep-blue {
+  background: var(--deep-blue);
+}
+
+.nickel {
+  background: var(--nickel);
+}
+
 .violet {
   background: var(--violet);
+}
+
+.purple {
+  background: var(--purple);
 }
 
 .inactive-color {

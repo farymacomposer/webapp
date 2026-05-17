@@ -7,4 +7,9 @@
   line-height: 50px;
   padding-bottom: 8px;
   width: var(--size-queue-btn-width);
+  transition: opacity 0.1s linear;
+
+  &:hover {
+    opacity: 0.7;
+  }
 }

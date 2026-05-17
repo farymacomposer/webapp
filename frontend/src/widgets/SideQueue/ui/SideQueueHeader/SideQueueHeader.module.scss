@@ -1,6 +1,6 @@
 .wrapper {
   background: var(--bg-color);
-  height: 114px;
+  height: 128px;
   padding: 20px 38px 20px var(--side-queue-padding);
   position: fixed;
   top: 0;
@@ -14,7 +14,7 @@
   overflow-x: auto;
   overflow-y: hidden;
 
-  ::-webkit-scrollbar {
+  &::-webkit-scrollbar {
     display: none;
   }
 }

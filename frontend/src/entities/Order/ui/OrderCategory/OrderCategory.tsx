@@ -11,6 +11,7 @@ interface OrderCardBaseProps {
   view?: CategoryView;
   name: string;
   color?: ButtonColor;
+  fullHeight?: boolean;
 }
 
 type OrderCardSquareProps = OrderCardBaseProps;
@@ -26,7 +27,7 @@ interface OrderCardButtonProps extends OrderCardBaseProps {
 export type OrderCardProps = OrderCardSquareProps | OrderCardRectangleProps | OrderCardButtonProps;
 
 export const OrderCategory = memo((props: OrderCardProps) => {
-  const { className, view = 'square', name, color = 'magenta' } = props;
+  const { className, view = 'square', name, color = 'magenta', fullHeight } = props;
 
   if (view === 'button') {
     const { onClick } = props as OrderCardButtonProps;
@@ -56,7 +57,13 @@ export const OrderCategory = memo((props: OrderCardProps) => {
   }
 
   return (
-    <div className={classNames(cls.category, {}, [className, cls[view], cls[color]])}>
+    <div
+      className={classNames(cls.category, { [cls.fullHeight]: fullHeight }, [
+        className,
+        cls[view],
+        cls[color],
+      ])}
+    >
       <Text size={'12'} align="center" weight="bold">
         {name}
       </Text>
