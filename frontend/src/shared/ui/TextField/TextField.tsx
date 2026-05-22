@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react';
-import { classNames, Mods } from '../../lib/classNames/classNames.ts';
+import { classNames, type Mods } from '../../lib/classNames/classNames.ts';
 import cls from './TextField.module.scss';
 
 export type TextFieldSize = 'big' | 'small';

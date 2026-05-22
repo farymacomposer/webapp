@@ -1,11 +1,11 @@
 import { OrderCategoriesList } from '@entities/Order';
 import { GroupView } from '@features/changeGroupView';
 import { useHorizontalDrag } from '@shared/lib/hooks/useHorizontalDrag/useHorizontalDrag.tsx';
+import { Search } from '@shared/ui/Search';
 import { HStack, VStack } from '@shared/ui/Stack';
 import { Text } from '@shared/ui/Text';
 import { memo, useCallback } from 'react';
 import cls from './SideQueueHeader.module.scss';
-import { Search } from '@shared/ui/Search';
 
 export const SideQueueHeader = memo(() => {
   const scrollRef = useHorizontalDrag<HTMLDivElement>();

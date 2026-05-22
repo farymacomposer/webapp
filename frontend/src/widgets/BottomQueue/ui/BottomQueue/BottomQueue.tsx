@@ -1,12 +1,12 @@
 import { OpenSideQueueButton } from '@features/openSideQueue';
 import { HStack } from '@shared/ui/Stack';
+import { type FlexGap } from '@shared/ui/Stack/Flex/Flex.tsx';
 import { memo, useCallback, useState } from 'react';
+import { gap as gapConst } from '../../const/const.ts';
 import { useCardSize } from '../../model/lib/useCardHeight/useCardSize.ts';
 import { useDataSize } from '../../model/lib/useDataSize/useDataSize.ts';
 import { BottomQueueCard } from '../BottomQueueCard/BottomQueueCard.tsx';
 import cls from './BottomQueue.module.scss';
-import { gap as gapConst } from '../../const/const.ts';
-import { FlexGap } from '@shared/ui/Stack/Flex/Flex.tsx';
 
 interface IProps {
   onOpenSideQueue: () => void;
