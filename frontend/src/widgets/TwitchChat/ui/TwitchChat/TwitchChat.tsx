@@ -6,7 +6,7 @@ export const TwitchChat = () => {
     <div className={cls.chatWrapper}>
       <iframe
         id="chat_embed"
-        src={`https://www.twitch.tv/embed/farymacomposer/chat?parent=${env.domen}`}
+        src={`https://www.twitch.tv/embed/farymacomposer/chat?parent=${env.domen}&darkpopout`}
         allowFullScreen
         className={cls.chat}
       />

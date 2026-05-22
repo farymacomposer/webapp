@@ -31,6 +31,7 @@ export const OrderCardSmall = (props: OrderCardProps) => {
 
   const messageMods = { [cls.show]: showMessage };
   const imageMods = { [cls.transparent]: showMessage };
+  const isOpen = visibility === 'open';
 
   const openContent = (
     <>
@@ -42,8 +43,8 @@ export const OrderCardSmall = (props: OrderCardProps) => {
               Svg={Youtube}
               type="link"
               link={order.youtubeLink}
-              width={30}
-              height={25}
+              width={28}
+              height={23}
               target="_blank"
               hover
             />
@@ -54,8 +55,8 @@ export const OrderCardSmall = (props: OrderCardProps) => {
               Svg={Spotify}
               type="link"
               link={order.spotifyLink}
-              width={25}
-              height={25}
+              width={22}
+              height={22}
               target="_blank"
               hover
             />
@@ -65,14 +66,14 @@ export const OrderCardSmall = (props: OrderCardProps) => {
               className={classNames(cls.messageLink, messageMods, [])}
               Svg={Message}
               type="button"
-              width={30}
-              height={25}
+              width={27}
+              height={21}
               onClick={onClickMessage}
               hover
             />
           )}
         </HStack>
-        <Text className={cls.price} size="18">
+        <Text className={cls.price} size="16">
           {order.price + '₽'}
         </Text>
       </HStack>
@@ -80,7 +81,7 @@ export const OrderCardSmall = (props: OrderCardProps) => {
         <AppImage className={classNames(cls.img, imageMods, [])} src={order.img} />
         {showMessage && order.comment && (
           <div className={cls.commentWrapper}>
-            <Text className={cls.comment} size="18" style="italic">
+            <Text className={cls.comment} size="16" style="italic">
               {order.comment}
             </Text>
           </div>
@@ -95,25 +96,27 @@ export const OrderCardSmall = (props: OrderCardProps) => {
       className={classNames(cls.card, {}, [className, cls.small])}
       style={style}
     >
-      {visibility === 'open' && openContent}
-      <HStack className={cls.textBlock} gap="14" align="center">
-        <OrderCategory name={order.category} fullHeight={visibility === 'open'} />
-        <VStack gap="4">
-          <Text
-            className={classNames(cls.name, { [cls.openCardName]: visibility === 'open' }, [])}
-            size="18"
-            weight="bold"
-          >
-            {order.title}
-          </Text>
-          {visibility === 'open' && (
-            <Text className={cls.user} size="18" style="italic">
-              {'от ' + order.user}
+      {isOpen && openContent}
+      <div className={classNames(cls.textBlock, { [cls.open]: isOpen }, [])}>
+        <HStack gap="14" align={isOpen ? 'stretch' : 'center'}>
+          <OrderCategory name={order.category} fullHeight={isOpen} />
+          <VStack gap="4">
+            <Text
+              className={classNames(cls.name, { [cls.openCardName]: isOpen }, [])}
+              size="16"
+              weight="bold"
+            >
+              {order.title}
             </Text>
-          )}
-        </VStack>
-      </HStack>
-      {children}
+            {isOpen && (
+              <Text className={cls.user} size="16" style="italic">
+                {'от ' + order.user}
+              </Text>
+            )}
+          </VStack>
+        </HStack>
+        {children}
+      </div>
     </VStack>
   );
 };

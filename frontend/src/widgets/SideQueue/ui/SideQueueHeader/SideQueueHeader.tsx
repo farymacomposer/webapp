@@ -5,6 +5,7 @@ import { HStack, VStack } from '@shared/ui/Stack';
 import { Text } from '@shared/ui/Text';
 import { memo, useCallback } from 'react';
 import cls from './SideQueueHeader.module.scss';
+import { Search } from '@shared/ui/Search';
 
 export const SideQueueHeader = memo(() => {
   const scrollRef = useHorizontalDrag<HTMLDivElement>();
@@ -17,15 +18,16 @@ export const SideQueueHeader = memo(() => {
   );
 
   return (
-    <VStack className={cls.wrapper} gap="22" max>
-      <HStack ref={scrollRef} className={cls.row} justify="between" gap="20" max>
-        <Text>50&nbsp;треков</Text>
+    <VStack className={cls.wrapper} gap="16" max>
+      <HStack ref={scrollRef} className={cls.row} justify="between" gap="36" max>
+        <Text size="18">50&nbsp;треков</Text>
         <OrderCategoriesList onClick={onClick} />
       </HStack>
       <HStack justify="between" max>
         <HStack gap="4">
           <GroupView />
         </HStack>
+        <Search label="Поиск по треку или нику" />
       </HStack>
     </VStack>
   );

@@ -49,7 +49,7 @@ export const OrderCategory = memo((props: OrderCardProps) => {
 
     return (
       <div id={id} className={classNames(cls.category, {}, [className, cls[view], cls[color]])}>
-        <Text size={'18'} align="center" weight="bold">
+        <Text size={'14'} align="center" weight="bold">
           {name}
         </Text>
       </div>

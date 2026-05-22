@@ -4,6 +4,9 @@
 .btn {
   padding: 0 4px;
   white-space: nowrap;
+  height: 28px;
+  width: 146px;
+  font: var(--font-12);
 }
 
 .square {
@@ -12,26 +15,26 @@
   display: flex;
   flex-shrink: 0;
   font-weight: 600;
-  height: 50px;
+  height: 40px;
   justify-content: center;
-  width: 50px;
+  width: 40px;
   user-select: none;
 
   &.fullHeight {
-    height: 94px;
+    height: auto;
   }
 }
 
 .rectangle {
-  scroll-margin-top: 120px;
+  scroll-margin-top: 110px;
   align-items: center;
   border-radius: 10px;
   display: flex;
   flex-shrink: 0;
   font-weight: 600;
-  height: 34px;
+  height: 28px;
   justify-content: center;
-  width: 120px;
+  width: 90px;
   user-select: none
 }
 

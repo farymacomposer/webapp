@@ -1,15 +1,15 @@
 .card {
-  max-width: 374px;
+  max-width: var(--card-max-width);
   transition: height 0.3s ease-in;
-  width: calc(33.3% - 10px);
+  width: calc(33.3% - 21px);
   height: var(--close-bottom-queue-height);
 
   @include xxl {
-    width: calc(25% - 15px);
+    width: calc(25% - 16px);
   }
 
   @include xxxl {
-    width: calc(20% - 16px);
+    width: calc(20% - 12px);
   }
 
   &:hover {
@@ -19,13 +19,11 @@
 }
 
 .open {
-  height: var(--open-bottom-queue-height);
   z-index: var(--modal-z-index);
-  transition: height 0.2s linear;
+  transition: height 0.2s ease-out;
 
   &:hover {
-    transition: height 0.2s linear;
-    height: var(--open-bottom-queue-height);
+    transition: height 0.2s ease-out;
   }
 }
 

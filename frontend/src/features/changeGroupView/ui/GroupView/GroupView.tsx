@@ -22,14 +22,13 @@ export const GroupView: FC<IProps> = memo(({ className }) => {
   );
 
   return (
-    <HStack gap="4" className={classNames(cls.wrapper, {}, [className])}>
+    <HStack gap="4">
       <Button
         onClick={changeView('order')}
         className={classNames(cls.btn, {}, [className])}
         color={activeView === 'order' ? 'orange' : 'inactive-color'}
         fontColor={activeView === 'order' ? 'font-white' : 'font-gray'}
         variant={activeView === 'order' ? 'outline' : 'clear'}
-        size="m"
       >
         по порядку
       </Button>
@@ -39,7 +38,6 @@ export const GroupView: FC<IProps> = memo(({ className }) => {
         color={activeView === 'waves' ? 'orange' : 'inactive-color'}
         fontColor={activeView === 'waves' ? 'font-white' : 'font-gray'}
         variant={activeView === 'waves' ? 'outline' : 'clear'}
-        size="m"
       >
         по волнам
       </Button>

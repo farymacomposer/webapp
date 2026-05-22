@@ -20,9 +20,9 @@ export const OrderCardsCategoryList = memo(({ orders }: OrderCardProps) => {
     activeView === 'order' ? orderCategoriesColorsDict : wavesCategoriesColorsDict;
 
   return (
-    <VStack gap="32" className={cls.wrapper}>
+    <VStack gap="20" className={cls.wrapper}>
       {orders.map((category) => (
-        <VStack key={category.id} gap="16" max>
+        <VStack key={category.id} gap="8" max>
           <OrderCategory
             id={category.name}
             name={category.name}

@@ -1,0 +1,37 @@
+.wrapper {
+  color: var(--text-color);
+}
+
+.textfield {
+  color: var(--text-color);
+  background: var(--accent-bg-color);
+  border: none;
+  outline: none;
+  border-radius: 10px;
+
+  &.big {
+    padding: 0 18px;
+    width: 280px;
+    height: 36px;
+    font-size: var(--font-size-14);
+  }
+
+  &.small {
+    padding: 0 14px;
+    width: 220px;
+    height: 26px;
+    font-size: var(--font-size-14);
+  }
+
+  &::placeholder {
+    color: var(--text-color);
+  }
+}
+
+.focused {
+  outline: 1px solid var(--gray);
+}
+
+.readonly {
+  opacity: 0.7;
+}

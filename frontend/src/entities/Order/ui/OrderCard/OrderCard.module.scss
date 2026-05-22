@@ -8,7 +8,7 @@
   cursor: pointer;
 
   .iconsBlock {
-    padding: 16px;
+    padding: 12px;
   }
 
   .imgWrapper {
@@ -42,7 +42,15 @@
   }
 
   .textBlock {
-    padding: 16px;
+    padding: 12px;
+
+    &.open {
+      background: var(--gradient-bg-color);
+      width: 100%;
+      position: absolute;
+      top: calc(100% - 110px);
+      bottom: 0;
+    }
   }
 
   .youtubeLink,
@@ -91,11 +99,11 @@
 
   .textBlock,
   .priceBlock {
-    padding: 8px 0;
+    padding: 4px 0;
   }
 
   .textBlock {
-    width: calc(100% - 240px);
+    width: calc(100% - 190px);
   }
 
   .name {
@@ -114,7 +122,7 @@
   }
 
   .priceBlock {
-    padding: 10px 0;
+    padding: 4px 0;
   }
 
   .price {

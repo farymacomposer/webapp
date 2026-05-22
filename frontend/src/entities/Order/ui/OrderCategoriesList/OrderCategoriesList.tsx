@@ -14,7 +14,7 @@ export const OrderCategoriesList: FC<IOrderCategoriesListProps> = memo(({ onClic
   const categories = activeView === 'order' ? orderCategories : wavesCategories;
 
   return (
-    <HStack className={cls.wrapper} gap="10" max>
+    <HStack className={cls.wrapper} gap="8" max>
       {categories.map((el, i) => (
         <OrderCategory
           className={cls.btn}

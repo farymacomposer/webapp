@@ -5,6 +5,10 @@
   --font-line-12: 14px;
   --font-12: var(--font-size-12) / var(--font-line-12) var(--font-family-main);
 
+  --font-size-14: 14px;
+  --font-line-14: 18px;
+  --font-14: var(--font-size-14) / var(--font-line-14) var(--font-family-main);
+
   --font-size-16: 16px;
   --font-line-16: 20px;
   --font-16: var(--font-size-16) / var(--font-line-16) var(--font-family-main);
@@ -34,11 +38,12 @@
   --app-gap: 10px;
 
   // Размеры нижняя очередь
-  --close-bottom-queue-height: 86px;
+  --close-bottom-queue-height: 70px;
   --open-bottom-queue-height: 562px;
-  --size-queue-btn-width: 74px;
+  --size-queue-btn-width: 52px;
+  --card-max-width: 374px;
 
   // Размеры боковая очередь
-  --side-queue-padding-xxl: 68px;
+  --side-queue-padding-xxl: 48px;
   --side-queue-padding: 20px;
 }
