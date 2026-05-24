@@ -1,14 +1,14 @@
 .card {
   background: var(--gradient-bg-color);
+  position: relative;
 }
 
 .small {
   border-radius: 10px 10px 0 0;
   cursor: pointer;
-  height: 100%;
 
   .iconsBlock {
-    padding: 16px;
+    padding: 12px;
   }
 
   .imgWrapper {
@@ -42,7 +42,15 @@
   }
 
   .textBlock {
-    padding: 16px;
+    padding: 12px;
+
+    &.open {
+      background: var(--gradient-bg-color);
+      width: 100%;
+      position: absolute;
+      top: calc(100% - 110px);
+      bottom: 0;
+    }
   }
 
   .youtubeLink,
@@ -60,7 +68,19 @@
   .name {
     -webkit-box-orient: vertical;
     display: -webkit-box;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .openCardName {
     -webkit-line-clamp: 3;
+  }
+
+  .user {
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -73,17 +93,16 @@
 .big {
   background: var(--gradient-accent-bg-color);
   border-radius: 10px;
-  height: auto;
   padding: 4px 22px 4px 4px;
   width: 100%;
 
   .textBlock,
   .priceBlock {
-    padding: 8px 0;
+    padding: 4px 0;
   }
 
   .textBlock {
-    width: calc(100% - 240px);
+    width: calc(100% - 190px);
   }
 
   .name {
@@ -102,7 +121,7 @@
   }
 
   .priceBlock {
-    padding: 10px 0;
+    padding: 4px 0;
   }
 
   .price {

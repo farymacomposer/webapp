@@ -1,10 +1,10 @@
-import { Page } from '@widgets/Page';
-import { VStack } from '@shared/ui/Stack';
-import { classNames } from '@shared/lib/classNames/classNames.ts';
-import cls from './NotFoundPage.module.scss';
 import { getRouteMain } from '@shared/const/router.ts';
+import { classNames } from '@shared/lib/classNames/classNames.ts';
 import { AppLink } from '@shared/ui/AppLink';
+import { VStack } from '@shared/ui/Stack';
 import { Text } from '@shared/ui/Text';
+import { Page } from '@widgets/Page';
+import cls from './NotFoundPage.module.scss';
 
 interface NotFoundPageProps {
   className?: string;

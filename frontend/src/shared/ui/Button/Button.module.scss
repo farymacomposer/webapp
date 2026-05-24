@@ -1,11 +1,18 @@
 .button {
   align-items: center;
   border-radius: 10px;
-  color: var(--text-color);
   cursor: pointer;
   display: flex;
   justify-content: center;
   text-align: center;
+
+  &.font-white {
+    color: var(--text-color);
+  }
+
+  &.font-gray {
+    color: var(--gray);
+  }
 }
 
 .withAddon {
@@ -81,6 +88,10 @@
     background: var(--cyan-blue);
   }
 
+  &.dark-gray {
+    background: var(--dark-gray);
+  }
+
   &.inactive-color {
     background: var(--inactive-color);
   }
@@ -137,15 +148,20 @@
     border: 2px solid var(--cyan-blue);
   }
 
+  &.dark-gray {
+    border: 2px solid var(--dark-gray);
+  }
+
   &.inactive-color {
     border: 2px solid var(--inactive-color);
   }
 }
 
 .m {
-  font: var(--font-16);
-  height: 34px;
-  width: 120px;
+  font: var(--font-18);
+  font-weight: 600;
+  height: 32px;
+  width: 132px;
 }
 
 .l {
@@ -156,9 +172,9 @@
 }
 
 .xl {
-  font: var(--font-20);
+  font: var(--font-16);
   font-weight: 500;
-  height: 56px;
+  height: 44px;
   width: 426px;
 }
 

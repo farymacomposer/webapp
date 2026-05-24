@@ -11,6 +11,7 @@ interface IconBaseProps extends SvgProps {
   type: IconType;
   className?: string;
   Svg: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  hover?: boolean;
 }
 
 interface NonClickableIconProps extends IconBaseProps {
@@ -30,10 +31,19 @@ interface ClickableLinkProps extends IconBaseProps {
 type IconProps = NonClickableIconProps | ClickableButtonProps | ClickableLinkProps;
 
 export const Icon = memo((props: IconProps) => {
-  const { type = 'not-clickable', className, Svg, width = 32, height = 32, ...otherProps } = props;
+  const {
+    type = 'not-clickable',
+    className,
+    Svg,
+    width = 32,
+    height = 32,
+    hover,
+    ...otherProps
+  } = props;
 
   const mods = {
     [cls.pointer]: type === 'button' || type === 'link',
+    [cls.hover]: hover,
   };
 
   const icon = (

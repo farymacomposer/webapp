@@ -48,7 +48,14 @@ export const Modal = (props: ModalProps) => {
         <Overlay onClick={close} />
         <div className={classNames(cls.content, {}, [className])}>
           {closeIcon && onClose && (
-            <Icon className={cls.closeIcon} Svg={Cross} type="button" onClick={onClose} />
+            <Icon
+              width={22}
+              height={22}
+              className={cls.closeIcon}
+              Svg={Cross}
+              type="button"
+              onClick={onClose}
+            />
           )}
           {children}
         </div>

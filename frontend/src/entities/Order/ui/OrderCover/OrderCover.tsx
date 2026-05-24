@@ -11,7 +11,7 @@ interface OrderCoverProps {
   alt?: string;
 }
 
-export const OrderCover = memo(({ className, src, size = 112, alt = 'cover' }: OrderCoverProps) => {
+export const OrderCover = memo(({ className, src, size = 82, alt = 'cover' }: OrderCoverProps) => {
   const styles = useMemo<CSSProperties>(
     () => ({
       width: size,
