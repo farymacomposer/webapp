@@ -2,9 +2,14 @@
   background: var(--violet-gradient);
   border-radius: 0 10px 0 0;
   flex-shrink: 0;
-  font-size: 50px;
+  font-size: 40px;
   height: var(--close-bottom-queue-height);
   line-height: 50px;
   padding-bottom: 8px;
   width: var(--size-queue-btn-width);
+  transition: opacity 0.1s linear;
+
+  &:hover {
+    opacity: 0.7;
+  }
 }

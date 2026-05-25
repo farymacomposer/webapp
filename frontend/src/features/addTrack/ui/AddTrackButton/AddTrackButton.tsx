@@ -1,17 +1,20 @@
+import { classNames } from '@shared/lib/classNames/classNames.ts';
 import { Button } from '@shared/ui/Button';
-import cls from '@widgets/Sidebar/ui/Sidebar/Sidebar.module.scss';
-import { memo } from 'react';
+import { type FC, memo } from 'react';
+import cls from './AddTrackButton.module.scss';
 
-export const AddTrackButton = memo(() => {
-  const addTrack = () => {
-    console.log(addTrack);
-  };
+interface IProps {
+  className?: string;
+}
+
+export const AddTrackButton: FC<IProps> = memo(({ className }) => {
+  const addTrack = () => undefined;
 
   return (
     <Button
       fullWidth
       onClick={addTrack}
-      className={cls.btn}
+      className={classNames(cls.btn, {}, [className])}
       color="neon-indigo"
       variant="filled"
       size="xl"

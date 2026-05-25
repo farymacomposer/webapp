@@ -17,7 +17,10 @@ export type ButtonColor =
   | 'deep-blue'
   | 'sky-blue'
   | 'cyan-blue'
+  | 'dark-gray'
   | 'inactive-color';
+
+export type ButtonFontColor = 'font-white' | 'font-gray';
 
 export type ButtonSize = 'm' | 'l' | 'xl';
 
@@ -48,6 +51,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    */
   color?: ButtonColor;
   /**
+   * Цвет шрифта
+   */
+  fontColor?: ButtonFontColor;
+  /**
    * Блок слева от текста
    */
   addonLeft?: ReactNode;
@@ -68,6 +75,7 @@ export const Button = forwardRef((props: ButtonProps, ref: ForwardedRef<HTMLButt
     addonLeft,
     addonRight,
     color = 'orange',
+    fontColor = 'font-white',
     ...otherProps
   } = props;
 
@@ -80,7 +88,13 @@ export const Button = forwardRef((props: ButtonProps, ref: ForwardedRef<HTMLButt
   return (
     <button
       type="button"
-      className={classNames(cls.button, mods, [className, cls[variant], cls[size], cls[color]])}
+      className={classNames(cls.button, mods, [
+        className,
+        cls[variant],
+        cls[size],
+        cls[color],
+        cls[fontColor],
+      ])}
       disabled={disabled}
       {...otherProps}
       ref={ref}

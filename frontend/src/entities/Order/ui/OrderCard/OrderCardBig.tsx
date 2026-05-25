@@ -5,6 +5,7 @@ import { Icon } from '@shared/ui/Icon';
 import { HStack, VStack } from '@shared/ui/Stack';
 import { Text } from '@shared/ui/Text';
 import { memo, useCallback, useState } from 'react';
+import { orderBigCardHeight } from '../../model/consts/sizes.ts';
 import { type Order } from '../../model/types/order.ts';
 import { OrderCover } from '../OrderCover/OrderCover.tsx';
 import cls from './OrderCard.module.scss';
@@ -26,18 +27,19 @@ export const OrderCardBig = memo((props: OrderCardProps) => {
 
   return (
     <HStack
-      gap="24"
+      gap="10"
       justify="between"
       align="stretch"
       className={classNames(cls.card, {}, [className, cls.big])}
+      style={{ height: orderBigCardHeight + 'px' }}
     >
       <OrderCover src={order.img} />
-      <VStack className={cls.textBlock} gap="10">
+      <VStack className={cls.textBlock} gap="6">
         <VStack max>
-          <Text className={cls.name} size="24" weight="bold">
+          <Text className={cls.name} size="18" weight="bold">
             {order.title}
           </Text>
-          <Text size="20" style="italic">{`от ${order.user}`}</Text>
+          <Text className={cls.author} size="16" style="italic">{`от ${order.user}`}</Text>
         </VStack>
         {order.youtubeLink && (
           <Icon
@@ -45,19 +47,19 @@ export const OrderCardBig = memo((props: OrderCardProps) => {
             Svg={Youtube}
             type="link"
             link={order.youtubeLink}
-            width={33}
-            height={23}
+            width={26}
+            height={26}
             target="_blank"
           />
         )}
         {order.comment && (
-          <Text className={classNames(cls.comment, messageMods, [])} size="18">
+          <Text className={classNames(cls.comment, messageMods, [])} size="16">
             {order.comment}
           </Text>
         )}
       </VStack>
       <VStack className={cls.priceBlock}>
-        <Text className={cls.price} size="24" align="right">
+        <Text className={cls.price} size="20" align="right">
           {`${order.price}₽`}
         </Text>
         {order.comment && (
@@ -65,6 +67,8 @@ export const OrderCardBig = memo((props: OrderCardProps) => {
             <Icon
               className={classNames(cls.messageLink, messageMods, [])}
               Svg={Message}
+              width={28}
+              height={28}
               type="button"
               onClick={onClickMessage}
             />

@@ -1,0 +1,152 @@
+project:
+  name: Faryma.Composer frontend
+  runtime: React 19 + Vite 8 + TypeScript 5.9
+  package_manager: npm
+  entry:
+    - AGENTS.md
+    - src/app/AGENTS.md
+    - src/pages/AGENTS.md
+    - src/widgets/AGENTS.md
+    - src/features/AGENTS.md
+    - src/entities/Order/AGENTS.md
+    - src/shared/AGENTS.md
+    - src/index.tsx
+    - src/app/App.tsx
+    - src/app/providers/Router/config/routeConfig.tsx
+    - src/shared/const/router.ts
+
+commands:
+  install: npm install
+  dev: npm run dev
+  build: npm run build
+  lint: npm run lint
+  test: npm run test
+  preview: npm run preview
+
+layers:
+  app:
+    path: src/app
+    entry:
+      - src/app/AGENTS.md
+      - src/app/App.tsx
+      - src/app/providers/Router
+      - src/app/providers/StoreProvider
+      - src/app/providers/ErrorBoundary
+      - src/app/styles
+  pages:
+    path: src/pages
+    entry:
+      - src/pages/AGENTS.md
+      - src/pages/MainPage
+      - src/pages/NotFoundPage
+  widgets:
+    path: src/widgets
+    entry:
+      - src/widgets/AGENTS.md
+      - src/widgets/Page
+      - src/widgets/Sidebar
+      - src/widgets/BottomQueue
+      - src/widgets/SideQueue
+      - src/widgets/TwitchPlayer
+      - src/widgets/TwitchChat
+      - src/widgets/PageLoader
+      - src/widgets/ErrorPage
+  features:
+    path: src/features
+    entry:
+      - src/features/AGENTS.md
+      - src/features/addTrack
+      - src/features/openSideQueue
+  entities:
+    path: src/entities
+    entry:
+      - src/entities/Order/AGENTS.md
+      - src/entities/Order
+  shared:
+    path: src/shared
+    entry:
+      - src/shared/AGENTS.md
+      - src/shared/ui
+      - src/shared/lib
+      - src/shared/const
+      - src/shared/assets
+      - src/shared/types
+
+features:
+  app_shell:
+    paths:
+      - src/app/AGENTS.md
+      - src/index.tsx
+      - src/app/App.tsx
+      - src/app/providers/ErrorBoundary
+      - src/app/styles
+  routing:
+    paths:
+      - src/app/AGENTS.md
+      - src/app/providers/Router
+      - src/app/providers/Router/config/routeConfig.tsx
+      - src/shared/const/router.ts
+      - src/pages/AGENTS.md
+      - src/pages/MainPage
+      - src/pages/NotFoundPage
+  main_page:
+    paths:
+      - src/pages/AGENTS.md
+      - src/widgets/AGENTS.md
+      - src/pages/MainPage
+      - src/widgets/Page
+      - src/widgets/TwitchPlayer
+      - src/widgets/BottomQueue
+      - src/widgets/SideQueue
+  sidebar:
+    paths:
+      - src/widgets/AGENTS.md
+      - src/features/AGENTS.md
+      - src/shared/AGENTS.md
+      - src/widgets/Sidebar
+      - src/features/addTrack
+      - src/widgets/TwitchChat
+      - src/shared/const/router.ts
+  side_queue:
+    paths:
+      - src/widgets/AGENTS.md
+      - src/features/AGENTS.md
+      - src/entities/Order/AGENTS.md
+      - src/shared/AGENTS.md
+      - src/widgets/SideQueue
+      - src/features/openSideQueue
+      - src/entities/Order
+      - src/shared/ui/Modal
+      - src/shared/lib/hooks/useModal
+  bottom_queue:
+    paths:
+      - src/widgets/AGENTS.md
+      - src/features/AGENTS.md
+      - src/entities/Order/AGENTS.md
+      - src/shared/AGENTS.md
+      - src/widgets/BottomQueue
+      - src/features/openSideQueue
+      - src/entities/Order
+      - src/shared/lib/hooks/useScreenSize
+      - src/shared/const/breakpoints.ts
+  order:
+    paths:
+      - src/entities/Order/AGENTS.md
+      - src/entities/Order
+      - src/widgets/BottomQueue/model/mockData
+      - src/widgets/SideQueue/model/mockData
+  store_provider:
+    paths:
+      - src/app/AGENTS.md
+      - src/app/providers/StoreProvider
+  error_boundary:
+    paths:
+      - src/app/AGENTS.md
+      - src/widgets/AGENTS.md
+      - src/app/providers/ErrorBoundary
+      - src/widgets/ErrorPage
+  shared_ui:
+    paths:
+      - src/shared/AGENTS.md
+      - src/shared/ui
+      - src/shared/lib/classNames

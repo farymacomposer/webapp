@@ -1,11 +1,22 @@
 .wrapper {
   background: var(--bg-color);
-  height: 114px;
-  padding: 20px 38px 20px var(--side-queue-padding);
+  height: var(--side-queue-header-height);
+  padding: 14px 38px 10px var(--side-queue-padding);
   position: fixed;
   top: 0;
+  z-index: var(--overlay-z-index);
 
   @include xxl {
-    padding: 20px var(--side-queue-padding-xxl);
+    padding: 14px var(--side-queue-padding-xxl);
   }
 }
+
+.row {
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+

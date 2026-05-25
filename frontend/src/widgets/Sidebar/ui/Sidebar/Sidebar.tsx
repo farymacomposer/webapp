@@ -1,13 +1,13 @@
+import { AddTrackButton } from '@features/addTrack';
+import { getRouteMain } from '@shared/const/router.ts';
 import { TwitchChat } from '@widgets/TwitchChat';
 import { memo, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useSidebarItems } from '../../model/selectors/getSidebarItems';
 import { SidebarItem } from '../SidebarItem/SidebarItem';
 import cls from './Sidebar.module.scss';
 import { classNames } from '@/shared/lib/classNames/classNames';
 import { HStack, VStack } from '@/shared/ui/Stack';
-import { useLocation } from 'react-router-dom';
-import { getRouteMain } from '@shared/const/router.ts';
-import { AddTrackButton } from '@features/addTrack';
 
 interface SidebarProps {
   className?: string;
@@ -25,16 +25,19 @@ export const Sidebar = memo(({ className }: SidebarProps) => {
   const isMainPage = pathname === getRouteMain();
 
   return (
-    <aside data-testid="sidebar" className={classNames(cls.sidebar, {}, [className])}>
+    <aside
+      data-testid="sidebar"
+      className={classNames(cls.sidebar, { [cls.relativeSidebar]: isMainPage }, [className])}
+    >
       <VStack className={cls.sidebar}>
         <HStack className={cls.items} role="navigation" justify="between" gap="4" max>
           {itemsList}
         </HStack>
         {isMainPage && (
-          <>
-            <AddTrackButton />
+          <VStack gap="4" max maxHeight>
+            <AddTrackButton className={cls.btn} />
             <TwitchChat />
-          </>
+          </VStack>
         )}
       </VStack>
     </aside>
