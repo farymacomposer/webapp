@@ -16,7 +16,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "types": ["jest", "@testing-library/jest-dom", "node"],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@app/*": ["./src/app/*"],

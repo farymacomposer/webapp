@@ -1,16 +1,14 @@
-import { Button } from '@shared/ui/Button';
-import cls from './AddTrackButton.module.scss';
-import { FC, memo } from 'react';
 import { classNames } from '@shared/lib/classNames/classNames.ts';
+import { Button } from '@shared/ui/Button';
+import { type FC, memo } from 'react';
+import cls from './AddTrackButton.module.scss';
 
 interface IProps {
   className?: string;
 }
 
 export const AddTrackButton: FC<IProps> = memo(({ className }) => {
-  const addTrack = () => {
-    console.log(addTrack);
-  };
+  const addTrack = () => undefined;
 
   return (
     <Button

@@ -5,12 +5,16 @@
   --font-line-12: 14px;
   --font-12: var(--font-size-12) / var(--font-line-12) var(--font-family-main);
 
+  --font-size-14: 14px;
+  --font-line-14: 18px;
+  --font-14: var(--font-size-14) / var(--font-line-14) var(--font-family-main);
+
   --font-size-16: 16px;
   --font-line-16: 20px;
   --font-16: var(--font-size-16) / var(--font-line-16) var(--font-family-main);
 
   --font-size-18: 18px;
-  --font-line-18: 24px;
+  --font-line-18: 22px;
   --font-18: var(--font-size-18) / var(--font-line-18) var(--font-family-main);
 
   --font-size-20: 20px;
@@ -18,7 +22,7 @@
   --font-20: var(--font-size-20) / var(--font-line-20) var(--font-family-main);
 
   --font-size-22: 22px;
-  --font-line-22: 30px;
+  --font-line-22: 28px;
   --font-22: var(--font-size-22) / var(--font-line-22) var(--font-family-main);
 
   --font-size-24: 24px;
@@ -30,16 +34,17 @@
   --overlay-z-index: 100;
 
   // Размеры
-  --size-sidebar: 426px;
-  --size-sidebar-xl: 326px;
+  --size-sidebar: 340px;
   --app-gap: 10px;
 
   // Размеры нижняя очередь
-  --close-bottom-queue-height: 86px;
-  --open-bottom-queue-height: 524px;
-  --size-queue-btn-width: 74px;
+  --close-bottom-queue-height: 70px;
+  --open-bottom-queue-height: 562px;
+  --size-queue-btn-width: 52px;
+  --card-max-width: 374px;
 
   // Размеры боковая очередь
-  --side-queue-padding-xxl: 68px;
+  --side-queue-padding-xxl: 48px;
   --side-queue-padding: 20px;
+  --side-queue-header-height: 102px;
 }

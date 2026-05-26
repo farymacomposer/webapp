@@ -83,10 +83,10 @@
 .closeIcon {
   position: absolute;
   right: 1px;
-  top: 11px;
+  top: 8px;
   z-index: var(--modal-z-index);
 
   @include xxl {
-    right: 9px;
+    right: 7px;
   }
 }

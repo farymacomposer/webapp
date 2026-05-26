@@ -2,6 +2,10 @@
   color: var(--text-color);
 }
 
+.transparent {
+  color: var(--inactive-color);
+}
+
 .error {
   color: var(--error-color);
 }
@@ -20,6 +24,10 @@
 
 .size_12 {
   font: var(--font-12);
+}
+
+.size_14 {
+  font: var(--font-14);
 }
 
 .size_16 {

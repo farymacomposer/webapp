@@ -1,3 +1,5 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
 import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -9,8 +11,21 @@ import importPlugin from 'eslint-plugin-import';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import eslintConfigPrettier from 'eslint-config-prettier';
 
+const tsconfigRootDir = path.dirname(fileURLToPath(import.meta.url));
+const projectService = {
+  allowDefaultProject: ['eslint.config.js'],
+  defaultProject: 'tsconfig.json',
+};
+
 export default defineConfig([
-  globalIgnores(['dist', 'build', 'node_modules', 'coverage']),
+  globalIgnores([
+    'dist',
+    'build',
+    'node_modules',
+    'coverage',
+    'src/**/*.stories.ts',
+    'src/**/*.stories.tsx',
+  ]),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -24,7 +39,8 @@ export default defineConfig([
       globals: globals.browser,
       parser: tseslint.parser,
       parserOptions: {
-        project: './tsconfig.json',
+        projectService,
+        tsconfigRootDir,
       },
     },
     plugins: {
@@ -39,6 +55,7 @@ export default defineConfig([
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/jsx-uses-react': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
       'react/jsx-uses-vars': 'error',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'jsx-a11y/alt-text': 'error',
@@ -85,7 +102,8 @@ export default defineConfig([
       globals: { ...globals.browser, ...globals.node },
       parser: tseslint.parser,
       parserOptions: {
-        project: './tsconfig.json',
+        projectService,
+        tsconfigRootDir,
       },
     },
     rules: {

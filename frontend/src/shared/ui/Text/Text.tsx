@@ -2,11 +2,11 @@ import { memo } from 'react';
 import cls from './Text.module.scss';
 import { classNames } from '@/shared/lib/classNames/classNames';
 
-export type TextVariant = 'primary' | 'error';
+export type TextVariant = 'primary' | 'transparent' | 'error';
 
 export type TextAlign = 'right' | 'left' | 'center';
 
-export type TextSize = '12' | '16' | '18' | '20' | '22' | '24';
+export type TextSize = '12' | '14' | '16' | '18' | '20' | '22' | '24';
 
 export type TextWeight = 'regular' | 'medium' | 'bold';
 
@@ -49,6 +49,7 @@ interface TextProps {
 
 const mapSizeToClass: Record<TextSize, string> = {
   '12': cls.size_12,
+  '14': cls.size_14,
   '16': cls.size_16,
   '18': cls.size_18,
   '20': cls.size_20,

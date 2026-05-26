@@ -1,7 +1,14 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { queueReducer } from '@entities/Queue';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { bottomQueueReducer } from '@widgets/BottomQueue';
+
+const rootReducer = combineReducers({
+  queue: queueReducer,
+  bottomQueue: bottomQueueReducer,
+});
 
 export const store = configureStore({
-  reducer: {},
+  reducer: rootReducer,
 });
 
 export type RootState = ReturnType<typeof store.getState>;
