@@ -31,7 +31,7 @@ export const OrderCardBig = memo((props: OrderCardProps) => {
       justify="between"
       align="stretch"
       className={classNames(cls.card, {}, [className, cls.big])}
-      style={{ height: orderBigCardHeight + 'px' }}
+      style={{ minHeight: orderBigCardHeight + 'px' }}
     >
       <OrderCover src={order.img} />
       <VStack className={cls.textBlock} gap="6">
@@ -52,7 +52,7 @@ export const OrderCardBig = memo((props: OrderCardProps) => {
             target="_blank"
           />
         )}
-        {order.comment && (
+        {!!order.comment && (
           <Text className={classNames(cls.comment, messageMods, [])} size="16">
             {order.comment}
           </Text>
