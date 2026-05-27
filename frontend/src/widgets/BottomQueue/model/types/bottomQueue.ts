@@ -1,3 +1,5 @@
+export type OpenCardId = number | null;
+
 export interface BottomQueueSchema {
-  openCardHeight: number;
+  openCardId: OpenCardId;
 }

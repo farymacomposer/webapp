@@ -4,7 +4,7 @@ import { classNames } from '@shared/lib/classNames/classNames.ts';
 import { Icon } from '@shared/ui/Icon';
 import { HStack, VStack } from '@shared/ui/Stack';
 import { Text } from '@shared/ui/Text';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { orderBigCardHeight } from '../../model/consts/sizes.ts';
 import { type Order } from '../../model/types/order.ts';
 import { OrderCover } from '../OrderCover/OrderCover.tsx';
@@ -24,6 +24,10 @@ export const OrderCardBig = memo((props: OrderCardProps) => {
   }, [setShowMessage]);
 
   const messageMods = { [cls.show]: showMessage };
+
+  useEffect(() => {
+    setShowMessage(false);
+  }, []);
 
   return (
     <HStack
