@@ -1,3 +1,4 @@
+import { classNames } from '@shared/lib/classNames/classNames.ts';
 import { HStack } from '@shared/ui/Stack';
 import { type FC, memo } from 'react';
 import { useActiveCategoryOrWaveId, useQueueGroupView } from '../../../Queue';
@@ -21,7 +22,7 @@ export const OrderCategoriesList: FC<IOrderCategoriesListProps> = memo(({ onClic
       {categories.map((el, i) => {
         return (
           <OrderCategory
-            className={cls.btn}
+            className={classNames(cls.btn, { [cls.small]: activeView === 'waves' }, [])}
             key={i}
             view="button"
             id={el.id}

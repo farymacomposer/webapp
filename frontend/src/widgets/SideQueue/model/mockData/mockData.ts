@@ -29,7 +29,7 @@ export const mockDataOrders = [
     name: 'NEXT UP',
     orders: [
       {
-        id: 11,
+        id: 12,
         title:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
           'ut labore et dolore magna aliqua',
@@ -45,7 +45,7 @@ export const mockDataOrders = [
           'laboris nisi ut aliquip ex ea commodo consequat. ',
       },
       {
-        id: 12,
+        id: 11,
         title: 'Lorem ipsum dolor sit',
         user: 'Петр Иванов',
         category: 'w2',
@@ -189,11 +189,11 @@ export const mockDataOrders = [
 
 export const mockDataWaves = [
   {
-    id: 2,
+    id: 1,
     name: 'NEW',
     orders: [
       {
-        id: 1,
+        id: 2,
         title:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
           'ut labore et dolore magna aliqua. Utt enim ad minim veniam, quis nostrud exercitation ullamco ' +
@@ -212,11 +212,11 @@ export const mockDataWaves = [
     ],
   },
   {
-    id: 1,
+    id: 2,
     name: 'WAVE1',
     orders: [
       {
-        id: 11,
+        id: 1,
         title:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
           'ut labore et dolore magna aliqua',
@@ -259,7 +259,7 @@ export const mockDataWaves = [
     ],
   },
   {
-    id: 4,
+    id: 3,
     name: 'WAVE2',
     orders: [
       {
@@ -290,7 +290,7 @@ export const mockDataWaves = [
     ],
   },
   {
-    id: 3,
+    id: 4,
     name: 'WAVE3',
     orders: [
       {
@@ -378,6 +378,94 @@ export const mockDataWaves = [
     orders: [
       {
         id: 20,
+        title:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
+          'ut labore et dolore magna aliqua',
+        user: 'Иван Иванов',
+        category: 'w5',
+        img: cover,
+        price: 3500,
+        youtubeLink: 'https://www.youtube.com/',
+        spotifyLink: '',
+        comment:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
+          'ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco ' +
+          'laboris nisi ut aliquip ex ea commodo consequat. ',
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: 'WAVE6',
+    orders: [
+      {
+        id: 21,
+        title:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
+          'ut labore et dolore magna aliqua',
+        user: 'Иван Иванов',
+        category: 'w5',
+        img: cover,
+        price: 3500,
+        youtubeLink: 'https://www.youtube.com/',
+        spotifyLink: '',
+        comment:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
+          'ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco ' +
+          'laboris nisi ut aliquip ex ea commodo consequat. ',
+      },
+    ],
+  },
+  {
+    id: 8,
+    name: 'WAVE7',
+    orders: [
+      {
+        id: 22,
+        title:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
+          'ut labore et dolore magna aliqua',
+        user: 'Иван Иванов',
+        category: 'w5',
+        img: cover,
+        price: 3500,
+        youtubeLink: 'https://www.youtube.com/',
+        spotifyLink: '',
+        comment:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
+          'ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco ' +
+          'laboris nisi ut aliquip ex ea commodo consequat. ',
+      },
+    ],
+  },
+  {
+    id: 9,
+    name: 'WAVE8',
+    orders: [
+      {
+        id: 23,
+        title:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
+          'ut labore et dolore magna aliqua',
+        user: 'Иван Иванов',
+        category: 'w5',
+        img: cover,
+        price: 3500,
+        youtubeLink: 'https://www.youtube.com/',
+        spotifyLink: '',
+        comment:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
+          'ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco ' +
+          'laboris nisi ut aliquip ex ea commodo consequat. ',
+      },
+    ],
+  },
+  {
+    id: 10,
+    name: 'WAVE9',
+    orders: [
+      {
+        id: 26,
         title:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ' +
           'ut labore et dolore magna aliqua',

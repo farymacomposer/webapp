@@ -78,7 +78,7 @@ export const useChangeActiveCategoryWithScroll = ({ refs, containerRef, orders }
     } else {
       dispatch(queueActions.changeActiveWaveId(Number(activeId)));
     }
-  }, [activeId, view]);
+  }, [activeId, view, dispatch]);
 
   return activeId;
 };

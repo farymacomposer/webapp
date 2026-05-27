@@ -7,9 +7,7 @@ import { mockDataOrders, mockDataWaves } from '../../model/mockData/mockData';
 import { SideQueueHeader } from '../SideQueueHeader/SideQueueHeader.tsx';
 import cls from './SideQueue.module.scss';
 
-interface IProps {}
-
-export const SideQueue = memo((props: IProps) => {
+export const SideQueue = memo(() => {
   const activeView = useQueueGroupView();
   const isOpen = useQueueOpenState();
 

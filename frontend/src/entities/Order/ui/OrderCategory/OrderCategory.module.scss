@@ -4,9 +4,8 @@
 .btn {
   padding: 0 4px;
   white-space: nowrap;
-  height: 28px;
-  width: 146px;
   font: var(--font-12);
+  flex-shrink: 0;
 }
 
 .square {
