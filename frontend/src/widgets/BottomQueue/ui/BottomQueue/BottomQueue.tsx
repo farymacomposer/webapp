@@ -1,29 +1,24 @@
+import { queueActions } from '@entities/Queue';
 import { OpenSideQueueButton } from '@features/openSideQueue';
+import { useAppDispatch } from '@shared/lib/hooks/useAppDispatch';
 import { HStack } from '@shared/ui/Stack';
 import { type FlexGap } from '@shared/ui/Stack/Flex/Flex.tsx';
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback } from 'react';
 import { gap as gapConst } from '../../const/const.ts';
 import { useCardSize } from '../../model/lib/useCardHeight/useCardSize.ts';
 import { useDataSize } from '../../model/lib/useDataSize/useDataSize.ts';
 import { BottomQueueCard } from '../BottomQueueCard/BottomQueueCard.tsx';
 import cls from './BottomQueue.module.scss';
 
-interface IProps {
-  onOpenSideQueue: () => void;
-}
-
-export const BottomQueue = memo(({ onOpenSideQueue }: IProps) => {
-  const [visibilityId, setVisibilityId] = useState<number | null>(null);
+export const BottomQueue = memo(() => {
+  const dispatch = useAppDispatch();
 
   const data = useDataSize();
   const { height: openHeight } = useCardSize();
 
-  const onChangeVisibility = useCallback(
-    (id: number | null) => () => {
-      setVisibilityId(id);
-    },
-    [setVisibilityId],
-  );
+  const onOpenSideQueue = useCallback(() => {
+    dispatch(queueActions.changeOpen(true));
+  }, [dispatch]);
 
   const gap = String(gapConst) as FlexGap;
 
@@ -32,14 +27,7 @@ export const BottomQueue = memo(({ onOpenSideQueue }: IProps) => {
       <OpenSideQueueButton onClick={onOpenSideQueue} />
       <HStack justify="start" align="end" className={cls.cardsRow} gap={gap}>
         {data.map((el) => (
-          <BottomQueueCard
-            key={el.id}
-            order={el}
-            isOpen={visibilityId === el.id}
-            onClick={onChangeVisibility(el.id)}
-            onClose={onChangeVisibility(null)}
-            openHeight={openHeight}
-          />
+          <BottomQueueCard key={el.id} order={el} openHeight={openHeight} />
         ))}
       </HStack>
     </HStack>

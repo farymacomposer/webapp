@@ -1,16 +1,16 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { type BottomQueueSchema } from '../types/bottomQueue.ts';
+import { type BottomQueueSchema, type OpenCardId } from '../types/bottomQueue.ts';
 
 const initialState: BottomQueueSchema = {
-  openCardHeight: 0,
+  openCardId: null,
 };
 
 export const bottomQueueSlice = createSlice({
   name: 'bottomQueue',
   initialState,
   reducers: {
-    changeBottomQueueCardHeight: (state, { payload }: PayloadAction<number>) => {
-      state.openCardHeight = payload;
+    changeOpenCardId: (state, { payload }: PayloadAction<OpenCardId>) => {
+      state.openCardId = payload;
     },
   },
 });

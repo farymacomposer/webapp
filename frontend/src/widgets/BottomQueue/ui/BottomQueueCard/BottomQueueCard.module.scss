@@ -27,6 +27,10 @@
   }
 }
 
+.overOverlay {
+  z-index: var(--over-overlay-z-index);
+}
+
 .iconWrapper {
   position: absolute;
   bottom: 30px;
