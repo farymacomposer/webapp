@@ -1,1 +1,1 @@
-запуск в дев режиме - npm run dev, билд -  npm run build
+запуск в дев режиме - pnpm run dev, билд - pnpm run build

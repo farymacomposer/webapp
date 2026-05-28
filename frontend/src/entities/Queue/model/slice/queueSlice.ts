@@ -7,6 +7,7 @@ import {
 } from '../types/queue.ts';
 
 const initialState: QueueSchema = {
+  open: false,
   groupView: 'order',
   activeCategoryId: null,
   activeWaveId: null,
@@ -16,6 +17,10 @@ export const queueSlice = createSlice({
   name: 'queue',
   initialState,
   reducers: {
+    changeOpen: (state, { payload }: PayloadAction<boolean>) => {
+      state.open = payload;
+    },
+
     changeQueueGroupView: (state, { payload }: PayloadAction<QueueGroupView>) => {
       state.groupView = payload;
     },

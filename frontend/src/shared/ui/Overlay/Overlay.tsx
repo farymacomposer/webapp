@@ -4,6 +4,9 @@ import { classNames } from '@/shared/lib/classNames/classNames';
 
 interface OverlayProps {
   className?: string;
+  /**
+   * Колбэк для закрытия
+   */
   onClick?: () => void;
 }
 

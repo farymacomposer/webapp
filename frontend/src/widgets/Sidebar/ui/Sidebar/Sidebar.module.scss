@@ -9,6 +9,10 @@
   position: initial;
 }
 
+.overOverlay {
+  z-index: var(--over-overlay-z-index);
+}
+
 .btn {
   margin-top: 20px;
 }
