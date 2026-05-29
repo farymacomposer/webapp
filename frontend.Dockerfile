@@ -1,12 +1,13 @@
 # Build stage
 FROM node:22-alpine AS build
 WORKDIR /app
+RUN corepack enable
 
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci
+COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY frontend/ .
-RUN npm run build
+RUN pnpm run build
 
 # Runtime stage
 FROM nginx:1.29-alpine AS final

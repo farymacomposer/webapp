@@ -38,7 +38,7 @@ export const OrderCardsCategoryList: FC<OrderCardProps> = memo(
         {orders.map((category, i) => (
           <VStack
             id={String(category.id)}
-            key={category.id}
+            key={category.id + activeView}
             ref={(el: HTMLElement | null) => {
               refs.current[category.id] = el;
             }}

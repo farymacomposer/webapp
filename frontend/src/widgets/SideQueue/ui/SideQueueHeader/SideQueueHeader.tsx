@@ -21,9 +21,11 @@ export const SideQueueHeader = memo(() => {
 
   return (
     <VStack className={cls.wrapper} gap="16" max>
-      <HStack ref={scrollRef} className={cls.row} justify="between" gap="36" max>
+      <HStack justify="between" gap="36" max>
         <Text size="18">50&nbsp;треков</Text>
-        <OrderCategoriesList onClick={onCategoryClick} />
+        <HStack ref={scrollRef} className={cls.row} justify="between" gap="36" max>
+          <OrderCategoriesList onClick={onCategoryClick} />
+        </HStack>
       </HStack>
       <HStack justify="between" max>
         <HStack gap="4">

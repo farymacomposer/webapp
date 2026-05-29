@@ -1,7 +1,7 @@
 project:
   name: Faryma.Composer frontend
   runtime: React 19 + Vite 8 + TypeScript 5.9
-  package_manager: npm
+  package_manager: pnpm
   entry:
     - AGENTS.md
     - src/app/AGENTS.md
@@ -16,12 +16,12 @@ project:
     - src/shared/const/router.ts
 
 commands:
-  install: npm install
-  dev: npm run dev
-  build: npm run build
-  lint: npm run lint
-  test: npm run test
-  preview: npm run preview
+  install: pnpm install
+  dev: pnpm run dev
+  build: pnpm run build
+  lint: pnpm run lint
+  test: pnpm run test
+  preview: pnpm run preview
 
 layers:
   app:

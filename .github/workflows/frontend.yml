@@ -1,23 +1,44 @@
-name: ESLint
+name: Frontend CI
 
 on:
   pull_request:
     branches: [ main, dev ]
     paths:
       - 'frontend/**'
+      - 'frontend.Dockerfile'
+      - '.github/workflows/frontend.yml'
+
+permissions:
+  contents: read
 
 jobs:
-  ESLint:
+  frontend:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.3.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Run ESLint
-        run: |
-          docker run -t --rm \
-            -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
-            -v "${{ github.workspace }}/frontend:/src" \
-            -w /src \
-            node:jod-slim \
-            sh -c "corepack enable pnpm && pnpm install --frozen-lockfile && pnpm exec eslint ."
+        run: pnpm run lint
+
+      - name: Build frontend
+        run: pnpm run build
