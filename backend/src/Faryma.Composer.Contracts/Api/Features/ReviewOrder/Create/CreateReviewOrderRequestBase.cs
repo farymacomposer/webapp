@@ -11,7 +11,7 @@ namespace Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create
         /// Псевдоним пользователя
         /// </summary>
         [Required]
-        [StringLength(40, MinimumLength = 1, ErrorMessage = "Длина псевдонима должна быть в пределах от 1 до 40 символов")]
+        [StringLength(40, MinimumLength = 1, ErrorMessage = "Длина псевдонима пользователя должна быть в пределах от 1 до 40 символов")]
         public required string Nickname { get; init; }
 
         /// <summary>
