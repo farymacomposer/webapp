@@ -2,13 +2,8 @@
   bottom: 0;
   flex-shrink: 0;
   position: fixed;
-  width: calc(100% - var(--size-sidebar-xl) - var(--app-gap));
+  width: calc(100% - var(--size-sidebar) - var(--app-gap));
   z-index: 2;
-
-
-  @include xxl {
-    width: calc(100% - var(--size-sidebar) - var(--app-gap));
-  }
 }
 
 .cardsRow {
