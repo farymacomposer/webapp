@@ -1,6 +1,5 @@
 import { env } from '@shared/config/env.ts';
 import cls from './TwitchPlayer.module.scss';
-import { env } from '@shared/config/env.ts';
 
 export const TwitchPlayer = () => {
   return (

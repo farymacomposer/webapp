@@ -74,7 +74,7 @@ export const OrderCardSmall = (props: OrderCardProps) => {
           )}
         </HStack>
         <Text className={cls.price} size="16">
-          {order.price + '₽'}
+          {order.price + ' ₽'}
         </Text>
       </HStack>
       <div className={cls.imgWrapper}>
