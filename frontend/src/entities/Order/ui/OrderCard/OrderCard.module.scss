@@ -131,8 +131,13 @@
   }
 
   .youtubeLink {
-    color: var(--error-color);
+    color: var(--light-gray);
     display: block;
+    transition: all 0.15s linear;
+
+    &:hover {
+      color: var(--error-color);
+    }
   }
 
   .messageLink {

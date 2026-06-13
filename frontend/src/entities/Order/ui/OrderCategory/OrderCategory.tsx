@@ -48,7 +48,7 @@ export const OrderCategory = memo((props: OrderCardProps) => {
         variant="filled"
         onClick={onClick(id)}
       >
-        {name}
+        <span>{name}</span>
       </Button>
     );
   }

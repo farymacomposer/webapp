@@ -1,6 +1,6 @@
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import cls from './Overlay.module.scss';
-import { classNames } from '@/shared/lib/classNames/classNames';
+import { classNames, type Mods } from '@/shared/lib/classNames/classNames';
 
 interface OverlayProps {
   className?: string;
@@ -12,6 +12,26 @@ interface OverlayProps {
 
 export const Overlay = memo((props: OverlayProps) => {
   const { className, onClick } = props;
+  const [visible, setVisible] = useState(false);
 
-  return <div onClick={onClick} className={classNames(cls.overlay, {}, [className])} />;
+  useEffect(() => {
+    setVisible(false);
+
+    const raf = requestAnimationFrame(() => {
+      setVisible(true);
+    });
+
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const handleClose = () => {
+    setVisible(false);
+    onClick?.();
+  };
+
+  const mods: Mods = {
+    [cls.visible]: visible,
+  };
+
+  return <div onClick={handleClose} className={classNames(cls.overlay, mods, [className])} />;
 });

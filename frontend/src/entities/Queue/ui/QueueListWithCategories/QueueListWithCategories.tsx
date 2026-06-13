@@ -1,41 +1,47 @@
 import { HStack, VStack } from '@shared/ui/Stack';
 import { Text } from '@shared/ui/Text';
 import { type FC, memo, type RefObject, useRef } from 'react';
-import { useQueueGroupView } from '../../../Queue';
+import { categoryGap } from '../../model/const/sizes.ts';
+import { useChangeActiveCategoryWithScroll } from '../../model/hooks/useChangeActiveCategoryWithScroll/useChangeActiveCategoryWithScroll.ts';
+import { useScrollCategoryBlockHeight } from '../../model/hooks/useScrollCategoryBlockHeight/useScrollCategoryBlockHeight.ts';
+import { useActiveCategories } from '../../model/selectors/getActiveCategories/getActiveCategories.ts';
+import { useOrders } from '../../model/selectors/getOrders/getOrders.ts';
+import { useQueueGroupView } from '../../model/selectors/getQueueGroupView/getQueueGroupView.ts';
+import { QueueShowMoreCardsButton } from '../QueueShowMoreCardsButton/QueueShowMoreCardsButton.tsx';
+import cls from './QueueListWithCategories.module.scss';
 import {
+  OrderCard,
   orderCategoriesColorsDict,
+  OrderCategory,
   wavesCategoriesColorsDict,
-} from '../../model/consts/orderCategoriesConsts.ts';
-import { categoryGap } from '../../model/consts/sizes.ts';
-import { useChangeActiveCategoryWithScroll } from '../../model/lib/useChangeActiveCategoryWithScroll/useChangeActiveCategoryWithScroll.ts';
-import { useScrollCategoryBlockHeight } from '../../model/lib/useScrollCategoryBlockHeight/useScrollCategoryBlockHeight.ts';
-import { type CategoryWithOrders } from '../../model/types/order.ts';
-import { OrderCard } from '../OrderCard/OrderCard.tsx';
-import { OrderCategory } from '../OrderCategory/OrderCategory';
-import cls from './OrderCardsCategoryList.module.scss';
+} from '@/entities/Order';
 
 export interface OrderCardProps {
-  orders: CategoryWithOrders[];
   /**
    * При скролле списка меняется активная категория (в заивисмости от положения скролла)
    */
   scrollWithChangingActiveCategory?: boolean;
+  /**
+   * Ref родительсколького div (контейнера)
+   */
   containerRef?: RefObject<HTMLElement | null>;
 }
 
-export const OrderCardsCategoryList: FC<OrderCardProps> = memo(
-  ({ orders, scrollWithChangingActiveCategory, containerRef }) => {
+export const QueueListWithCategories: FC<OrderCardProps> = memo(
+  ({ scrollWithChangingActiveCategory, containerRef }) => {
+    const orders = useOrders();
+    const categories = useActiveCategories();
     const activeView = useQueueGroupView();
     const categoriesColorsDict =
       activeView === 'order' ? orderCategoriesColorsDict : wavesCategoriesColorsDict;
-    const lastCategoryHeight = useScrollCategoryBlockHeight(orders.at(-1));
+    const lastCategoryHeight = useScrollCategoryBlockHeight();
 
     const refs = useRef<Record<string, HTMLElement | null>>({});
-    useChangeActiveCategoryWithScroll({ refs, containerRef, orders });
+    useChangeActiveCategoryWithScroll({ refs, containerRef });
 
     return (
       <VStack gap="20" className={cls.wrapper}>
-        {orders.map((category, i) => (
+        {categories.map((category, i) => (
           <VStack
             id={String(category.id)}
             key={category.id + activeView}
@@ -52,10 +58,11 @@ export const OrderCardsCategoryList: FC<OrderCardProps> = memo(
               color={categoriesColorsDict[category.name as keyof typeof categoriesColorsDict]}
               view="rectangle"
             />
-            {category.orders.map((el) => (
-              <OrderCard key={el.id} view="big" order={el} />
+            {category.openIds.map((el) => (
+              <OrderCard key={el} view="big" order={orders[el]} />
             ))}
-            {scrollWithChangingActiveCategory && i + 1 === orders.length && (
+            {category.needMoreBtn && <QueueShowMoreCardsButton category={category} />}
+            {scrollWithChangingActiveCategory && i + 1 === categories.length && (
               <HStack
                 justify="center"
                 className={cls.categoryMinHeight}

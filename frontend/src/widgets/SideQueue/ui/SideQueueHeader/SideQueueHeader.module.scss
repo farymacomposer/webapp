@@ -10,13 +10,3 @@
     padding: 14px var(--side-queue-padding-xxl);
   }
 }
-
-.row {
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-

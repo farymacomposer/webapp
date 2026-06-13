@@ -70,6 +70,7 @@ export const OrderCardBig = memo((props: OrderCardProps) => {
               width={28}
               height={28}
               type="button"
+              hover
               onClick={onClickMessage}
             />
           </HStack>

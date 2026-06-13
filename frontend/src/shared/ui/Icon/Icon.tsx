@@ -61,7 +61,7 @@ export const Icon = memo((props: IconProps) => {
     return (
       <button
         type="button"
-        className={classNames(cls.button, {}, [className])}
+        className={classNames(cls.button, mods, [className])}
         onClick={buttonProps.onClick}
         style={{ height, width }}
       >

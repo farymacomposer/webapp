@@ -45,7 +45,7 @@ export const Modal = (props: ModalProps) => {
   return (
     <Portal element={document.getElementById('app') ?? document.body}>
       <div className={classNames(cls.modal, mods, ['app_modal'])}>
-        <Overlay onClick={close} />
+        {isOpen && <Overlay onClick={close} />}
         <div className={classNames(cls.content, {}, [className])}>
           {closeIcon && onClose && (
             <Icon

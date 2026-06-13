@@ -1,19 +1,20 @@
-import { queueActions, useQueueGroupView } from '@entities/Queue';
 import { useAppDispatch } from '@shared/lib/hooks/useAppDispatch';
 import { type RefObject, useEffect, useState } from 'react';
-import { headerHeight } from '../../consts/sizes.ts';
-import type { CategoryWithOrders } from '../../types/order.ts';
+import { headerHeight } from '../../const/sizes.ts';
+import { useOrders } from '../../selectors/getOrders/getOrders.ts';
+import { useQueueGroupView } from '../../selectors/getQueueGroupView/getQueueGroupView.ts';
+import { queueActions } from '../../slice/queueSlice.ts';
 
 interface IProps {
   refs: RefObject<Record<string, HTMLElement | null>>;
   containerRef?: RefObject<HTMLElement | null>;
-  orders: CategoryWithOrders[];
 }
 
-export const useChangeActiveCategoryWithScroll = ({ refs, containerRef, orders }: IProps) => {
+export const useChangeActiveCategoryWithScroll = ({ refs, containerRef }: IProps) => {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const view = useQueueGroupView();
+  const orders = useOrders();
 
   const dispatch = useAppDispatch();
 
@@ -68,7 +69,7 @@ export const useChangeActiveCategoryWithScroll = ({ refs, containerRef, orders }
     return () => {
       container.removeEventListener('scroll', handleScroll);
     };
-  }, [orders, activeId]);
+  }, [orders, activeId, containerRef, refs]);
 
   useEffect(() => {
     if (!activeId) return;

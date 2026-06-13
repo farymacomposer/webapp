@@ -1,6 +1,4 @@
-import { type ButtonColor } from '@shared/ui/Button';
-
-enum OrderCategories {
+export enum EOrderCategories {
   NOW = 'NOW',
   NEXT_UP = 'NEXT UP',
   FINISHED = 'FINISHED',
@@ -8,7 +6,7 @@ enum OrderCategories {
   FROZEN = 'FROZEN',
 }
 
-enum WavesCategories {
+export enum EWavesCategories {
   NEW = 'NEW',
   WAVE1 = 'WAVE1',
   WAVE2 = 'WAVE2',
@@ -36,34 +34,22 @@ export enum OrderCategoriesColors {
 }
 
 export const orderCategoriesColorsDict = {
-  [OrderCategories.NOW]: OrderCategoriesColors.MAGENTA,
-  [OrderCategories.NEXT_UP]: OrderCategoriesColors.ORANGE,
-  [OrderCategories.FINISHED]: OrderCategoriesColors.SKU_BLUE,
-  [OrderCategories.FUTURE]: OrderCategoriesColors.VIOLET,
-  [OrderCategories.FROZEN]: OrderCategoriesColors.INACTIVE,
+  [EOrderCategories.NOW]: OrderCategoriesColors.MAGENTA,
+  [EOrderCategories.NEXT_UP]: OrderCategoriesColors.ORANGE,
+  [EOrderCategories.FINISHED]: OrderCategoriesColors.SKU_BLUE,
+  [EOrderCategories.FUTURE]: OrderCategoriesColors.VIOLET,
+  [EOrderCategories.FROZEN]: OrderCategoriesColors.INACTIVE,
 };
 
 export const wavesCategoriesColorsDict = {
-  [WavesCategories.NEW]: OrderCategoriesColors.ORANGE,
-  [WavesCategories.WAVE1]: OrderCategoriesColors.CYAN_BLUE,
-  [WavesCategories.WAVE2]: OrderCategoriesColors.SKU_BLUE,
-  [WavesCategories.WAVE3]: OrderCategoriesColors.DEEP_BLUE,
-  [WavesCategories.WAVE4]: OrderCategoriesColors.NICKEL,
-  [WavesCategories.WAVE5]: OrderCategoriesColors.VIOLET,
-  [WavesCategories.WAVE6]: OrderCategoriesColors.PURPLE,
-  [WavesCategories.WAVE7]: OrderCategoriesColors.DEEP_MAGENTA,
-  [WavesCategories.WAVE8]: OrderCategoriesColors.MAGENTA,
-  [WavesCategories.WAVE9]: OrderCategoriesColors.MAGENTA_PINK,
+  [EWavesCategories.NEW]: OrderCategoriesColors.ORANGE,
+  [EWavesCategories.WAVE1]: OrderCategoriesColors.CYAN_BLUE,
+  [EWavesCategories.WAVE2]: OrderCategoriesColors.SKU_BLUE,
+  [EWavesCategories.WAVE3]: OrderCategoriesColors.DEEP_BLUE,
+  [EWavesCategories.WAVE4]: OrderCategoriesColors.NICKEL,
+  [EWavesCategories.WAVE5]: OrderCategoriesColors.VIOLET,
+  [EWavesCategories.WAVE6]: OrderCategoriesColors.PURPLE,
+  [EWavesCategories.WAVE7]: OrderCategoriesColors.DEEP_MAGENTA,
+  [EWavesCategories.WAVE8]: OrderCategoriesColors.MAGENTA,
+  [EWavesCategories.WAVE9]: OrderCategoriesColors.MAGENTA_PINK,
 };
-
-export const orderCategories = Object.values(OrderCategories).map((el, i) => ({
-  id: i + 1,
-  value: el,
-  color: orderCategoriesColorsDict[el] as ButtonColor,
-}));
-
-export const wavesCategories = Object.values(WavesCategories).map((el, i) => ({
-  id: i + 1,
-  value: el,
-  color: wavesCategoriesColorsDict[el] as ButtonColor,
-}));

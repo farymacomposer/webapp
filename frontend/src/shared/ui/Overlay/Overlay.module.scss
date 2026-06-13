@@ -10,4 +10,10 @@
   right: 0;
   top: 0;
   z-index: var(--overlay-z-index);
+  opacity: 0;
+  transition: opacity 0.25s linear;
+
+  &.visible {
+    opacity: 1;
+  }
 }

@@ -99,8 +99,8 @@ export const OrderCardSmall = (props: OrderCardProps) => {
       {isOpen && openContent}
       <div className={classNames(cls.textBlock, { [cls.open]: isOpen }, [])}>
         <HStack gap="14" align={isOpen ? 'stretch' : 'center'}>
-          <OrderCategory id={order.id} name={order.category} fullHeight={isOpen} />
-          <VStack gap="4">
+          <OrderCategory id={order.id} name={order.waveShortName} fullHeight={isOpen} />
+          <VStack style={{ gap: 0 }}>
             <Text
               className={classNames(cls.name, { [cls.openCardName]: isOpen }, [])}
               size="16"
