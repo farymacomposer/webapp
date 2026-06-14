@@ -6,7 +6,19 @@ export type FlexJustify = 'start' | 'center' | 'end' | 'between';
 export type FlexAlign = 'start' | 'center' | 'end' | 'stretch';
 export type FlexDirection = 'row' | 'column';
 export type FlexWrap = 'nowrap' | 'wrap';
-export type FlexGap = '4' | '6' | '8' | '10' | '14' | '16' | '20' | '22' | '24' | '32' | '36';
+export type FlexGap =
+  | '4'
+  | '6'
+  | '8'
+  | '10'
+  | '12'
+  | '14'
+  | '16'
+  | '20'
+  | '22'
+  | '24'
+  | '32'
+  | '36';
 
 const justifyClasses: Record<FlexJustify, string> = {
   start: cls.justifyStart,
@@ -32,6 +44,7 @@ const gapClasses: Record<FlexGap, string> = {
   6: cls.gap6,
   8: cls.gap8,
   10: cls.gap10,
+  12: cls.gap12,
   14: cls.gap14,
   16: cls.gap16,
   20: cls.gap20,

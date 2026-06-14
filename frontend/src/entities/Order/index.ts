@@ -1,5 +1,14 @@
 export { OrderCard } from './ui/OrderCard/OrderCard';
 
-export { OrderCategoriesList } from './ui/OrderCategoriesList/OrderCategoriesList';
+export { OrderCategory } from './ui/OrderCategory/OrderCategory';
 
-export { OrderCardsCategoryList } from './ui/OrderCardsCategoryList/OrderCardsCategoryList';
+export { type Order } from './model/types/order.ts';
+
+export {
+  EOrderCategories,
+  EWavesCategories,
+  orderCategoriesColorsDict,
+  wavesCategoriesColorsDict,
+} from './model/consts/orderCategoriesConsts.ts';
+
+export { orderBigCardHeight, rectangleCategoryNameHeight } from './model/consts/sizes.ts';

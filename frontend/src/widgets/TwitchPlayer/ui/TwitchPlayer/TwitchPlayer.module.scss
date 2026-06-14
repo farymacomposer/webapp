@@ -1,14 +1,21 @@
 .stream {
   background: var(--accent-bg-color);
-  height: calc(100% - var(--close-bottom-queue-height) - var(--app-gap));
-  position: relative;
-  width: 100%;
+  height: calc(100vh - var(--close-bottom-queue-height) - var(--app-gap));
+  overflow: hidden;
+  position: fixed;
+  width: calc(100vw - var(--size-sidebar) - var(--app-gap));
   z-index: 1;
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+  isolation: isolate;
 }
 
 .twitchPlayer {
+  position: absolute;
   width: 100%;
   height: 100%;
   border: none;
+  inset: 0;
 }
 

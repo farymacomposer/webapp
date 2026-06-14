@@ -8,6 +8,7 @@
   padding-bottom: 8px;
   width: var(--size-queue-btn-width);
   transition: opacity 0.1s linear;
+  user-select: none;
 
   &:hover {
     opacity: 0.7;

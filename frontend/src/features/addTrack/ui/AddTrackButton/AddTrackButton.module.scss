@@ -1,6 +1,7 @@
 .btn {
   flex-shrink: 0;
   transition: opacity 0.1s linear;
+  user-select: none;
 
   &:hover {
     opacity: 0.7;

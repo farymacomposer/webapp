@@ -4,10 +4,10 @@ import { getRouteMain } from '@shared/const/router.ts';
 import { TwitchChat } from '@widgets/TwitchChat';
 import { memo, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useIsBottomQueueOpen } from '../../../BottomQueue';
-import { useSidebarItems } from '../../model/selectors/getSidebarItems';
+import { useSidebarItems } from '../../model/hooks/getSidebarItems';
 import { SidebarItem } from '../SidebarItem/SidebarItem';
 import cls from './Sidebar.module.scss';
+import { useIsBottomQueueOpen } from '@/entities/Queue';
 import { classNames, type Mods } from '@/shared/lib/classNames/classNames';
 import { HStack, VStack } from '@/shared/ui/Stack';
 

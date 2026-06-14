@@ -1,0 +1,30 @@
+.wrapper {
+  width: calc(100% - 140px);
+  flex-grow: 1;
+}
+
+.btn {
+  padding: 0 24px;
+  height: 28px;
+  width: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+  font-weight: 600;
+  transition: filter 0.1s linear;
+
+  &.small {
+    padding: 0 8px;
+    min-width: 0;
+
+    & span {
+      min-width: 10px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &:hover {
+    filter: brightness(125%);
+  }
+}

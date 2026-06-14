@@ -11,6 +11,15 @@
   src: url('@shared/assets/fonts/Inter-Regular.ttf') format('truetype');
 }
 
+/* inter-400 italic */
+@font-face {
+  font-display: swap;
+  font-family: Inter;
+  font-style: italic;
+  font-weight: 400;
+  src: url('@shared/assets/fonts/Inter-Italic.ttf') format('truetype');
+}
+
 /* inter-500 */
 @font-face {
   font-display: swap;
@@ -29,6 +38,7 @@
   src: url('@shared/assets/fonts/Inter-SemiBold.ttf') format('truetype');
 }
 
+
 .app {
   background: var(--bg-color);
   color: var(--text-color);
@@ -36,4 +46,5 @@
   display: flex;
   font: var(--font-m);
   min-height: 100vh;
+  font-family: var(--font-family-main);
 }
