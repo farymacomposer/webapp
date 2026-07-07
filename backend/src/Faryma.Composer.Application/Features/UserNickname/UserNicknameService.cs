@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Infrastructure;
 
 namespace Faryma.Composer.Application.Features.UserNickname

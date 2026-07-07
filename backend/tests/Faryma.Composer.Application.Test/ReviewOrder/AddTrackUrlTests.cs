@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
-using Faryma.Composer.Contracts.Application.Features.AppSettings;
+using Faryma.Composer.Contracts.Api.Features.AppSettings;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
@@ -230,9 +230,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             long detailedReviewAmount)
         {
             AppSettingsService appSettingsService = services.GetRequiredService<AppSettingsService>();
-            await appSettingsService.Update(new AppSettingsModel
+            await appSettingsService.Update(new AppSettingsDto
             {
-                ReviewOrderNominalAmount = appSettingsService.Settings.ReviewOrderNominalAmount,
+                ReviewOrderNominalAmount = appSettingsService.Settings.ReviewOrderNominalPrice,
                 ReviewOrderExtraTimeAmountPerSecond = extraTimeAmountPerSecond,
                 ReviewOrderDetailedReviewAmount = detailedReviewAmount,
             }, CancellationToken.None);

@@ -21,7 +21,6 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
             services.AddDbContextFactory<AppDbContext>((provider, options) =>
             {
                 PostgreOptions postgreOptions = provider.GetRequiredService<IOptions<PostgreOptions>>().Value;
-
                 options.UseNpgsql(postgreOptions.GetConnectionString(), npgOptions => npgOptions.MapEnum());
             });
 
@@ -41,6 +40,7 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
                 .AddScoped<ReviewStore>()
                 .AddScoped<ReviewOrderStore>()
                 .AddScoped<TransactionStore>()
+                .AddScoped<UserEntitlementStore>()
                 .AddScoped<UserNicknameStore>()
                 .AddScoped<DateTimeService>();
 

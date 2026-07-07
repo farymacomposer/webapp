@@ -69,9 +69,29 @@ namespace Faryma.Composer.Desktop.ViewModels
         public string MainNickname { get; } = dto.MainNickname;
 
         /// <summary>
-        /// Общая стоимость заказа (номинал + платежи)
+        /// Денежная сумма для обратной совместимости
         /// </summary>
         public long TotalAmount { get; } = dto.TotalAmount;
+
+        /// <summary>
+        /// Обязательная стоимость заказа
+        /// </summary>
+        public long RequiredAmount { get; } = dto.RequiredAmount;
+
+        /// <summary>
+        /// Сумма покрытия обязательной стоимости
+        /// </summary>
+        public long CoveredAmount { get; } = dto.CoveredAmount;
+
+        /// <summary>
+        /// Сумма денежных платежей по заказу
+        /// </summary>
+        public long PaidAmount { get; } = dto.PaidAmount;
+
+        /// <summary>
+        /// Денежная сумма, которая влияет на донатный приоритет
+        /// </summary>
+        public long PaidPriorityAmount { get; } = dto.PaidPriorityAmount;
 
         /// <summary>
         /// Позиция заказа в очереди

@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Contracts.Application.Features.AppSettings;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,42 +20,22 @@ namespace Faryma.Composer.Application.Features.AppSettings
                 .SingleAsync();
         }
 
-        public async Task<AppSettingsEntity> Update(AppSettingsModel item, CancellationToken ct)
+        public async Task<AppSettingsEntity> Update(AppSettingsEntity dto, CancellationToken ct)
         {
-            if (Settings.ReviewOrderNominalAmount == item.ReviewOrderNominalAmount
-                && Settings.ReviewOrderExtraTimeAmountPerSecond == item.ReviewOrderExtraTimeAmountPerSecond
-                && Settings.ReviewOrderDetailedReviewAmount == item.ReviewOrderDetailedReviewAmount)
-            {
-                return Settings;
-            }
+            await using AppDbContext context = await contextFactory.CreateDbContextAsync(ct);
 
-            AppSettingsEntity entity = Clone(Settings);
-            entity.ReviewOrderNominalAmount = item.ReviewOrderNominalAmount;
-            entity.ReviewOrderExtraTimeAmountPerSecond = item.ReviewOrderExtraTimeAmountPerSecond;
-            entity.ReviewOrderDetailedReviewAmount = item.ReviewOrderDetailedReviewAmount;
+            AppSettingsEntity entity = await context.AppSettings.SingleAsync(ct);
 
-            await Save(entity, ct);
+            entity.ReviewOrderNominalPrice = dto.ReviewOrderNominalPrice;
+            entity.IncludedTrackDurationSeconds = dto.IncludedTrackDurationSeconds;
+            entity.ReviewOrderExtraTrackSecondPrice = dto.ReviewOrderExtraTrackSecondPrice;
+            entity.ReviewOrderDetailedPrice = dto.ReviewOrderDetailedPrice;
+
+            await context.SaveChangesAsync(ct);
+
             Settings = entity;
 
             return entity;
-        }
-
-        private static AppSettingsEntity Clone(AppSettingsEntity item)
-        {
-            return new()
-            {
-                Id = item.Id,
-                ReviewOrderNominalAmount = item.ReviewOrderNominalAmount,
-                ReviewOrderExtraTimeAmountPerSecond = item.ReviewOrderExtraTimeAmountPerSecond,
-                ReviewOrderDetailedReviewAmount = item.ReviewOrderDetailedReviewAmount,
-            };
-        }
-
-        private async Task Save(AppSettingsEntity item, CancellationToken ct)
-        {
-            await using AppDbContext context = await contextFactory.CreateDbContextAsync();
-            context.Update(item);
-            await context.SaveChangesAsync(ct);
         }
     }
 }

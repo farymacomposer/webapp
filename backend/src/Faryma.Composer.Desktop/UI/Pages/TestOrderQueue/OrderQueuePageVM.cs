@@ -2,13 +2,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.MoveUp;
 using Faryma.Composer.Contracts.Api.Shared.Dto;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Desktop.Api.ComposerStream;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Services;
 using Faryma.Composer.Desktop.ViewModels;
+using Faryma.Composer.Domain.Enums;
 
 namespace Faryma.Composer.Desktop.UI
 {
@@ -46,10 +46,22 @@ namespace Faryma.Composer.Desktop.UI
         public partial string? TrackUrl { get; set; }
 
         /// <summary>
+        /// Длительность трека в секундах
+        /// </summary>
+        [ObservableProperty]
+        public partial int TrackDurationSeconds { get; set; }
+
+        /// <summary>
         /// Сумма платежа
         /// </summary>
         [ObservableProperty]
         public partial string? PaymentAmount { get; set; }
+
+        /// <summary>
+        /// Id жетона пользователя
+        /// </summary>
+        [ObservableProperty]
+        public partial string? UserEntitlementId { get; set; }
 
         /// <summary>
         /// Комментарий пользователя
@@ -107,7 +119,9 @@ namespace Faryma.Composer.Desktop.UI
             Nickname = faker.Internet.UserName();
             OrderType = ReviewOrderType.Donation;
             TrackUrl = faker.Internet.Url();
+            TrackDurationSeconds = 60;
             PaymentAmount = faker.Finance.Amount(750, 5000, 0).ToString();
+            UserEntitlementId = null;
             UserComment = faker.Lorem.Sentence(5, 15).OrNull(faker);
         }
 
@@ -120,42 +134,88 @@ namespace Faryma.Composer.Desktop.UI
             Nickname = null;
             OrderType = ReviewOrderType.Unspecified;
             TrackUrl = null;
+            TrackDurationSeconds = 0;
             PaymentAmount = null;
+            UserEntitlementId = null;
             UserComment = null;
         }
 
         [RelayCommand]
         private async Task CreateReviewOrder()
         {
-            _ = int.TryParse(PaymentAmount, out int paymentAmount);
+            _ = long.TryParse(PaymentAmount, out long paymentAmount);
+            _ = long.TryParse(UserEntitlementId, out long userEntitlementId);
 
-            await reviewOrderService.Create(IdempotencyKey, new CreateReviewOrderRequest
+            string nickname = Nickname ?? string.Empty;
+            int? trackDurationSeconds = string.IsNullOrWhiteSpace(TrackUrl) ? null : TrackDurationSeconds;
+            bool useToken = (OrderType is ReviewOrderType.Free or ReviewOrderType.OutOfQueue)
+                && !string.IsNullOrWhiteSpace(UserEntitlementId);
+
+            if (useToken)
             {
-                Nickname = Nickname,
-                OrderType = OrderType,
-                TrackUrl = TrackUrl,
-                PaymentAmount = paymentAmount,
-                TopUpProvider = AccountTopUpProvider.Manual,
-                UserComment = UserComment,
-            });
+                await reviewOrderService.CreateToken(IdempotencyKey, new CreateTokenReviewOrderRequest
+                {
+                    UserNickname = nickname,
+                    TrackUrl = TrackUrl,
+                    TrackDurationSeconds = trackDurationSeconds,
+                    UserEntitlementId = userEntitlementId,
+                    UserComment = UserComment,
+                });
+
+                return;
+            }
+
+            switch (OrderType)
+            {
+                case ReviewOrderType.Donation:
+                    await reviewOrderService.CreateDonation(IdempotencyKey, new CreateDonationReviewOrderRequest
+                    {
+                        UserNickname = nickname,
+                        TrackUrl = TrackUrl,
+                        TrackDurationSeconds = trackDurationSeconds,
+                        PaymentAmount = paymentAmount,
+                        TopUpProvider = AccountTopUpProvider.Manual,
+                        UserComment = UserComment,
+                    });
+                    break;
+
+                case ReviewOrderType.OutOfQueue:
+                    await reviewOrderService.CreateOutOfQueue(IdempotencyKey, new CreateOutOfQueueReviewOrderRequest
+                    {
+                        UserNickname = nickname,
+                        TrackUrl = TrackUrl,
+                        TrackDurationSeconds = trackDurationSeconds,
+                        UserComment = UserComment,
+                    });
+                    break;
+
+                case ReviewOrderType.Free:
+                    await reviewOrderService.CreateFree(IdempotencyKey, new CreateFreeReviewOrderRequest
+                    {
+                        UserNickname = nickname,
+                        TrackUrl = TrackUrl,
+                        TrackDurationSeconds = trackDurationSeconds,
+                        UserComment = UserComment,
+                    });
+                    break;
+
+                case ReviewOrderType.Charity:
+                    await reviewOrderService.CreateCharity(IdempotencyKey, new CreateCharityReviewOrderRequest
+                    {
+                        UserNickname = nickname,
+                        TrackUrl = TrackUrl,
+                        TrackDurationSeconds = trackDurationSeconds,
+                        UserComment = UserComment,
+                    });
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Unsupported review order type '{OrderType}'");
+            }
         }
 
         [RelayCommand]
-        private async Task MoveUpReviewOrder()
-        {
-            _ = int.TryParse(PaymentAmount, out int paymentAmount);
-
-            await reviewOrderService.MoveUp(IdempotencyKey, new MoveUpReviewOrderRequest
-            {
-                ReviewOrderId = SelectedOrder?.Id ?? 0,
-                Nickname = Nickname,
-                PaymentAmount = paymentAmount,
-                TopUpProvider = AccountTopUpProvider.Manual,
-            });
-        }
-
-        [RelayCommand]
-        private Task AddTrackUrl() => reviewOrderService.AddTrackUrl(SelectedOrder?.Id ?? 0, TrackUrl!);
+        private Task<ReviewOrderDto> AddTrackUrl() => reviewOrderService.AddTrackUrl(SelectedOrder?.Id ?? 0, TrackUrl!, TrackDurationSeconds);
 
         [RelayCommand]
         private Task TakeOrderInProgress() => reviewOrderService.TakeOrderInProgress(SelectedOrder?.Id ?? 0);

@@ -47,6 +47,13 @@
                                 Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                         </local:TitledContentRow>
 
+                        <local:TitledContentRow Title="UserEntitlementId">
+                            <TextBox
+                                ui:TextBoxExtensions.ValidationMode="Dynamic"
+                                ui:TextBoxExtensions.ValidationType="Number"
+                                Text="{x:Bind ViewModel.UserEntitlementId, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        </local:TitledContentRow>
+
                         <local:TitledContentRow Title="OrderType">
                             <ComboBox
                                 HorizontalAlignment="Stretch"
@@ -55,6 +62,7 @@
                         </local:TitledContentRow>
 
                         <local:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
+                        <local:TitledContentRow Title="TrackDurationSeconds" Content="{x:Bind ViewModel.TrackDurationSeconds, Mode=OneWay}" />
 
                         <StackPanel
                             HorizontalAlignment="Center"
@@ -110,16 +118,12 @@
                                 Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                         </local:TitledContentRow>
 
-                        <Button
-                            HorizontalAlignment="Center"
-                            Command="{x:Bind ViewModel.MoveUpReviewOrderCommand}"
-                            Content="Поднять в очереди"
-                            Style="{StaticResource AccentButtonStyle}" />
                     </StackPanel>
 
                     <StackPanel Style="{StaticResource StackPanelCardStyle}">
 
                         <local:TitledContentRow Title="TrackUrl" Content="{x:Bind ViewModel.TrackUrl, Mode=OneWay}" />
+                        <local:TitledContentRow Title="TrackDurationSeconds" Content="{x:Bind ViewModel.TrackDurationSeconds, Mode=OneWay}" />
 
                         <Button
                             HorizontalAlignment="Center"

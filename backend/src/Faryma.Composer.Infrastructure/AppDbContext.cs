@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Contracts.Infrastructure;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+﻿using Faryma.Composer.Domain;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -58,6 +58,16 @@ namespace Faryma.Composer.Infrastructure
         public DbSet<UserNicknameAccountEntity> UserNicknameAccounts { get; set; }
 
         /// <summary>
+        /// Жетоны пользователей
+        /// </summary>
+        public DbSet<UserEntitlementEntity> UserEntitlements { get; set; }
+
+        /// <summary>
+        /// Погашения жетонов пользователей
+        /// </summary>
+        public DbSet<UserEntitlementRedemptionEntity> UserEntitlementRedemptions { get; set; }
+
+        /// <summary>
         /// Псевдонимы пользователей
         /// </summary>
         public DbSet<UserNicknameEntity> UserNicknames { get; set; }
@@ -88,6 +98,11 @@ namespace Faryma.Composer.Infrastructure
         /// Заказы разборов треков
         /// </summary>
         public DbSet<ReviewOrderEntity> ReviewOrders { get; set; }
+
+        /// <summary>
+        /// Оплаты подробного разбора заказов
+        /// </summary>
+        public DbSet<ReviewOrderDetailedReviewPaymentEntity> ReviewOrderDetailedReviewPayments { get; set; }
 
         /// <summary>
         /// Отмены транзакций
@@ -123,7 +138,10 @@ namespace Faryma.Composer.Infrastructure
             builder.Entity<AppSettingsEntity>().HasData(new AppSettingsEntity
             {
                 Id = 1,
-                ReviewOrderNominalAmount = 750,
+                ReviewOrderNominalPrice = 1000,
+                IncludedTrackDurationSeconds = 60 * 5,
+                ReviewOrderExtraTrackSecondPrice = 3,
+                ReviewOrderDetailedPrice = 1000,
             });
 
             builder.Entity<TrackGenreEntity>().HasData(

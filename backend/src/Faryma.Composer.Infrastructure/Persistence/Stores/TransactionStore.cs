@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
+using Faryma.Composer.Domain.Enums;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
@@ -47,7 +47,8 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
 
-            if (source is not ReviewOrderEntity)
+            if (source is not (ReviewOrderEntity
+                or ReviewOrderDetailedReviewPaymentEntity))
             {
                 throw new ArgumentException($"Недопустимый источник платежа '{source.GetType().Name}'", nameof(source));
             }

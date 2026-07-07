@@ -1,14 +1,16 @@
-﻿using Faryma.Composer.Application.Features.AppSettings;
+﻿using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Events;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
+using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Application.Features.ReviewOrder.Commands;
+using Faryma.Composer.Application.Features.ReviewOrder.Models;
+using Faryma.Composer.Application.Features.ReviewOrder.Pricing;
 using Faryma.Composer.Application.Features.UserNickname;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Events;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
-using Faryma.Composer.Contracts.Application.Features.ReviewOrder;
-using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
+using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         UserManager<UserEntity> userManager,
         UserNicknameService userNicknameService,
         AppSettingsService appSettingsService,
+        ReviewOrderPricingService reviewOrderPricingService,
         OrderQueueService orderQueueService,
         OrderQueueEventChannel orderQueueEventChannel,
         DateTimeService dateTimeService)
@@ -27,19 +30,29 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         public async Task<ReviewOrderEntity> CreateOutOfQueue(CreateOutOfQueueOrderCommand command, CancellationToken ct = default)
         {
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
-            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
 
             ComposerStreamEntity? nearestStream = await uow.ComposerStreamStore.FindNearest(ct)
-                ?? throw new ReviewOrderException("Нет доступного стрима");
+                ?? throw new ReviewOrderException("Нет доступного ближайшего стрима");
+
+            ReviewOrderStatus status = command.TrackUrl is null
+                ? ReviewOrderStatus.Preorder
+                : ReviewOrderStatus.Pending;
 
             ReviewOrderEntity order = uow.ReviewOrderStore.Create(
-                appSettingsService.Settings.ReviewOrderNominalAmount,
-                payableAmount: 0,
+                ReviewOrderType.OutOfQueue,
+                status,
                 command.TrackUrl,
                 command.TrackDurationSeconds,
+                appSettingsService.Settings.ReviewOrderNominalPrice,
+                payableAmount: 0,
                 command.UserComment,
-                ReviewOrderType.OutOfQueue,
                 nearestStream,
+                userNickname,
+                createdByUser);
+
+            CreateAndRedeemAdminCoverage(
+                order,
                 userNickname,
                 createdByUser);
 
@@ -53,28 +66,40 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         public async Task<ReviewOrderEntity> CreateDonation(CreateDonationOrderCommand command, CancellationToken ct = default)
         {
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
-            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
-            ComposerStreamEntity nearestStream = await FindNearestStream(userNickname, ct)
-                ?? throw new ReviewOrderException("Нет доступного стрима");
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
 
-            TransactionEntity topUp = uow.TransactionStore.CreateAccountTopUp(
+            ComposerStreamEntity nearestStream = await FindNearestStream(userNickname, ct)
+                ?? throw new ReviewOrderException("Нет доступного ближайшего стрима");
+
+            const ReviewOrderType orderType = ReviewOrderType.Donation;
+
+            long requiredAmount = CalculateRequiredAmount(orderType, command.TrackDurationSeconds);
+
+            ReviewOrderStatus status = DetermineCheckoutStatus(
+                orderType,
+                command.TrackUrl,
+                command.TrackDurationSeconds,
+                command.PaymentAmount);
+
+            ReviewOrderEntity order = uow.ReviewOrderStore.Create(
+                orderType,
+                status,
+                command.TrackUrl,
+                command.TrackDurationSeconds,
+                appSettingsService.Settings.ReviewOrderNominalPrice,
+                payableAmount: 0,
+                command.UserComment,
+                nearestStream,
+                userNickname,
+                createdByUser);
+
+            uow.TransactionStore.CreateAccountTopUp(
                 command.TopUpProvider,
                 command.PaymentAmount,
                 userNickname.Account,
                 createdByUser);
 
-            ReviewOrderEntity order = uow.ReviewOrderStore.Create(
-                appSettingsService.Settings.ReviewOrderNominalAmount,
-                appSettingsService.Settings.ReviewOrderNominalAmount,
-                command.TrackUrl,
-                command.TrackDurationSeconds,
-                command.UserComment,
-                ReviewOrderType.Donation,
-                nearestStream,
-                userNickname,
-                createdByUser);
-
-            TransactionEntity payment = uow.TransactionStore.CreatePayment(
+            uow.TransactionStore.CreatePayment(
                 command.PaymentAmount,
                 userNickname.Account,
                 order);
@@ -89,19 +114,30 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         public async Task<ReviewOrderEntity> CreateFree(CreateFreeOrderCommand command, CancellationToken ct = default)
         {
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
-            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
             ComposerStreamEntity nearestStream = await FindNearestStream(userNickname, ct)
-                ?? throw new ReviewOrderException("Нет доступного стрима");
+                ?? throw new ReviewOrderException("Нет доступного ближайшего стрима");
+
+            const ReviewOrderType orderType = ReviewOrderType.Free;
+
+            long coverageAmount = CalculateRequiredAmount(orderType, command.TrackDurationSeconds);
 
             ReviewOrderEntity order = uow.ReviewOrderStore.Create(
-                appSettingsService.Settings.ReviewOrderNominalAmount,
-                payableAmount: 0,
+                appSettingsService.Settings.ReviewOrderNominalPrice,
+                coverageAmount,
                 command.TrackUrl,
                 command.TrackDurationSeconds,
                 command.UserComment,
-                ReviewOrderType.Free,
+                orderType,
                 nearestStream,
                 userNickname,
+                createdByUser,
+                status: DetermineCheckoutStatus(orderType, command.TrackUrl, command.TrackDurationSeconds, coverageAmount));
+
+            CreateAndRedeemAdminCoverage(
+                order,
+                userNickname,
+                UserEntitlementTarget.FreeReviewOrder,
                 createdByUser);
 
             await uow.SaveChanges(ct);
@@ -117,13 +153,13 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             ComposerStreamEntity? liveStream = await uow.ComposerStreamStore.FindLive(ct);
             if (liveStream is null || liveStream.Type != ComposerStreamType.Charity)
             {
-                throw new ReviewOrderException("Не запущен благотворительный стрим");
+                throw new ReviewOrderException("Нет запущенного благотворительного стрима");
             }
 
-            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
 
             ReviewOrderEntity order = uow.ReviewOrderStore.Create(
-                appSettingsService.Settings.ReviewOrderNominalAmount,
+                appSettingsService.Settings.ReviewOrderNominalPrice,
                 payableAmount: 0,
                 command.TrackUrl,
                 command.TrackDurationSeconds,
@@ -140,15 +176,25 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
-        public async Task<TransactionEntity> MoveUp(MoveUpCommand command, CancellationToken ct = default)
+        public async Task<TransactionEntity> PayOrder(PayOrderCommand command, CancellationToken ct = default)
         {
+            if (command.PaymentAmount <= 0)
+            {
+                throw new ReviewOrderException("Сумма платежа должна быть больше нуля");
+            }
+
             UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
             ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
-            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
             {
-                throw new ReviewOrderException("Невозможно поднять заказ", order);
+                throw new ReviewOrderException("Невозможно оплатить заказ", order);
+            }
+
+            if (order.Type is not (ReviewOrderType.Donation or ReviewOrderType.Free))
+            {
+                throw new ReviewOrderException("Тип заказа не поддерживает денежную оплату", order);
             }
 
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
@@ -164,6 +210,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
                 userNickname.Account,
                 order);
 
+            RecalculateCheckoutStatus(order);
+
             await uow.SaveChanges(ct);
 
             orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderMovedUp, previousStatus));
@@ -173,20 +221,21 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
         public async Task<ReviewOrderEntity> AddTrackUrl(AddTrackUrlCommand command, CancellationToken ct = default)
         {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(command.TrackDurationSeconds);
+
             ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
-            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
             {
                 throw new ReviewOrderException("Невозможно добавить/изменить ссылку на трек", order);
             }
 
             order.TrackUrl = command.TrackUrl;
+            order.TrackDurationSeconds = command.TrackDurationSeconds;
 
-            if (order.Status == ReviewOrderStatus.Preorder)
-            {
-                order.Status = ReviewOrderStatus.Pending;
-            }
+            SynchronizePayableAmount(order);
+            RecalculateCheckoutStatus(order);
 
             await uow.SaveChanges(ct);
 
@@ -270,7 +319,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
                 return order;
             }
 
-            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
             {
                 throw new ReviewOrderException("Невозможно заморозить заказ", order);
             }
@@ -294,7 +343,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
                 return order;
             }
 
-            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
             {
                 throw new ReviewOrderException("Невозможно разморозить заказ", order);
             }
@@ -318,7 +367,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
                 return order;
             }
 
-            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.InProgress))
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment or ReviewOrderStatus.InProgress))
             {
                 throw new ReviewOrderException("Невозможно отменить заказ", order);
             }
@@ -337,6 +386,163 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
             return order;
         }
 
+        public async Task<PayDetailedReviewResult> PayDetailedReview(PayDetailedReviewCommand command, CancellationToken ct = default)
+        {
+            UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
+            ReviewOrderEntity order = await GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderStatus previousStatus = order.Status;
+
+            if ((command.TopUpProvider is null) == (command.UserEntitlementId is null))
+            {
+                throw new ReviewOrderException("Укажите либо платеж, либо жетон подробного разбора", order);
+            }
+
+            if (order.DetailedReviewPayment is not null)
+            {
+                throw new ReviewOrderException("Подробный разбор уже оплачен", order);
+            }
+
+            long amount = reviewOrderPricingService.CalculateDetailedReviewPaymentAmount();
+            if (amount <= 0)
+            {
+                throw new ReviewOrderException("Стоимость подробного разбора должна быть больше нуля", order);
+            }
+
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
+            ReviewOrderDetailedReviewPaymentEntity source = uow.ReviewOrderStore.CreateDetailedReviewPayment(
+                order,
+                amount,
+                createdByUser);
+
+            TransactionEntity? payment = null;
+            UserEntitlementRedemptionEntity? redemption = null;
+            if (command.TopUpProvider is AccountTopUpProvider topUpProvider)
+            {
+                uow.TransactionStore.CreateAccountTopUp(
+                    topUpProvider,
+                    amount,
+                    userNickname.Account,
+                    createdByUser);
+
+                payment = uow.TransactionStore.CreatePayment(
+                    amount,
+                    userNickname.Account,
+                    source);
+            }
+            else
+            {
+                UserEntitlementEntity entitlement = await uow.UserEntitlementStore.FindById(
+                    command.UserEntitlementId!.Value,
+                    ct)
+                    ?? throw new ReviewOrderException("Жетон не найден", order);
+
+                if (entitlement.UserNicknameId != userNickname.Id)
+                {
+                    throw new ReviewOrderException("Жетон принадлежит другому псевдониму", order);
+                }
+
+                ValidateDetailedReviewEntitlement(entitlement, order);
+
+                redemption = uow.UserEntitlementStore.Redeem(
+                    entitlement,
+                    UserEntitlementTarget.DetailedReview,
+                    amount,
+                    createdByUser,
+                    detailedReviewPayment: source,
+                    comment: "Погашение жетона подробного разбора");
+            }
+
+            await uow.SaveChanges(ct);
+
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderMovedUp, previousStatus));
+
+            return new PayDetailedReviewResult
+            {
+                ReviewOrder = order,
+                PaymentTransaction = payment,
+                UserEntitlementRedemption = redemption,
+            };
+        }
+
+        public async Task<ReviewOrderEntity> CreateWithToken(CreateTokenOrderCommand command, CancellationToken ct = default)
+        {
+            UserEntity createdByUser = await GetUser(command.CreatedByUserId, ct);
+            UserEntitlementEntity entitlement = await uow.UserEntitlementStore.FindById(command.UserEntitlementId, ct)
+                ?? throw new ReviewOrderException("Жетон не найден");
+            UserNicknameEntity userNickname = await uow.UserNicknameStore.FindByNickname(command.UserNickname, ct)
+                ?? throw new ReviewOrderException("Псевдоним не найден");
+
+            if (entitlement.UserNicknameId != userNickname.Id)
+            {
+                throw new ReviewOrderException("Жетон принадлежит другому псевдониму");
+            }
+
+            if (entitlement.UserNickname.UserId is null)
+            {
+                throw new ReviewOrderException("Жетон не привязан к пользователю");
+            }
+
+            if (entitlement.UserNickname.UserId != createdByUser.Id)
+            {
+                throw new ReviewOrderException("Жетон принадлежит другому пользователю");
+            }
+
+            ReviewOrderType orderType = GetOrderType(entitlement.Target);
+            UserEntitlementTarget target = GetOrderEntitlementTarget(orderType);
+            ValidateServiceToken(entitlement, target);
+
+            ComposerStreamEntity nearestStream = await FindCreationStream(orderType, userNickname, ct)
+                ?? throw new ReviewOrderException("Нет доступного стрима");
+            long coverageAmount = CalculateRequiredAmount(orderType, command.TrackDurationSeconds);
+
+            ReviewOrderEntity order = uow.ReviewOrderStore.Create(
+                appSettingsService.Settings.ReviewOrderNominalPrice,
+                coverageAmount,
+                command.TrackUrl,
+                command.TrackDurationSeconds,
+                command.UserComment,
+                orderType,
+                nearestStream,
+                userNickname,
+                createdByUser,
+                status: DetermineCheckoutStatus(orderType, command.TrackUrl, command.TrackDurationSeconds, coverageAmount));
+
+            uow.UserEntitlementStore.Redeem(
+                entitlement,
+                target,
+                coverageAmount,
+                createdByUser,
+                reviewOrder: order,
+                comment: "Погашение жетона при создании заказа");
+
+            await uow.SaveChanges(ct);
+
+            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified));
+
+            return order;
+        }
+
+        private static ReviewOrderType GetOrderType(UserEntitlementTarget target)
+        {
+            return target switch
+            {
+                UserEntitlementTarget.FreeReviewOrder => ReviewOrderType.Free,
+                UserEntitlementTarget.OutOfQueueReviewOrder => ReviewOrderType.OutOfQueue,
+                UserEntitlementTarget.DetailedReview => throw new ReviewOrderException("Жетон подробного разбора нельзя использовать для создания заказа"),
+                _ => throw new ReviewOrderException("Жетон не применим к созданию заказа")
+            };
+        }
+
+        private static UserEntitlementTarget GetOrderEntitlementTarget(ReviewOrderType orderType)
+        {
+            return orderType switch
+            {
+                ReviewOrderType.Free => UserEntitlementTarget.FreeReviewOrder,
+                ReviewOrderType.OutOfQueue => UserEntitlementTarget.OutOfQueueReviewOrder,
+                _ => throw new ReviewOrderException("Тип заказа не поддерживает жетон")
+            };
+        }
+
         private async Task<ReviewOrderEntity> GetOrder(long orderId, CancellationToken ct)
         {
             return await uow.ReviewOrderStore.FindById(orderId, ct)
@@ -347,6 +553,126 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         {
             return await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId, ct)
                 ?? throw new ReviewOrderException("Пользователь не найден");
+        }
+
+        private long CalculateRequiredAmount(ReviewOrderType orderType, int? trackDurationSeconds)
+        {
+            return reviewOrderPricingService
+                .CalculateRequiredPriceComponents(
+                    orderType,
+                    appSettingsService.Settings.ReviewOrderNominalPrice,
+                    trackDurationSeconds)
+                .Sum(x => x.Amount);
+        }
+
+        private ReviewOrderStatus DetermineCheckoutStatus(
+            ReviewOrderType orderType,
+            string? trackUrl,
+            int? trackDurationSeconds,
+            long coveredAmount)
+        {
+            if (trackUrl is null)
+            {
+                return ReviewOrderStatus.Preorder;
+            }
+
+            long requiredAmount = CalculateRequiredAmount(orderType, trackDurationSeconds);
+
+            return coveredAmount >= requiredAmount
+                ? ReviewOrderStatus.Pending
+                : ReviewOrderStatus.AwaitingPayment;
+        }
+
+        private void RecalculateCheckoutStatus(ReviewOrderEntity order)
+        {
+            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
+            {
+                return;
+            }
+
+            ReviewOrderPricing pricing = reviewOrderPricingService.Calculate(order);
+            if (!pricing.IsRequiredCovered)
+            {
+                order.Status = order.TrackUrl is null
+                    ? ReviewOrderStatus.Preorder
+                    : ReviewOrderStatus.AwaitingPayment;
+                return;
+            }
+
+            order.Status = order.TrackUrl is null
+                ? ReviewOrderStatus.Preorder
+                : ReviewOrderStatus.Pending;
+        }
+
+        private void SynchronizePayableAmount(ReviewOrderEntity order)
+        {
+            order.PayableAmount = reviewOrderPricingService
+                .CalculateRequiredPriceComponents(
+                    order.Type,
+                    order.Price,
+                    order.TrackDurationSeconds)
+                .Sum(x => x.Amount);
+        }
+
+        private void CreateAndRedeemAdminCoverage(
+            ReviewOrderEntity order,
+            UserNicknameEntity userNickname,
+            UserEntity createdByUser)
+        {
+            UserEntitlementTarget target = order.Type switch
+            {
+                ReviewOrderType.OutOfQueue => UserEntitlementTarget.OutOfQueueReviewOrder,
+                ReviewOrderType.Free => UserEntitlementTarget.FreeReviewOrder,
+                _ => throw new ReviewOrderException("Тип заказа не поддерживает жетон", order)
+            };
+
+            UserEntitlementEntity entitlement = uow.UserEntitlementStore.Create(
+                target,
+                userNickname,
+                createdByUser);
+
+            uow.UserEntitlementStore.Redeem(
+                entitlement,
+                target,
+                createdByUser,
+                reviewOrder: order);
+        }
+
+        private void ValidateDetailedReviewEntitlement(UserEntitlementEntity entitlement, ReviewOrderEntity order) =>
+            ValidateServiceToken(entitlement, UserEntitlementTarget.DetailedReview, order);
+
+        private void ValidateServiceToken(
+            UserEntitlementEntity entitlement,
+            UserEntitlementTarget target,
+            ReviewOrderEntity? order = null)
+        {
+            if (entitlement.Target != target)
+            {
+                throw new ReviewOrderException("Жетон не применим к выбранной услуге", order);
+            }
+
+            if (entitlement.RedeemedAt is not null || entitlement.Redemption is not null)
+            {
+                throw new ReviewOrderException("Жетон уже погашен", order);
+            }
+
+            if (entitlement.CanceledAt is not null)
+            {
+                throw new ReviewOrderException("Жетон отменен", order);
+            }
+        }
+
+        private async Task<ComposerStreamEntity?> FindCreationStream(
+            ReviewOrderType orderType,
+            UserNicknameEntity userNickname,
+            CancellationToken ct)
+        {
+            return orderType switch
+            {
+                ReviewOrderType.Free => await FindNearestStream(userNickname, ct),
+                ReviewOrderType.OutOfQueue => await uow.ComposerStreamStore.FindNearest(ct),
+                _ => throw new ReviewOrderException("Тип заказа не поддерживает создание по жетону")
+            };
         }
 
         private async Task<ComposerStreamEntity?> FindNearestStream(UserNicknameEntity userNickname, CancellationToken ct)

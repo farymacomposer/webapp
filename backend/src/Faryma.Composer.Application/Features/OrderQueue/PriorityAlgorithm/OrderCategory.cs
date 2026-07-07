@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using Faryma.Composer.Domain.Entities.TransactionSources;
+using Faryma.Composer.Domain.Enums;
 
 namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
 {

@@ -1,8 +1,7 @@
-﻿using Faryma.Composer.Api.Features.Auth;
+﻿using Faryma.Composer.Api.Contracts.Features.AppSettings;
+using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Application.Features.AppSettings;
-using Faryma.Composer.Contracts.Api.Features.AppSettings;
-using Faryma.Composer.Contracts.Application.Features.AppSettings;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Faryma.Composer.Api.Features.AppSettings
@@ -20,7 +19,12 @@ namespace Faryma.Composer.Api.Features.AppSettings
         /// </summary>
         [HttpGet]
         [AuthorizeAdmins]
-        public ActionResult<AppSettingsDto> GetAppSettings() => Ok(AppSettingsDto.Map(appSettingsService.Settings));
+        public ActionResult<AppSettingsDto> GetAppSettings()
+        {
+            AppSettingsEntity appSettings = appSettingsService.Settings;
+
+            return Ok(AppSettingsDto.Map(appSettings));
+        }
 
         /// <summary>
         /// Обновляет настройки
@@ -29,14 +33,15 @@ namespace Faryma.Composer.Api.Features.AppSettings
         [AuthorizeAdmins]
         public async Task<ActionResult<AppSettingsDto>> UpdateAppSettings(AppSettingsDto dto, CancellationToken ct)
         {
-            AppSettingsEntity settings = await appSettingsService.Update(new AppSettingsModel
+            AppSettingsEntity appSettings = await appSettingsService.Update(new AppSettingsEntity
             {
-                ReviewOrderNominalAmount = dto.ReviewOrderNominalAmount,
-                ReviewOrderExtraTimeAmountPerSecond = dto.ReviewOrderExtraTimeAmountPerSecond,
-                ReviewOrderDetailedReviewAmount = dto.ReviewOrderDetailedReviewAmount,
+                ReviewOrderNominalPrice = dto.ReviewOrderNominalPrice,
+                IncludedTrackDurationSeconds = dto.IncludedTrackDurationSeconds,
+                ReviewOrderExtraTrackSecondPrice = dto.ReviewOrderExtraTrackSecondPrice,
+                ReviewOrderDetailedPrice = dto.ReviewOrderDetailedPrice,
             }, ct);
 
-            return Ok(AppSettingsDto.Map(settings));
+            return Ok(AppSettingsDto.Map(appSettings));
         }
     }
 }

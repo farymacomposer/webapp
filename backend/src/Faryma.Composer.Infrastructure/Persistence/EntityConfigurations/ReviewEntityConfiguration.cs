@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

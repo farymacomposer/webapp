@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

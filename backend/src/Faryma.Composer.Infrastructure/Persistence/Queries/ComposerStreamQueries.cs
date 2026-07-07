@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Queries
@@ -78,7 +78,9 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             var query = context.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.ProcessedReviewOrders.Any(x => x.Type != ReviewOrderType.OutOfQueue)
-                    && x.CreatedReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
+                    && x.CreatedReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder
+                        || x.Status == ReviewOrderStatus.Pending
+                        || x.Status == ReviewOrderStatus.AwaitingPayment))
                 .Select(x => new
                 {
                     x.EventDate,

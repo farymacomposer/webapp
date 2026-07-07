@@ -11,7 +11,6 @@ namespace Faryma.Composer.Desktop.Navigation
         private ContentControl _frame = null!;
 
         public void SetFrame(ContentControl frame) => _frame = frame;
-
         public Task HandleException(Func<Task> action, string? errorMessage = null) => HandleException(action(), errorMessage);
         public Task HandleException(Action action, string? errorMessage = null) => HandleException(async () => action(), errorMessage);
 

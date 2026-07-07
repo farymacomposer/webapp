@@ -16,6 +16,7 @@ namespace Faryma.Composer.Infrastructure
         ReviewStore reviewStore,
         ReviewOrderStore reviewOrderStore,
         TransactionStore transactionStore,
+        UserEntitlementStore userEntitlementStore,
         UserNicknameStore userNicknameStore
         )
     {
@@ -28,6 +29,7 @@ namespace Faryma.Composer.Infrastructure
         public ReviewStore ReviewStore { get; } = reviewStore;
         public ReviewOrderStore ReviewOrderStore { get; } = reviewOrderStore;
         public TransactionStore TransactionStore { get; } = transactionStore;
+        public UserEntitlementStore UserEntitlementStore { get; } = userEntitlementStore;
         public UserNicknameStore UserNicknameStore { get; } = userNicknameStore;
 
         public Task<IDbContextTransaction> BeginTransaction(CancellationToken ct) => context.Database.BeginTransactionAsync(ct);

@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using Faryma.Composer.Domain.Entities.TransactionSources;
+using Faryma.Composer.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Queries
@@ -7,13 +7,15 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
     public sealed class ReviewOrderQueries(AppDbContext context)
     {
         /// <summary>
-        /// Проверяет, есть ли у стрима активные созданные заказы в статусах Preorder или Pending
+        /// Проверяет, есть ли у стрима активные созданные заказы
         /// </summary>
         public Task<bool> ExistsActiveCreatedOrdersForStream(long streamId, CancellationToken ct = default)
         {
             return context.ReviewOrders
                 .AnyAsync(x => x.CreationStreamId == streamId
-                    && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending), ct);
+                    && (x.Status == ReviewOrderStatus.Preorder
+                        || x.Status == ReviewOrderStatus.Pending
+                        || x.Status == ReviewOrderStatus.AwaitingPayment), ct);
         }
 
         /// <summary>
@@ -81,11 +83,12 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
             IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
-                .Include(x => x.Transactions)
                 .Where(x => x.CreationStreamId == streamId
-                    && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending));
+                    && (x.Status == ReviewOrderStatus.Preorder
+                        || x.Status == ReviewOrderStatus.Pending
+                        || x.Status == ReviewOrderStatus.AwaitingPayment));
 
-            return query.ToListAsync(ct);
+            return IncludePricingSources(query).ToListAsync(ct);
         }
 
         /// <summary>
@@ -97,12 +100,13 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
-                .Include(x => x.Transactions)
                 .Where(x => (x.CreationStreamId == streamId
-                    && (x.Status == ReviewOrderStatus.Preorder || x.Status == ReviewOrderStatus.Pending))
+                    && (x.Status == ReviewOrderStatus.Preorder
+                        || x.Status == ReviewOrderStatus.Pending
+                        || x.Status == ReviewOrderStatus.AwaitingPayment))
                     || (x.ProcessingStreamId == streamId && x.Status == ReviewOrderStatus.Completed));
 
-            return query.ToListAsync(ct);
+            return IncludePricingSources(query).ToListAsync(ct);
         }
 
         /// <summary>
@@ -114,15 +118,24 @@ namespace Faryma.Composer.Infrastructure.Persistence.Queries
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
-                .Include(x => x.Transactions)
                 .Where(x => x.Status == ReviewOrderStatus.Preorder
                     || x.Status == ReviewOrderStatus.Pending
+                    || x.Status == ReviewOrderStatus.AwaitingPayment
                     || x.Status == ReviewOrderStatus.InProgress
                     || (x.ProcessingStream != null
                         && x.ProcessingStream.Status == ComposerStreamStatus.Live
                         && x.Status == ReviewOrderStatus.Completed));
 
-            return query.ToListAsync(ct);
+            return IncludePricingSources(query).ToListAsync(ct);
+        }
+
+        private static IQueryable<ReviewOrderEntity> IncludePricingSources(IQueryable<ReviewOrderEntity> query)
+        {
+            return query
+                .Include(x => x.Transactions)
+                .Include(x => x.DetailedReviewPayment)
+                .ThenInclude(x => x!.Transactions)
+                .Include(x => x.CoverageRedemption);
         }
     }
 }

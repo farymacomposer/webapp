@@ -1,14 +1,14 @@
 ﻿using Faryma.Composer.Application.Common;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 using Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Events;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
+using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Faryma.Composer.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Application.Features.OrderQueue.Events;
 
 namespace Faryma.Composer.Application.Features.OrderQueue
 {

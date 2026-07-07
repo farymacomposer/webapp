@@ -2,11 +2,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
+using Faryma.Composer.Contracts.Api.Shared.Dto;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
 using Faryma.Composer.Desktop.Api.ReviewOrder;
 using Faryma.Composer.Desktop.Navigation;
 using Faryma.Composer.Desktop.Utils;
 using Faryma.Composer.Desktop.Validation;
+using Faryma.Composer.Domain.Enums;
 
 namespace Faryma.Composer.Desktop.UI
 {
@@ -34,6 +36,7 @@ namespace Faryma.Composer.Desktop.UI
         ];
 
         public bool IsPaymentAmountVisible => OrderType is ReviewOrderType.Donation;
+        public bool IsUserEntitlementIdVisible => OrderType is ReviewOrderType.Free or ReviewOrderType.OutOfQueue;
         public bool IsOrderTypeStepVisible => CurrentStep is CreateReviewOrderStep.OrderType;
         public bool IsDetailsStepVisible => CurrentStep is CreateReviewOrderStep.Details;
         public bool IsBackButtonVisible => CurrentStep is not CreateReviewOrderStep.OrderType;
@@ -58,6 +61,12 @@ namespace Faryma.Composer.Desktop.UI
         /// </summary>
         [ObservableProperty]
         public partial string? PaymentAmount { get; set; }
+
+        /// <summary>
+        /// Id жетона пользователя
+        /// </summary>
+        [ObservableProperty]
+        public partial string? UserEntitlementId { get; set; }
 
         /// <summary>
         /// Ссылка на трек
@@ -112,6 +121,8 @@ namespace Faryma.Composer.Desktop.UI
             }
 
             PaymentAmount = null;
+            UserEntitlementId = null;
+            OnPropertyChanged(nameof(IsUserEntitlementIdVisible));
         }
 
         [RelayCommand]
@@ -135,6 +146,7 @@ namespace Faryma.Composer.Desktop.UI
         private async Task Create()
         {
             _ = long.TryParse(PaymentAmount, out long paymentAmount);
+            _ = long.TryParse(UserEntitlementId, out long userEntitlementId);
 
             int? trackDurationSeconds = null;
             if (TrackDuration is not null)
@@ -143,26 +155,86 @@ namespace Faryma.Composer.Desktop.UI
                 trackDurationSeconds = (int)trackDuration.TotalSeconds;
             }
 
-            CreateReviewOrderRequest request = new()
-            {
-                Nickname = Nickname?.Trim() ?? string.Empty,
-                OrderType = OrderType,
-                TrackUrl = string.IsNullOrWhiteSpace(TrackUrl) ? null : TrackUrl,
-                TrackDurationSeconds = trackDurationSeconds,
-                PaymentAmount = IsPaymentAmountVisible ? paymentAmount : null,
-                TopUpProvider = IsPaymentAmountVisible ? AccountTopUpProvider.Manual : null,
-                UserComment = string.IsNullOrWhiteSpace(UserComment) ? null : UserComment,
-            };
+            CreateReviewOrderRequestBase request = CreateRequest(paymentAmount, userEntitlementId, trackDurationSeconds);
 
             if (await validationService.Check(request))
             {
                 await messageService.HandleException(async () =>
                 {
-                    await reviewOrderHttpClient.Create(_idempotencyKey, request);
+                    await SendCreateRequest(request);
 
                     HideDialog();
                 });
             }
+        }
+
+        private CreateReviewOrderRequestBase CreateRequest(long paymentAmount, long userEntitlementId, int? trackDurationSeconds)
+        {
+            string nickname = Nickname?.Trim() ?? string.Empty;
+            string? trackUrl = string.IsNullOrWhiteSpace(TrackUrl) ? null : TrackUrl;
+            string? userComment = string.IsNullOrWhiteSpace(UserComment) ? null : UserComment;
+            bool useToken = (OrderType is ReviewOrderType.Free or ReviewOrderType.OutOfQueue)
+                && !string.IsNullOrWhiteSpace(UserEntitlementId);
+
+            if (useToken)
+            {
+                return new CreateTokenReviewOrderRequest
+                {
+                    UserNickname = nickname,
+                    TrackUrl = trackUrl,
+                    TrackDurationSeconds = trackDurationSeconds,
+                    UserEntitlementId = userEntitlementId,
+                    UserComment = userComment,
+                };
+            }
+
+            return OrderType switch
+            {
+                ReviewOrderType.Donation => new CreateDonationReviewOrderRequest
+                {
+                    UserNickname = nickname,
+                    TrackUrl = trackUrl,
+                    TrackDurationSeconds = trackDurationSeconds,
+                    PaymentAmount = paymentAmount,
+                    TopUpProvider = AccountTopUpProvider.Manual,
+                    UserComment = userComment,
+                },
+                ReviewOrderType.OutOfQueue => new CreateOutOfQueueReviewOrderRequest
+                {
+                    UserNickname = nickname,
+                    TrackUrl = trackUrl,
+                    TrackDurationSeconds = trackDurationSeconds,
+                    UserComment = userComment,
+                },
+                ReviewOrderType.Free => new CreateFreeReviewOrderRequest
+                {
+                    UserNickname = nickname,
+                    TrackUrl = trackUrl,
+                    TrackDurationSeconds = trackDurationSeconds,
+                    UserComment = userComment,
+                },
+                ReviewOrderType.Charity => new CreateCharityReviewOrderRequest
+                {
+                    UserNickname = nickname,
+                    TrackUrl = trackUrl,
+                    TrackDurationSeconds = trackDurationSeconds,
+                    UserComment = userComment,
+                },
+                _ => throw new InvalidOperationException($"Unsupported review order type '{OrderType}'"),
+            };
+        }
+
+        private Task<ReviewOrderDto> SendCreateRequest(CreateReviewOrderRequestBase request)
+        {
+            return request switch
+            {
+                CreateDonationReviewOrderRequest donationRequest => reviewOrderHttpClient.CreateDonation(_idempotencyKey, donationRequest),
+                CreateOutOfQueueReviewOrderRequest outOfQueueRequest => reviewOrderHttpClient.CreateOutOfQueue(_idempotencyKey, outOfQueueRequest),
+                CreateFreeReviewOrderRequest freeRequest => reviewOrderHttpClient.CreateFree(_idempotencyKey, freeRequest),
+                CreateTokenReviewOrderRequest tokenRequest => reviewOrderHttpClient.CreateToken(_idempotencyKey, tokenRequest),
+                CreateCharityReviewOrderRequest charityRequest => reviewOrderHttpClient.CreateCharity(_idempotencyKey, charityRequest),
+                _ => throw new InvalidOperationException($"Unsupported create request type '{request.GetType().Name}'"),
+            };
         }
 
         private void Refresh()
@@ -172,6 +244,7 @@ namespace Faryma.Composer.Desktop.UI
             OrderType = ReviewOrderType.Donation;
             Nickname = null;
             PaymentAmount = null;
+            UserEntitlementId = null;
             TrackUrl = null;
             TrackDuration = null;
             UserComment = null;

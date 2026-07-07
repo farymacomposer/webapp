@@ -16,7 +16,19 @@
   <Folder Name="/docs/database/">
     <File Path="docs/database/schema.dbml" />
   </Folder>
-  <Folder Name="/src/" />
+  <Folder Name="/src/">
+    <Project Path="src/Faryma.Composer.Api.Contracts/Faryma.Composer.Api.Contracts.csproj" />
+    <Project Path="src/Faryma.Composer.Api/Faryma.Composer.Api.csproj" />
+    <Project Path="src/Faryma.Composer.Application.SharedContracts/Faryma.Composer.Application.SharedContracts.csproj" />
+    <Project Path="src/Faryma.Composer.Application/Faryma.Composer.Application.csproj" />
+    <Project Path="src/Faryma.Composer.Desktop/Faryma.Composer.Desktop.csproj">
+      <Platform Solution="*|Any CPU" Project="x64" />
+      <Deploy Solution="*|Any CPU" />
+    </Project>
+    <Project Path="src/Faryma.Composer.Domain/Faryma.Composer.Domain.csproj" />
+    <Project Path="src/Faryma.Composer.Infrastructure/Faryma.Composer.Infrastructure.csproj" />
+    <Project Path="src/Faryma.Composer.MigrationsBundle/Faryma.Composer.MigrationsBundle.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Faryma.Composer.Api.Test/Faryma.Composer.Api.Test.csproj" />
     <Project Path="tests/Faryma.Composer.Application.Test/Faryma.Composer.Application.Test.csproj" />
@@ -45,13 +57,4 @@
     <File Path="use-cases/review-order/take-order-in-progress.md" />
     <File Path="use-cases/review-order/unfreeze-review-order.md" />
   </Folder>
-  <Project Path="src/Faryma.Composer.Api/Faryma.Composer.Api.csproj" />
-  <Project Path="src/Faryma.Composer.Application/Faryma.Composer.Application.csproj" />
-  <Project Path="src/Faryma.Composer.Contracts/Faryma.Composer.Contracts.csproj" />
-  <Project Path="src/Faryma.Composer.Desktop/Faryma.Composer.Desktop.csproj">
-    <Platform Solution="*|Any CPU" Project="x64" />
-    <Deploy Solution="*|Any CPU" />
-  </Project>
-  <Project Path="src/Faryma.Composer.Infrastructure/Faryma.Composer.Infrastructure.csproj" />
-  <Project Path="src/Faryma.Composer.MigrationsBundle/Faryma.Composer.MigrationsBundle.csproj" />
 </Solution>

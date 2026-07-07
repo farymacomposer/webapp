@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text.Json;
 using Faryma.Composer.Api.Common.Extensions;
-using Faryma.Composer.Contracts.Api;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Api.Contracts;
+using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -41,6 +41,7 @@ namespace Faryma.Composer.Api.Common.Filters
                 if (existing.ExpiresAt > now)
                 {
                     actionContext.Result = CreateReplayResult(existing, requestHash);
+
                     return;
                 }
 
@@ -163,7 +164,7 @@ namespace Faryma.Composer.Api.Common.Filters
         }
 
         private async Task DeleteExpiredRecord(
-                    string endpointKey,
+            string endpointKey,
             Guid userId,
             Guid idempotencyKey,
             DateTime now,

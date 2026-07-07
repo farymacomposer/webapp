@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +16,7 @@ namespace Faryma.Composer.Infrastructure
         public const string ReviewOrderTypeEnum = SchemaName + "." + nameof(ReviewOrderType);
         public const string TransactionKindEnum = SchemaName + "." + nameof(TransactionKind);
         public const string AccountTopUpProviderEnum = SchemaName + "." + nameof(AccountTopUpProvider);
+        public const string UserEntitlementTargetEnum = SchemaName + "." + nameof(UserEntitlementTarget);
 
         public static string? GetConnectionString(IConfiguration configuration)
         {
@@ -34,7 +35,8 @@ namespace Faryma.Composer.Infrastructure
                 .MapEnum<ReviewOrderStatus>(nameof(ReviewOrderStatus), SchemaName)
                 .MapEnum<ReviewOrderType>(nameof(ReviewOrderType), SchemaName)
                 .MapEnum<TransactionKind>(nameof(TransactionKind), SchemaName)
-                .MapEnum<AccountTopUpProvider>(nameof(AccountTopUpProvider), SchemaName);
+                .MapEnum<AccountTopUpProvider>(nameof(AccountTopUpProvider), SchemaName)
+                .MapEnum<UserEntitlementTarget>(nameof(UserEntitlementTarget), SchemaName);
         }
 
         // Вспомогательный метод для выравнивания enum в БД по номеру, а не по названию
@@ -47,7 +49,8 @@ namespace Faryma.Composer.Infrastructure
                 .HasPostgresEnum<ReviewOrderStatus>(SchemaName, nameof(ReviewOrderStatus))
                 .HasPostgresEnum<ReviewOrderType>(SchemaName, nameof(ReviewOrderType))
                 .HasPostgresEnum<TransactionKind>(SchemaName, nameof(TransactionKind))
-                .HasPostgresEnum<AccountTopUpProvider>(SchemaName, nameof(AccountTopUpProvider));
+                .HasPostgresEnum<AccountTopUpProvider>(SchemaName, nameof(AccountTopUpProvider))
+                .HasPostgresEnum<UserEntitlementTarget>(SchemaName, nameof(UserEntitlementTarget));
         }
     }
 }

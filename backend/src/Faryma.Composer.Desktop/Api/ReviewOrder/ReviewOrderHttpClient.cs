@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Faryma.Composer.Contracts.Api;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.MoveUp;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Pay;
 using Faryma.Composer.Contracts.Api.Shared.Dto;
 using Faryma.Composer.Desktop.Api.Exceptions;
 using Faryma.Composer.Desktop.Api.ReviewOrder.Responses;
@@ -11,13 +11,18 @@ namespace Faryma.Composer.Desktop.Api.ReviewOrder
 {
     public sealed class ReviewOrderHttpClient(HttpClient httpClient, JsonSerializerOptions serializerOptions)
     {
-        public Task<ReviewOrderDto> Create(Guid idempotencyKey, CreateReviewOrderRequest request) => Post("/api/review-orders", idempotencyKey, request);
-        public Task<ReviewOrderDto> MoveUp(Guid idempotencyKey, MoveUpReviewOrderRequest request) => Post("/api/review-orders/move-up", idempotencyKey, request);
+        public Task<ReviewOrderDto> CreateDonation(Guid idempotencyKey, CreateDonationReviewOrderRequest request) => Post("/api/review-orders/create/donation", idempotencyKey, request);
+        public Task<ReviewOrderDto> CreateOutOfQueue(Guid idempotencyKey, CreateOutOfQueueReviewOrderRequest request) => Post("/api/review-orders/create/out-of-queue", idempotencyKey, request);
+        public Task<ReviewOrderDto> CreateFree(Guid idempotencyKey, CreateFreeReviewOrderRequest request) => Post("/api/review-orders/create/free", idempotencyKey, request);
+        public Task<ReviewOrderDto> CreateToken(Guid idempotencyKey, CreateTokenReviewOrderRequest request) => Post("/api/review-orders/create/token", idempotencyKey, request);
+        public Task<ReviewOrderDto> CreateCharity(Guid idempotencyKey, CreateCharityReviewOrderRequest request) => Post("/api/review-orders/create/charity", idempotencyKey, request);
+        public Task<ReviewOrderDto> Pay(Guid idempotencyKey, PayReviewOrderRequest request) => Post("/api/review-orders/pay", idempotencyKey, request);
 
-        public Task<ReviewOrderDto> AddTrackUrl(long reviewOrderId, string trackUrl) => Post("/api/review-orders/track-url", new
+        public Task<ReviewOrderDto> AddTrackUrl(long reviewOrderId, string trackUrl, int trackDurationSeconds) => Post("/api/review-orders/track-url", new
         {
             ReviewOrderId = reviewOrderId,
             TrackUrl = trackUrl,
+            TrackDurationSeconds = trackDurationSeconds,
         });
 
         public Task<ReviewOrderDto> TakeOrderInProgress(long reviewOrderId) => Post("/api/review-orders/take-in-progress", new

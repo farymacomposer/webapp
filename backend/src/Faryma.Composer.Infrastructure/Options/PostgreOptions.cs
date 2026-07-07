@@ -28,6 +28,9 @@ namespace Faryma.Composer.Infrastructure.Options
         [Required]
         public required string Password { get; set; }
 
+        [ConfigurationKeyName("POOLING")]
+        public bool? Pooling { get; set; }
+
         public string GetConnectionString()
         {
             NpgsqlConnectionStringBuilder builder = new()
@@ -38,6 +41,11 @@ namespace Faryma.Composer.Infrastructure.Options
                 Username = Username,
                 Password = Password,
             };
+
+            if (Pooling.HasValue)
+            {
+                builder.Pooling = Pooling.Value;
+            }
 
             return builder.ToString();
         }

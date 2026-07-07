@@ -19,7 +19,7 @@ namespace Faryma.Composer.MigrationsBundle
             optionsBuilder.UseNpgsql(DbContextHelper.GetConnectionString(configuration), npgOptions => npgOptions
                 .MapEnum()
                 .MigrationsHistoryTable("__EFMigrationsHistory", DbContextHelper.SchemaName)
-                .MigrationsAssembly("Faryma.Composer.MigrationsBundle"));
+                .MigrationsAssembly(typeof(AppDbMigrationContextFactory).Assembly.GetName().Name));
 
             return new AppDbContext(optionsBuilder.Options);
         }

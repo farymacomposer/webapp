@@ -1,15 +1,15 @@
 ﻿using Faryma.Composer.Api.Common.Extensions;
+using Faryma.Composer.Api.Contracts.Features.ComposerStream.Cancel;
+using Faryma.Composer.Api.Contracts.Features.ComposerStream.Complete;
+using Faryma.Composer.Api.Contracts.Features.ComposerStream.Create;
+using Faryma.Composer.Api.Contracts.Features.ComposerStream.Find;
+using Faryma.Composer.Api.Contracts.Features.ComposerStream.FindLiveAndPlanned;
+using Faryma.Composer.Api.Contracts.Features.ComposerStream.Start;
+using Faryma.Composer.Api.Contracts.Shared.Dto;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Application.Features.ComposerStream;
-using Faryma.Composer.Contracts.Api.Features.ComposerStream.Cancel;
-using Faryma.Composer.Contracts.Api.Features.ComposerStream.Complete;
-using Faryma.Composer.Contracts.Api.Features.ComposerStream.Create;
-using Faryma.Composer.Contracts.Api.Features.ComposerStream.Find;
-using Faryma.Composer.Contracts.Api.Features.ComposerStream.FindLiveAndPlanned;
-using Faryma.Composer.Contracts.Api.Features.ComposerStream.Start;
-using Faryma.Composer.Contracts.Api.Shared.Dto;
-using Faryma.Composer.Contracts.Application.Features.ComposerStream.Commands;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Application.Features.ComposerStream.Commands;
+using Faryma.Composer.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Faryma.Composer.Api.Features.ComposerStream

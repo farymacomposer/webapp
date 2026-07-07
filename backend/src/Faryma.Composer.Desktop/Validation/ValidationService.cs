@@ -1,36 +1,37 @@
-﻿using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
 using Faryma.Composer.Desktop.Navigation;
 
 namespace Faryma.Composer.Desktop.Validation
 {
     public sealed class ValidationService(MessageService messageService)
     {
-        public async Task<bool> Check(CreateReviewOrderRequest request)
+        public async Task<bool> Check(CreateReviewOrderRequestBase request)
         {
-            bool hasUrl = !string.IsNullOrWhiteSpace(request.TrackUrl);
-            bool hasDuration = request.TrackDurationSeconds > 0;
+            List<ValidationResult> results = [];
+            Validator.TryValidateObject(request, new ValidationContext(request), results, validateAllProperties: true);
 
-            SimpleValidator validator = new SimpleValidator()
-                .WarnIf(string.IsNullOrWhiteSpace(request.Nickname), "Не задан никнейм пользователя")
-                .WarnIf(request.OrderType == ReviewOrderType.Donation && request.PaymentAmount == 0, "Не задана сумма платежа")
-                .RequireUrlIfProvided(request.TrackUrl, "Некорректная ссылка на трек")
-                .WarnIf(hasUrl != hasDuration, "Если указаны ссылка на трек или длительность, должны быть заполнены оба поля");
-
-            if (validator.HasWarnings)
+            if (string.IsNullOrWhiteSpace(request.UserNickname))
             {
-                await ShowWarning(validator.Warnings);
+                results.Add(new ValidationResult("Не задан никнейм пользователя"));
             }
 
-            return !validator.HasWarnings;
+            await ShowWarning(results);
+
+            return results.Count == 0;
         }
 
-        private Task ShowWarning(IEnumerable<string> warnings)
+        private async Task ShowWarning(List<ValidationResult> results)
         {
-            return messageService.ShowWarnings(warnings, new MessageOptions
+            if (results.Count > 0)
             {
-                Title = "Некорректные данные",
-            });
+                await messageService.ShowWarnings(
+                    results.Select(result => result.ErrorMessage ?? "Некорректные данные").Distinct(),
+                    new MessageOptions
+                    {
+                        Title = "Некорректные данные",
+                    });
+            }
         }
     }
 }

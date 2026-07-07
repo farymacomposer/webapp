@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using Faryma.Composer.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Domain.Entities.TransactionSources;
+using Faryma.Composer.Domain.Enums;
 
 namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
 {
@@ -45,7 +45,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen
                     && x.Type == ReviewOrderType.OutOfQueue
-                    && x.Status is ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending)
+                    && x.Status is ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment)
                 .OrderBy(x => x.CreatedAt)
                 .ToList());
 
@@ -56,7 +56,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm
                 .Select(x => x.Value.Order)
                 .Where(x => !x.IsFrozen
                     && x.Type is ReviewOrderType.Donation or ReviewOrderType.Free
-                    && x.Status is ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending
+                    && x.Status is ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment
                     && x.CreationStream.EventDate <= queueManager.NearestStreamDate)
                 .GroupBy(x => x.CreationStream.EventDate)
                 .Select(x => (x.Key, new OrderCategory(x.Order(OrderPriorityComparer.Default).ToList())))

@@ -79,6 +79,15 @@
                                 Text="{x:Bind ViewModel.PaymentAmount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                         </local:TitledContentRow>
 
+                        <local:TitledContentRow Title="Id жетона" Visibility="{x:Bind ViewModel.IsUserEntitlementIdVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBox
+                                Width="{StaticResource TitledContentWidth}"
+                                ui:TextBoxExtensions.ValidationMode="Dynamic"
+                                ui:TextBoxExtensions.ValidationType="Number"
+                                MaxLength="18"
+                                Text="{x:Bind ViewModel.UserEntitlementId, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        </local:TitledContentRow>
+
                         <local:TitledContentRow Title="Ссылка на трек" Spacing="24">
                             <TextBox
                                 Width="{StaticResource TitledContentWidth}"

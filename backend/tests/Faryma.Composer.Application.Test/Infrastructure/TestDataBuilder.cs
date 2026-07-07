@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.Infrastructure

@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Contracts.Api.Features.Auth.Options;
-using Faryma.Composer.Contracts.Infrastructure;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+﻿using Faryma.Composer.Api.Contracts.Features.Auth.Options;
+using Faryma.Composer.Domain;
+using Faryma.Composer.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 

@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure;
+﻿using Faryma.Composer.Domain;
 
 namespace Faryma.Composer.Api.Test.Infrastructure.Auth
 {

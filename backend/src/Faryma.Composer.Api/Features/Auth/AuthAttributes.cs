@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Infrastructure;
+﻿using Faryma.Composer.Domain;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Faryma.Composer.Api.Features.Auth

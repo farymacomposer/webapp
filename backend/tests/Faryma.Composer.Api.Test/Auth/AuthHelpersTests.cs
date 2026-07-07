@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
-using Faryma.Composer.Contracts.Infrastructure;
+using Faryma.Composer.Domain;
 
 namespace Faryma.Composer.Api.Test.Auth
 {

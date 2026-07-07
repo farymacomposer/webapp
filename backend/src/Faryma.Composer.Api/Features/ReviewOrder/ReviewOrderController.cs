@@ -1,22 +1,23 @@
-﻿using System.Diagnostics;
-using Faryma.Composer.Api.Common.Attributes;
+﻿using Faryma.Composer.Api.Common.Attributes;
 using Faryma.Composer.Api.Common.Extensions;
+using Faryma.Composer.Api.Contracts;
+using Faryma.Composer.Api.Contracts.Features.ReviewOrder.AddTrackUrl;
+using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Cancel;
+using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Complete;
+using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Create;
+using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Freeze;
+using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Pay;
+using Faryma.Composer.Api.Contracts.Features.ReviewOrder.PayDetailedReview;
+using Faryma.Composer.Api.Contracts.Features.ReviewOrder.TakeInProgress;
+using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Unfreeze;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Application.Features.ReviewOrder;
-using Faryma.Composer.Contracts.Api;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.AddTrackUrl;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Cancel;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Complete;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Create;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Freeze;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.MoveUp;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.TakeInProgress;
-using Faryma.Composer.Contracts.Api.Features.ReviewOrder.Unfreeze;
-using Faryma.Composer.Contracts.Api.Shared.Dto;
-using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Application.Features.ReviewOrder.Commands;
+using Faryma.Composer.Application.Features.ReviewOrder.Models;
+using Faryma.Composer.Application.SharedContracts.Features.ReviewOrder.Commands;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Faryma.Composer.Api.Features.ReviewOrder
@@ -28,88 +29,172 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
     [Route("api/review-orders")]
     [Produces("application/json")]
     public sealed class ReviewOrderController(
-        ReviewOrderService reviewOrderService) : ControllerBase
+        ReviewOrderService reviewOrderService,
+        ReviewOrderDtoMapper reviewOrderDtoMapper) : ControllerBase
     {
         /// <summary>
-        /// Создает заказ
+        /// Создает внеочередной заказ
         /// </summary>
-        /// <param name="idempotencyKey">Ключ идемпотентности</param>
-        /// <param name="request">Запрос создания заказа</param>
-        /// <param name="ct">Токен отмены</param>
-        [HttpPost]
+        [HttpPost("create/out-of-queue")]
         [AuthorizeAdmins]
         [Idempotent]
-        public async Task<ActionResult<CreateReviewOrderResponse>> CreateReviewOrder(
+        public async Task<ActionResult<CreateReviewOrderResponse>> CreateOutOfQueueReviewOrder(
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
-            [FromBody] CreateReviewOrderRequest request,
+            [FromBody] CreateOutOfQueueReviewOrderRequest request,
             CancellationToken ct)
         {
             _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
-            ReviewOrderEntity order = request.OrderType switch
+            ReviewOrderEntity order = await reviewOrderService.CreateOutOfQueue(new CreateOutOfQueueOrderCommand
             {
-                ReviewOrderType.OutOfQueue => await reviewOrderService.CreateOutOfQueue(new CreateOutOfQueueOrderCommand
-                {
-                    Nickname = request.Nickname,
-                    TrackUrl = request.TrackUrl,
-                    TrackDurationSeconds = request.TrackDurationSeconds,
-                    UserComment = request.UserComment,
-                    CreatedByUserId = userId,
-                }, ct),
-                ReviewOrderType.Donation => await reviewOrderService.CreateDonation(new CreateDonationOrderCommand
-                {
-                    Nickname = request.Nickname,
-                    TrackUrl = request.TrackUrl,
-                    TrackDurationSeconds = request.TrackDurationSeconds,
-                    UserComment = request.UserComment,
-                    PaymentAmount = request.PaymentAmount!.Value,
-                    TopUpProvider = request.TopUpProvider!.Value,
-                    CreatedByUserId = userId,
-                }, ct),
-                ReviewOrderType.Free => await reviewOrderService.CreateFree(new CreateFreeOrderCommand
-                {
-                    Nickname = request.Nickname,
-                    TrackUrl = request.TrackUrl,
-                    TrackDurationSeconds = request.TrackDurationSeconds,
-                    UserComment = request.UserComment,
-                    CreatedByUserId = userId,
-                }, ct),
-                ReviewOrderType.Charity => await reviewOrderService.CreateCharity(new CreateCharityOrderCommand
-                {
-                    Nickname = request.Nickname,
-                    TrackUrl = request.TrackUrl,
-                    TrackDurationSeconds = request.TrackDurationSeconds,
-                    UserComment = request.UserComment,
-                    CreatedByUserId = userId,
-                }, ct),
-                _ => throw new UnreachableException("Неподдерживаемый тип заказа"),
-            };
+                UserNickname = request.UserNickname,
+                UserComment = request.UserComment,
+                TrackUrl = request.TrackUrl,
+                TrackDurationSeconds = request.TrackDurationSeconds,
+                CreatedByUserId = userId,
+            }, ct);
 
             return Ok(new CreateReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map(order)
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
             });
         }
 
         /// <summary>
-        /// Поднимает заказ в очереди
+        /// Создает донатный заказ
         /// </summary>
-        /// <param name="idempotencyKey">Ключ идемпотентности</param>
-        /// <param name="request">Запрос поднятия заказа в очереди</param>
-        /// <param name="ct">Токен отмены</param>
-        [HttpPost("move-up")]
+        [HttpPost("create/donation")]
         [AuthorizeAdmins]
         [Idempotent]
-        public async Task<ActionResult<MoveUpReviewOrderResponse>> MoveUpReviewOrder(
+        public async Task<ActionResult<CreateReviewOrderResponse>> CreateDonationReviewOrder(
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
-            [FromBody] MoveUpReviewOrderRequest request,
+            [FromBody] CreateDonationReviewOrderRequest request,
             CancellationToken ct)
         {
             _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
-            TransactionEntity transaction = await reviewOrderService.MoveUp(new MoveUpCommand
+            ReviewOrderEntity order = await reviewOrderService.CreateDonation(new CreateDonationOrderCommand
+            {
+                UserNickname = request.UserNickname,
+                UserComment = request.UserComment,
+                TrackUrl = request.TrackUrl,
+                TrackDurationSeconds = request.TrackDurationSeconds,
+                PaymentAmount = request.PaymentAmount,
+                TopUpProvider = request.TopUpProvider,
+                CreatedByUserId = userId,
+            }, ct);
+
+            return Ok(new CreateReviewOrderResponse
+            {
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
+            });
+        }
+
+        /// <summary>
+        /// Создает бесплатный заказ
+        /// </summary>
+        [HttpPost("create/free")]
+        [AuthorizeAdmins]
+        [Idempotent]
+        public async Task<ActionResult<CreateReviewOrderResponse>> CreateFreeReviewOrder(
+            [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
+            [FromBody] CreateFreeReviewOrderRequest request,
+            CancellationToken ct)
+        {
+            _ = idempotencyKey; // Используется фильтром
+            Guid userId = User.GetUserId();
+
+            ReviewOrderEntity order = await reviewOrderService.CreateFree(new CreateFreeOrderCommand
+            {
+                UserNickname = request.UserNickname,
+                UserComment = request.UserComment,
+                TrackUrl = request.TrackUrl,
+                TrackDurationSeconds = request.TrackDurationSeconds,
+                CreatedByUserId = userId,
+            }, ct);
+
+            return Ok(new CreateReviewOrderResponse
+            {
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
+            });
+        }
+
+        /// <summary>
+        /// Создает заказ по существующему жетону пользователя
+        /// </summary>
+        [HttpPost("create/token")]
+        [Authorize]
+        [Idempotent]
+        public async Task<ActionResult<CreateReviewOrderResponse>> CreateTokenReviewOrder(
+            [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
+            [FromBody] CreateTokenReviewOrderRequest request,
+            CancellationToken ct)
+        {
+            _ = idempotencyKey; // Используется фильтром
+            Guid userId = User.GetUserId();
+
+            ReviewOrderEntity order = await reviewOrderService.CreateWithToken(new CreateTokenOrderCommand
+            {
+                UserNickname = request.UserNickname,
+                UserComment = request.UserComment,
+                TrackUrl = request.TrackUrl,
+                TrackDurationSeconds = request.TrackDurationSeconds,
+                UserEntitlementId = request.UserEntitlementId,
+                CreatedByUserId = userId,
+            }, ct);
+
+            return Ok(new CreateReviewOrderResponse
+            {
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
+            });
+        }
+
+        /// <summary>
+        /// Создает благотворительный заказ
+        /// </summary>
+        [HttpPost("create/charity")]
+        [AuthorizeAdmins]
+        [Idempotent]
+        public async Task<ActionResult<CreateReviewOrderResponse>> CreateCharityReviewOrder(
+            [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
+            [FromBody] CreateCharityReviewOrderRequest request,
+            CancellationToken ct)
+        {
+            _ = idempotencyKey; // Используется фильтром
+            Guid userId = User.GetUserId();
+
+            ReviewOrderEntity order = await reviewOrderService.CreateCharity(new CreateCharityOrderCommand
+            {
+                UserNickname = request.UserNickname,
+                UserComment = request.UserComment,
+                TrackUrl = request.TrackUrl,
+                TrackDurationSeconds = request.TrackDurationSeconds,
+                CreatedByUserId = userId,
+            }, ct);
+
+            return Ok(new CreateReviewOrderResponse
+            {
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
+            });
+        }
+
+        /// <summary>
+        /// Оплачивает заказ
+        /// </summary>
+        [HttpPost("pay")]
+        [AuthorizeAdmins]
+        [Idempotent]
+        public async Task<ActionResult<PayReviewOrderResponse>> PayReviewOrder(
+            [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
+            [FromBody] PayReviewOrderRequest request,
+            CancellationToken ct)
+        {
+            _ = idempotencyKey; // Используется фильтром
+            Guid userId = User.GetUserId();
+
+            TransactionEntity transaction = await reviewOrderService.PayOrder(new PayOrderCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Nickname = request.Nickname.Trim(),
@@ -118,10 +203,41 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 CreatedByUserId = userId,
             }, ct);
 
-            return Ok(new MoveUpReviewOrderResponse
+            return Ok(new PayReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map((ReviewOrderEntity)transaction.TransactionSource),
+                ReviewOrder = reviewOrderDtoMapper.Map((ReviewOrderEntity)transaction.TransactionSource),
                 PaymentTransactionId = transaction.Id
+            });
+        }
+
+        /// <summary>
+        /// Оплачивает подробный разбор заказа
+        /// </summary>
+        [HttpPost("pay-detailed-review")]
+        [AuthorizeAdmins]
+        [Idempotent]
+        public async Task<ActionResult<PayDetailedReviewOrderResponse>> PayDetailedReview(
+            [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
+            [FromBody] PayDetailedReviewOrderRequest request,
+            CancellationToken ct)
+        {
+            _ = idempotencyKey; // Используется фильтром
+            Guid userId = User.GetUserId();
+
+            PayDetailedReviewResult result = await reviewOrderService.PayDetailedReview(new PayDetailedReviewCommand
+            {
+                ReviewOrderId = request.ReviewOrderId,
+                Nickname = request.Nickname.Trim(),
+                TopUpProvider = request.TopUpProvider,
+                UserEntitlementId = request.UserEntitlementId,
+                CreatedByUserId = userId,
+            }, ct);
+
+            return Ok(new PayDetailedReviewOrderResponse
+            {
+                ReviewOrder = reviewOrderDtoMapper.Map(result.ReviewOrder),
+                PaymentTransactionId = result.PaymentTransaction?.Id,
+                UserEntitlementRedemptionId = result.UserEntitlementRedemption?.Id
             });
         }
 
@@ -136,11 +252,12 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             {
                 ReviewOrderId = request.ReviewOrderId,
                 TrackUrl = request.TrackUrl,
+                TrackDurationSeconds = request.TrackDurationSeconds,
             }, ct);
 
             return Ok(new AddTrackUrlResponse
             {
-                ReviewOrder = ReviewOrderDto.Map(order)
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
             });
         }
 
@@ -155,7 +272,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new TakeOrderInProgressResponse
             {
-                ReviewOrder = ReviewOrderDto.Map(order)
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
             });
         }
 
@@ -177,7 +294,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new CompleteReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map(order),
+                ReviewOrder = reviewOrderDtoMapper.Map(order),
                 ReviewId = order.Review!.Id,
             });
         }
@@ -193,7 +310,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new FreezeReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map(order)
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
             });
         }
 
@@ -208,7 +325,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new UnfreezeReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map(order)
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
             });
         }
 
@@ -227,7 +344,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new CancelReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map(order)
+                ReviewOrder = reviewOrderDtoMapper.Map(order)
             });
         }
     }

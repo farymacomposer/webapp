@@ -1,17 +1,18 @@
-using Faryma.Composer.Application.Features.AppSettings;
+﻿using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Features.ReviewOrder.Pricing;
 using Faryma.Composer.Application.Test.Infrastructure;
+using Faryma.Composer.Contracts.Api.Features.AppSettings;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
 using Faryma.Composer.Contracts.Api.Shared.Dto;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
-using Faryma.Composer.Contracts.Application.Features.AppSettings;
-using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Models;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
+using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
@@ -22,16 +23,16 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         /// Проверяет, что стоимость дополнительной длительности считается по текущей серверной настройке.
         /// </summary>
         [Fact]
-        public async Task CalculateExtraTimePaymentPricing_UsesConfiguredAmountPerSecond()
+        public async Task CalculateExtraTimePricing_UsesConfiguredAmountPerSecond()
         {
             await using ApplicationTestHost app = await CreateAppAsync();
 
-            ReviewOrderExtraTimePaymentPricing pricing = await app.RunScopeAsync(async services =>
+            ReviewOrderExtraTimePricing pricing = await app.RunScopeAsync(async services =>
             {
                 await ConfigurePricing(services, extraTimeAmountPerSecond: 3, detailedReviewAmount: 500);
 
-                return services.GetRequiredService<ReviewOrderService>()
-                    .CalculateExtraTimePaymentPricing(trackDurationSeconds: 420);
+                return services.GetRequiredService<ReviewOrderPricingService>()
+                    .CalculateExtraTimePricing(trackDurationSeconds: 420);
             });
 
             Assert.Equal(420, pricing.TrackDurationSeconds);
@@ -47,16 +48,16 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         [Theory]
         [InlineData(60)]
         [InlineData(300)]
-        public async Task CalculateExtraTimePaymentPricing_ReturnsZeroAmount_WhenTrackFitsIncludedDuration(int trackDurationSeconds)
+        public async Task CalculateExtraTimePricing_ReturnsZeroAmount_WhenTrackFitsIncludedDuration(int trackDurationSeconds)
         {
             await using ApplicationTestHost app = await CreateAppAsync();
 
-            ReviewOrderExtraTimePaymentPricing pricing = await app.RunScopeAsync(async services =>
+            ReviewOrderExtraTimePricing pricing = await app.RunScopeAsync(async services =>
             {
                 await ConfigurePricing(services, extraTimeAmountPerSecond: 3, detailedReviewAmount: 500);
 
-                return services.GetRequiredService<ReviewOrderService>()
-                    .CalculateExtraTimePaymentPricing(trackDurationSeconds);
+                return services.GetRequiredService<ReviewOrderPricingService>()
+                    .CalculateExtraTimePricing(trackDurationSeconds);
             });
 
             Assert.Equal(0, pricing.ExtraDurationSeconds);
@@ -138,7 +139,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 return await services.GetRequiredService<ReviewOrderService>()
                     .CreateDonation(new CreateDonationOrderCommand
                     {
-                        Nickname = "Nick-CreateSnapshot",
+                        UserNickname = "Nick-CreateSnapshot",
                         TrackUrl = "https://example.com/create-snapshot",
                         TrackDurationSeconds = 420,
                         UserComment = null,
@@ -222,7 +223,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 ReviewOrderEntity order = await services.GetRequiredService<ReviewOrderService>()
                     .CreateFree(new CreateFreeOrderCommand
                     {
-                        Nickname = "Nick-TokenPricing",
+                        UserNickname = "Nick-TokenPricing",
                         TrackUrl = "https://example.com/token-pricing",
                         TrackDurationSeconds = 60,
                         UserComment = null,
@@ -240,10 +241,10 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         }
 
         /// <summary>
-        /// Проверяет, что queue-запрос загружает погашения покрытий для расчета pricing.
+        /// Проверяет, что queue-запрос загружает погашение покрытия для расчета pricing.
         /// </summary>
         [Fact]
-        public async Task GetOrdersInQueue_LoadsCoverageRedemptionsForPricing()
+        public async Task GetOrdersInQueue_LoadsCoverageRedemptionForPricing()
         {
             await using ApplicationTestHost app = await CreateAppAsync();
             UserEntity user = await app.Data.CreateUserAsync("admin");
@@ -255,7 +256,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateFree(new CreateFreeOrderCommand
                 {
-                    Nickname = "Nick-QueueCoverage",
+                    UserNickname = "Nick-QueueCoverage",
                     TrackUrl = "https://example.com/queue-coverage",
                     TrackDurationSeconds = 60,
                     UserComment = null,
@@ -305,15 +306,14 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 UserNicknameEntity userNickname = await uow.UserNicknameStore.FindByNickname("Nick-EntitlementCoverage")
                     ?? throw new InvalidOperationException("Псевдоним не найден");
 
-                actualOrder.NonPaymentCoverageAmount = 600;
-                UserEntitlementEntity token = uow.UserEntitlementStore.CreateServiceToken(
+                UserEntitlementEntity token = uow.UserEntitlementStore.Create(
                     userNickname,
-                    UserEntitlementTarget.ReviewOrder,
+                    UserEntitlementTarget.FreeReviewOrder,
                     actualUser);
 
                 uow.UserEntitlementStore.Redeem(
                     token,
-                    UserEntitlementTarget.ReviewOrder,
+                    UserEntitlementTarget.FreeReviewOrder,
                     coveredAmount: 600,
                     actualUser,
                     reviewOrder: actualOrder);
@@ -426,9 +426,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             long detailedReviewAmount)
         {
             AppSettingsService appSettingsService = services.GetRequiredService<AppSettingsService>();
-            await appSettingsService.Update(new AppSettingsModel
+            await appSettingsService.Update(new AppSettingsDto
             {
-                ReviewOrderNominalAmount = appSettingsService.Settings.ReviewOrderNominalAmount,
+                ReviewOrderNominalAmount = appSettingsService.Settings.ReviewOrderNominalPrice,
                 ReviewOrderExtraTimeAmountPerSecond = extraTimeAmountPerSecond,
                 ReviewOrderDetailedReviewAmount = detailedReviewAmount,
             }, CancellationToken.None);

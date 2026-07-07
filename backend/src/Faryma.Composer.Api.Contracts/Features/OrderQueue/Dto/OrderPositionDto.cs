@@ -1,0 +1,57 @@
+﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Contracts.Shared.Dto;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
+using Faryma.Composer.Domain.Entities.TransactionSources;
+
+namespace Faryma.Composer.Api.Contracts.Features.OrderQueue.Dto
+{
+    /// <summary>
+    /// Представляет позицию заказа в очереди, включая сам заказ и историю перемещений
+    /// </summary>
+    public sealed record OrderPositionDto
+    {
+        /// <summary>
+        /// Заказ разбора трека
+        /// </summary>
+        [Required]
+        public required ReviewOrderDto Order { get; init; }
+
+        /// <summary>
+        /// Заказ был обновлен
+        /// </summary>
+        public required bool IsOrderUpdated { get; init; }
+
+        /// <summary>
+        /// Предыдущая позиция заказа в очереди
+        /// </summary>
+        [Required]
+        public required OrderQueuePositionDto PreviousPosition { get; init; }
+
+        /// <summary>
+        /// Текущая позиция заказа в очереди
+        /// </summary>
+        [Required]
+        public required OrderQueuePositionDto CurrentPosition { get; init; }
+
+        /// <summary>
+        /// Позиция заказа в очереди была изменена
+        /// </summary>
+        public required bool IsPositionChanged { get; init; }
+
+        public static OrderPositionDto Map(OrderPosition orderPosition) => Map(orderPosition, ReviewOrderDto.Map);
+
+        public static OrderPositionDto Map(
+            OrderPosition orderPosition,
+            Func<ReviewOrderEntity, ReviewOrderDto> mapOrder)
+        {
+            return new()
+            {
+                Order = mapOrder(orderPosition.Order),
+                IsOrderUpdated = orderPosition.IsOrderUpdated,
+                PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),
+                CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),
+                IsPositionChanged = orderPosition.PositionHistory.IsPositionChanged,
+            };
+        }
+    }
+}

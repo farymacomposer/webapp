@@ -1,14 +1,15 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
+using Faryma.Composer.Contracts.Api.Features.AppSettings;
 using Faryma.Composer.Contracts.Api.Features.ReviewOrder.PayDetailedReview;
-using Faryma.Composer.Contracts.Application.Features.AppSettings;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Models;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
@@ -62,7 +63,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(order.Id, result.ReviewOrder.Id);
             Assert.Equal(TransactionKind.Payment, payment.Kind);
             Assert.Equal(source.Id, payment.TransactionSourceId);
-            Assert.Equal(650, source.Amount);
+            Assert.Equal(650, source.Price);
             Assert.Single(source.Transactions);
             Assert.Equal(650, source.Transactions.Single().Debit);
             Assert.Equal(
@@ -88,7 +89,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 UserNicknameEntity userNickname = await uow.UserNicknameStore.FindByNickname("Nick-DetailedToken")
                     ?? uow.UserNicknameStore.Create("Nick-DetailedToken");
 
-                UserEntitlementEntity token = uow.UserEntitlementStore.CreateServiceToken(
+                UserEntitlementEntity token = uow.UserEntitlementStore.Create(
                     userNickname,
                     UserEntitlementTarget.DetailedReview,
                     actualUser);
@@ -134,7 +135,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.NotNull(result.UserEntitlementRedemption);
             Assert.Equal(result.UserEntitlementRedemption.Id, redemption.Id);
             Assert.Equal(order.Id, result.ReviewOrder.Id);
-            Assert.Equal(650, source.Amount);
+            Assert.Equal(650, source.Price);
             Assert.Equal(UserEntitlementTarget.DetailedReview, redemption.Target);
             Assert.Equal(650, redemption.CoveredAmount);
             Assert.Equal(tokenId, redemption.UserEntitlementId);
@@ -299,9 +300,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             long detailedReviewAmount)
         {
             AppSettingsService appSettingsService = services.GetRequiredService<AppSettingsService>();
-            await appSettingsService.Update(new AppSettingsModel
+            await appSettingsService.Update(new AppSettingsDto
             {
-                ReviewOrderNominalAmount = appSettingsService.Settings.ReviewOrderNominalAmount,
+                ReviewOrderNominalAmount = appSettingsService.Settings.ReviewOrderNominalPrice,
                 ReviewOrderExtraTimeAmountPerSecond = extraTimeAmountPerSecond,
                 ReviewOrderDetailedReviewAmount = detailedReviewAmount,
             }, CancellationToken.None);

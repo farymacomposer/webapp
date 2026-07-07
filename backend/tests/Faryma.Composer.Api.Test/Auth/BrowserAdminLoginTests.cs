@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
 using Faryma.Composer.Contracts.Api.Features.Auth.Login;
-using Faryma.Composer.Contracts.Infrastructure;
+using Faryma.Composer.Domain;
 
 namespace Faryma.Composer.Api.Test.Auth
 {

@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Contracts.Api.Features.OrderQueue;
-using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
+﻿using Faryma.Composer.Api.Contracts.Features.OrderQueue;
+using Faryma.Composer.Api.Contracts.Features.OrderQueue.AsyncContracts;
 using Saunter.Attributes;
 
 namespace Faryma.Composer.Api.Features.OrderQueue

@@ -1,0 +1,20 @@
+﻿using Faryma.Composer.Domain.Enums;
+
+namespace Faryma.Composer.Application.Features.ReviewOrder.Commands
+{
+    /// <summary>
+    /// Команда создания донатного заказа
+    /// </summary>
+    public sealed record CreateDonationOrderCommand : CreateCommandBase
+    {
+        /// <summary>
+        /// Сумма платежа
+        /// </summary>
+        public required long PaymentAmount { get; init; }
+
+        /// <summary>
+        /// Провайдер/канал пополнения счета пользователя
+        /// </summary>
+        public required AccountTopUpProvider TopUpProvider { get; init; }
+    }
+}

@@ -1,6 +1,6 @@
 root = true
 
-[*.{cs,xaml,ts,js,proto,md}]
+[*.{cs,xaml,ts,js,proto,md,json,razor}]
 charset = utf-8-bom
 spelling_languages = en-us,ru-ru
 spelling_checkable_types = strings,identifiers,comments
@@ -375,6 +375,9 @@ dotnet_diagnostic.rcs0049.severity = none
 # Fix formatting of a list
 dotnet_diagnostic.rcs0053.severity = none
 
+# Normalize whitespace at the end of a file
+dotnet_diagnostic.rcs0058.severity = none
+
 # Add/remove line after file scoped namespace declaration
 dotnet_diagnostic.rcs0060.severity = none
 
@@ -432,6 +435,9 @@ dotnet_diagnostic.rcs1108.severity = none
 # Add braces to switch section with multiple statements
 dotnet_diagnostic.rcs1111.severity = none
 
+# Combine 'Enumerable.Where' method chain
+dotnet_diagnostic.rcs1112.severity = none
+
 # Inline local variable
 dotnet_diagnostic.rcs1124.severity = none
 
@@ -474,11 +480,17 @@ dotnet_diagnostic.rcs1226.severity = none
 # Make parameter ref read-only
 dotnet_diagnostic.rcs1231.severity = none
 
+# Avoid nested ?: operators
+dotnet_diagnostic.rcs1238.severity = none
+
 # Use element access
 dotnet_diagnostic.rcs1246.severity = none
 
 # Fix documentation comment tag
 dotnet_diagnostic.rcs1247.severity = none
+
+# Use implicit/explicit object creation
+dotnet_diagnostic.rcs1250.severity = none
 
 # Format documentation comment summary
 dotnet_diagnostic.rcs1253.severity = none
@@ -607,12 +619,6 @@ dotnet_diagnostic.rcs0055.severity = warning
 
 # Normalize whitespace at the beginning of a file
 dotnet_diagnostic.rcs0057.severity = warning
-
-roslynator_new_line_at_end_of_file = true
-# Applicable to: rcs0058
-
-# Normalize whitespace at the end of a file
-dotnet_diagnostic.rcs0058.severity = warning
 
 # Use nameof operator
 dotnet_diagnostic.rcs1015.severity = warning
@@ -918,9 +924,6 @@ dotnet_diagnostic.rcs1107.severity = error
 # Declare type inside namespace
 dotnet_diagnostic.rcs1110.severity = error
 
-# Combine 'Enumerable.Where' method chain
-dotnet_diagnostic.rcs1112.severity = none
-
 # Use 'string.IsNullOrEmpty' method
 dotnet_diagnostic.rcs1113.severity = error
 
@@ -1095,9 +1098,6 @@ dotnet_diagnostic.rcs1235.severity = error
 # Use exception filter
 dotnet_diagnostic.rcs1236.severity = error
 
-# Avoid nested ?: operators
-dotnet_diagnostic.rcs1238.severity = none
-
 # Use 'for' statement instead of 'while' statement
 dotnet_diagnostic.rcs1239.severity = error
 
@@ -1112,15 +1112,6 @@ dotnet_diagnostic.rcs1243.severity = error
 
 # Simplify 'default' expression
 dotnet_diagnostic.rcs1244.severity = error
-
-roslynator_object_creation_type_style = implicit_when_type_is_obvious
-# Applicable to: rcs1250
-
-roslynator_use_var_instead_of_implicit_object_creation = false
-# Applicable to: rcs1250
-
-# Use implicit/explicit object creation
-dotnet_diagnostic.rcs1250.severity = none
 
 # Remove unnecessary braces from record declaration
 dotnet_diagnostic.rcs1251.severity = error
@@ -1472,55 +1463,55 @@ dotnet_diagnostic.CA1806.severity = warning
 # CA1822: Пометьте члены как статические
 dotnet_diagnostic.CA1822.severity = suggestion
 
-# CA1825: избегайте выделения массива нулевой длины
+# CA1825: Избегайте выделения массива нулевой длины
 dotnet_diagnostic.CA1825.severity = error
 
-# CA1826: используйте свойство вместо метода Linq Enumerable
+# CA1826: Используйте свойство вместо метода Linq Enumerable
 dotnet_diagnostic.CA1826.severity = error
 
-# CA1827: не используйте Count()/LongCount() при использовании Any()
+# CA1827: Не используйте Count()/LongCount() при использовании Any()
 dotnet_diagnostic.CA1827.severity = error
 
-# CA1828: не используйте CountAsync/LongCountAsync при использовании AnyAsync
+# CA1828: Не используйте CountAsync/LongCountAsync при использовании AnyAsync
 dotnet_diagnostic.CA1828.severity = error
 
-# CA1829: используйте свойство Length/Count вместо метода Enumerable.Count
+# CA1829: Используйте свойство Length/Count вместо метода Enumerable.Count
 dotnet_diagnostic.CA1829.severity = error
 
-# CA1830: предпочитайте строго типизированные перегрузки методов Добавления и вставки в StringBuilder
+# CA1830: Предпочитайте строго типизированные перегрузки методов Добавления и вставки в StringBuilder
 dotnet_diagnostic.CA1830.severity = error
 
-# CA1834: используйте StringBuilder.Append(char) для одно символьных строк
+# CA1834: Используйте StringBuilder.Append(char) для одно символьных строк
 dotnet_diagnostic.CA1834.severity = error
 
-# CA1835: предпочитать перегрузки методов ReadAsync/WriteAsync, основанные на памяти, в классах, основанных на потоках
+# CA1835: Предпочитать перегрузки методов ReadAsync/WriteAsync, основанные на памяти, в классах, основанных на потоках
 dotnet_diagnostic.CA1835.severity = error
 
-# CA1836: предпочитать IsEmpty over Count при наличии
+# CA1836: Предпочитать IsEmpty over Count при наличии
 dotnet_diagnostic.CA1836.severity = error
 
-# CA1837: используйте Environment.ProcessId вместо Process.GetCurrentProcess(). Идентификатор
+# CA1837: Используйте Environment.ProcessId вместо Process.GetCurrentProcess(). Идентификатор
 dotnet_diagnostic.CA1837.severity = error
 
-# CA1839. использование Environment.ProcessPath вместо Process.GetCurrentProcess().MainModule.FileName
+# CA1839. Использование Environment.ProcessPath вместо Process.GetCurrentProcess().MainModule.FileName
 dotnet_diagnostic.CA1839.severity = error
 
-# CA1840. использование Environment.CurrentManagedThreadId вместо Thread.CurrentThread.ManagedThreadId
+# CA1840. Использование Environment.CurrentManagedThreadId вместо Thread.CurrentThread.ManagedThreadId
 dotnet_diagnostic.CA1840.severity = error
 
-# CA1841: предпочтение словарных методов Contains
+# CA1841: Предпочтение словарных методов Contains
 dotnet_diagnostic.CA1841.severity = error
 
 # CA1842: Не используйте "WhenAll" с одной задачей
 dotnet_diagnostic.CA1842.severity = error
 
-# CA1843: не используйте WaitAll с одной задачей
+# CA1843: Не используйте WaitAll с одной задачей
 dotnet_diagnostic.CA1843.severity = error
 
-# CA1845: используйте string.Concat на основе диапазона
+# CA1845: Используйте string.Concat на основе диапазона
 dotnet_diagnostic.CA1845.severity = error
 
-# CA1846: предпочтение AsSpan вместо Substring
+# CA1846: Предпочтение AsSpan вместо Substring
 dotnet_diagnostic.CA1846.severity = error
 
 # CA1847: Использовать знаковый литерал для поиска одного знака
@@ -1529,34 +1520,34 @@ dotnet_diagnostic.CA1847.severity = warning
 # CA1852: Seal internal types
 dotnet_diagnostic.CA1852.severity = warning
 
-# CA1853: ненужный вызов "Dictionary.ContainsKey(key)"
+# CA1853: Ненужный вызов "Dictionary.ContainsKey(key)"
 dotnet_diagnostic.CA1853.severity = error
 
-# CA1854: предпочитать IDictionary.TryGetValue(TKey, out TValue) метод
+# CA1854: Предпочитать IDictionary.TryGetValue(TKey, out TValue) метод
 dotnet_diagnostic.CA1854.severity = error
 
-# CA1858: используйте StartsWith вместо IndexOf
+# CA1858: Используйте StartsWith вместо IndexOf
 dotnet_diagnostic.CA1858.severity = error
 
-# CA1859: используйте конкретные типы, если это возможно для повышения производительности
+# CA1859: Используйте конкретные типы, если это возможно для повышения производительности
 dotnet_diagnostic.CA1859.severity = warning
 
-# CA1860: избегайте использования метода расширения "Enumerable.Any()"
+# CA1860: Избегайте использования метода расширения "Enumerable.Any()"
 dotnet_diagnostic.CA1860.severity = error
 
-# CA1861: избегайте массивов констант в качестве аргументов
+# CA1861: Избегайте массивов констант в качестве аргументов
 dotnet_diagnostic.CA1861.severity = error
 
-# CA1864: предпочитать метод IDictionary.TryAdd(TKey, TValue)"
+# CA1864: Предпочитать метод IDictionary.TryAdd(TKey, TValue)"
 dotnet_diagnostic.CA1864.severity = error
 
-# CA1868: ненужный вызов "Contains" для наборов
+# CA1868: Ненужный вызов "Contains" для наборов
 dotnet_diagnostic.CA1868.severity = error
 
 # CA1869: Избегайте создания нового экземпляра "JsonSerializerOptions" для каждой операции сериализации. Выполняйте кэширование и повторно используйте экземпляры
 dotnet_diagnostic.CA1869.severity = error
 
-# CA1870: использование кэшированного экземпляра SearchValues
+# CA1870: Использование кэшированного экземпляра SearchValues
 dotnet_diagnostic.CA1870.severity = error
 
 # CA2017: Несоответствие счетчика параметров

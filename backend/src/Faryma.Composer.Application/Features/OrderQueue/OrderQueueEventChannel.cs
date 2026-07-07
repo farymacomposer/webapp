@@ -1,5 +1,5 @@
 ﻿using System.Threading.Channels;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Events;
+using Faryma.Composer.Application.Features.OrderQueue.Events;
 
 namespace Faryma.Composer.Application.Features.OrderQueue
 {

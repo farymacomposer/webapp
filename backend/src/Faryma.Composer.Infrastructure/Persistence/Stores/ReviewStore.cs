@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+﻿using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {

@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue.Events;
+﻿using Faryma.Composer.Application.Features.OrderQueue.Events;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

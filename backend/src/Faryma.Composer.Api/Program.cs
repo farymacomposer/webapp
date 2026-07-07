@@ -1,9 +1,9 @@
 ﻿using Faryma.Composer.Api.Common.DependencyInjection;
 using Faryma.Composer.Api.Common.Extensions;
 using Faryma.Composer.Api.Common.Startup;
+using Faryma.Composer.Api.Contracts.Features.OrderQueue;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
-using Faryma.Composer.Contracts.Api.Features.OrderQueue;
 using Serilog;
 
 namespace Faryma.Composer.Api
@@ -27,9 +27,8 @@ namespace Faryma.Composer.Api
                 .AddPersistenceAndIdentity(builder.Configuration)
                 .AddApiAuthentication()
                 .AddAuthorization()
-                .AddCoreServices();
-
-            builder.Services.AddPresentationLayer(builder.Environment);
+                .AddCoreServices()
+                .AddPresentationLayer(builder.Environment);
 
             WebApplication app = builder.Build();
 

@@ -6,6 +6,7 @@ using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Contracts.Infrastructure.Entities;
 using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
 using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
@@ -20,11 +21,11 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         {
             CreateDonationReviewOrderRequest request = new()
             {
-                Nickname = "Nick-NoPayment",
+                UserNickname = "Nick-NoPayment",
                 TrackUrl = "https://example.com/track",
                 TrackDurationSeconds = 60,
                 PaymentAmount = 0,
-                TopUpProvider = null,
+                TopUpProvider = AccountTopUpProvider.Manual,
                 UserComment = null,
             };
 
@@ -41,7 +42,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         {
             CreateDonationReviewOrderRequest request = new()
             {
-                Nickname = "Nick-Donation",
+                UserNickname = "Nick-Donation",
                 TrackUrl = "https://example.com/track",
                 TrackDurationSeconds = 60,
                 PaymentAmount = 1_000,
@@ -63,7 +64,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         {
             CreateOutOfQueueReviewOrderRequest request = new()
             {
-                Nickname = "Nick-OOQ",
+                UserNickname = "Nick-OOQ",
                 TrackUrl = "https://example.com/track",
                 TrackDurationSeconds = 60,
                 UserComment = null,
@@ -83,7 +84,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         {
             CreateFreeReviewOrderRequest request = new()
             {
-                Nickname = "Nick-Free",
+                UserNickname = "Nick-Free",
                 TrackUrl = "https://example.com/track",
                 TrackDurationSeconds = 60,
                 UserComment = null,
@@ -103,7 +104,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         {
             CreateCharityReviewOrderRequest request = new()
             {
-                Nickname = "Nick-Charity",
+                UserNickname = "Nick-Charity",
                 TrackUrl = "https://example.com/track",
                 TrackDurationSeconds = 60,
                 UserComment = null,
@@ -132,7 +133,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                 {
-                    Nickname = "Nick-Donation",
+                    UserNickname = "Nick-Donation",
                     TrackUrl = "https://example.com/track",
                     TrackDurationSeconds = 60,
                     UserComment = "комментарий",
@@ -183,7 +184,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                 {
-                    Nickname = "Nick-Preorder",
+                    UserNickname = "Nick-Preorder",
                     TrackUrl = null,
                     TrackDurationSeconds = null,
                     UserComment = null,
@@ -219,7 +220,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                 {
-                    Nickname = "Nick-NewDonation",
+                    UserNickname = "Nick-NewDonation",
                     TrackUrl = withTrackUrl ? "https://example.com/new-donation" : null,
                     TrackDurationSeconds = withTrackUrl ? 60 : null,
                     UserComment = null,
@@ -260,7 +261,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateFree(new CreateFreeOrderCommand
                 {
-                    Nickname = "Nick-Free",
+                    UserNickname = "Nick-Free",
                     TrackUrl = "https://example.com/free",
                     TrackDurationSeconds = 60,
                     UserComment = null,
@@ -271,9 +272,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.NotEqual(nearerCharity.Id, order.CreationStreamId);
             Assert.Equal(donationStream.Id, order.CreationStreamId);
             Assert.Equal(ReviewOrderType.Free, order.Type);
-            Assert.Equal(0, persisted.NonPaymentCoverageAmount);
-            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
-            Assert.Equal(UserEntitlementTarget.ReviewOrder, redemption.Target);
+            UserEntitlementRedemptionEntity redemption = Assert.NotNull(persisted.CoverageRedemption);
+            Assert.Equal(UserEntitlementTarget.FreeReviewOrder, redemption.Target);
             Assert.Equal(1_000, redemption.CoveredAmount);
             UserEntitlementEntity entitlement = await app.RunScopeAsync(async services =>
             {
@@ -316,7 +316,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                 {
-                    Nickname = "Nick-DonationHistory",
+                    UserNickname = "Nick-DonationHistory",
                     TrackUrl = "https://example.com/donation-repeat",
                     TrackDurationSeconds = 60,
                     UserComment = null,
@@ -350,7 +350,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateFree(new CreateFreeOrderCommand
                 {
-                    Nickname = "Nick-NewFree",
+                    UserNickname = "Nick-NewFree",
                     TrackUrl = "https://example.com/free",
                     TrackDurationSeconds = 60,
                     UserComment = null,
@@ -381,7 +381,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateOutOfQueue(new CreateOutOfQueueOrderCommand
                 {
-                    Nickname = "Nick-OOQ",
+                    UserNickname = "Nick-OOQ",
                     TrackUrl = null,
                     TrackDurationSeconds = null,
                     UserComment = null,
@@ -394,7 +394,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(ReviewOrderStatus.Preorder, order.Status);
             Assert.Equal(1_000, order.PayableAmount);
             Assert.Equal(0, persisted.NonPaymentCoverageAmount);
-            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
+            UserEntitlementRedemptionEntity redemption = Assert.NotNull(persisted.CoverageRedemption);
             Assert.Equal(UserEntitlementTarget.OutOfQueueReviewOrder, redemption.Target);
             Assert.Equal(1_000, redemption.CoveredAmount);
         }
@@ -411,12 +411,12 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 createdByUserId: user.Id,
                 eventDate: app.Today.AddDays(1),
                 type: ComposerStreamType.Donation);
-            long tokenId = await CreateServiceToken(app, user, "Nick-UserFree", UserEntitlementTarget.ReviewOrder);
+            long tokenId = await CreateServiceToken(app, user, "Nick-UserFree", UserEntitlementTarget.FreeReviewOrder);
 
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateWithToken(new CreateTokenOrderCommand
                 {
-                    Nickname = "Nick-UserFree",
+                    UserNickname = "Nick-UserFree",
                     TrackUrl = "https://example.com/user-free",
                     TrackDurationSeconds = 60,
                     UserComment = null,
@@ -428,9 +428,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             Assert.Equal(ReviewOrderType.Free, persisted.Type);
             Assert.Equal(ReviewOrderStatus.Pending, persisted.Status);
             Assert.Equal(1_000, persisted.PayableAmount);
-            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
+            UserEntitlementRedemptionEntity redemption = Assert.NotNull(persisted.CoverageRedemption);
             Assert.Equal(tokenId, redemption.UserEntitlementId);
-            Assert.Equal(UserEntitlementTarget.ReviewOrder, redemption.Target);
+            Assert.Equal(UserEntitlementTarget.FreeReviewOrder, redemption.Target);
             Assert.Equal(1_000, redemption.CoveredAmount);
             Assert.NotNull(await GetTokenRedeemedAt(app, tokenId));
         }
@@ -452,7 +452,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateWithToken(new CreateTokenOrderCommand
                 {
-                    Nickname = "Nick-UserOOQ",
+                    UserNickname = "Nick-UserOOQ",
                     TrackUrl = null,
                     TrackDurationSeconds = null,
                     UserComment = null,
@@ -463,7 +463,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             Assert.Equal(ReviewOrderType.OutOfQueue, persisted.Type);
             Assert.Equal(ReviewOrderStatus.Preorder, persisted.Status);
-            UserEntitlementRedemptionEntity redemption = Assert.Single(persisted.CoverageRedemptions);
+            UserEntitlementRedemptionEntity redemption = Assert.NotNull(persisted.CoverageRedemption);
             Assert.Equal(UserEntitlementTarget.OutOfQueueReviewOrder, redemption.Target);
             Assert.Equal(tokenId, redemption.UserEntitlementId);
         }
@@ -486,7 +486,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateWithToken(new CreateTokenOrderCommand
                     {
-                        Nickname = "Nick-UserDetailed",
+                        UserNickname = "Nick-UserDetailed",
                         TrackUrl = "https://example.com/user-detailed",
                         TrackDurationSeconds = 60,
                         UserComment = null,
@@ -508,13 +508,13 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 createdByUserId: owner.Id,
                 eventDate: app.Today.AddDays(1),
                 type: ComposerStreamType.Donation);
-            long tokenId = await CreateServiceToken(app, owner, "Nick-OtherOwner", UserEntitlementTarget.ReviewOrder);
+            long tokenId = await CreateServiceToken(app, owner, "Nick-OtherOwner", UserEntitlementTarget.FreeReviewOrder);
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateWithToken(new CreateTokenOrderCommand
                     {
-                        Nickname = "Nick-OtherOwner",
+                        UserNickname = "Nick-OtherOwner",
                         TrackUrl = "https://example.com/other-owner",
                         TrackDurationSeconds = 60,
                         UserComment = null,
@@ -539,7 +539,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                 {
-                    Nickname = "Nick-Partial",
+                    UserNickname = "Nick-Partial",
                     TrackUrl = "https://example.com/partial",
                     TrackDurationSeconds = 60,
                     UserComment = null,
@@ -569,7 +569,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                     {
-                        Nickname = "Nick-NoCoverage",
+                        UserNickname = "Nick-NoCoverage",
                         TrackUrl = "https://example.com/no-coverage",
                         TrackDurationSeconds = 60,
                         UserComment = null,
@@ -595,7 +595,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
                 services.GetRequiredService<ReviewOrderService>().CreateCharity(new CreateCharityOrderCommand
                 {
-                    Nickname = "Nick-Charity",
+                    UserNickname = "Nick-Charity",
                     TrackUrl = "https://example.com/charity",
                     TrackDurationSeconds = 60,
                     UserComment = null,
@@ -626,7 +626,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateCharity(new CreateCharityOrderCommand
                     {
-                        Nickname = "Nick-Charity",
+                        UserNickname = "Nick-Charity",
                         TrackUrl = "https://example.com/charity",
                         TrackDurationSeconds = 60,
                         UserComment = null,
@@ -651,7 +651,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 "Donation" => app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
                     {
-                        Nickname = "Nick-NoStream",
+                        UserNickname = "Nick-NoStream",
                         TrackUrl = "https://example.com/donation",
                         TrackDurationSeconds = 60,
                         UserComment = null,
@@ -662,7 +662,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 "Free" => app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateFree(new CreateFreeOrderCommand
                     {
-                        Nickname = "Nick-NoStream",
+                        UserNickname = "Nick-NoStream",
                         TrackUrl = "https://example.com/free",
                         TrackDurationSeconds = 60,
                         UserComment = null,
@@ -671,7 +671,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 "OutOfQueue" => app.RunScopeAsync(services =>
                     services.GetRequiredService<ReviewOrderService>().CreateOutOfQueue(new CreateOutOfQueueOrderCommand
                     {
-                        Nickname = "Nick-NoStream",
+                        UserNickname = "Nick-NoStream",
                         TrackUrl = null,
                         TrackDurationSeconds = null,
                         UserComment = null,
@@ -698,7 +698,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                     ?? uow.UserNicknameStore.Create(nickname);
                 userNickname.UserId = owner.Id;
 
-                UserEntitlementEntity token = uow.UserEntitlementStore.CreateServiceToken(
+                UserEntitlementEntity token = uow.UserEntitlementStore.Create(
                     userNickname,
                     target,
                     actualUser);

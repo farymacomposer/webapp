@@ -1,10 +1,10 @@
 ﻿using System.Security.Claims;
 using Faryma.Composer.Api.Common.Extensions;
+using Faryma.Composer.Api.Contracts.Features.Auth.Login;
+using Faryma.Composer.Api.Contracts.Features.Auth.Logout;
+using Faryma.Composer.Api.Contracts.Features.Auth.Options;
+using Faryma.Composer.Api.Contracts.Features.Auth.RefreshToken;
 using Faryma.Composer.Api.Features.Auth.Services;
-using Faryma.Composer.Contracts.Api.Features.Auth.Login;
-using Faryma.Composer.Contracts.Api.Features.Auth.Logout;
-using Faryma.Composer.Contracts.Api.Features.Auth.Options;
-using Faryma.Composer.Contracts.Api.Features.Auth.RefreshToken;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

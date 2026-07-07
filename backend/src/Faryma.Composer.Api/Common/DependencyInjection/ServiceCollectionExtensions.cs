@@ -7,19 +7,21 @@ using Faryma.Composer.Api.Common.Exceptions;
 using Faryma.Composer.Api.Common.Filters;
 using Faryma.Composer.Api.Common.Options;
 using Faryma.Composer.Api.Common.Startup;
+using Faryma.Composer.Api.Contracts.Features.Auth.Options;
+using Faryma.Composer.Api.Contracts.Features.OrderQueue;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Api.Features.Auth.Services;
 using Faryma.Composer.Api.Features.OrderQueue;
-using Faryma.Composer.Contracts.Api.Features.Auth.Options;
-using Faryma.Composer.Contracts.Api.Features.OrderQueue;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Api.Features.ReviewOrder;
+using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -246,10 +248,12 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                     });
                 })
                 .AddOpenApi()
+                .Configure<JsonOptions>(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()))
                 .AddAsyncApiSpecification(environment);
 
             services
                 .AddScoped<IdempotentFilter>()
+                .AddScoped<ReviewOrderDtoMapper>()
                 .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
@@ -282,7 +286,7 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
 
         private static Task HandleApiCookieRedirect(RedirectContext<CookieAuthenticationOptions> context, int statusCode)
         {
-            if (IsApiRequest(context.Request))
+            if (context.Request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase))
             {
                 context.Response.StatusCode = statusCode;
                 return Task.CompletedTask;
@@ -291,7 +295,5 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
             context.Response.Redirect(context.RedirectUri);
             return Task.CompletedTask;
         }
-
-        private static bool IsApiRequest(HttpRequest request) => request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase);
     }
 }
