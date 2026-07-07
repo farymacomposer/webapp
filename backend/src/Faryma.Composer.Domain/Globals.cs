@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Api.Contracts
+﻿namespace Faryma.Composer.Domain
 {
     public static class Globals
     {

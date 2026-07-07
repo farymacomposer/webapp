@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text.Json;
 using Faryma.Composer.Api.Common.Extensions;
-using Faryma.Composer.Api.Contracts;
+using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Mvc;

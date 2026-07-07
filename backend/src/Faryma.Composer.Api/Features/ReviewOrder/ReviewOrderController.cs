@@ -1,6 +1,8 @@
-﻿using Faryma.Composer.Api.Common.Attributes;
+﻿#pragma warning disable RCS1163 // Unused parameter
+#pragma warning disable IDE0060 // Удалите неиспользуемый параметр
+
+using Faryma.Composer.Api.Common.Attributes;
 using Faryma.Composer.Api.Common.Extensions;
-using Faryma.Composer.Api.Contracts;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.AddTrackUrl;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Cancel;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Complete;
@@ -14,7 +16,7 @@ using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Features.ReviewOrder.Commands;
 using Faryma.Composer.Application.Features.ReviewOrder.Models;
-using Faryma.Composer.Application.SharedContracts.Features.ReviewOrder.Commands;
+using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Microsoft.AspNetCore.Authorization;
@@ -43,7 +45,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] CreateOutOfQueueReviewOrderRequest request,
             CancellationToken ct)
         {
-            _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
             ReviewOrderEntity order = await reviewOrderService.CreateOutOfQueue(new CreateOutOfQueueOrderCommand
@@ -72,7 +73,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] CreateDonationReviewOrderRequest request,
             CancellationToken ct)
         {
-            _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
             ReviewOrderEntity order = await reviewOrderService.CreateDonation(new CreateDonationOrderCommand
@@ -103,7 +103,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] CreateFreeReviewOrderRequest request,
             CancellationToken ct)
         {
-            _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
             ReviewOrderEntity order = await reviewOrderService.CreateFree(new CreateFreeOrderCommand
@@ -132,7 +131,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] CreateTokenReviewOrderRequest request,
             CancellationToken ct)
         {
-            _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
             ReviewOrderEntity order = await reviewOrderService.CreateWithToken(new CreateTokenOrderCommand
@@ -162,7 +160,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] CreateCharityReviewOrderRequest request,
             CancellationToken ct)
         {
-            _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
             ReviewOrderEntity order = await reviewOrderService.CreateCharity(new CreateCharityOrderCommand
@@ -191,7 +188,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] PayReviewOrderRequest request,
             CancellationToken ct)
         {
-            _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
             TransactionEntity transaction = await reviewOrderService.PayOrder(new PayOrderCommand
@@ -221,7 +217,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] PayDetailedReviewOrderRequest request,
             CancellationToken ct)
         {
-            _ = idempotencyKey; // Используется фильтром
             Guid userId = User.GetUserId();
 
             PayDetailedReviewResult result = await reviewOrderService.PayDetailedReview(new PayDetailedReviewCommand

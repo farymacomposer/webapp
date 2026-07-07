@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Domain;
 
 namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Create
 {
