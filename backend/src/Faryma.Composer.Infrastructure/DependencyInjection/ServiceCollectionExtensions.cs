@@ -21,7 +21,9 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
             services.AddDbContextFactory<AppDbContext>((provider, options) =>
             {
                 PostgreOptions postgreOptions = provider.GetRequiredService<IOptions<PostgreOptions>>().Value;
-                options.UseNpgsql(postgreOptions.GetConnectionString(), npgOptions => npgOptions.MapEnum());
+                options
+                    .UseNpgsql(postgreOptions.GetConnectionString(), npgOptions => npgOptions.MapEnum())
+                    .UseAppDataSeeding();
             });
 
             services

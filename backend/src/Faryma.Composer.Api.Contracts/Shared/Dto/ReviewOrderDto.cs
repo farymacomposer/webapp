@@ -139,7 +139,7 @@ namespace Faryma.Composer.Api.Contracts.Shared.Dto
             return Map(
                 item,
                 item.PayableAmount,
-                paidAmount + (item.CoverageRedemption?.CoveredAmount ?? 0),
+                paidAmount,
                 paidAmount,
                 paidPriorityAmount);
         }

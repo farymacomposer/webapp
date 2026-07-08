@@ -135,15 +135,6 @@ namespace Faryma.Composer.Infrastructure
                 }
             );
 
-            builder.Entity<AppSettingsEntity>().HasData(new AppSettingsEntity
-            {
-                Id = 1,
-                ReviewOrderNominalPrice = 1000,
-                IncludedTrackDurationSeconds = 60 * 5,
-                ReviewOrderExtraTrackSecondPrice = 3,
-                ReviewOrderDetailedPrice = 1000,
-            });
-
             builder.Entity<TrackGenreEntity>().HasData(
                 new TrackGenreEntity { Id = 1, Name = "электронное" },
                 new TrackGenreEntity { Id = 2, Name = "фолк" },
