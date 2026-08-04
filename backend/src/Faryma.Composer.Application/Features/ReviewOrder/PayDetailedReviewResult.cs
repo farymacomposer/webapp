@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 
-namespace Faryma.Composer.Application.Features.ReviewOrder.Models
+namespace Faryma.Composer.Application.Features.ReviewOrder
 {
     /// <summary>
     /// Результат оплаты подробного разбора деньгами или жетоном.

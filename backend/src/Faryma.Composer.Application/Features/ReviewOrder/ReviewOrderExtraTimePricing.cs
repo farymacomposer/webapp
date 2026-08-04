@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Application.Features.ReviewOrder.Models
+﻿namespace Faryma.Composer.Application.Features.ReviewOrder
 {
     /// <summary>
     /// Расчет стоимости дополнительной длительности трека в заказе разбора

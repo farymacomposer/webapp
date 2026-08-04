@@ -1,11 +1,12 @@
 ﻿using Faryma.Composer.Domain.Enums;
+using Mediator;
 
-namespace Faryma.Composer.Application.Features.ReviewOrder.Commands
+namespace Faryma.Composer.Application.Features.ReviewOrder
 {
     /// <summary>
     /// Команда оплаты подробного разбора заказа
     /// </summary>
-    public sealed record PayDetailedReviewCommand
+    public sealed record PayDetailedReviewCommand : IRequest<PayDetailedReviewResult>
     {
         /// <summary>
         /// Id заказа разбора трека

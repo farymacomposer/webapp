@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Application.Features.ReviewOrder.Commands
+﻿namespace Faryma.Composer.Application.Features.ReviewOrder
 {
     /// <summary>
     /// Команда создания заказа

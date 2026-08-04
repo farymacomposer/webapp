@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Domain.Exceptions;
 
 namespace Faryma.Composer.Domain.Entities.TransactionSources
 {
@@ -129,6 +130,85 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
         /// </summary>
         public UserEntitlementRedemptionEntity? CoverageRedemption { get; set; }
 
+        public void AddTrackUrl(string trackUrl, int trackDurationSeconds, long requiredAmount)
+        {
+            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
+            {
+                throw new ReviewOrderException("Невозможно добавить/изменить ссылку на трек", this);
+            }
+
+            long paymentAmount = Transactions.Sum(x => x.Debit);
+
+            (ReviewOrderStatus status, long payableAmount) = requiredAmount > paymentAmount
+                ? (ReviewOrderStatus.AwaitingPayment, requiredAmount - paymentAmount)
+                : (ReviewOrderStatus.Pending, 0);
+
+            Status = status;
+            PayableAmount = payableAmount;
+            TrackUrl = trackUrl;
+            TrackDurationSeconds = trackDurationSeconds;
+        }
+
+        public void TakeInProgress(ComposerStreamEntity liveStream, QueueCategory queueCategory, DateTime now)
+        {
+            if (IsFrozen || Status != ReviewOrderStatus.Pending)
+            {
+                throw new ReviewOrderException("Невозможно взять в работу заказ", this);
+            }
+
+            QueueCategory = queueCategory;
+            ProcessingStream = liveStream;
+            Status = ReviewOrderStatus.InProgress;
+            InProgressAt = now;
+        }
+
+        public void Complete(ReviewEntity review, DateTime now)
+        {
+            if (Status != ReviewOrderStatus.InProgress)
+            {
+                throw new ReviewOrderException("Невозможно выполнить заказ", this);
+            }
+
+            Review = review;
+            CompletedAt = now;
+            Status = ReviewOrderStatus.Completed;
+        }
+
+        public void Freeze()
+        {
+            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
+            {
+                throw new ReviewOrderException("Невозможно заморозить заказ", this);
+            }
+
+            IsFrozen = true;
+        }
+
+        public void Unfreeze()
+        {
+            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
+            {
+                throw new ReviewOrderException("Невозможно разморозить заказ", this);
+            }
+
+            IsFrozen = false;
+        }
+
+        public void Cancel(string cancelReason, DateTime now)
+        {
+            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment or ReviewOrderStatus.InProgress))
+            {
+                throw new ReviewOrderException("Невозможно отменить заказ", this);
+            }
+
+            CanceledAt = now;
+            CancelReason = cancelReason;
+            QueueCategory = QueueCategory.Unspecified;
+            ProcessingStream = null;
+            Status = ReviewOrderStatus.Canceled;
+            InProgressAt = null;
+        }
+
         /// <summary>
         /// Возвращает общую стоимость заказа
         /// </summary>
@@ -148,6 +228,27 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
             };
 
             return result + servicePaymentsAmount;
+        }
+
+        public void RecalculateCheckoutStatus()
+        {
+            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
+            {
+                return;
+            }
+
+            ReviewOrderPricing pricing = reviewOrderPricingService.Calculate(order);
+            if (!pricing.IsRequiredCovered)
+            {
+                Status = TrackUrl is null
+                    ? ReviewOrderStatus.Preorder
+                    : ReviewOrderStatus.AwaitingPayment;
+                return;
+            }
+
+            Status = TrackUrl is null
+                ? ReviewOrderStatus.Preorder
+                : ReviewOrderStatus.Pending;
         }
 
         private static long GetPaymentAmount(IEnumerable<TransactionEntity>? transactions)

@@ -1,9 +1,12 @@
-﻿namespace Faryma.Composer.Application.Features.ReviewOrder.Commands
+﻿using Faryma.Composer.Domain.Entities.TransactionSources;
+using Mediator;
+
+namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
 {
     /// <summary>
     /// Команда выполнения заказа
     /// </summary>
-    public sealed record CompleteCommand
+    public sealed record CompleteCommand : IRequest<ReviewOrderEntity>
     {
         /// <summary>
         /// Id заказа разбора трека

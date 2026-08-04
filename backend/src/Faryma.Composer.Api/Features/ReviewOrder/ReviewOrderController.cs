@@ -14,13 +14,19 @@ using Faryma.Composer.Api.Contracts.Features.ReviewOrder.TakeInProgress;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Unfreeze;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Application.Features.ReviewOrder;
-using Faryma.Composer.Application.Features.ReviewOrder.Commands;
-using Faryma.Composer.Application.Features.ReviewOrder.Models;
+using Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl;
+using Faryma.Composer.Application.Features.ReviewOrder.Cancel;
+using Faryma.Composer.Application.Features.ReviewOrder.Complete;
+using Faryma.Composer.Application.Features.ReviewOrder.CreateCharity;
+using Faryma.Composer.Application.Features.ReviewOrder.CreateDonation;
+using Faryma.Composer.Application.Features.ReviewOrder.CreateFree;
+using Faryma.Composer.Application.Features.ReviewOrder.CreateOutOfQueue;
 using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using AppMediator = Mediator.Mediator;
 
 namespace Faryma.Composer.Api.Features.ReviewOrder
 {
@@ -31,7 +37,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
     [Route("api/review-orders")]
     [Produces("application/json")]
     public sealed class ReviewOrderController(
-        ReviewOrderService reviewOrderService,
+        AppMediator mediator,
         ReviewOrderDtoMapper reviewOrderDtoMapper) : ControllerBase
     {
         /// <summary>
@@ -47,7 +53,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             Guid userId = User.GetUserId();
 
-            ReviewOrderEntity order = await reviewOrderService.CreateOutOfQueue(new CreateOutOfQueueOrderCommand
+            ReviewOrderEntity order = await mediator.Send(new CreateOutOfQueueCommand
             {
                 UserNickname = request.UserNickname,
                 UserComment = request.UserComment,
@@ -75,7 +81,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             Guid userId = User.GetUserId();
 
-            ReviewOrderEntity order = await reviewOrderService.CreateDonation(new CreateDonationOrderCommand
+            ReviewOrderEntity order = await mediator.Send(new CreateDonationCommand
             {
                 UserNickname = request.UserNickname,
                 UserComment = request.UserComment,
@@ -105,7 +111,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             Guid userId = User.GetUserId();
 
-            ReviewOrderEntity order = await reviewOrderService.CreateFree(new CreateFreeOrderCommand
+            ReviewOrderEntity order = await mediator.Send(new CreateFreeCommand
             {
                 UserNickname = request.UserNickname,
                 UserComment = request.UserComment,
@@ -133,7 +139,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             Guid userId = User.GetUserId();
 
-            ReviewOrderEntity order = await reviewOrderService.CreateWithToken(new CreateTokenOrderCommand
+            ReviewOrderEntity order = await mediator.Send(new CreateTokenOrderCommand
             {
                 UserNickname = request.UserNickname,
                 UserComment = request.UserComment,
@@ -162,7 +168,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             Guid userId = User.GetUserId();
 
-            ReviewOrderEntity order = await reviewOrderService.CreateCharity(new CreateCharityOrderCommand
+            ReviewOrderEntity order = await mediator.Send(new CreateCharityCommand
             {
                 UserNickname = request.UserNickname,
                 UserComment = request.UserComment,
@@ -190,7 +196,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             Guid userId = User.GetUserId();
 
-            TransactionEntity transaction = await reviewOrderService.PayOrder(new PayOrderCommand
+            TransactionEntity transaction = await mediator.Send(new PayOrderCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Nickname = request.Nickname.Trim(),
@@ -219,7 +225,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             Guid userId = User.GetUserId();
 
-            PayDetailedReviewResult result = await reviewOrderService.PayDetailedReview(new PayDetailedReviewCommand
+            PayDetailedReviewResult result = await mediator.Send(new PayDetailedReviewCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Nickname = request.Nickname.Trim(),
@@ -243,7 +249,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [AuthorizeAdmins]
         public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl(AddTrackUrlRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.AddTrackUrl(new AddTrackUrlCommand
+            ReviewOrderEntity order = await mediator.Send(new AddTrackUrlCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 TrackUrl = request.TrackUrl,
@@ -263,7 +269,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [AuthorizeAdmins]
         public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.TakeInProgress(request.ReviewOrderId, ct);
+            //ReviewOrderEntity order = await mediator.Send(request.ReviewOrderId, ct);
 
             return Ok(new TakeOrderInProgressResponse
             {
@@ -280,7 +286,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             Guid userId = User.GetUserId();
 
-            ReviewOrderEntity order = await reviewOrderService.Complete(new CompleteCommand
+            ReviewOrderEntity order = await mediator.Send(new CompleteCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Rating = request.Rating,
@@ -301,7 +307,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [AuthorizeAdmins]
         public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(FreezeReviewOrderRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.Freeze(request.ReviewOrderId, ct);
+            //ReviewOrderEntity order = await mediator.Send(request.ReviewOrderId, ct);
 
             return Ok(new FreezeReviewOrderResponse
             {
@@ -316,7 +322,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [AuthorizeAdmins]
         public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(UnfreezeReviewOrderRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.Unfreeze(request.ReviewOrderId, ct);
+            //ReviewOrderEntity order = await mediator.Send(request.ReviewOrderId, ct);
 
             return Ok(new UnfreezeReviewOrderResponse
             {
@@ -331,7 +337,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [AuthorizeAdmins]
         public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request, CancellationToken ct)
         {
-            ReviewOrderEntity order = await reviewOrderService.Cancel(new CancelCommand
+            ReviewOrderEntity order = await mediator.Send(new CancelCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 CancelReason = request.CancelReason,

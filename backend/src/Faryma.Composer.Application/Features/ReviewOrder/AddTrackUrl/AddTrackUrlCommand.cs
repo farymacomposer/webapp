@@ -1,9 +1,12 @@
-﻿namespace Faryma.Composer.Application.Features.ReviewOrder.Commands
+﻿using Faryma.Composer.Domain.Entities.TransactionSources;
+using Mediator;
+
+namespace Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl
 {
     /// <summary>
     /// Команда добавления/изменения ссылки на трек в заказе
     /// </summary>
-    public sealed record AddTrackUrlCommand
+    public sealed record AddTrackUrlCommand : IRequest<ReviewOrderEntity>
     {
         /// <summary>
         /// Id заказа разбора трека

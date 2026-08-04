@@ -28,6 +28,12 @@ namespace Faryma.Composer.Application.DependencyInjection
                 .AddScoped<UserNicknameService>()
                 .AddScoped<ReviewService>();
 
+            services.AddMediator(options =>
+            {
+                options.Assemblies = [typeof(ReviewOrderService).Assembly];
+                options.ServiceLifetime = ServiceLifetime.Scoped;
+            });
+
             return services;
         }
     }

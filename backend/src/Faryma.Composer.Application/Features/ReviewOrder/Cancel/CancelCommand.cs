@@ -1,9 +1,12 @@
-﻿namespace Faryma.Composer.Application.Features.ReviewOrder.Commands
+﻿using Faryma.Composer.Domain.Entities.TransactionSources;
+using Mediator;
+
+namespace Faryma.Composer.Application.Features.ReviewOrder.Cancel
 {
     /// <summary>
     /// Команда отмены заказа
     /// </summary>
-    public sealed record CancelCommand
+    public sealed record CancelCommand : IRequest<ReviewOrderEntity>
     {
         /// <summary>
         /// Id заказа разбора трека
