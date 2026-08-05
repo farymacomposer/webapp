@@ -1,5 +1,4 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueue;
-using Faryma.Composer.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
 using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 using Faryma.Composer.Domain.Entities;
@@ -46,7 +45,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderTaken, previousStatus));
+            orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderTaken, previousStatus);
 
             return order;
         }

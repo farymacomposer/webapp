@@ -1,11 +1,9 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueue;
-using Faryma.Composer.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Application.Features.UserNickname;
 using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure;
 using Mediator;
 
@@ -22,16 +20,6 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Pay
             ReviewOrderEntity order = await reviewOrderService.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
-            if (order.Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
-            {
-                throw new ReviewOrderException("Невозможно оплатить заказ", order);
-            }
-
-            if (order.Type is not (ReviewOrderType.Donation or ReviewOrderType.Free))
-            {
-                throw new ReviewOrderException("Тип заказа не поддерживает денежную оплату", order);
-            }
-
             UserEntity createdByUser = await reviewOrderService.GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
 
@@ -42,11 +30,13 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Pay
                 userNickname,
                 order);
 
-            RecalculateCheckoutStatus(order);
+            long requiredAmount = reviewOrderService.GetTrackRequiredAmount(order.TrackDurationSeconds);
+
+            order.Pay(requiredAmount);
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderMovedUp, previousStatus));
+            orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderMovedUp, previousStatus);
 
             return order;
         }

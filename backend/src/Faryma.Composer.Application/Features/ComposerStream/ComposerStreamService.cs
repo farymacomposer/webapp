@@ -1,7 +1,6 @@
-﻿using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
-using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Events;
-using Faryma.Composer.Application.Features.ComposerStream.Commands;
+﻿using Faryma.Composer.Application.Features.ComposerStream.Commands;
 using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
@@ -32,7 +31,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 ComposerStreamEntity stream = uow.ComposerStreamStore.Create(command.EventDate, command.Type, createdByUser);
                 await uow.SaveChanges(ct);
 
-                orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.StreamCreated));
+                orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamCreated);
 
                 return stream;
             }
@@ -69,7 +68,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.StreamStarted));
+            orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamStarted);
 
             return stream;
         }
@@ -99,7 +98,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.StreamCompleted));
+            orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamCompleted);
 
             return stream;
         }
@@ -128,7 +127,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new ComposerStreamChangedEvent(stream, OrderQueueUpdateType.StreamCanceled));
+            orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamCanceled);
 
             return stream;
         }

@@ -1,5 +1,4 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueue;
-using Faryma.Composer.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
@@ -27,7 +26,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Unfreeze
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderUnfrozen, previousStatus));
+            orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderUnfrozen, previousStatus);
 
             return order;
         }

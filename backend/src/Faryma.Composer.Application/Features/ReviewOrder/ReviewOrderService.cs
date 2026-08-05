@@ -1,6 +1,5 @@
 ﻿using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
-using Faryma.Composer.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Application.Features.ReviewOrder.Pricing;
 using Faryma.Composer.Application.Features.UserNickname;
 using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
@@ -90,7 +89,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderMovedUp, previousStatus));
+            orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderMovedUp, previousStatus);
 
             return new PayDetailedReviewResult
             {
@@ -153,7 +152,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
 
             await uow.SaveChanges(ct);
 
-            orderQueueEventChannel.Write(new ReviewOrderChangedEvent(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified));
+            orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified);
 
             return order;
         }

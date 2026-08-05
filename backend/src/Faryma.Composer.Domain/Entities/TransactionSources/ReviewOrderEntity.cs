@@ -130,6 +130,28 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
         /// </summary>
         public UserEntitlementRedemptionEntity? CoverageRedemption { get; set; }
 
+        public void Pay(long requiredAmount)
+        {
+            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
+            {
+                throw new ReviewOrderException("Невозможно оплатить заказ", this);
+            }
+
+            if (Type is not (ReviewOrderType.Donation or ReviewOrderType.Free))
+            {
+                throw new ReviewOrderException("Тип заказа не поддерживает денежную оплату", this);
+            }
+
+            long paymentAmount = GetPaymentAmount(Transactions);
+
+            (ReviewOrderStatus status, long payableAmount) = requiredAmount > paymentAmount
+                ? (ReviewOrderStatus.AwaitingPayment, requiredAmount - paymentAmount)
+                : (ReviewOrderStatus.Pending, 0);
+
+            Status = status;
+            PayableAmount = payableAmount;
+        }
+
         public void AddTrackUrl(string trackUrl, int trackDurationSeconds, long requiredAmount)
         {
             if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
