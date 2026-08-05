@@ -1,5 +1,5 @@
-﻿using Faryma.Composer.Contracts.Application.Features.OrderQueue;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
+﻿using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 
 namespace Faryma.Composer.Application.Test.Infrastructure
 {

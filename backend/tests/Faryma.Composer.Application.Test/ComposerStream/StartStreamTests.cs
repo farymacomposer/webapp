@@ -1,7 +1,8 @@
 ﻿using Faryma.Composer.Application.Features.ComposerStream;
 using Faryma.Composer.Application.Test.Infrastructure;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Domain.Exceptions;
 
 namespace Faryma.Composer.Application.Test.ComposerStream
 {

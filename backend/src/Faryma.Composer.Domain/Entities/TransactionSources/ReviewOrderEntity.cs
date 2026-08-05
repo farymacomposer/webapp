@@ -137,7 +137,7 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
                 throw new ReviewOrderException("Невозможно добавить/изменить ссылку на трек", this);
             }
 
-            long paymentAmount = Transactions.Sum(x => x.Debit);
+            long paymentAmount = GetPaymentAmount(Transactions);
 
             (ReviewOrderStatus status, long payableAmount) = requiredAmount > paymentAmount
                 ? (ReviewOrderStatus.AwaitingPayment, requiredAmount - paymentAmount)
@@ -209,46 +209,24 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
             InProgressAt = null;
         }
 
-        /// <summary>
-        /// Возвращает общую стоимость заказа
-        /// </summary>
+        public long GetPaymentAmount() => GetPaymentAmount(Transactions);
+
         public long GetTotalAmount()
         {
-            long orderPaymentsAmount = GetPaymentAmount(Transactions);
+            long paymentAmount = GetPaymentAmount(Transactions);
             long servicePaymentsAmount = GetPaymentAmount(DetailedReviewPayment?.Transactions);
 
             long result = Type switch
             {
                 ReviewOrderType.OutOfQueue => 0,
-                ReviewOrderType.Donation => orderPaymentsAmount,
-                ReviewOrderType.Free => Price + orderPaymentsAmount,
+                ReviewOrderType.Donation => paymentAmount + servicePaymentsAmount,
+                ReviewOrderType.Free => Price + paymentAmount + servicePaymentsAmount,
                 ReviewOrderType.Charity => 0,
                 ReviewOrderType.Custom => throw new NotSupportedException("Неподдерживаемый тип заказа"),
                 _ => throw new InvalidOperationException("Неподдерживаемый тип заказа"),
             };
 
-            return result + servicePaymentsAmount;
-        }
-
-        public void RecalculateCheckoutStatus()
-        {
-            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
-            {
-                return;
-            }
-
-            ReviewOrderPricing pricing = reviewOrderPricingService.Calculate(order);
-            if (!pricing.IsRequiredCovered)
-            {
-                Status = TrackUrl is null
-                    ? ReviewOrderStatus.Preorder
-                    : ReviewOrderStatus.AwaitingPayment;
-                return;
-            }
-
-            Status = TrackUrl is null
-                ? ReviewOrderStatus.Preorder
-                : ReviewOrderStatus.Pending;
+            return result;
         }
 
         private static long GetPaymentAmount(IEnumerable<TransactionEntity>? transactions)

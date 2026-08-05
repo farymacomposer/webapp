@@ -1,10 +1,10 @@
 ﻿using Faryma.Composer.Application.Features.ReviewOrder;
+using Faryma.Composer.Application.Features.ReviewOrder.CreateDonation;
 using Faryma.Composer.Application.Test.Infrastructure;
-using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Domain.Exceptions;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
@@ -25,7 +25,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 startedAt: app.FixedNow);
 
             ReviewOrderEntity order = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationCommand
                 {
                     UserNickname = "Nick-Take",
                     TrackUrl = "https://example.com/take",

@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using Faryma.Composer.Api.Features.Auth.Services;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
+using Faryma.Composer.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.TestHost;

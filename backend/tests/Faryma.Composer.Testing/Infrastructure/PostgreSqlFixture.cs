@@ -15,8 +15,8 @@ namespace Faryma.Composer.Testing.Infrastructure
         public string Username => PostgreSqlBuilder.DefaultUsername;
         public string Password => PostgreSqlBuilder.DefaultPassword;
 
-        public Task InitializeAsync() => _container.StartAsync();
-        public Task DisposeAsync() => _container.DisposeAsync().AsTask();
+        public async ValueTask InitializeAsync() => await _container.StartAsync();
+        public ValueTask DisposeAsync() => _container.DisposeAsync();
 
         public async Task<string> CreateDatabaseAsync(string prefix)
         {

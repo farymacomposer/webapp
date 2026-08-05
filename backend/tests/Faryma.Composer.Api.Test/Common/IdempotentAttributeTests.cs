@@ -2,7 +2,7 @@
 using System.Net.Http.Json;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
-using Faryma.Composer.Contracts.Api;
+using Faryma.Composer.Domain;
 using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;

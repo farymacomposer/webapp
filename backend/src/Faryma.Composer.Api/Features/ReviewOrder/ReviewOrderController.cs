@@ -12,6 +12,7 @@ using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Pay;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.PayDetailedReview;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.TakeInProgress;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Unfreeze;
+using Faryma.Composer.Api.Contracts.Shared.Dto;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl;
@@ -21,10 +22,12 @@ using Faryma.Composer.Application.Features.ReviewOrder.CreateCharity;
 using Faryma.Composer.Application.Features.ReviewOrder.CreateDonation;
 using Faryma.Composer.Application.Features.ReviewOrder.CreateFree;
 using Faryma.Composer.Application.Features.ReviewOrder.CreateOutOfQueue;
+using Faryma.Composer.Application.Features.ReviewOrder.Freeze;
+using Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress;
+using Faryma.Composer.Application.Features.ReviewOrder.Unfreeze;
 using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AppMediator = Mediator.Mediator;
 
@@ -34,16 +37,14 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
     /// Управление заказами разборов треков
     /// </summary>
     [ApiController]
-    [Route("api/review-orders")]
+    [Route("api/[controller]/[action]")]
     [Produces("application/json")]
-    public sealed class ReviewOrderController(
-        AppMediator mediator,
-        ReviewOrderDtoMapper reviewOrderDtoMapper) : ControllerBase
+    public sealed class ReviewOrderController(AppMediator mediator) : ControllerBase
     {
         /// <summary>
         /// Создает внеочередной заказ
         /// </summary>
-        [HttpPost("create/out-of-queue")]
+        [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateOutOfQueueReviewOrder(
@@ -64,14 +65,14 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new CreateReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
         /// <summary>
         /// Создает донатный заказ
         /// </summary>
-        [HttpPost("create/donation")]
+        [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateDonationReviewOrder(
@@ -94,14 +95,14 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new CreateReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
         /// <summary>
         /// Создает бесплатный заказ
         /// </summary>
-        [HttpPost("create/free")]
+        [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateFreeReviewOrder(
@@ -122,43 +123,14 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new CreateReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
-            });
-        }
-
-        /// <summary>
-        /// Создает заказ по существующему жетону пользователя
-        /// </summary>
-        [HttpPost("create/token")]
-        [Authorize]
-        [Idempotent]
-        public async Task<ActionResult<CreateReviewOrderResponse>> CreateTokenReviewOrder(
-            [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
-            [FromBody] CreateTokenReviewOrderRequest request,
-            CancellationToken ct)
-        {
-            Guid userId = User.GetUserId();
-
-            ReviewOrderEntity order = await mediator.Send(new CreateTokenOrderCommand
-            {
-                UserNickname = request.UserNickname,
-                UserComment = request.UserComment,
-                TrackUrl = request.TrackUrl,
-                TrackDurationSeconds = request.TrackDurationSeconds,
-                UserEntitlementId = request.UserEntitlementId,
-                CreatedByUserId = userId,
-            }, ct);
-
-            return Ok(new CreateReviewOrderResponse
-            {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
         /// <summary>
         /// Создает благотворительный заказ
         /// </summary>
-        [HttpPost("create/charity")]
+        [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<CreateReviewOrderResponse>> CreateCharityReviewOrder(
@@ -179,14 +151,14 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new CreateReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
         /// <summary>
         /// Оплачивает заказ
         /// </summary>
-        [HttpPost("pay")]
+        [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<PayReviewOrderResponse>> PayReviewOrder(
@@ -207,7 +179,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new PayReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map((ReviewOrderEntity)transaction.TransactionSource),
+                ReviewOrder = ReviewOrderDto.Map((ReviewOrderEntity)transaction.TransactionSource),
                 PaymentTransactionId = transaction.Id
             });
         }
@@ -215,7 +187,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <summary>
         /// Оплачивает подробный разбор заказа
         /// </summary>
-        [HttpPost("pay-detailed-review")]
+        [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
         public async Task<ActionResult<PayDetailedReviewOrderResponse>> PayDetailedReview(
@@ -236,7 +208,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new PayDetailedReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(result.ReviewOrder),
+                ReviewOrder = ReviewOrderDto.Map(result.ReviewOrder),
                 PaymentTransactionId = result.PaymentTransaction?.Id,
                 UserEntitlementRedemptionId = result.UserEntitlementRedemption?.Id
             });
@@ -245,7 +217,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <summary>
         /// Добавляет или изменяет ссылку на трек
         /// </summary>
-        [HttpPost("track-url")]
+        [HttpPost]
         [AuthorizeAdmins]
         public async Task<ActionResult<AddTrackUrlResponse>> AddTrackUrl(AddTrackUrlRequest request, CancellationToken ct)
         {
@@ -258,29 +230,32 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new AddTrackUrlResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
         /// <summary>
         /// Взятие заказа в работу
         /// </summary>
-        [HttpPost("take-in-progress")]
+        [HttpPost]
         [AuthorizeAdmins]
         public async Task<ActionResult<TakeOrderInProgressResponse>> TakeOrderInProgress(TakeOrderInProgressRequest request, CancellationToken ct)
         {
-            //ReviewOrderEntity order = await mediator.Send(request.ReviewOrderId, ct);
+            ReviewOrderEntity order = await mediator.Send(new TakeInProgressCommand
+            {
+                ReviewOrderId = request.ReviewOrderId
+            }, ct);
 
             return Ok(new TakeOrderInProgressResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
         /// <summary>
         /// Выполнение заказа
         /// </summary>
-        [HttpPost("complete")]
+        [HttpPost]
         [AuthorizeAdmins]
         public async Task<ActionResult<CompleteReviewOrderResponse>> CompleteReviewOrder(CompleteReviewOrderRequest request, CancellationToken ct)
         {
@@ -295,7 +270,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new CompleteReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order),
+                ReviewOrder = ReviewOrderDto.Map(order),
                 ReviewId = order.Review!.Id,
             });
         }
@@ -303,37 +278,43 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         /// <summary>
         /// Замораживает заказ
         /// </summary>
-        [HttpPost("freeze")]
+        [HttpPost]
         [AuthorizeAdmins]
         public async Task<ActionResult<FreezeReviewOrderResponse>> FreezeReviewOrder(FreezeReviewOrderRequest request, CancellationToken ct)
         {
-            //ReviewOrderEntity order = await mediator.Send(request.ReviewOrderId, ct);
+            ReviewOrderEntity order = await mediator.Send(new FreezeCommand
+            {
+                ReviewOrderId = request.ReviewOrderId
+            }, ct);
 
             return Ok(new FreezeReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
         /// <summary>
         /// Размораживает заказ
         /// </summary>
-        [HttpPost("unfreeze")]
+        [HttpPost]
         [AuthorizeAdmins]
         public async Task<ActionResult<UnfreezeReviewOrderResponse>> UnfreezeReviewOrder(UnfreezeReviewOrderRequest request, CancellationToken ct)
         {
-            //ReviewOrderEntity order = await mediator.Send(request.ReviewOrderId, ct);
+            ReviewOrderEntity order = await mediator.Send(new UnfreezeCommand
+            {
+                ReviewOrderId = request.ReviewOrderId
+            }, ct);
 
             return Ok(new UnfreezeReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 
         /// <summary>
         /// Отменяет заказ
         /// </summary>
-        [HttpPost("cancel")]
+        [HttpPost]
         [AuthorizeAdmins]
         public async Task<ActionResult<CancelReviewOrderResponse>> CancelReviewOrder(CancelReviewOrderRequest request, CancellationToken ct)
         {
@@ -345,7 +326,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new CancelReviewOrderResponse
             {
-                ReviewOrder = reviewOrderDtoMapper.Map(order)
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
     }

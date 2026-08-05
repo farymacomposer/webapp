@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using Faryma.Composer.Api.Test.Infrastructure;
-using Faryma.Composer.Contracts.Exceptions;
+using Faryma.Composer.Domain.Exceptions;
 
 namespace Faryma.Composer.Api.Test.Common
 {

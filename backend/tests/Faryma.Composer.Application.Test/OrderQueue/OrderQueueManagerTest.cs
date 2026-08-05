@@ -1,10 +1,11 @@
 ﻿using System.Globalization;
+using Faryma.Composer.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Enums;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
+using Faryma.Composer.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.OrderQueue
@@ -1020,7 +1021,6 @@ namespace Faryma.Composer.Application.Test.OrderQueue
                 Type = ReviewOrderType.Donation,
                 Price = amount,
                 PayableAmount = amount,
-                NonPaymentCoverageAmount = 0,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreatedByUser = user,
@@ -1052,7 +1052,6 @@ namespace Faryma.Composer.Application.Test.OrderQueue
                 Type = ReviewOrderType.OutOfQueue,
                 Price = 0,
                 PayableAmount = 0,
-                NonPaymentCoverageAmount = 0,
                 MainNickname = name,
                 MainNormalizedNickname = _normalizer.NormalizeName(name),
                 CreatedByUser = user,

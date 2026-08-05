@@ -96,6 +96,26 @@ namespace Faryma.Composer.Api.Contracts.Shared.Dto
         [Required]
         public required ComposerStreamDto CreationStream { get; init; }
 
+        public static ReviewOrderDto Map(ReviewOrderEntity item)
+        {
+            return new()
+            {
+                Id = item.Id,
+                CreatedAt = item.CreatedAt,
+                InProgressAt = item.InProgressAt,
+                CompletedAt = item.CompletedAt,
+                Type = item.Type,
+                Status = item.Status,
+                IsFrozen = item.IsFrozen,
+                TrackUrl = item.TrackUrl,
+                TrackDurationSeconds = item.TrackDurationSeconds,
+                UserComment = item.UserComment,
+                MainNickname = item.MainNickname,
+                TotalAmount = item.GetTotalAmount(),
+                CreationStream = ComposerStreamDto.Map(item.CreationStream),
+            };
+        }
+
         public static ReviewOrderDto Map(
             ReviewOrderEntity item,
             long requiredAmount,

@@ -1,10 +1,9 @@
 ﻿using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Events;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
+using Faryma.Composer.Application.Features.OrderQueue.Events;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;

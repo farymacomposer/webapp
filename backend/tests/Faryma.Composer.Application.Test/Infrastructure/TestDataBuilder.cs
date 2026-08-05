@@ -1,6 +1,5 @@
-﻿using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+﻿using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 
@@ -81,7 +80,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             bool isFrozen = false,
             string? trackUrl = null,
             int? trackDurationSeconds = null,
-            int nominalAmount = 750,
+            int nominalPrice = 750,
             int payableAmount = 750,
             long totalPaymentAmount = 0,
             QueueCategory queueCategory = QueueCategory.Unspecified,
@@ -107,17 +106,17 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                     : 0;
 
                 ReviewOrderEntity order = uow.ReviewOrderStore.Create(
-                    nominalAmount,
-                    initialPayableAmount,
+                    type,
+                    status,
                     initialTrackUrl,
                     initialTrackDurationSeconds,
+                    nominalPrice,
+                    initialPayableAmount,
                     userComment: "тестовый комментарий",
-                    type,
                     creationStream,
                     userNickname,
                     createdByUser);
 
-                order.Status = status;
                 order.IsFrozen = isFrozen;
                 order.QueueCategory = queueCategory;
                 order.ProcessingStream = processingStream;

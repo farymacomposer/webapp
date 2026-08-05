@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using Faryma.Composer.Api.Common.Attributes;
-using Faryma.Composer.Contracts.Exceptions;
+using Faryma.Composer.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

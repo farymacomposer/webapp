@@ -1,14 +1,14 @@
 ﻿using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Application.Features.ReviewOrder;
+using Faryma.Composer.Application.Features.ReviewOrder.CreateDonation;
+using Faryma.Composer.Application.Features.ReviewOrder.Pay;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 using Faryma.Composer.Application.Test.Infrastructure;
-using Faryma.Composer.Contracts.Api.Features.AppSettings;
-using Faryma.Composer.Contracts.Application.Features.OrderQueue.Models;
-using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Domain.Exceptions;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
@@ -32,7 +32,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 trackUrl: status == ReviewOrderStatus.Preorder ? null : "https://example.com/track");
 
             TransactionEntity payment = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                 {
                     ReviewOrderId = order.Id,
                     Nickname = "Nick-Pay",
@@ -83,7 +83,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                    services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                     {
                         ReviewOrderId = order.Id,
                         Nickname = "Nick-Pay",
@@ -110,7 +110,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 trackUrl: "https://example.com/track");
 
             TransactionEntity payment = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                 {
                     ReviewOrderId = order.Id,
                     Nickname = "Nick-PayableType",
@@ -146,7 +146,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                    services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                     {
                         ReviewOrderId = order.Id,
                         Nickname = "Nick-NonPayableType",
@@ -174,7 +174,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 isFrozen: true);
 
             TransactionEntity payment = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                 {
                     ReviewOrderId = order.Id,
                     Nickname = "Nick-Frozen",
@@ -205,7 +205,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                    services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                     {
                         ReviewOrderId = order.Id,
                         Nickname = "Nick-Zero",
@@ -226,7 +226,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                    services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                     {
                         ReviewOrderId = long.MaxValue,
                         Nickname = "Nick-Pay",
@@ -252,7 +252,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 startedAt: app.FixedNow);
 
             ReviewOrderEntity strongerOrder = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationCommand
                 {
                     UserNickname = "Nick-Strong",
                     TrackUrl = "https://example.com/strong",
@@ -265,7 +265,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             await app.DrainQueueEventsAsync();
 
             ReviewOrderEntity candidate = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationOrderCommand
+                services.GetRequiredService<ReviewOrderService>().CreateDonation(new CreateDonationCommand
                 {
                     UserNickname = "Nick-Candidate",
                     TrackUrl = "https://example.com/candidate",
@@ -282,7 +282,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             int beforeIndex = beforeSnapshot.Positions.Single(x => x.Order.Id == candidate.Id).PositionHistory.Current.QueueIndex;
 
             await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                 {
                     ReviewOrderId = candidate.Id,
                     Nickname = "Nick-Candidate",
@@ -317,7 +317,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 totalPaymentAmount: 600);
 
             TransactionEntity payment = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                 {
                     ReviewOrderId = order.Id,
                     Nickname = "Nick-Payer",
@@ -353,7 +353,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 totalPaymentAmount: 750);
 
             TransactionEntity payment = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                 {
                     ReviewOrderId = order.Id,
                     Nickname = "Nick-ExtraDuration",
@@ -391,7 +391,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             {
                 await ConfigurePricing(services, extraTimeAmountPerSecond: 10, detailedReviewAmount: 1_000);
 
-                return await services.GetRequiredService<ReviewOrderService>().PayOrder(new PayOrderCommand
+                return await services.GetRequiredService<ReviewOrderService>().PayOrder(new PayCommand
                 {
                     ReviewOrderId = order.Id,
                     Nickname = "Nick-SnapshotStatus",

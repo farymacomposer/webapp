@@ -1,11 +1,11 @@
 ﻿using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.ReviewOrder;
+using Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl;
 using Faryma.Composer.Application.Test.Infrastructure;
-using Faryma.Composer.Contracts.Api.Features.AppSettings;
-using Faryma.Composer.Contracts.Application.Features.ReviewOrder.Commands;
-using Faryma.Composer.Contracts.Infrastructure.Entities;
-using Faryma.Composer.Contracts.Infrastructure.Entities.TransactionSources;
-using Faryma.Composer.Contracts.Infrastructure.Enums;
+using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
+using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Domain.Exceptions;
 
 namespace Faryma.Composer.Application.Test.ReviewOrder
 {
@@ -113,7 +113,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 createdByUserId: user.Id,
                 status: ReviewOrderStatus.Preorder,
                 trackUrl: null,
-                nominalAmount: 750,
+                nominalPrice: 750,
                 payableAmount: 750,
                 totalPaymentAmount: 1_350);
 

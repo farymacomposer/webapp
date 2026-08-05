@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Security.Authentication;
-using Faryma.Composer.Contracts.Exceptions;
+using Faryma.Composer.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Faryma.Composer.Api.Test.Infrastructure
