@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Persistence.Stores
@@ -22,6 +23,12 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 .Where(x => x.Id == id);
 
             return query.FirstOrDefaultAsync(ct);
+        }
+
+        public async Task<ReviewOrderEntity> Get(long id, CancellationToken ct)
+        {
+            return await FindById(id, ct)
+                ?? throw new NotFoundException($"Заказ id: {id} не найден");
         }
 
         public ReviewOrderDetailedReviewPaymentEntity CreateDetailedReviewPayment(

@@ -9,12 +9,11 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Freeze
 {
     public sealed class FreezeHandler(
         UnitOfWork uow,
-        ReviewOrderService reviewOrderService,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<FreezeCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(FreezeCommand command, CancellationToken ct = default)
         {
-            ReviewOrderEntity order = await reviewOrderService.GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderEntity order = await uow.ReviewOrderStore.Get(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
             if (order.IsFrozen)

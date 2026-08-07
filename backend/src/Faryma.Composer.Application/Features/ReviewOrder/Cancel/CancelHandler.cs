@@ -9,13 +9,12 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Cancel
 {
     public sealed class CancelHandler(
         UnitOfWork uow,
-        ReviewOrderService reviewOrderService,
         OrderQueueEventChannel orderQueueEventChannel,
         DateTimeService dateTimeService) : IRequestHandler<CancelCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(CancelCommand command, CancellationToken ct = default)
         {
-            ReviewOrderEntity order = await reviewOrderService.GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderEntity order = await uow.ReviewOrderStore.Get(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
             if (order.Status == ReviewOrderStatus.Canceled)

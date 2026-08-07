@@ -17,7 +17,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Pay
     {
         public async ValueTask<ReviewOrderEntity> Handle(PayCommand command, CancellationToken ct = default)
         {
-            ReviewOrderEntity order = await reviewOrderService.GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderEntity order = await uow.ReviewOrderStore.Get(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
             UserEntity createdByUser = await reviewOrderService.GetUser(command.CreatedByUserId, ct);

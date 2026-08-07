@@ -1,5 +1,4 @@
 ﻿using Faryma.Composer.Infrastructure.Options;
-using Faryma.Composer.Infrastructure.Persistence.Queries;
 using Faryma.Composer.Infrastructure.Persistence.Stores;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
@@ -32,10 +31,6 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
 
             services
                 .AddScoped<UnitOfWork>()
-
-                .AddScoped<ComposerStreamQueries>()
-                .AddScoped<ReviewOrderQueries>()
-                .AddScoped<UserNicknameQueries>()
 
                 .AddScoped<ComposerStreamStore>()
                 .AddScoped<RefreshTokenStore>()

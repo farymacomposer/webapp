@@ -1,5 +1,6 @@
 ﻿using Faryma.Composer.Application.Features.ComposerStream.Commands;
 using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
@@ -14,12 +15,38 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 {
     public sealed class ComposerStreamService(
         UnitOfWork uow,
+        ReviewOrderService reviewOrderService,
         UserManager<UserEntity> userManager,
         OrderQueueEventChannel orderQueueEventChannel,
         DateTimeService dateTimeService)
     {
-        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct) => uow.ComposerStreamQueries.Find(dateFrom, dateTo, ct);
-        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct) => uow.ComposerStreamQueries.FindLiveAndPlanned(ct);
+        /// <summary>
+        /// Возвращает стримы в указанном диапазоне дат
+        /// </summary>
+        public Task<List<ComposerStreamEntity>> Find(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct)
+        {
+            return uow.Context.ComposerStreams
+                .AsNoTracking()
+                .Where(x => x.EventDate >= dateFrom && x.EventDate <= dateTo)
+                .OrderBy(x => x.EventDate)
+                .ToListAsync(ct);
+        }
+
+        /// <summary>
+        /// Возвращает список актуальных стримов: Live и Planned на сегодня/будущее
+        /// </summary>
+        public Task<List<ComposerStreamEntity>> FindLiveAndPlanned(CancellationToken ct)
+        {
+            DateOnly today = dateTimeService.Today;
+
+            IQueryable<ComposerStreamEntity> query = uow.Context.ComposerStreams
+                .AsNoTracking()
+                .Where(x => x.Status == ComposerStreamStatus.Live
+                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
+                .OrderBy(x => x.EventDate);
+
+            return query.ToListAsync(ct);
+        }
 
         public async Task<ComposerStreamEntity> Create(CreateCommand command, CancellationToken ct = default)
         {
@@ -45,7 +72,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
         {
             // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
 
-            ComposerStreamEntity stream = await GetStream(composerStreamId, ct);
+            ComposerStreamEntity stream = await uow.ComposerStreamStore.Get(composerStreamId, ct);
 
             if (stream.Status == ComposerStreamStatus.Live)
             {
@@ -57,7 +84,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 throw new ComposerStreamException($"Невозможно начать стрим в статусе '{stream.Status}'", stream);
             }
 
-            ComposerStreamEntity? live = await uow.ComposerStreamQueries.FindLive(ct);
+            ComposerStreamEntity? live = await FindLive(ct);
             if (live is not null && live.Id != composerStreamId)
             {
                 throw new ComposerStreamException($"Невозможно начать стрим, пока стрим на дату: {live.EventDate} запущен", stream);
@@ -75,7 +102,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
         public async Task<ComposerStreamEntity> Complete(long composerStreamId, CancellationToken ct = default)
         {
-            ComposerStreamEntity stream = await GetStream(composerStreamId, ct);
+            ComposerStreamEntity stream = await uow.ComposerStreamStore.Get(composerStreamId, ct);
 
             if (stream.Status == ComposerStreamStatus.Completed)
             {
@@ -87,7 +114,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{stream.Status}'", stream);
             }
 
-            ReviewOrderEntity? inProgress = await uow.ReviewOrderQueries.FindInProgress(ct);
+            ReviewOrderEntity? inProgress = await reviewOrderService.FindInProgress(ct);
             if (inProgress is not null)
             {
                 throw new ComposerStreamException($"Невозможно завершить стрим, пока заказ Id: {inProgress.Id} находится в работе", stream);
@@ -105,7 +132,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
 
         public async Task<ComposerStreamEntity> Cancel(long composerStreamId, CancellationToken ct = default)
         {
-            ComposerStreamEntity stream = await GetStream(composerStreamId, ct);
+            ComposerStreamEntity stream = await uow.ComposerStreamStore.Get(composerStreamId, ct);
 
             if (stream.Status == ComposerStreamStatus.Canceled)
             {
@@ -117,7 +144,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 throw new ComposerStreamException($"Невозможно отменить стрим в статусе '{stream.Status}'", stream);
             }
 
-            bool hasActiveCreatedOrders = await uow.ReviewOrderQueries.ExistsActiveCreatedOrdersForStream(stream.Id, ct);
+            bool hasActiveCreatedOrders = await ExistsActiveCreatedOrdersForStream(stream.Id, ct);
             if (hasActiveCreatedOrders)
             {
                 throw new ComposerStreamException("Невозможно отменить стрим: для него существуют активные заказы", stream);
@@ -132,10 +159,26 @@ namespace Faryma.Composer.Application.Features.ComposerStream
             return stream;
         }
 
-        private async Task<ComposerStreamEntity> GetStream(long composerStreamId, CancellationToken ct)
+        /// <summary>
+        /// Проверяет, есть ли у стрима активные созданные заказы
+        /// </summary>
+        private Task<bool> ExistsActiveCreatedOrdersForStream(long streamId, CancellationToken ct = default)
         {
-            return await uow.ComposerStreamStore.FindById(composerStreamId, ct)
-                ?? throw new ComposerStreamException($"Стрим с id: {composerStreamId} не найден");
+            return uow.Context.ReviewOrders
+                .AnyAsync(x => x.CreationStreamId == streamId
+                    && (x.Status == ReviewOrderStatus.Preorder
+                        || x.Status == ReviewOrderStatus.Pending
+                        || x.Status == ReviewOrderStatus.AwaitingPayment), ct);
+        }
+
+        /// <summary>
+        /// Возвращает текущий стрим в статусе Live, если он существует
+        /// </summary>
+        private Task<ComposerStreamEntity?> FindLive(CancellationToken ct)
+        {
+            return uow.Context.ComposerStreams
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
         }
     }
 }

@@ -1,15 +1,11 @@
-﻿using Faryma.Composer.Infrastructure.Persistence.Queries;
-using Faryma.Composer.Infrastructure.Persistence.Stores;
+﻿using Faryma.Composer.Infrastructure.Persistence.Stores;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Faryma.Composer.Infrastructure
 {
     public sealed class UnitOfWork(
         AppDbContext context,
-
-        ComposerStreamQueries composerStreamQueries,
-        ReviewOrderQueries reviewOrderQueries,
-        UserNicknameQueries userNicknameQueries,
+        DateTimeService dateTimeService,
 
         ComposerStreamStore composerStreamStore,
         RefreshTokenStore refreshTokenStore,
@@ -20,9 +16,8 @@ namespace Faryma.Composer.Infrastructure
         UserNicknameStore userNicknameStore
         )
     {
-        public ComposerStreamQueries ComposerStreamQueries { get; } = composerStreamQueries;
-        public ReviewOrderQueries ReviewOrderQueries { get; } = reviewOrderQueries;
-        public UserNicknameQueries UserNicknameQueries { get; } = userNicknameQueries;
+        public AppDbContext Context { get; } = context;
+        public DateTimeService DateTimeService { get; } = dateTimeService;
 
         public ComposerStreamStore ComposerStreamStore { get; } = composerStreamStore;
         public RefreshTokenStore RefreshTokenStore { get; } = refreshTokenStore;
@@ -32,8 +27,8 @@ namespace Faryma.Composer.Infrastructure
         public UserEntitlementStore UserEntitlementStore { get; } = userEntitlementStore;
         public UserNicknameStore UserNicknameStore { get; } = userNicknameStore;
 
-        public Task<IDbContextTransaction> BeginTransaction(CancellationToken ct) => context.Database.BeginTransactionAsync(ct);
-        public Task<int> SaveChanges(CancellationToken ct = default) => context.SaveChangesAsync(ct);
-        public void Remove<TEntity>(TEntity entity) where TEntity : class => context.Remove(entity);
+        public Task<IDbContextTransaction> BeginTransaction(CancellationToken ct) => Context.Database.BeginTransactionAsync(ct);
+        public Task<int> SaveChanges(CancellationToken ct = default) => Context.SaveChangesAsync(ct);
+        public void Remove<TEntity>(TEntity entity) where TEntity : class => Context.Remove(entity);
     }
 }

@@ -16,7 +16,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
     {
         public async ValueTask<ReviewOrderEntity> Handle(CompleteCommand command, CancellationToken ct = default)
         {
-            ReviewOrderEntity order = await reviewOrderService.GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderEntity order = await uow.ReviewOrderStore.Get(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
             if (order.Status == ReviewOrderStatus.Completed)

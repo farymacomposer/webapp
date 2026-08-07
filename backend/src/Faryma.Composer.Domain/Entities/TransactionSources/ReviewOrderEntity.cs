@@ -251,6 +251,17 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
             return result;
         }
 
+        public long GetPaidPriorityAmount()
+        {
+            return Type switch
+            {
+                ReviewOrderType.Donation or ReviewOrderType.Free => GetPaymentAmount(Transactions),
+                ReviewOrderType.OutOfQueue or ReviewOrderType.Charity => 0,
+                ReviewOrderType.Custom => throw new NotSupportedException("Неподдерживаемый тип заказа"),
+                _ => throw new InvalidOperationException("Неподдерживаемый тип заказа"),
+            };
+        }
+
         private static long GetPaymentAmount(IEnumerable<TransactionEntity>? transactions)
         {
             if (transactions is null)

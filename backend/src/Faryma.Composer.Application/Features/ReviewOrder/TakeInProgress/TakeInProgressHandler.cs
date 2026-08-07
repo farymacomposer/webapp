@@ -19,7 +19,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
     {
         public async ValueTask<ReviewOrderEntity> Handle(TakeInProgressCommand command, CancellationToken ct = default)
         {
-            ReviewOrderEntity order = await reviewOrderService.GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderEntity order = await uow.ReviewOrderStore.Get(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
             if (order.Status == ReviewOrderStatus.InProgress)
@@ -30,7 +30,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
             ComposerStreamEntity liveStream = await uow.ComposerStreamStore.FindLive(ct)
                 ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима", order);
 
-            ReviewOrderEntity? inProgress = await uow.ReviewOrderQueries.FindInProgress(ct);
+            ReviewOrderEntity? inProgress = await reviewOrderService.FindInProgress(ct);
             if (inProgress is not null && inProgress.Id != command.ReviewOrderId)
             {
                 throw new ReviewOrderException($"Невозможно взять в работу заказ, пока заказ Id: {inProgress.Id} находится в работе", order);

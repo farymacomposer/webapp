@@ -14,9 +14,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl
     {
         public async ValueTask<ReviewOrderEntity> Handle(AddTrackUrlCommand command, CancellationToken ct = default)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(command.TrackDurationSeconds);
-
-            ReviewOrderEntity order = await reviewOrderService.GetOrder(command.ReviewOrderId, ct);
+            ReviewOrderEntity order = await uow.ReviewOrderStore.Get(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
             long requiredAmount = reviewOrderService.GetTrackRequiredAmount(command.TrackDurationSeconds);
