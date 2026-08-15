@@ -3,7 +3,6 @@ using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain.Entities;
-using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure;
@@ -114,10 +113,10 @@ namespace Faryma.Composer.Application.Features.ComposerStream
                 throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{stream.Status}'", stream);
             }
 
-            ReviewOrderEntity? inProgress = await reviewOrderService.FindInProgress(ct);
-            if (inProgress is not null)
+            long? idOrderInProgress = await reviewOrderService.FindInProgress(ct);
+            if (idOrderInProgress is not null)
             {
-                throw new ComposerStreamException($"Невозможно завершить стрим, пока заказ Id: {inProgress.Id} находится в работе", stream);
+                throw new ComposerStreamException($"Невозможно завершить стрим, пока заказ Id: {idOrderInProgress} находится в работе", stream);
             }
 
             stream.Status = ComposerStreamStatus.Completed;

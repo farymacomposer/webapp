@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Api.Contracts.Shared.Dto;
 using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
-using Faryma.Composer.Domain.Entities.TransactionSources;
 
 namespace Faryma.Composer.Api.Contracts.Features.OrderQueue.Dto
 {
@@ -38,15 +37,11 @@ namespace Faryma.Composer.Api.Contracts.Features.OrderQueue.Dto
         /// </summary>
         public required bool IsPositionChanged { get; init; }
 
-        public static OrderPositionDto Map(OrderPosition orderPosition) => Map(orderPosition, ReviewOrderDto.Map);
-
-        public static OrderPositionDto Map(
-            OrderPosition orderPosition,
-            Func<ReviewOrderEntity, ReviewOrderDto> mapOrder)
+        public static OrderPositionDto Map(OrderPosition orderPosition)
         {
             return new()
             {
-                Order = mapOrder(orderPosition.Order),
+                Order = ReviewOrderDto.Map(orderPosition.Order),
                 IsOrderUpdated = orderPosition.IsOrderUpdated,
                 PreviousPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Previous),
                 CurrentPosition = OrderQueuePositionDto.Map(orderPosition.PositionHistory.Current),

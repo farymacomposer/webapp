@@ -23,7 +23,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateOutOfQueue
             UserEntity createdByUser = await reviewOrderService.GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
 
-            ComposerStreamEntity? nearestStream = await uow.ComposerStreamStore.FindNearest(ct)
+            ComposerStreamEntity nearestStream = await uow.ComposerStreamStore.FindNearest(ct)
                 ?? throw new ReviewOrderException("Нет доступного ближайшего стрима");
 
             ReviewOrderStatus status = command.TrackUrl is null

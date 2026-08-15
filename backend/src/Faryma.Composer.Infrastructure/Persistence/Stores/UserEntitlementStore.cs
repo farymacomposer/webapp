@@ -7,16 +7,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
     public sealed class UserEntitlementStore(AppDbContext context, DateTimeService dateTimeService)
     {
-        public Task<UserEntitlementEntity?> FindById(long id, CancellationToken ct = default)
-        {
-            IQueryable<UserEntitlementEntity> query = context.UserEntitlements
-                .Include(x => x.UserNickname)
-                .Include(x => x.Redemption)
-                .Where(x => x.Id == id);
-
-            return query.FirstOrDefaultAsync(ct);
-        }
-
         public UserEntitlementEntity Create(
             UserEntitlementTarget target,
             UserNicknameEntity userNickname,
@@ -31,6 +21,16 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 UserNickname = userNickname,
                 CreatedByUser = createdByUser,
             }).Entity;
+        }
+
+        public Task<UserEntitlementEntity?> FindById(long id, CancellationToken ct = default)
+        {
+            IQueryable<UserEntitlementEntity> query = context.UserEntitlements
+                .Include(x => x.UserNickname)
+                .Include(x => x.Redemption)
+                .Where(x => x.Id == id);
+
+            return query.FirstOrDefaultAsync(ct);
         }
 
         public UserEntitlementRedemptionEntity Redeem(
@@ -68,16 +68,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 ReviewOrder = reviewOrder,
                 DetailedReview = detailedReview,
             }).Entity;
-        }
-
-        public void Cancel(UserEntitlementEntity entitlement)
-        {
-            if (entitlement.RedeemedAt is not null || entitlement.Redemption is not null)
-            {
-                throw new InvalidOperationException("Нельзя отменить погашенное право");
-            }
-
-            entitlement.CanceledAt = dateTimeService.Now;
         }
 
         private static void ValidateTarget(UserEntitlementTarget target)

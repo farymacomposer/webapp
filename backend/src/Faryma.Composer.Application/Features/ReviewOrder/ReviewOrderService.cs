@@ -92,11 +92,11 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
         /// <summary>
         /// Возвращает заказ в статусе InProgress, если он существует
         /// </summary>
-        public Task<ReviewOrderEntity?> FindInProgress(CancellationToken ct = default)
+        public async Task<long?> FindInProgress(CancellationToken ct = default)
         {
-            return uow.Context.ReviewOrders
+            return (await uow.Context.ReviewOrders
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct);
+                .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct))?.Id;
         }
 
         private Task<bool> UserNicknameHasOrders(UserNicknameEntity userNickname, CancellationToken ct) =>

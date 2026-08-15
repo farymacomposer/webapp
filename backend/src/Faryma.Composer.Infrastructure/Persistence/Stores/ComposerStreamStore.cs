@@ -24,13 +24,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
         }
 
         public Task<ComposerStreamEntity?> FindById(long id, CancellationToken ct = default) => context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id, ct);
-
-        public async Task<ComposerStreamEntity> Get(long id, CancellationToken ct)
-        {
-            return await FindById(id, ct)
-                ?? throw new NotFoundException($"Стрим id: {id} не найден");
-        }
-
         public Task<ComposerStreamEntity?> FindLive(CancellationToken ct = default) => context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
 
         /// <summary>
@@ -62,6 +55,12 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 .OrderBy(x => x.EventDate);
 
             return query.FirstOrDefaultAsync(ct);
+        }
+
+        public async Task<ComposerStreamEntity> Get(long id, CancellationToken ct)
+        {
+            return await FindById(id, ct)
+                ?? throw new NotFoundException($"Стрим id: {id} не найден");
         }
     }
 }

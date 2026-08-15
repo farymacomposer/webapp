@@ -7,12 +7,12 @@ using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.Features.OrderQueue;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Faryma.Composer.Application.Features.OrderQueue
 {
-    public sealed partial class OrderQueueService(
+    public sealed class OrderQueueService(
         IOrderQueueNotificationService notificationService,
         IServiceScopeFactory scopeFactory)
     {
@@ -27,14 +27,15 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         public async Task Initialize()
         {
             await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-            UnitOfWork uow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+            ReviewOrderQueries reviewOrderQueries = scope.ServiceProvider.GetRequiredService<ReviewOrderQueries>();
+            ComposerStreamQueries composerStreamQueries = scope.ServiceProvider.GetRequiredService<ComposerStreamQueries>();
 
-            DateOnly nearestStreamDate = await GetNearestStreamDate(uow);
-            ReviewOrderEntity? lastTakenOrder = await FindLastTaken(uow);
-            ReviewOrderEntity? lastTakenDebt = await FindLastTakenDebt(uow);
-            ReviewOrderEntity? lastTakenOutOfQueue = await FindLastTakenOutOfQueue(uow);
-            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await GetLastNicknamesByStreamDate(uow);
-            List<ReviewOrderEntity> orders = await GetOrdersInQueue(uow);
+            DateOnly nearestStreamDate = await composerStreamQueries.GetNearestStreamDate();
+            ReviewOrderEntity? lastTakenOrder = await reviewOrderQueries.FindLastTaken();
+            ReviewOrderEntity? lastTakenDebt = await reviewOrderQueries.FindLastTakenDebt();
+            ReviewOrderEntity? lastTakenOutOfQueue = await reviewOrderQueries.FindLastTakenOutOfQueue();
+            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await composerStreamQueries.GetLastNicknamesByStreamDate();
+            List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersInQueue();
 
             _queueManager = new OrderQueueManager
             {
@@ -63,11 +64,15 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             switch (evt)
             {
                 case ReviewOrderChangedEvent orderChanged:
+                {
                     await HandleOrderChanged(orderChanged);
                     break;
+                }
                 case ComposerStreamChangedEvent streamChanged:
+                {
                     await HandleStreamChanged(streamChanged);
                     break;
+                }
                 default:
                     throw new InvalidOperationException($"Неподдерживаемый тип события: {evt.GetType().Name}");
             }
@@ -103,9 +108,9 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             if (evt.UpdateType == OrderQueueUpdateType.OrderCanceled && evt.PreviousStatus == ReviewOrderStatus.InProgress)
             {
                 await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-                UnitOfWork uow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+                ReviewOrderQueries reviewOrderQueries = scope.ServiceProvider.GetRequiredService<ReviewOrderQueries>();
 
-                ReviewOrderEntity? lastTakenOrder = await FindLastTaken(uow);
+                ReviewOrderEntity? lastTakenOrder = await reviewOrderQueries.FindLastTaken();
                 if (lastTakenOrder is not null)
                 {
                     _queueManager.PriorityManagerState.UpdateFromOrder(lastTakenOrder);
@@ -118,7 +123,8 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         private async Task HandleStreamChanged(ComposerStreamChangedEvent evt)
         {
             await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-            UnitOfWork uow = scope.ServiceProvider.GetRequiredService<UnitOfWork>();
+            ReviewOrderQueries reviewOrderQueries = scope.ServiceProvider.GetRequiredService<ReviewOrderQueries>();
+            ComposerStreamQueries composerStreamQueries = scope.ServiceProvider.GetRequiredService<ComposerStreamQueries>();
 
             ComposerStreamEntity stream = evt.Stream;
 
@@ -132,21 +138,21 @@ namespace Faryma.Composer.Application.Features.OrderQueue
                 }
                 case OrderQueueUpdateType.StreamStarted:
                 {
-                    List<ReviewOrderEntity> orders = await GetOrdersToStartStream(uow, stream.Id);
+                    List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToStartStream(stream.Id);
                     _queueManager.NearestStreamDate = stream.EventDate;
                     _queueManager.UpdateOrders(orders);
                     break;
                 }
                 case OrderQueueUpdateType.StreamCompleted:
                 {
-                    List<ReviewOrderEntity> orders = await GetOrdersToCompleteStream(uow, stream.Id);
-                    _queueManager.NearestStreamDate = await GetNearestStreamDate(uow);
+                    List<ReviewOrderEntity> orders = await reviewOrderQueries.GetOrdersToCompleteStream(stream.Id);
+                    _queueManager.NearestStreamDate = await composerStreamQueries.GetNearestStreamDate();
                     _queueManager.UpdateOrders(orders);
                     break;
                 }
                 case OrderQueueUpdateType.StreamCanceled:
                 {
-                    _queueManager.NearestStreamDate = await GetNearestStreamDate(uow);
+                    _queueManager.NearestStreamDate = await composerStreamQueries.GetNearestStreamDate();
                     _queueManager.UpdateOrders();
                     break;
                 }

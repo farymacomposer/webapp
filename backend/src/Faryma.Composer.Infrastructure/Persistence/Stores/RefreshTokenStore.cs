@@ -5,12 +5,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
 {
     public sealed class RefreshTokenStore(AppDbContext context, DateTimeService dateTimeService)
     {
-        public Task<RefreshTokenEntity?> FindByHash(string tokenHash) =>
-            context.RefreshTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash);
-
-        public Task<RefreshTokenEntity?> FindByUserIdAndHash(Guid userId, string tokenHash) =>
-            context.RefreshTokens.FirstOrDefaultAsync(x => x.UserId == userId && x.TokenHash == tokenHash);
-
         public RefreshTokenEntity Create(string tokenHash, Guid familyId, int expiryInDays, UserEntity user)
         {
             DateTime now = dateTimeService.Now;
@@ -24,6 +18,12 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 User = user,
             }).Entity;
         }
+
+        public Task<RefreshTokenEntity?> FindByHash(string tokenHash) =>
+            context.RefreshTokens.FirstOrDefaultAsync(x => x.TokenHash == tokenHash);
+
+        public Task<RefreshTokenEntity?> FindByUserIdAndHash(Guid userId, string tokenHash) =>
+            context.RefreshTokens.FirstOrDefaultAsync(x => x.UserId == userId && x.TokenHash == tokenHash);
 
         public Task RevokeFamily(Guid familyId)
         {

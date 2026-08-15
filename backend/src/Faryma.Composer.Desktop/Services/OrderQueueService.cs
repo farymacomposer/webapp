@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.WinUI;
+using Faryma.Composer.Api.Contracts.Features.OrderQueue.AsyncContracts;
+using Faryma.Composer.Api.Contracts.Features.OrderQueue.Dto;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
-using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
-using Faryma.Composer.Contracts.Api.Features.OrderQueue.Dto;
 using Faryma.Composer.Desktop.Api.OrderQueue;
 using Faryma.Composer.Desktop.ViewModels;
 using Microsoft.UI.Dispatching;

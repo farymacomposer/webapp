@@ -10,43 +10,6 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
         AppDbContext context,
         DateTimeService dateTimeService)
     {
-        public Task<ReviewOrderEntity?> FindById(long id, CancellationToken ct = default)
-        {
-            IQueryable<ReviewOrderEntity> query = context.ReviewOrders
-                .Include(x => x.CreationStream)
-                .Include(x => x.ProcessingStream)
-                .Include(x => x.Transactions)
-                .Include(x => x.DetailedReviewPayment)
-                .ThenInclude(x => x!.Transactions)
-                .Include(x => x.CoverageRedemption)
-                .Include(x => x.Review)
-                .Where(x => x.Id == id);
-
-            return query.FirstOrDefaultAsync(ct);
-        }
-
-        public async Task<ReviewOrderEntity> Get(long id, CancellationToken ct)
-        {
-            return await FindById(id, ct)
-                ?? throw new NotFoundException($"Заказ id: {id} не найден");
-        }
-
-        public ReviewOrderDetailedReviewPaymentEntity CreateDetailedReviewPayment(
-            ReviewOrderEntity order,
-            long amount,
-            UserEntity createdByUser)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
-
-            return context.Add(new ReviewOrderDetailedReviewPaymentEntity
-            {
-                CreatedAt = dateTimeService.Now,
-                ReviewOrder = order,
-                Price = amount,
-                CreatedByUser = createdByUser,
-            }).Entity;
-        }
-
         public ReviewOrderEntity Create(
             ReviewOrderType type,
             ReviewOrderStatus status,
@@ -90,6 +53,43 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
                 UserNicknames = { userNickname },
                 CreatedByUser = createdByUser,
             }).Entity;
+        }
+
+        public ReviewOrderDetailedReviewPaymentEntity CreateDetailedReviewPayment(
+            ReviewOrderEntity order,
+            long amount,
+            UserEntity createdByUser)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
+
+            return context.Add(new ReviewOrderDetailedReviewPaymentEntity
+            {
+                CreatedAt = dateTimeService.Now,
+                ReviewOrder = order,
+                Price = amount,
+                CreatedByUser = createdByUser,
+            }).Entity;
+        }
+
+        public Task<ReviewOrderEntity?> FindById(long id, CancellationToken ct = default)
+        {
+            IQueryable<ReviewOrderEntity> query = context.ReviewOrders
+                .Include(x => x.CreationStream)
+                .Include(x => x.ProcessingStream)
+                .Include(x => x.Transactions)
+                .Include(x => x.DetailedReviewPayment)
+                .ThenInclude(x => x!.Transactions)
+                .Include(x => x.CoverageRedemption)
+                .Include(x => x.Review)
+                .Where(x => x.Id == id);
+
+            return query.FirstOrDefaultAsync(ct);
+        }
+
+        public async Task<ReviewOrderEntity> Get(long id, CancellationToken ct)
+        {
+            return await FindById(id, ct)
+                ?? throw new NotFoundException($"Заказ id: {id} не найден");
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using Faryma.Composer.Api.Contracts.Features.OrderQueue.AsyncContracts;
 using Faryma.Composer.Contracts.Api.Features.OrderQueue;
-using Faryma.Composer.Contracts.Api.Features.OrderQueue.AsyncContracts;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 

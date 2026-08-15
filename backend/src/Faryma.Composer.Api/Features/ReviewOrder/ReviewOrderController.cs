@@ -9,12 +9,10 @@ using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Complete;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Create;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Freeze;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Pay;
-using Faryma.Composer.Api.Contracts.Features.ReviewOrder.PayDetailedReview;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.TakeInProgress;
 using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Unfreeze;
 using Faryma.Composer.Api.Contracts.Shared.Dto;
 using Faryma.Composer.Api.Features.Auth;
-using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl;
 using Faryma.Composer.Application.Features.ReviewOrder.Cancel;
 using Faryma.Composer.Application.Features.ReviewOrder.Complete;
@@ -23,10 +21,10 @@ using Faryma.Composer.Application.Features.ReviewOrder.CreateDonation;
 using Faryma.Composer.Application.Features.ReviewOrder.CreateFree;
 using Faryma.Composer.Application.Features.ReviewOrder.CreateOutOfQueue;
 using Faryma.Composer.Application.Features.ReviewOrder.Freeze;
+using Faryma.Composer.Application.Features.ReviewOrder.Pay;
 using Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress;
 using Faryma.Composer.Application.Features.ReviewOrder.Unfreeze;
 using Faryma.Composer.Domain;
-using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Microsoft.AspNetCore.Mvc;
 using AppMediator = Mediator.Mediator;
@@ -168,7 +166,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         {
             Guid userId = User.GetUserId();
 
-            TransactionEntity transaction = await mediator.Send(new PayOrderCommand
+            ReviewOrderEntity order = await mediator.Send(new PayCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Nickname = request.Nickname.Trim(),
@@ -179,38 +177,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
 
             return Ok(new PayReviewOrderResponse
             {
-                ReviewOrder = ReviewOrderDto.Map((ReviewOrderEntity)transaction.TransactionSource),
-                PaymentTransactionId = transaction.Id
-            });
-        }
-
-        /// <summary>
-        /// Оплачивает подробный разбор заказа
-        /// </summary>
-        [HttpPost]
-        [AuthorizeAdmins]
-        [Idempotent]
-        public async Task<ActionResult<PayDetailedReviewOrderResponse>> PayDetailedReview(
-            [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
-            [FromBody] PayDetailedReviewOrderRequest request,
-            CancellationToken ct)
-        {
-            Guid userId = User.GetUserId();
-
-            PayDetailedReviewResult result = await mediator.Send(new PayDetailedReviewCommand
-            {
-                ReviewOrderId = request.ReviewOrderId,
-                Nickname = request.Nickname.Trim(),
-                TopUpProvider = request.TopUpProvider,
-                UserEntitlementId = request.UserEntitlementId,
-                CreatedByUserId = userId,
-            }, ct);
-
-            return Ok(new PayDetailedReviewOrderResponse
-            {
-                ReviewOrder = ReviewOrderDto.Map(result.ReviewOrder),
-                PaymentTransactionId = result.PaymentTransaction?.Id,
-                UserEntitlementRedemptionId = result.UserEntitlementRedemption?.Id
+                ReviewOrder = ReviewOrderDto.Map(order)
             });
         }
 

@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Infrastructure.Options;
+﻿using Faryma.Composer.Infrastructure.Features.OrderQueue;
+using Faryma.Composer.Infrastructure.Options;
 using Faryma.Composer.Infrastructure.Persistence.Stores;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,9 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
             services
                 .AddScoped<UnitOfWork>()
 
+                .AddScoped<ComposerStreamQueries>()
+                .AddScoped<ReviewOrderQueries>()
+
                 .AddScoped<ComposerStreamStore>()
                 .AddScoped<RefreshTokenStore>()
                 .AddScoped<ReviewStore>()
@@ -39,6 +43,7 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
                 .AddScoped<TransactionStore>()
                 .AddScoped<UserEntitlementStore>()
                 .AddScoped<UserNicknameStore>()
+
                 .AddScoped<DateTimeService>();
 
             return services;

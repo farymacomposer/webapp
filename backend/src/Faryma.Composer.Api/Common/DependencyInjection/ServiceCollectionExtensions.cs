@@ -12,7 +12,6 @@ using Faryma.Composer.Api.Contracts.Features.OrderQueue;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Api.Features.Auth.Services;
 using Faryma.Composer.Api.Features.OrderQueue;
-using Faryma.Composer.Api.Features.ReviewOrder;
 using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Infrastructure;
@@ -253,7 +252,6 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
 
             services
                 .AddScoped<IdempotentFilter>()
-                .AddScoped<ReviewOrderDtoMapper>()
                 .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 

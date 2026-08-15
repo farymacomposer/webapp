@@ -432,9 +432,6 @@ dotnet_diagnostic.rcs1096.severity = none
 # Add 'static' modifier to all partial class declarations
 dotnet_diagnostic.rcs1108.severity = none
 
-# Add braces to switch section with multiple statements
-dotnet_diagnostic.rcs1111.severity = none
-
 # Combine 'Enumerable.Where' method chain
 dotnet_diagnostic.rcs1112.severity = none
 
@@ -923,6 +920,9 @@ dotnet_diagnostic.rcs1107.severity = error
 
 # Declare type inside namespace
 dotnet_diagnostic.rcs1110.severity = error
+
+# Add braces to switch section with multiple statements
+dotnet_diagnostic.rcs1111.severity = error
 
 # Use 'string.IsNullOrEmpty' method
 dotnet_diagnostic.rcs1113.severity = error

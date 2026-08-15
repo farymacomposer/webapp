@@ -1,20 +1,21 @@
 ﻿using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Application.Features.OrderQueue
+namespace Faryma.Composer.Infrastructure.Features.OrderQueue
 {
-    public sealed partial class OrderQueueService
+    public sealed class ComposerStreamQueries(
+        AppDbContext context,
+        DateTimeService dateTimeService)
     {
         /// <summary>
         /// Возвращает дату ближайшего доступного стрима или DateOnly.MinValue, если стримов нет
         /// </summary>
-        private static async Task<DateOnly> GetNearestStreamDate(UnitOfWork uow)
+        public async Task<DateOnly> GetNearestStreamDate()
         {
-            DateOnly today = uow.DateTimeService.Today;
+            DateOnly today = dateTimeService.Today;
 
-            IOrderedQueryable<ComposerStreamEntity> query = uow.Context.ComposerStreams
+            IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
@@ -28,9 +29,9 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         /// <summary>
         /// Возвращает последний выданный никнейм по каждой дате стрима для приоритетного алгоритма очереди
         /// </summary>
-        private static Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate(UnitOfWork uow)
+        public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate()
         {
-            var query = uow.Context.ComposerStreams
+            var query = context.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.ProcessedReviewOrders.Any(x => x.Type != ReviewOrderType.OutOfQueue)
                     && x.CreatedReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder

@@ -47,5 +47,15 @@ namespace Faryma.Composer.Domain.Entities
         /// Погашение права
         /// </summary>
         public UserEntitlementRedemptionEntity? Redemption { get; set; }
+
+        public void Cancel(DateTime now)
+        {
+            if (RedeemedAt is not null || Redemption is not null)
+            {
+                throw new InvalidOperationException("Нельзя отменить погашенное право");
+            }
+
+            CanceledAt = now;
+        }
     }
 }

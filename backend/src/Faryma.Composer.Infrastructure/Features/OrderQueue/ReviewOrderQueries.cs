@@ -1,16 +1,15 @@
 ﻿using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Application.Features.OrderQueue
+namespace Faryma.Composer.Infrastructure.Features.OrderQueue
 {
-    public sealed partial class OrderQueueService
+    public sealed class ReviewOrderQueries(UnitOfWork uow)
     {
         /// <summary>
         /// Возвращает текущий заказ в работе, либо последний завершенный заказ
         /// </summary>
-        private static async Task<ReviewOrderEntity?> FindLastTaken(UnitOfWork uow)
+        public async Task<ReviewOrderEntity?> FindLastTaken()
         {
             return await uow.Context.ReviewOrders
                 .AsNoTracking()
@@ -25,7 +24,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         /// <summary>
         /// Возвращает текущий/последний взятый заказ категории Debt
         /// </summary>
-        private static async Task<ReviewOrderEntity?> FindLastTakenDebt(UnitOfWork uow)
+        public async Task<ReviewOrderEntity?> FindLastTakenDebt()
         {
             return await uow.Context.ReviewOrders
                 .AsNoTracking()
@@ -43,7 +42,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         /// <summary>
         /// Возвращает текущий/последний взятый заказ типа OutOfQueue
         /// </summary>
-        private static async Task<ReviewOrderEntity?> FindLastTakenOutOfQueue(UnitOfWork uow)
+        public async Task<ReviewOrderEntity?> FindLastTakenOutOfQueue()
         {
             return await uow.Context.ReviewOrders
                 .AsNoTracking()
@@ -59,7 +58,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         /// <summary>
         /// Возвращает заказы, которые участвуют в расчете текущей очереди
         /// </summary>
-        private static Task<List<ReviewOrderEntity>> GetOrdersInQueue(UnitOfWork uow)
+        public Task<List<ReviewOrderEntity>> GetOrdersInQueue()
         {
             IQueryable<ReviewOrderEntity> query = uow.Context.ReviewOrders
                 .AsNoTracking()
@@ -79,7 +78,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         /// <summary>
         /// Возвращает заказы, которые нужно обновить при старте стрима
         /// </summary>
-        private static Task<List<ReviewOrderEntity>> GetOrdersToStartStream(UnitOfWork uow, long streamId)
+        public Task<List<ReviewOrderEntity>> GetOrdersToStartStream(long streamId)
         {
             IQueryable<ReviewOrderEntity> query = uow.Context.ReviewOrders
                 .AsNoTracking()
@@ -95,7 +94,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         /// <summary>
         /// Возвращает заказы, которые нужно обновить при завершении стрима
         /// </summary>
-        private static Task<List<ReviewOrderEntity>> GetOrdersToCompleteStream(UnitOfWork uow, long streamId)
+        public Task<List<ReviewOrderEntity>> GetOrdersToCompleteStream(long streamId)
         {
             IQueryable<ReviewOrderEntity> query = uow.Context.ReviewOrders
                 .AsNoTracking()

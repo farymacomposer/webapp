@@ -30,10 +30,10 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
             ComposerStreamEntity liveStream = await uow.ComposerStreamStore.FindLive(ct)
                 ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима", order);
 
-            ReviewOrderEntity? inProgress = await reviewOrderService.FindInProgress(ct);
-            if (inProgress is not null && inProgress.Id != command.ReviewOrderId)
+            long? idOrderInProgress = await reviewOrderService.FindInProgress(ct);
+            if (idOrderInProgress is not null && idOrderInProgress != command.ReviewOrderId)
             {
-                throw new ReviewOrderException($"Невозможно взять в работу заказ, пока заказ Id: {inProgress.Id} находится в работе", order);
+                throw new ReviewOrderException($"Невозможно взять в работу заказ, пока заказ Id: {idOrderInProgress} находится в работе", order);
             }
 
             OrderQueuePosition position = await orderQueueService.GetCurrentQueuePosition(order);

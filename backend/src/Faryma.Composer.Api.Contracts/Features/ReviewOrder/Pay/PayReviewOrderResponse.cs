@@ -13,10 +13,5 @@ namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Pay
         /// </summary>
         [Required]
         public required ReviewOrderDto ReviewOrder { get; init; }
-
-        /// <summary>
-        /// Id платежа
-        /// </summary>
-        public required long PaymentTransactionId { get; init; }
     }
 }

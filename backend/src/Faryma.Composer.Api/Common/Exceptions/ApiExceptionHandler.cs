@@ -22,16 +22,19 @@ namespace Faryma.Composer.Api.Common.Exceptions
             switch (exception)
             {
                 case AuthenticationException:
+                {
                     await WriteJson(httpContext, StatusCodes.Status401Unauthorized, new { Message = "Ошибка аутентификации" }, cancellationToken);
 
                     return true;
-
+                }
                 case AppException appException:
+                {
                     await WriteJson(httpContext, AppException.StatusCode, appException.GetResultObject(), cancellationToken);
 
                     return true;
-
+                }
                 default:
+                {
                     logger.LogCritical(exception, "Необработанное исключение API");
 
                     httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -46,6 +49,7 @@ namespace Faryma.Composer.Api.Common.Exceptions
                             Title = "Произошла непредвиденная ошибка"
                         }
                     });
+                }
             }
         }
 

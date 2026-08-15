@@ -1,17 +1,14 @@
 ﻿using Faryma.Composer.Api.Contracts.Features.OrderQueue;
 using Faryma.Composer.Api.Contracts.Features.OrderQueue.AsyncContracts;
-using Faryma.Composer.Api.Features.ReviewOrder;
-using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 using Microsoft.AspNetCore.SignalR;
 using Saunter.Attributes;
 
 namespace Faryma.Composer.Api.Features.OrderQueue
 {
     [AsyncApi]
-    public sealed class OrderQueueNotificationHub(
-        OrderQueueService orderQueueService,
-        ReviewOrderDtoMapper reviewOrderDtoMapper) : Hub<IClient>, IOrderQueueNotificationServer
+    public sealed class OrderQueueNotificationHub(OrderQueueService orderQueueService) : Hub<IClient>, IOrderQueueNotificationServer
     {
         public override async Task OnConnectedAsync()
         {
@@ -24,7 +21,7 @@ namespace Faryma.Composer.Api.Features.OrderQueue
         public async Task GetSnapshot()
         {
             OrderQueueSnapshot snapshot = await orderQueueService.GetQueueSnapshot();
-            OrderQueueSnapshotMessage message = OrderQueueSnapshotMessage.Map(snapshot, reviewOrderDtoMapper.Map);
+            OrderQueueSnapshotMessage message = OrderQueueSnapshotMessage.Map(snapshot);
 
             await Clients.Caller.ReceiveSnapshot(message);
         }
