@@ -3,27 +3,28 @@ using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.Features.ComposerStream;
+using Faryma.Composer.Infrastructure.Features.User;
 using Mediator;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
 namespace Faryma.Composer.Application.Features.ComposerStream.Create
 {
     public sealed class CreateHandler(
-        UnitOfWork uow,
-        UserManager<UserEntity> userManager,
+        AppDbContext context,
+        UserStore userStore,
+        ComposerStreamStore composerStreamStore,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CreateCommand, ComposerStreamEntity>
     {
-        public async ValueTask<ComposerStreamEntity> Handle(CreateCommand command, CancellationToken ct = default)
+        public async ValueTask<ComposerStreamEntity> Handle(CreateCommand command, CancellationToken ct)
         {
             try
             {
-                UserEntity createdByUser = await userManager.Users.FirstOrDefaultAsync(x => x.Id == command.CreatedByUserId, ct)
-                    ?? throw new ComposerStreamException($"Пользователь с id: {command.CreatedByUserId} не найден");
+                UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
 
-                ComposerStreamEntity stream = uow.ComposerStreamStore.Create(command.EventDate, command.Type, createdByUser);
-                await uow.SaveChanges(ct);
+                ComposerStreamEntity stream = composerStreamStore.CreateStream(command.EventDate, command.Type, createdByUser);
+                await context.SaveChangesAsync(ct);
 
                 orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamCreated);
 

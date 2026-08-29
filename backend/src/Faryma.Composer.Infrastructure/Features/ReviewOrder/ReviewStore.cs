@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 
-namespace Faryma.Composer.Infrastructure.Persistence.Stores
+namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
     public sealed class ReviewStore(AppDbContext context, DateTimeService dateTimeService)
     {

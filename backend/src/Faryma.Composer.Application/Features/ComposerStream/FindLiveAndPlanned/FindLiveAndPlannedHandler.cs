@@ -4,9 +4,9 @@ using Mediator;
 
 namespace Faryma.Composer.Application.Features.ComposerStream.FindLiveAndPlanned
 {
-    public sealed class FindLiveAndPlannedHandler(ComposerStreamQueries composerStreamQueries) : IRequestHandler<FindLiveAndPlannedQuery, IReadOnlyCollection<ComposerStreamEntity>>
+    public sealed class FindLiveAndPlannedHandler(ComposerStreamStore composerStreamStore) : IRequestHandler<FindLiveAndPlannedQuery, IReadOnlyCollection<ComposerStreamEntity>>
     {
-        public async ValueTask<IReadOnlyCollection<ComposerStreamEntity>> Handle(FindLiveAndPlannedQuery query, CancellationToken ct = default) =>
-            await composerStreamQueries.FindLiveAndPlanned(ct);
+        public async ValueTask<IReadOnlyCollection<ComposerStreamEntity>> Handle(FindLiveAndPlannedQuery query, CancellationToken ct) =>
+            await composerStreamStore.FindLiveAndPlannedStreams(ct);
     }
 }

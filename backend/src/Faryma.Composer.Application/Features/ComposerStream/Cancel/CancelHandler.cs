@@ -10,20 +10,20 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ComposerStream.Cancel
 {
     public sealed class CancelHandler(
-        UnitOfWork uow,
-        ComposerStreamQueries composerStreamQueries,
+        AppDbContext context,
+        ComposerStreamStore composerStreamStore,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CancelCommand, ComposerStreamEntity>
     {
-        public async ValueTask<ComposerStreamEntity> Handle(CancelCommand command, CancellationToken ct = default)
+        public async ValueTask<ComposerStreamEntity> Handle(CancelCommand command, CancellationToken ct)
         {
-            ComposerStreamEntity stream = await uow.ComposerStreamStore.Get(command.ComposerStreamId, ct);
+            ComposerStreamEntity stream = await composerStreamStore.GetStream(command.ComposerStreamId, ct);
 
             if (stream.Status == ComposerStreamStatus.Canceled)
             {
                 return stream;
             }
 
-            bool hasActiveCreatedOrders = await composerStreamQueries.ExistsActiveCreatedOrdersForStream(stream.Id, ct);
+            bool hasActiveCreatedOrders = await composerStreamStore.ExistsActiveCreatedOrdersForStream(stream.Id, ct);
             if (hasActiveCreatedOrders)
             {
                 throw new ComposerStreamException("Невозможно отменить стрим: для него существуют активные заказы", stream);
@@ -31,7 +31,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Cancel
 
             stream.Cancel();
 
-            await uow.SaveChanges(ct);
+            await context.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamCanceled);
 

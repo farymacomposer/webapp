@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\ReviewOrder\" />
+    <Folder Include="Persistence\Stores\" />
   </ItemGroup>
 
 </Project>

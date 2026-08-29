@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.OrderQueue
 {
-    public sealed class OrderQueueQueries(
+    public sealed class OrderQueueStore(
         AppDbContext context,
         DateTimeService dateTimeService)
     {

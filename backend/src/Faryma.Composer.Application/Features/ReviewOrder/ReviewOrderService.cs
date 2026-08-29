@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Faryma.Composer.Application.Features.ReviewOrder
 {
     public sealed class ReviewOrderService(
-        UnitOfWork uow,
+        AppDbContext context,
         UserManager<UserEntity> userManager,
         AppSettingsService appSettingsService)
     {
@@ -89,17 +89,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder
                 order);
         }
 
-        /// <summary>
-        /// Возвращает заказ в статусе InProgress, если он существует
-        /// </summary>
-        public async Task<long?> FindInProgress(CancellationToken ct = default)
-        {
-            return (await uow.Context.ReviewOrders
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct))?.Id;
-        }
-
         private Task<bool> UserNicknameHasOrders(UserNicknameEntity userNickname, CancellationToken ct) =>
-            uow.Context.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0, ct);
+            context.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0, ct);
     }
 }

@@ -2,7 +2,7 @@
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 
-namespace Faryma.Composer.Infrastructure.Persistence.Stores
+namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
     public sealed class TransactionStore(AppDbContext context, DateTimeService dateTimeService)
     {

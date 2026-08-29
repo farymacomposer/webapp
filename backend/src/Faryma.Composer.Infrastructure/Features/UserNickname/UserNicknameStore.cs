@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Persistence.Stores
+namespace Faryma.Composer.Infrastructure.Features.UserNickname
 {
     public sealed class UserNicknameStore(AppDbContext context, ILookupNormalizer normalizer)
     {
@@ -25,7 +25,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             return result;
         }
 
-        public Task<UserNicknameEntity?> FindByNickname(string nickname, CancellationToken ct = default)
+        public Task<UserNicknameEntity?> FindByNickname(string nickname, CancellationToken ct)
         {
             string normalized = normalizer.NormalizeName(nickname);
 

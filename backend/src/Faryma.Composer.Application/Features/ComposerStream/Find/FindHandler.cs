@@ -4,9 +4,9 @@ using Mediator;
 
 namespace Faryma.Composer.Application.Features.ComposerStream.Find
 {
-    public sealed class FindHandler(ComposerStreamQueries composerStreamQueries) : IRequestHandler<FindQuery, IReadOnlyCollection<ComposerStreamEntity>>
+    public sealed class FindHandler(ComposerStreamStore composerStreamStore) : IRequestHandler<FindQuery, IReadOnlyCollection<ComposerStreamEntity>>
     {
-        public async ValueTask<IReadOnlyCollection<ComposerStreamEntity>> Handle(FindQuery query, CancellationToken ct = default) =>
-            await composerStreamQueries.Find(query.DateFrom, query.DateTo, ct);
+        public async ValueTask<IReadOnlyCollection<ComposerStreamEntity>> Handle(FindQuery query, CancellationToken ct) =>
+            await composerStreamStore.FindStreams(query.DateFrom, query.DateTo, ct);
     }
 }

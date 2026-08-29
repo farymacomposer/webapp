@@ -4,11 +4,9 @@ using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Persistence.Stores
+namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
-    public sealed class ReviewOrderStore(
-        AppDbContext context,
-        DateTimeService dateTimeService)
+    public sealed class ReviewOrderStore(AppDbContext context, DateTimeService dateTimeService)
     {
         public ReviewOrderEntity Create(
             ReviewOrderType type,
@@ -71,7 +69,13 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             }).Entity;
         }
 
-        public Task<ReviewOrderEntity?> FindById(long id, CancellationToken ct = default)
+        public async Task<ReviewOrderEntity> GetOrder(long id, CancellationToken ct)
+        {
+            return await FindOrderById(id, ct)
+                ?? throw new NotFoundException($"Заказ id: {id} не найден");
+        }
+
+        public Task<ReviewOrderEntity?> FindOrderById(long id, CancellationToken ct)
         {
             IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .Include(x => x.CreationStream)
@@ -86,10 +90,48 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             return query.FirstOrDefaultAsync(ct);
         }
 
-        public async Task<ReviewOrderEntity> Get(long id, CancellationToken ct)
+        /// <summary>
+        /// Возвращает заказ в статусе InProgress, если он существует
+        /// </summary>
+        public Task<ReviewOrderEntity?> FindInProgress(CancellationToken ct)
         {
-            return await FindById(id, ct)
-                ?? throw new NotFoundException($"Заказ id: {id} не найден");
+            return context.ReviewOrders
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct);
+        }
+
+        public Task<ComposerStreamEntity?> FindLiveStream(CancellationToken ct) =>
+            context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
+
+        /// <summary>
+        /// Возвращает ближайший доступный стрим: Live или ближайший Planned на сегодня/будущее
+        /// </summary>
+        public Task<ComposerStreamEntity?> FindNearestStream(CancellationToken ct)
+        {
+            DateOnly today = dateTimeService.Today;
+
+            IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
+                .Where(x => x.Status == ComposerStreamStatus.Live
+                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
+                .OrderBy(x => x.EventDate);
+
+            return query.FirstOrDefaultAsync(ct);
+        }
+
+        /// <summary>
+        /// Возвращает ближайший доступный стрим указанного типа: Live или ближайший Planned на сегодня/будущее
+        /// </summary>
+        public Task<ComposerStreamEntity?> FindNearestStream(ComposerStreamType type, CancellationToken ct)
+        {
+            DateOnly today = dateTimeService.Today;
+
+            IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
+                .Where(x => x.Type == type
+                    && (x.Status == ComposerStreamStatus.Live
+                        || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today)))
+                .OrderBy(x => x.EventDate);
+
+            return query.FirstOrDefaultAsync(ct);
         }
     }
 }

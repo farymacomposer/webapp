@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Persistence.Stores
+namespace Faryma.Composer.Infrastructure.Features.Auth
 {
     public sealed class RefreshTokenStore(AppDbContext context, DateTimeService dateTimeService)
     {

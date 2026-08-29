@@ -3,7 +3,7 @@ using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace Faryma.Composer.Infrastructure.Persistence.Stores
+namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
     public sealed class UserEntitlementStore(AppDbContext context, DateTimeService dateTimeService)
     {
@@ -23,7 +23,7 @@ namespace Faryma.Composer.Infrastructure.Persistence.Stores
             }).Entity;
         }
 
-        public Task<UserEntitlementEntity?> FindById(long id, CancellationToken ct = default)
+        public Task<UserEntitlementEntity?> FindById(long id, CancellationToken ct)
         {
             IQueryable<UserEntitlementEntity> query = context.UserEntitlements
                 .Include(x => x.UserNickname)

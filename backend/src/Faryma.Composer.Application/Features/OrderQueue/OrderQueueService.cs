@@ -27,7 +27,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         public async Task Initialize()
         {
             await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-            OrderQueueQueries orderQueueQueries = scope.ServiceProvider.GetRequiredService<OrderQueueQueries>();
+            OrderQueueStore orderQueueQueries = scope.ServiceProvider.GetRequiredService<OrderQueueStore>();
 
             DateOnly nearestStreamDate = await orderQueueQueries.GetNearestStreamDate();
             ReviewOrderEntity? lastTakenOrder = await orderQueueQueries.FindLastTaken();
@@ -107,7 +107,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             if (evt.UpdateType == OrderQueueUpdateType.OrderCanceled && evt.PreviousStatus == ReviewOrderStatus.InProgress)
             {
                 await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-                OrderQueueQueries orderQueueQueries = scope.ServiceProvider.GetRequiredService<OrderQueueQueries>();
+                OrderQueueStore orderQueueQueries = scope.ServiceProvider.GetRequiredService<OrderQueueStore>();
 
                 ReviewOrderEntity? lastTakenOrder = await orderQueueQueries.FindLastTaken();
                 if (lastTakenOrder is not null)
@@ -122,7 +122,7 @@ namespace Faryma.Composer.Application.Features.OrderQueue
         private async Task HandleStreamChanged(ComposerStreamChangedEvent evt)
         {
             await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
-            OrderQueueQueries orderQueueQueries = scope.ServiceProvider.GetRequiredService<OrderQueueQueries>();
+            OrderQueueStore orderQueueQueries = scope.ServiceProvider.GetRequiredService<OrderQueueStore>();
 
             ComposerStreamEntity stream = evt.Stream;
 

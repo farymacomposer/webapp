@@ -7,12 +7,14 @@ using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.Features.ReviewOrder;
 using Mediator;
 
 namespace Faryma.Composer.Application.Features.ReviewOrder.CreateCharity
 {
     public sealed class CreateCharityHandler(
-        UnitOfWork uow,
+        AppDbContext context,
+        ReviewOrderStore reviewOrderStore,
         ReviewOrderService reviewOrderService,
         UserNicknameService userNicknameService,
         AppSettingsService appSettingsService,
@@ -23,7 +25,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateCharity
             UserEntity createdByUser = await reviewOrderService.GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
 
-            ComposerStreamEntity? liveStream = await uow.ComposerStreamStore.FindLive(ct);
+            ComposerStreamEntity? liveStream = await reviewOrderStore.FindLiveStream(ct);
             if (liveStream is null || liveStream.Type != ComposerStreamType.Charity)
             {
                 throw new ReviewOrderException("Нет запущенного благотворительного стрима");
@@ -33,7 +35,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateCharity
                 ? ReviewOrderStatus.Preorder
                 : ReviewOrderStatus.Pending;
 
-            ReviewOrderEntity order = uow.ReviewOrderStore.Create(
+            ReviewOrderEntity order = reviewOrderStore.Create(
                 ReviewOrderType.Charity,
                 status,
                 command.TrackUrl,
@@ -45,7 +47,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateCharity
                 userNickname,
                 createdByUser);
 
-            await uow.SaveChanges(ct);
+            await context.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified);
 

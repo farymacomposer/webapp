@@ -10,23 +10,23 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ComposerStream.Start
 {
     public sealed class StartHandler(
-        UnitOfWork uow,
-        OrderQueueEventChannel orderQueueEventChannel,
-        ComposerStreamQueries composerStreamQueries,
-        DateTimeService dateTimeService) : IRequestHandler<StartCommand, ComposerStreamEntity>
+        AppDbContext context,
+        DateTimeService dateTimeService,
+        ComposerStreamStore composerStreamStore,
+        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<StartCommand, ComposerStreamEntity>
     {
-        public async ValueTask<ComposerStreamEntity> Handle(StartCommand command, CancellationToken ct = default)
+        public async ValueTask<ComposerStreamEntity> Handle(StartCommand command, CancellationToken ct)
         {
             // TODO: если дата стрима не совпадает с текущей датой, то нельзя запустить
 
-            ComposerStreamEntity stream = await uow.ComposerStreamStore.Get(command.ComposerStreamId, ct);
+            ComposerStreamEntity stream = await composerStreamStore.GetStream(command.ComposerStreamId, ct);
 
             if (stream.Status == ComposerStreamStatus.Live)
             {
                 return stream;
             }
 
-            ComposerStreamEntity? live = await composerStreamQueries.FindLive(ct);
+            ComposerStreamEntity? live = await composerStreamStore.FindLiveStream(ct);
             if (live is not null && live.Id != command.ComposerStreamId)
             {
                 throw new ComposerStreamException($"Невозможно начать стрим, пока стрим на дату: {live.EventDate} запущен", stream);
@@ -34,7 +34,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Start
 
             stream.Start(dateTimeService.Now);
 
-            await uow.SaveChanges(ct);
+            await context.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamStarted);
 

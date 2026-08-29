@@ -1,6 +1,10 @@
-﻿using Faryma.Composer.Infrastructure.Features.OrderQueue;
+﻿using Faryma.Composer.Infrastructure.Features.Auth;
+using Faryma.Composer.Infrastructure.Features.ComposerStream;
+using Faryma.Composer.Infrastructure.Features.OrderQueue;
+using Faryma.Composer.Infrastructure.Features.ReviewOrder;
+using Faryma.Composer.Infrastructure.Features.User;
+using Faryma.Composer.Infrastructure.Features.UserNickname;
 using Faryma.Composer.Infrastructure.Options;
-using Faryma.Composer.Infrastructure.Persistence.Stores;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,19 +35,28 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
                 .PersistKeysToDbContext<AppDbContext>();
 
             services
-                .AddScoped<UnitOfWork>()
+                .AddScoped<DateTimeService>()
 
-                .AddScoped<OrderQueueQueries>()
-
-                .AddScoped<ComposerStreamStore>()
+                // Auth
                 .AddScoped<RefreshTokenStore>()
-                .AddScoped<ReviewStore>()
+
+                // ComposerStream
+                .AddScoped<ComposerStreamStore>()
+
+                // OrderQueue
+                .AddScoped<OrderQueueStore>()
+
+                // ReviewOrder
                 .AddScoped<ReviewOrderStore>()
+                .AddScoped<ReviewStore>()
                 .AddScoped<TransactionStore>()
                 .AddScoped<UserEntitlementStore>()
-                .AddScoped<UserNicknameStore>()
 
-                .AddScoped<DateTimeService>();
+                // User
+                .AddScoped<UserStore>()
+
+                // UserNickname
+                .AddScoped<UserNicknameStore>();
 
             return services;
         }
