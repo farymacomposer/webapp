@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Domain;
 
-namespace Faryma.Composer.Api.Features.ReviewOrder.Create
+namespace Faryma.Composer.Api.Features.ReviewOrder
 {
     /// <summary>
     /// Общие поля запроса создания заказа на разбор
     /// </summary>
-    public abstract record CreateReviewOrderRequestBase : IValidatableObject
+    public abstract record CreateRequestBase : IValidatableObject
     {
         /// <summary>
         /// Псевдоним пользователя

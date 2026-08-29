@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using Faryma.Composer.Api.Features.Auth.Login;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
 using Faryma.Composer.Domain;
@@ -61,13 +62,11 @@ namespace Faryma.Composer.Api.Test.Auth
             SeededAuthUser admin = await SeedAdmin(app);
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.PostAsJsonAsync(
-                _browserAdminLoginRoute,
-                new LoginRequest
-                {
-                    UserName = admin.UserName,
-                    Password = "WrongPassword123!",
-                });
+            using HttpResponseMessage response = await client.PostAsJsonAsync(_browserAdminLoginRoute, new LoginRequest
+            {
+                UserName = admin.UserName,
+                Password = "WrongPassword123!",
+            }, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.False(response.Headers.TryGetValues("Set-Cookie", out _));

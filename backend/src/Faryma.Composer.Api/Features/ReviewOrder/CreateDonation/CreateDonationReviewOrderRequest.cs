@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Domain.Enums;
 
-namespace Faryma.Composer.Api.Features.ReviewOrder.Create
+namespace Faryma.Composer.Api.Features.ReviewOrder.CreateDonation
 {
     /// <summary>
     /// Запрос создания донатного заказа на разбор
     /// </summary>
-    public sealed record CreateDonationReviewOrderRequest : CreateReviewOrderRequestBase
+    public sealed record CreateDonationReviewOrderRequest : CreateRequestBase
     {
         /// <summary>
         /// Сумма платежа

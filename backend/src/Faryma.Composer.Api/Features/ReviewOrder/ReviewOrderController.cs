@@ -7,7 +7,10 @@ using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Api.Features.ReviewOrder.AddTrackUrl;
 using Faryma.Composer.Api.Features.ReviewOrder.Cancel;
 using Faryma.Composer.Api.Features.ReviewOrder.Complete;
-using Faryma.Composer.Api.Features.ReviewOrder.Create;
+using Faryma.Composer.Api.Features.ReviewOrder.CreateCharity;
+using Faryma.Composer.Api.Features.ReviewOrder.CreateDonation;
+using Faryma.Composer.Api.Features.ReviewOrder.CreateFree;
+using Faryma.Composer.Api.Features.ReviewOrder.CreateOutOfQueue;
 using Faryma.Composer.Api.Features.ReviewOrder.Freeze;
 using Faryma.Composer.Api.Features.ReviewOrder.Pay;
 using Faryma.Composer.Api.Features.ReviewOrder.TakeInProgress;
@@ -45,7 +48,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
-        public async Task<ActionResult<CreateReviewOrderResponse>> CreateOutOfQueueReviewOrder(
+        public async Task<ActionResult<CreateOutOfQueueReviewOrderResponse>> CreateOutOfQueueReviewOrder(
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] CreateOutOfQueueReviewOrderRequest request,
             CancellationToken ct)
@@ -61,7 +64,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 CreatedByUserId = userId,
             }, ct);
 
-            return Ok(new CreateReviewOrderResponse
+            return Ok(new CreateOutOfQueueReviewOrderResponse
             {
                 ReviewOrder = ReviewOrderDto.Map(order)
             });
@@ -73,7 +76,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
-        public async Task<ActionResult<CreateReviewOrderResponse>> CreateDonationReviewOrder(
+        public async Task<ActionResult<CreateDonationReviewOrderResponse>> CreateDonationReviewOrder(
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] CreateDonationReviewOrderRequest request,
             CancellationToken ct)
@@ -91,7 +94,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 CreatedByUserId = userId,
             }, ct);
 
-            return Ok(new CreateReviewOrderResponse
+            return Ok(new CreateDonationReviewOrderResponse
             {
                 ReviewOrder = ReviewOrderDto.Map(order)
             });
@@ -103,7 +106,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
-        public async Task<ActionResult<CreateReviewOrderResponse>> CreateFreeReviewOrder(
+        public async Task<ActionResult<CreateFreeReviewOrderResponse>> CreateFreeReviewOrder(
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] CreateFreeReviewOrderRequest request,
             CancellationToken ct)
@@ -119,7 +122,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 CreatedByUserId = userId,
             }, ct);
 
-            return Ok(new CreateReviewOrderResponse
+            return Ok(new CreateFreeReviewOrderResponse
             {
                 ReviewOrder = ReviewOrderDto.Map(order)
             });
@@ -131,7 +134,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [HttpPost]
         [AuthorizeAdmins]
         [Idempotent]
-        public async Task<ActionResult<CreateReviewOrderResponse>> CreateCharityReviewOrder(
+        public async Task<ActionResult<CreateCharityReviewOrderResponse>> CreateCharityReviewOrder(
             [FromHeader(Name = Globals.IdempotencyKey)] Guid idempotencyKey,
             [FromBody] CreateCharityReviewOrderRequest request,
             CancellationToken ct)
@@ -147,7 +150,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 CreatedByUserId = userId,
             }, ct);
 
-            return Ok(new CreateReviewOrderResponse
+            return Ok(new CreateCharityReviewOrderResponse
             {
                 ReviewOrder = ReviewOrderDto.Map(order)
             });

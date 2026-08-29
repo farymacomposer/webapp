@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Faryma.Composer.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Application.Features.OrderQueue.Models;
 using Faryma.Composer.Application.Features.OrderQueue.PriorityAlgorithm;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
