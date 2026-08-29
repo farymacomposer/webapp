@@ -1,13 +1,13 @@
 // Business database schema for the app domain.
-// This document intentionally omits infrastructure-only tables such as ASP.NET Identity,
-// refresh tokens, idempotency records, data protection keys, and other persistence plumbing.
+// This document intentionally omits infrastructure-only tables such as ASP.NET Identity, refresh tokens, idempotency records, data protection keys, and other persistence plumbing.
 // PostgreSQL schema: app
 
 Table app_settings [note: 'Настройки приложения'] {
   Id long [pk]
-  ReviewOrderNominalAmount int [note: 'Номинальная стоимость заказа']
-  ReviewOrderExtraTimeAmountPerSecond long [note: 'Стоимость одной дополнительной секунды трека для заказа разбора']
-  ReviewOrderDetailedReviewAmount long [note: 'Стоимость услуги подробного разбора заказа']
+  ReviewOrderNominalPrice long [note: 'Номинальная стоимость заказа']
+  IncludedTrackDurationSeconds int [note: 'Длительность трека, включенная в номинальную стоимость заказа, в секундах']
+  ReviewOrderExtraTrackSecondPrice long [note: 'Стоимость одной дополнительной секунды трека для заказа разбора']
+  ReviewOrderDetailedPrice long [note: 'Стоимость услуги подробного разбора заказа']
 }
 
 Table composer_streams [note: 'Стрим композитора'] {
@@ -26,8 +26,8 @@ Table reviews [note: 'Результат разбора трека композ�
   CreatedAt DateTime [note: 'Дата и время создания разбора']
   UpdatedAt DateTime [note: 'Дата и время последнего обновления']
   TimestampUrl string [null, note: 'Ссылка на видео разбора']
-  ReviewOrderId long [null, ref: - review_orders.Id, note: 'Связанный заказ']
-  TrackId long [null, ref: > tracks.Id, note: 'Связанный музыкальный трек']
+  ReviewOrderId long [null, unique, ref: -? review_orders.Id, note: 'Связанный заказ']
+  TrackId long [null, ref: >? tracks.Id, note: 'Связанный музыкальный трек']
   CreatedByUserId Guid [ref: > AspNetUsers.Id, note: 'Пользователь, создавший разбор']
 }
 
@@ -40,9 +40,9 @@ Table tracks [note: 'Музыкальный трек'] {
   ReleaseDate DateOnly [null, note: 'Дата выпуска трека']
   CoverUrl string [null, note: 'Ссылка на обложку']
   ExtendedGenres List(string) [note: 'Расширенные жанры']
-  Tags List(TrackTag) [note: 'Тэги JSON массив TrackTag: { Name: string, Meta?: string }']
+  Tags List(TrackTag) [null, note: 'Тэги JSON массив TrackTag: { Name: string, Meta?: string }']
   AddedByUserNicknameId Guid [ref: > user_nicknames.Id, note: 'Пользователь, загрузивший трек']
-  CountryId long [null, ref: > track_countries.Id, note: 'Страна производства']
+  CountryId long [null, ref: >? track_countries.Id, note: 'Страна производства']
   CreatedByUserId Guid [ref: > AspNetUsers.Id, note: 'Пользователь, создавший трек']
 }
 
@@ -85,14 +85,14 @@ Table user_nicknames [note: 'Псевдоним пользователя'] {
   Id Guid [pk]
   Nickname string [note: 'Псевдоним']
   NormalizedNickname string [unique, note: 'Нормализованный псевдоним']
-  UserId Guid [null, ref: > AspNetUsers.Id, note: 'Пользователь системы']
+  UserId Guid [null, ref: >? AspNetUsers.Id, note: 'Пользователь системы']
 }
 
 Table user_nickname_accounts [note: 'Счет псевдонима пользователя'] {
   Id Guid [pk]
   xmin uint [note: 'Версия записи PostgreSQL rowversion']
   Balance long [note: 'Текущий баланс']
-  UserNicknameId Guid [ref: - user_nicknames.Id, note: 'Идентификатор псевдонима пользователя']
+  UserNicknameId Guid [unique, ref: - user_nicknames.Id, note: 'Идентификатор псевдонима пользователя']
 }
 
 Table user_entitlements [note: 'Пользовательское право на бесплатное получение заказа или услуги: жетон'] {
@@ -109,12 +109,10 @@ Table user_entitlement_redemptions [note: 'Погашение пользоват
   Id long [pk]
   CreatedAt DateTime [note: 'Дата и время погашения']
   Target UserEntitlementTarget [note: 'Заказ или услуга, полученная бесплатно при погашении']
-  CoveredAmount long [note: 'Стоимость бесплатного права, зафиксированная на момент погашения']
-  Comment string [null, note: 'Комментарий к погашению']
   UserEntitlementId long [unique, ref: - user_entitlements.Id, note: 'Погашенное пользовательское право']
   RedeemedByUserId Guid [ref: > AspNetUsers.Id, note: 'Пользователь, выполнивший погашение']
-  ReviewOrderId long [null, unique, ref: > review_orders.Id, note: 'Заказ разбора, полученный по жетону']
-  ReviewOrderDetailedReviewPaymentId long [null, unique, ref: > review_order_detailed_review_payments.Id, note: 'Услуга подробного разбора, полученная по жетону']
+  ReviewOrderId long [null, unique, ref: -? review_orders.Id, note: 'Заказ разбора, полученный по жетону']
+  ReviewOrderDetailedReviewPaymentId long [null, unique, ref: -? review_order_detailed_review_payments.Id, note: 'Услуга подробного разбора, полученная по жетону']
 }
 
 Table user_track_ratings [note: 'Пользовательская оценка трека'] {
@@ -140,17 +138,17 @@ Table transaction_sources [note: 'Базовый источник транзак
 }
 
 Table account_top_ups [note: 'Пополнение счета пользователя'] {
-  Id long [pk, ref: > transaction_sources.Id]
+  Id long [pk, ref: - transaction_sources.Id]
   Provider AccountTopUpProvider [note: 'Провайдер/канал пополнения счета пользователя']
   UserNicknameAccountId Guid [ref: > user_nickname_accounts.Id, note: 'Идентификатор счета псевдонима пользователя']
 }
 
 Table review_orders [note: 'Заказ разбора трека'] {
-  Id long [pk, ref: > transaction_sources.Id]
+  Id long [pk, ref: - transaction_sources.Id]
   MainNickname string [note: 'Основной ник пользователя, из всех пользователей, кто причастен к созданию заказа']
   MainNormalizedNickname string [note: 'Нормализованный основной ник пользователя']
   CreationStreamId long [ref: > composer_streams.Id, note: 'Связанный стрим, где создан заказ']
-  ProcessingStreamId long [null, ref: > composer_streams.Id, note: 'Связанный стрим, где заказ взят в работу']
+  ProcessingStreamId long [null, ref: >? composer_streams.Id, note: 'Связанный стрим, где заказ взят в работу']
   InProgressAt DateTime [null, note: 'Дата и время взятия заказа в работу']
   CompletedAt DateTime [null, note: 'Дата и время выполнения заказа']
   CanceledAt DateTime [null, note: 'Дата и время отмены заказа']
@@ -161,24 +159,24 @@ Table review_orders [note: 'Заказ разбора трека'] {
   IsFrozen bool [note: 'Заказ заморожен']
   TrackUrl string [null, note: 'Ссылка на трек']
   TrackDurationSeconds int [null, note: 'Длительность трека в секундах']
-  TrackId long [null, ref: > tracks.Id, note: 'Ссылка на трек (ID)']
-  NominalAmount long [note: 'Номинальная стоимость заказа']
+  TrackId long [null, ref: >? tracks.Id, note: 'Ссылка на трек (ID)']
+  Price long [note: 'Стоимость заказа']
   PayableAmount long [note: 'Snapshot обязательной стоимости заказа: номинал плюс доплата за длительность']
   PricingComment string [null, note: 'Комментарий к цене']
   UserComment string [null, note: 'Комментарий пользователя']
 }
 
 Table review_order_detailed_review_payments [note: 'Оплата подробного разбора заказа'] {
-  Id long [pk, ref: > transaction_sources.Id]
+  Id long [pk, ref: - transaction_sources.Id]
   ReviewOrderId long [unique, ref: - review_orders.Id, note: 'Заказ разбора, для которого оплачена услуга подробного разбора']
-  Amount long [note: 'Стоимость подробного разбора на момент оплаты']
+  Price long [note: 'Стоимость подробного разбора']
 }
 
 Table transaction_reversals [note: 'Отмена транзакции'] {
-  Id long [pk, ref: > transaction_sources.Id]
+  Id long [pk, ref: - transaction_sources.Id]
   Reason varchar(100) [note: 'Причина отмены']
-  ReversedTransactionId long [unique, ref: > transactions.Id, note: 'Транзакция, которую отменили']
-  ReversalTransactionId long [unique, ref: > transactions.Id, note: 'Транзакция отмены']
+  ReversedTransactionId long [unique, ref: - transactions.Id, note: 'Транзакция, которую отменили']
+  ReversalTransactionId long [unique, ref: - transactions.Id, note: 'Транзакция отмены']
 }
 
 Ref ReviewOrderEntityUserNicknameEntity: review_orders.Id <> user_nicknames.Id // Связь заказов и псевдонимов
@@ -254,7 +252,7 @@ Enum AccountTopUpProvider {
 // Услуга или стоимость, которую может покрывать пользовательское право
 Enum UserEntitlementTarget {
   Unspecified [note: 'Не задано']
-  FreeReviewOrder [note: 'Бесплатный заказ разбора трека']
   OutOfQueueReviewOrder [note: 'Заказ разбора трека вне очереди']
-  DetailedReview [note: 'Услуга подробного разбора заказа']
+  FreeReviewOrder [note: 'Бесплатный заказ разбора трека']
+  DetailedReview [note: 'Услуга подробного разбора трека']
 }
