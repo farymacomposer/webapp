@@ -30,13 +30,13 @@ namespace Faryma.Composer.Api.Features.Auth.Options
             }
         }
 
-        private static IEnumerable<ValidationResult> ValidateAccount(AdminBootstrapAccountOptions account)
+        private static List<ValidationResult> ValidateAccount(AdminBootstrapAccountOptions account)
         {
             ValidationContext context = new(account);
             List<ValidationResult> validationResults = [];
             if (Validator.TryValidateObject(account, context, validationResults, true))
             {
-                return Enumerable.Empty<ValidationResult>();
+                return [];
             }
 
             return validationResults;

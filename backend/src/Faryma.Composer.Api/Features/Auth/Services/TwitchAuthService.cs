@@ -86,6 +86,7 @@ namespace Faryma.Composer.Api.Features.Auth.Services
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             ClaimsIdentity identity = new(claims, AppAuthenticationSchemes.BrowserCookieScheme);
+
             return new ClaimsPrincipal(identity);
         }
     }
