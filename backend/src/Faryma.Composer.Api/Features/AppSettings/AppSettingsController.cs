@@ -9,8 +9,9 @@ namespace Faryma.Composer.Api.Features.AppSettings
     /// Управление настройками приложения
     /// </summary>
     [ApiController]
-    [Route("api/app-settings")]
+    [Route("api/[controller]/[action]")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public sealed class AppSettingsController(AppSettingsService appSettingsService) : ControllerBase
     {
         /// <summary>

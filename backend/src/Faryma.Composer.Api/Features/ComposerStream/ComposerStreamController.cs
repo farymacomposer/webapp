@@ -14,6 +14,7 @@ using Faryma.Composer.Application.Features.ComposerStream.Find;
 using Faryma.Composer.Application.Features.ComposerStream.FindLiveAndPlanned;
 using Faryma.Composer.Application.Features.ComposerStream.Start;
 using Faryma.Composer.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AppMediator = Mediator.Mediator;
 
@@ -23,14 +24,16 @@ namespace Faryma.Composer.Api.Features.ComposerStream
     /// Управление стримами
     /// </summary>
     [ApiController]
-    [Route("api/composer-streams")]
+    [Route("api/[controller]/[action]")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public sealed class ComposerStreamController(AppMediator mediator) : ControllerBase
     {
         /// <summary>
         /// Возвращает список стримов
         /// </summary>
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<FindStreamsResponse>> FindStreams([FromQuery] FindStreamsRequest request, CancellationToken ct)
         {
             IReadOnlyCollection<ComposerStreamEntity> streams = await mediator.Send(new FindStreamsQuery
@@ -48,7 +51,8 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// <summary>
         /// Возвращает текущий и запланированные стримы
         /// </summary>
-        [HttpGet("live-and-planned")]
+        [HttpGet]
+        [Authorize]
         public async Task<ActionResult<FindLiveAndPlannedResponse>> FindLiveAndPlanned(CancellationToken ct)
         {
             IReadOnlyCollection<ComposerStreamEntity> streams = await mediator.Send(new FindLiveAndPlannedStreamsQuery(), ct);
@@ -84,7 +88,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// <summary>
         /// Запускает стрим
         /// </summary>
-        [HttpPost("start")]
+        [HttpPost]
         [AuthorizeComposer]
         public async Task<ActionResult<StartStreamResponse>> StartStream(StartStreamRequest request, CancellationToken ct)
         {
@@ -102,7 +106,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// <summary>
         /// Завершает стрим
         /// </summary>
-        [HttpPost("complete")]
+        [HttpPost]
         [AuthorizeComposer]
         public async Task<ActionResult<CompleteStreamResponse>> CompleteStream(CompleteStreamRequest request, CancellationToken ct)
         {
@@ -120,7 +124,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// <summary>
         /// Отменяет стрим
         /// </summary>
-        [HttpPost("cancel")]
+        [HttpPost]
         [AuthorizeComposer]
         public async Task<ActionResult<CancelStreamResponse>> CancelStream(CancelStreamRequest request, CancellationToken ct)
         {

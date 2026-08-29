@@ -40,6 +40,7 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
     [ApiController]
     [Route("api/[controller]/[action]")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public sealed class ReviewOrderController(AppMediator mediator) : ControllerBase
     {
         /// <summary>

@@ -81,16 +81,5 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
                         || x.Status == ReviewOrderStatus.Pending
                         || x.Status == ReviewOrderStatus.AwaitingPayment), ct);
         }
-
-        /// <summary>
-        /// Возвращает id заказа в статусе InProgress, если он существует
-        /// </summary>
-        public async Task<long?> FindIdOrderInProgress(CancellationToken ct)
-        {
-            return (await appDbContext.ReviewOrders
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct))
-                ?.Id;
-        }
     }
 }

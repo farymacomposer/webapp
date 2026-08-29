@@ -18,8 +18,9 @@ namespace Faryma.Composer.Api.Features.Auth
     /// Аутентификация пользователей
     /// </summary>
     [ApiController]
-    [Route("api/auth")]
+    [Route("api/[controller]/[action]")]
     [Produces("application/json")]
+    [Consumes("application/json")]
     public sealed class AuthController(
         AuthTokenService authTokenService,
         IOptions<TwitchOptions> twitchOptions,

@@ -14,10 +14,6 @@
   <Folder Name="/src/" />
   <Folder Name="/src/01 EntryPoints/">
     <Project Path="src/Faryma.Composer.Api/Faryma.Composer.Api.csproj" />
-    <Project Path="src/Faryma.Composer.Desktop/Faryma.Composer.Desktop.csproj">
-      <Platform Solution="*|Any CPU" Project="x64" />
-      <Deploy Solution="*|Any CPU" />
-    </Project>
     <Project Path="src/Faryma.Composer.MigrationsBundle/Faryma.Composer.MigrationsBundle.csproj" />
   </Folder>
   <Folder Name="/src/02 Core/">
