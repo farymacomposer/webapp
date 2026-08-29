@@ -1,10 +1,10 @@
 ﻿using Faryma.Composer.Api.Common.DependencyInjection;
 using Faryma.Composer.Api.Common.Extensions;
+using Faryma.Composer.Api.Common.Logging;
 using Faryma.Composer.Api.Common.Startup;
 using Faryma.Composer.Api.Contracts.Features.OrderQueue;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
-using Serilog;
 
 namespace Faryma.Composer.Api
 {
@@ -20,7 +20,7 @@ namespace Faryma.Composer.Api
 
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args ?? []);
 
-            builder.Host.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration));
+            builder.Host.UseLogging();
 
             builder.Services
                 .AddConfiguration(builder.Configuration)

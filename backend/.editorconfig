@@ -302,37 +302,6 @@ dotnet_analyzer_diagnostic.category-roslynator.severity = warning
 roslynator_prefix_field_identifier_with_underscore = true
 
 
-### deprecated ###
-
-
-dotnet_diagnostic.rcs0014.severity = none
-dotnet_diagnostic.rcs0022.severity = none
-dotnet_diagnostic.rcs0038.severity = none
-dotnet_diagnostic.rcs0043.severity = none
-dotnet_diagnostic.rcs0047.severity = none
-dotnet_diagnostic.rcs1008.severity = none
-dotnet_diagnostic.rcs1009.severity = none
-dotnet_diagnostic.rcs1010.severity = none
-dotnet_diagnostic.rcs1012.severity = none
-dotnet_diagnostic.rcs1035.severity = none
-dotnet_diagnostic.rcs1036.severity = none
-dotnet_diagnostic.rcs1038.severity = none
-dotnet_diagnostic.rcs1040.severity = none
-dotnet_diagnostic.rcs1041.severity = none
-dotnet_diagnostic.rcs1063.severity = none
-dotnet_diagnostic.rcs1064.severity = none
-dotnet_diagnostic.rcs1065.severity = none
-dotnet_diagnostic.rcs1066.severity = none
-dotnet_diagnostic.rcs1072.severity = none
-dotnet_diagnostic.rcs1091.severity = none
-dotnet_diagnostic.rcs1100.severity = none
-dotnet_diagnostic.rcs1101.severity = none
-dotnet_diagnostic.rcs1106.severity = none
-dotnet_diagnostic.rcs1176.severity = none
-dotnet_diagnostic.rcs1177.severity = none
-dotnet_diagnostic.rcs1237.severity = none
-
-
 #### Отключено ####
 
 
@@ -559,7 +528,7 @@ dotnet_diagnostic.rcs1203.severity = suggestion
 # Remove unnecessary 'else'
 dotnet_diagnostic.rcs1211.severity = suggestion
 
-roslynator_suppress_unity_script_methods = false
+roslynator_unity_code_analysis.enabled = false
 # Applicable to: rcs1213
 
 # Remove unused member declaration
@@ -658,6 +627,9 @@ dotnet_diagnostic.rcs1080.severity = warning
 
 # Make class static
 dotnet_diagnostic.rcs1102.severity = warning
+
+# Add braces to switch section with multiple statements
+dotnet_diagnostic.rcs1111.severity = warning
 
 # Declare enum member with zero value (when enum has FlagsAttribute)
 dotnet_diagnostic.rcs1135.severity = warning
@@ -920,9 +892,6 @@ dotnet_diagnostic.rcs1107.severity = error
 
 # Declare type inside namespace
 dotnet_diagnostic.rcs1110.severity = error
-
-# Add braces to switch section with multiple statements
-dotnet_diagnostic.rcs1111.severity = error
 
 # Use 'string.IsNullOrEmpty' method
 dotnet_diagnostic.rcs1113.severity = error
@@ -1416,6 +1385,9 @@ dotnet_diagnostic.IDE0160.severity = error
 
 # IDE0305: Используйте выражение для работы с коллекциями
 dotnet_diagnostic.IDE0305.severity = none
+
+# IDE0330 Использовать "System.Threading.Lock"
+dotnet_diagnostic.IDE0330.severity = warning
 
 # IDE2002: Между последовательными фигурными скобками не должно быть пустых строк
 dotnet_diagnostic.IDE2002.severity = error

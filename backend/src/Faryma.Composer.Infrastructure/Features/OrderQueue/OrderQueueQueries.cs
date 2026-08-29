@@ -1,20 +1,64 @@
-﻿using Faryma.Composer.Domain.Entities.TransactionSources;
+﻿using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.OrderQueue
 {
-    public sealed class ReviewOrderQueries(UnitOfWork uow)
+    public sealed class OrderQueueQueries(
+        AppDbContext context,
+        DateTimeService dateTimeService)
     {
+        /// <summary>
+        /// Возвращает дату ближайшего доступного стрима или DateOnly.MinValue, если стримов нет
+        /// </summary>
+        public async Task<DateOnly> GetNearestStreamDate()
+        {
+            DateOnly today = dateTimeService.Today;
+
+            IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
+                .AsNoTracking()
+                .Where(x => x.Status == ComposerStreamStatus.Live
+                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
+                .OrderBy(x => x.EventDate);
+
+            ComposerStreamEntity? nearestStream = await query.FirstOrDefaultAsync();
+
+            return nearestStream?.EventDate ?? DateOnly.MinValue;
+        }
+
+        /// <summary>
+        /// Возвращает последний выданный никнейм по каждой дате стрима для приоритетного алгоритма очереди
+        /// </summary>
+        public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate()
+        {
+            var query = context.ComposerStreams
+                .AsNoTracking()
+                .Where(x => x.ProcessedReviewOrders.Any(x => x.Type != ReviewOrderType.OutOfQueue)
+                    && x.CreatedReviewOrders.Any(x => x.Status == ReviewOrderStatus.Preorder
+                        || x.Status == ReviewOrderStatus.Pending
+                        || x.Status == ReviewOrderStatus.AwaitingPayment))
+                .Select(x => new
+                {
+                    x.EventDate,
+                    x.ProcessedReviewOrders
+                        .Where(x => x.Type != ReviewOrderType.OutOfQueue)
+                        .OrderBy(x => (x.Status == ReviewOrderStatus.Completed) ? x.CompletedAt : DateTime.MaxValue)
+                        .Last().MainNormalizedNickname
+                });
+
+            return query.ToDictionaryAsync(k => k.EventDate, v => v.MainNormalizedNickname);
+        }
+
         /// <summary>
         /// Возвращает текущий заказ в работе, либо последний завершенный заказ
         /// </summary>
         public async Task<ReviewOrderEntity?> FindLastTaken()
         {
-            return await uow.Context.ReviewOrders
+            return await context.ReviewOrders
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress)
-                ?? await uow.Context.ReviewOrders
+                ?? await context.ReviewOrders
                     .AsNoTracking()
                     .Where(x => x.Status == ReviewOrderStatus.Completed)
                     .OrderBy(x => x.CompletedAt)
@@ -26,12 +70,12 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// </summary>
         public async Task<ReviewOrderEntity?> FindLastTakenDebt()
         {
-            return await uow.Context.ReviewOrders
+            return await context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Where(x => x.QueueCategory == QueueCategory.Debt && x.Status == ReviewOrderStatus.InProgress)
                 .FirstOrDefaultAsync()
-                ?? await uow.Context.ReviewOrders
+                ?? await context.ReviewOrders
                     .AsNoTracking()
                     .Include(x => x.CreationStream)
                     .Where(x => x.QueueCategory == QueueCategory.Debt && x.Status == ReviewOrderStatus.Completed)
@@ -44,11 +88,11 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// </summary>
         public async Task<ReviewOrderEntity?> FindLastTakenOutOfQueue()
         {
-            return await uow.Context.ReviewOrders
+            return await context.ReviewOrders
                 .AsNoTracking()
                 .Where(x => x.Type == ReviewOrderType.OutOfQueue && x.Status == ReviewOrderStatus.InProgress)
                 .FirstOrDefaultAsync()
-                ?? await uow.Context.ReviewOrders
+                ?? await context.ReviewOrders
                     .AsNoTracking()
                     .Where(x => x.Type == ReviewOrderType.OutOfQueue && x.Status == ReviewOrderStatus.Completed)
                     .OrderBy(x => x.CompletedAt)
@@ -60,7 +104,7 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// </summary>
         public Task<List<ReviewOrderEntity>> GetOrdersInQueue()
         {
-            IQueryable<ReviewOrderEntity> query = uow.Context.ReviewOrders
+            IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
@@ -80,7 +124,7 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// </summary>
         public Task<List<ReviewOrderEntity>> GetOrdersToStartStream(long streamId)
         {
-            IQueryable<ReviewOrderEntity> query = uow.Context.ReviewOrders
+            IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Where(x => x.CreationStreamId == streamId
@@ -96,7 +140,7 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// </summary>
         public Task<List<ReviewOrderEntity>> GetOrdersToCompleteStream(long streamId)
         {
-            IQueryable<ReviewOrderEntity> query = uow.Context.ReviewOrders
+            IQueryable<ReviewOrderEntity> query = context.ReviewOrders
                 .AsNoTracking()
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)

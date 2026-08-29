@@ -47,10 +47,7 @@ namespace Faryma.Composer.Api.Common.Extensions
                 branch => branch.UseHttpsRedirection());
         }
 
-        private static bool IsApiDocumentationRequest(HttpRequest request)
-        {
-            return _apiDocumentationPaths.Any(path =>
-                request.Path.StartsWithSegments(path, StringComparison.OrdinalIgnoreCase));
-        }
+        private static bool IsApiDocumentationRequest(HttpRequest request) =>
+            _apiDocumentationPaths.Any(path => request.Path.StartsWithSegments(path, StringComparison.OrdinalIgnoreCase));
     }
 }

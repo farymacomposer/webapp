@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Net;
+using System.Net.Sockets;
 
 namespace Faryma.Composer.Api.Common.Options
 {
@@ -13,11 +14,8 @@ namespace Faryma.Composer.Api.Common.Options
 
         public bool HasTrustedForwarders => KnownProxies.Length > 0 || KnownNetworks.Length > 0;
 
-        public static bool HasValidKnownProxies(ForwardedHeadersSettings settings) =>
-            settings.KnownProxies.All(value => IPAddress.TryParse(value, out _));
-
-        public static bool HasValidKnownNetworks(ForwardedHeadersSettings settings) =>
-            settings.KnownNetworks.All(CanParseNetwork);
+        public static bool HasValidKnownProxies(ForwardedHeadersSettings settings) => settings.KnownProxies.All(value => IPAddress.TryParse(value, out _));
+        public static bool HasValidKnownNetworks(ForwardedHeadersSettings settings) => settings.KnownNetworks.All(CanParseNetwork);
 
         public static IPNetwork ParseKnownNetwork(string value)
         {
@@ -41,7 +39,7 @@ namespace Faryma.Composer.Api.Common.Options
                 return false;
             }
 
-            int maxPrefixLength = address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork
+            int maxPrefixLength = address.AddressFamily == AddressFamily.InterNetwork
                 ? 32
                 : 128;
 

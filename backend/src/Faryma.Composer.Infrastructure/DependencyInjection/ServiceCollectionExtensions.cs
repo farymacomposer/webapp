@@ -33,8 +33,7 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
             services
                 .AddScoped<UnitOfWork>()
 
-                .AddScoped<ComposerStreamQueries>()
-                .AddScoped<ReviewOrderQueries>()
+                .AddScoped<OrderQueueQueries>()
 
                 .AddScoped<ComposerStreamStore>()
                 .AddScoped<RefreshTokenStore>()
