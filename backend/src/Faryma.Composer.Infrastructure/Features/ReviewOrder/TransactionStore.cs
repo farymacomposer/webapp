@@ -6,6 +6,25 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
     public sealed class TransactionStore(AppDbContext context, DateTimeService dateTimeService)
     {
+        public void CreateAccountTopUpAndPayment(
+            AccountTopUpProvider topUpProvider,
+            long paymentAmount,
+            UserEntity createdByUser,
+            UserNicknameEntity userNickname,
+            ReviewOrderEntity order)
+        {
+            CreateAccountTopUp(
+                topUpProvider,
+                paymentAmount,
+                userNickname.Account,
+                createdByUser);
+
+            CreatePayment(
+                paymentAmount,
+                userNickname.Account,
+                order);
+        }
+
         public TransactionEntity CreateAccountTopUp(
             AccountTopUpProvider topUpProvider,
             long amount,

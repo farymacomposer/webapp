@@ -7,6 +7,30 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
     public sealed class UserEntitlementStore(AppDbContext context, DateTimeService dateTimeService)
     {
+        public void CreateAndRedeemAdminCoverage(
+            ReviewOrderEntity order,
+            UserNicknameEntity userNickname,
+            UserEntity createdByUser)
+        {
+            UserEntitlementTarget target = order.Type switch
+            {
+                ReviewOrderType.OutOfQueue => UserEntitlementTarget.OutOfQueueReviewOrder,
+                ReviewOrderType.Free => UserEntitlementTarget.FreeReviewOrder,
+                _ => throw new NotSupportedException($"Тип заказа {order.Type} не поддерживает жетон")
+            };
+
+            UserEntitlementEntity entitlement = Create(
+                target,
+                userNickname,
+                createdByUser);
+
+            Redeem(
+                entitlement,
+                target,
+                createdByUser,
+                order);
+        }
+
         public UserEntitlementEntity Create(
             UserEntitlementTarget target,
             UserNicknameEntity userNickname,

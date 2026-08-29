@@ -3,7 +3,7 @@ using Mediator;
 
 namespace Faryma.Composer.Application.Features.ComposerStream.FindLiveAndPlanned
 {
-    public sealed record FindLiveAndPlannedQuery : IRequest<IReadOnlyCollection<ComposerStreamEntity>>
+    public sealed record FindLiveAndPlannedStreamsQuery : IRequest<IReadOnlyCollection<ComposerStreamEntity>>
     {
     }
 }

@@ -10,9 +10,9 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ComposerStream.Complete
 {
     public sealed class CompleteHandler(
-        AppDbContext context,
-        DateTimeService dateTimeService,
         ComposerStreamStore composerStreamStore,
+        DateTimeService dateTimeService,
+        AppDbContext appDbContext,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CompleteCommand, ComposerStreamEntity>
     {
         public async ValueTask<ComposerStreamEntity> Handle(CompleteCommand command, CancellationToken ct)
@@ -25,14 +25,14 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Complete
             }
 
             long? idOrderInProgress = await composerStreamStore.FindIdOrderInProgress(ct);
-            if (idOrderInProgress is not null)
+            if (idOrderInProgress.HasValue)
             {
                 throw new ComposerStreamException($"Невозможно завершить стрим, пока заказ Id: {idOrderInProgress} находится в работе", stream);
             }
 
             stream.Complete(dateTimeService.Now);
 
-            await context.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamCompleted);
 

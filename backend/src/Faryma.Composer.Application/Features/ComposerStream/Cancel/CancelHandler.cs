@@ -10,8 +10,8 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ComposerStream.Cancel
 {
     public sealed class CancelHandler(
-        AppDbContext context,
         ComposerStreamStore composerStreamStore,
+        AppDbContext appDbContext,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CancelCommand, ComposerStreamEntity>
     {
         public async ValueTask<ComposerStreamEntity> Handle(CancelCommand command, CancellationToken ct)
@@ -31,7 +31,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Cancel
 
             stream.Cancel();
 
-            await context.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamCanceled);
 

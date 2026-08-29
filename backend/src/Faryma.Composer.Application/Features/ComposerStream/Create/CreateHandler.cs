@@ -12,9 +12,9 @@ using Npgsql;
 namespace Faryma.Composer.Application.Features.ComposerStream.Create
 {
     public sealed class CreateHandler(
-        AppDbContext context,
         UserStore userStore,
         ComposerStreamStore composerStreamStore,
+        AppDbContext appDbContext,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CreateCommand, ComposerStreamEntity>
     {
         public async ValueTask<ComposerStreamEntity> Handle(CreateCommand command, CancellationToken ct)
@@ -22,9 +22,9 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Create
             try
             {
                 UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
-
                 ComposerStreamEntity stream = composerStreamStore.CreateStream(command.EventDate, command.Type, createdByUser);
-                await context.SaveChangesAsync(ct);
+
+                await appDbContext.SaveChangesAsync(ct);
 
                 orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamCreated);
 

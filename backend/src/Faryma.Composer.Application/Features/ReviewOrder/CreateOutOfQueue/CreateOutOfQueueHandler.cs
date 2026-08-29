@@ -5,32 +5,33 @@ using Faryma.Composer.Application.Features.UserNickname;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.Features.ReviewOrder;
+using Faryma.Composer.Infrastructure.Features.User;
 using Mediator;
 
 namespace Faryma.Composer.Application.Features.ReviewOrder.CreateOutOfQueue
 {
     public sealed class CreateOutOfQueueHandler(
-        UnitOfWork uow,
-        ReviewOrderService reviewOrderService,
+        AppDbContext appDbContext,
+        UserStore userStore,
+        ReviewOrderStore reviewOrderStore,
         UserNicknameService userNicknameService,
         AppSettingsService appSettingsService,
+        UserEntitlementStore userEntitlementStore,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CreateOutOfQueueCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(CreateOutOfQueueCommand command, CancellationToken ct = default)
         {
-            UserEntity createdByUser = await reviewOrderService.GetUser(command.CreatedByUserId, ct);
+            UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
+            ComposerStreamEntity nearestStream = await reviewOrderStore.GetNearestStream(ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
-
-            ComposerStreamEntity nearestStream = await uow.ComposerStreamStore.FindNearest(ct)
-                ?? throw new ReviewOrderException("Нет доступного ближайшего стрима");
 
             ReviewOrderStatus status = command.TrackUrl is null
                 ? ReviewOrderStatus.Preorder
                 : ReviewOrderStatus.Pending;
 
-            ReviewOrderEntity order = uow.ReviewOrderStore.Create(
+            ReviewOrderEntity order = reviewOrderStore.CreateOrder(
                 ReviewOrderType.OutOfQueue,
                 status,
                 command.TrackUrl,
@@ -42,12 +43,12 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateOutOfQueue
                 userNickname,
                 createdByUser);
 
-            reviewOrderService.CreateAndRedeemAdminCoverage(
+            userEntitlementStore.CreateAndRedeemAdminCoverage(
                 order,
                 userNickname,
                 createdByUser);
 
-            await uow.SaveChanges(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified);
 

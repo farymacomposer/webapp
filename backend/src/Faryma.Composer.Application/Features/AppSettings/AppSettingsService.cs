@@ -13,25 +13,25 @@ namespace Faryma.Composer.Application.Features.AppSettings
 
         public async Task Initialize()
         {
-            await using AppDbContext context = await contextFactory.CreateDbContextAsync();
+            await using AppDbContext appDbContext = await contextFactory.CreateDbContextAsync();
 
-            Settings = await context.AppSettings
+            Settings = await appDbContext.AppSettings
                 .AsNoTracking()
                 .SingleAsync();
         }
 
         public async Task<AppSettingsEntity> Update(AppSettingsEntity dto, CancellationToken ct)
         {
-            await using AppDbContext context = await contextFactory.CreateDbContextAsync(ct);
+            await using AppDbContext appDbContext = await contextFactory.CreateDbContextAsync(ct);
 
-            AppSettingsEntity entity = await context.AppSettings.SingleAsync(ct);
+            AppSettingsEntity entity = await appDbContext.AppSettings.SingleAsync(ct);
 
             entity.ReviewOrderNominalPrice = dto.ReviewOrderNominalPrice;
             entity.IncludedTrackDurationSeconds = dto.IncludedTrackDurationSeconds;
             entity.ReviewOrderExtraTrackSecondPrice = dto.ReviewOrderExtraTrackSecondPrice;
             entity.ReviewOrderDetailedPrice = dto.ReviewOrderDetailedPrice;
 
-            await context.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             Settings = entity;
 

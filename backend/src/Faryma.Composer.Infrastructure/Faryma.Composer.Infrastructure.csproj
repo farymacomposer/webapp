@@ -11,8 +11,4 @@
     <ProjectReference Include="..\Faryma.Composer.Domain\Faryma.Composer.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Persistence\Stores\" />
-  </ItemGroup>
-
 </Project>

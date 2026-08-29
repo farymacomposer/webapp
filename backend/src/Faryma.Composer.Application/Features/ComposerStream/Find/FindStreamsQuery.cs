@@ -3,7 +3,7 @@ using Mediator;
 
 namespace Faryma.Composer.Application.Features.ComposerStream.Find
 {
-    public sealed record FindQuery : IRequest<IReadOnlyCollection<ComposerStreamEntity>>
+    public sealed record FindStreamsQuery : IRequest<IReadOnlyCollection<ComposerStreamEntity>>
     {
         /// <summary>
         /// Начальная дата периода поиска

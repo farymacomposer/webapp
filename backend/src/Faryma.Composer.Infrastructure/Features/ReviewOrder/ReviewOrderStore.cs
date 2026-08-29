@@ -8,7 +8,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
     public sealed class ReviewOrderStore(AppDbContext context, DateTimeService dateTimeService)
     {
-        public ReviewOrderEntity Create(
+        public ReviewOrderEntity CreateOrder(
             ReviewOrderType type,
             ReviewOrderStatus status,
             string? trackUrl,
@@ -53,22 +53,6 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
             }).Entity;
         }
 
-        public ReviewOrderDetailedReviewPaymentEntity CreateDetailedReviewPayment(
-            ReviewOrderEntity order,
-            long amount,
-            UserEntity createdByUser)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
-
-            return context.Add(new ReviewOrderDetailedReviewPaymentEntity
-            {
-                CreatedAt = dateTimeService.Now,
-                ReviewOrder = order,
-                Price = amount,
-                CreatedByUser = createdByUser,
-            }).Entity;
-        }
-
         public async Task<ReviewOrderEntity> GetOrder(long id, CancellationToken ct)
         {
             return await FindOrderById(id, ct)
@@ -93,20 +77,27 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
         /// <summary>
         /// Возвращает заказ в статусе InProgress, если он существует
         /// </summary>
-        public Task<ReviewOrderEntity?> FindInProgress(CancellationToken ct)
+        public Task<ReviewOrderEntity?> FindOrderInProgress(CancellationToken ct)
         {
             return context.ReviewOrders
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct);
         }
 
-        public Task<ComposerStreamEntity?> FindLiveStream(CancellationToken ct) =>
-            context.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
+        /// <summary>
+        /// Возвращает запущенный благотворительный стрим
+        /// </summary>
+        public async Task<ComposerStreamEntity> GetLiveCharityStream(CancellationToken ct)
+        {
+            return await context.ComposerStreams
+                .FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live && x.Type == ComposerStreamType.Charity, ct)
+                ?? throw new NotFoundException("Нет запущенного благотворительного стрима");
+        }
 
         /// <summary>
         /// Возвращает ближайший доступный стрим: Live или ближайший Planned на сегодня/будущее
         /// </summary>
-        public Task<ComposerStreamEntity?> FindNearestStream(CancellationToken ct)
+        public async Task<ComposerStreamEntity> GetNearestStream(CancellationToken ct)
         {
             DateOnly today = dateTimeService.Today;
 
@@ -115,23 +106,46 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
                 .OrderBy(x => x.EventDate);
 
-            return query.FirstOrDefaultAsync(ct);
+            return await query.FirstOrDefaultAsync(ct)
+                ?? throw new NotFoundException("Нет доступного ближайшего стрима");
         }
 
         /// <summary>
-        /// Возвращает ближайший доступный стрим указанного типа: Live или ближайший Planned на сегодня/будущее
+        /// Возвращает ближайший доступный стрим: Live или ближайший Planned на сегодня/будущее, с учетом заказов пользователя
         /// </summary>
-        public Task<ComposerStreamEntity?> FindNearestStream(ComposerStreamType type, CancellationToken ct)
+        public async Task<ComposerStreamEntity?> FindNearestStream(UserNicknameEntity userNickname, CancellationToken ct)
         {
             DateOnly today = dateTimeService.Today;
 
-            IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
-                .Where(x => x.Type == type
-                    && (x.Status == ComposerStreamStatus.Live
-                        || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today)))
-                .OrderBy(x => x.EventDate);
+            IQueryable<ComposerStreamEntity> query = context.ComposerStreams
+                .Where(x => x.Status == ComposerStreamStatus.Live
+                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today));
 
-            return query.FirstOrDefaultAsync(ct);
+            bool userNicknameHasOrders = await context.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0, ct);
+            if (userNicknameHasOrders)
+            {
+                query = query.Where(x => x.Type == ComposerStreamType.Donation);
+            }
+
+            query = query.OrderBy(x => x.EventDate);
+
+            return await query.FirstOrDefaultAsync(ct);
+        }
+
+        public ReviewOrderDetailedReviewPaymentEntity CreateDetailedReviewPayment(
+            ReviewOrderEntity order,
+            long price,
+            UserEntity createdByUser)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
+
+            return context.Add(new ReviewOrderDetailedReviewPaymentEntity
+            {
+                CreatedAt = dateTimeService.Now,
+                ReviewOrder = order,
+                Price = price,
+                CreatedByUser = createdByUser,
+            }).Entity;
         }
     }
 }

@@ -10,9 +10,9 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ComposerStream.Start
 {
     public sealed class StartHandler(
-        AppDbContext context,
-        DateTimeService dateTimeService,
         ComposerStreamStore composerStreamStore,
+        DateTimeService dateTimeService,
+        AppDbContext appDbContext,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<StartCommand, ComposerStreamEntity>
     {
         public async ValueTask<ComposerStreamEntity> Handle(StartCommand command, CancellationToken ct)
@@ -34,7 +34,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Start
 
             stream.Start(dateTimeService.Now);
 
-            await context.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(stream, OrderQueueUpdateType.StreamStarted);
 

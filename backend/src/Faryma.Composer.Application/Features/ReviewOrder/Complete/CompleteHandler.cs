@@ -5,19 +5,20 @@ using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Features.ReviewOrder;
+using Faryma.Composer.Infrastructure.Features.User;
 using Mediator;
 
 namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
 {
     public sealed class CompleteHandler(
         AppDbContext context,
-        ReviewOrderStore reviewOrderStore,
+        DateTimeService dateTimeService,
+        UserStore userStore,
         ReviewStore reviewStore,
-        ReviewOrderService reviewOrderService,
-        OrderQueueEventChannel orderQueueEventChannel,
-        DateTimeService dateTimeService) : IRequestHandler<CompleteCommand, ReviewOrderEntity>
+        ReviewOrderStore reviewOrderStore,
+        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CompleteCommand, ReviewOrderEntity>
     {
-        public async ValueTask<ReviewOrderEntity> Handle(CompleteCommand command, CancellationToken ct = default)
+        public async ValueTask<ReviewOrderEntity> Handle(CompleteCommand command, CancellationToken ct)
         {
             ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
@@ -27,7 +28,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
                 return order;
             }
 
-            UserEntity createdByUser = await reviewOrderService.GetUser(command.CreatedByUserId, ct);
+            UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
             ReviewEntity review = reviewStore.Create(order, command.Rating, createdByUser);
 
             order.Complete(review, dateTimeService.Now);

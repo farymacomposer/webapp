@@ -10,11 +10,11 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Cancel
 {
     public sealed class CancelHandler(
         AppDbContext context,
+        DateTimeService dateTimeService,
         ReviewOrderStore reviewOrderStore,
-        OrderQueueEventChannel orderQueueEventChannel,
-        DateTimeService dateTimeService) : IRequestHandler<CancelCommand, ReviewOrderEntity>
+        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CancelCommand, ReviewOrderEntity>
     {
-        public async ValueTask<ReviewOrderEntity> Handle(CancelCommand command, CancellationToken ct = default)
+        public async ValueTask<ReviewOrderEntity> Handle(CancelCommand command, CancellationToken ct)
         {
             ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;

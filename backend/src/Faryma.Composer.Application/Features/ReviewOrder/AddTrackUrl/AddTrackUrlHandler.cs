@@ -14,7 +14,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl
         ReviewOrderService reviewOrderService,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<AddTrackUrlCommand, ReviewOrderEntity>
     {
-        public async ValueTask<ReviewOrderEntity> Handle(AddTrackUrlCommand command, CancellationToken ct = default)
+        public async ValueTask<ReviewOrderEntity> Handle(AddTrackUrlCommand command, CancellationToken ct)
         {
             ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;

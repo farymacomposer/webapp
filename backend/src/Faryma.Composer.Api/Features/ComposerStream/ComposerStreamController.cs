@@ -33,7 +33,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [HttpGet]
         public async Task<ActionResult<FindStreamsResponse>> FindStreams([FromQuery] FindStreamsRequest request, CancellationToken ct)
         {
-            IReadOnlyCollection<ComposerStreamEntity> streams = await mediator.Send(new FindQuery
+            IReadOnlyCollection<ComposerStreamEntity> streams = await mediator.Send(new FindStreamsQuery
             {
                 DateFrom = request.DateFrom,
                 DateTo = request.DateTo,
@@ -51,7 +51,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [HttpGet("live-and-planned")]
         public async Task<ActionResult<FindLiveAndPlannedResponse>> FindLiveAndPlanned(CancellationToken ct)
         {
-            IReadOnlyCollection<ComposerStreamEntity> streams = await mediator.Send(new FindLiveAndPlannedQuery(), ct);
+            IReadOnlyCollection<ComposerStreamEntity> streams = await mediator.Send(new FindLiveAndPlannedStreamsQuery(), ct);
 
             return Ok(new FindLiveAndPlannedResponse
             {

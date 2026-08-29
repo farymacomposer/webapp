@@ -5,37 +5,32 @@ using Faryma.Composer.Application.Features.UserNickname;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Features.ReviewOrder;
+using Faryma.Composer.Infrastructure.Features.User;
 using Mediator;
 
 namespace Faryma.Composer.Application.Features.ReviewOrder.CreateCharity
 {
     public sealed class CreateCharityHandler(
         AppDbContext context,
-        ReviewOrderStore reviewOrderStore,
-        ReviewOrderService reviewOrderService,
+        UserStore userStore,
         UserNicknameService userNicknameService,
+        ReviewOrderStore reviewOrderStore,
         AppSettingsService appSettingsService,
         OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CreateCharityCommand, ReviewOrderEntity>
     {
-        public async ValueTask<ReviewOrderEntity> Handle(CreateCharityCommand command, CancellationToken ct = default)
+        public async ValueTask<ReviewOrderEntity> Handle(CreateCharityCommand command, CancellationToken ct)
         {
-            UserEntity createdByUser = await reviewOrderService.GetUser(command.CreatedByUserId, ct);
+            UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
-
-            ComposerStreamEntity? liveStream = await reviewOrderStore.FindLiveStream(ct);
-            if (liveStream is null || liveStream.Type != ComposerStreamType.Charity)
-            {
-                throw new ReviewOrderException("Нет запущенного благотворительного стрима");
-            }
+            ComposerStreamEntity liveStream = await reviewOrderStore.GetLiveCharityStream(ct);
 
             ReviewOrderStatus status = command.TrackUrl is null
                 ? ReviewOrderStatus.Preorder
                 : ReviewOrderStatus.Pending;
 
-            ReviewOrderEntity order = reviewOrderStore.Create(
+            ReviewOrderEntity order = reviewOrderStore.CreateOrder(
                 ReviewOrderType.Charity,
                 status,
                 command.TrackUrl,
