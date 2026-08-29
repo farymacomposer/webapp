@@ -19,7 +19,7 @@ namespace Faryma.Composer.Api.Features.Auth.Services
         AppDbContext appDbContext,
         RefreshTokenStore refreshTokenStore,
         UserManager<UserEntity> userManager,
-        DateTimeService dateTimeService,
+        DateTimeContext dateTimeContext,
         IOptions<JwtOptions> options)
     {
         public async Task<(string AccessToken, string RefreshToken)> IssueForUser(UserEntity user, CancellationToken ct)
@@ -59,9 +59,9 @@ namespace Faryma.Composer.Api.Features.Auth.Services
                 throw new AuthenticationException("Refresh token отозван");
             }
 
-            if (stored.IsExpired(dateTimeService.Now))
+            if (stored.IsExpired(dateTimeContext.Now))
             {
-                stored.RevokedAt = dateTimeService.Now;
+                stored.RevokedAt = dateTimeContext.Now;
                 try
                 {
                     await appDbContext.SaveChangesAsync();
@@ -91,7 +91,7 @@ namespace Faryma.Composer.Api.Features.Auth.Services
             string nextRefresh = GenerateRefreshToken();
             string nextHash = Hash(nextRefresh);
 
-            stored.RevokedAt = dateTimeService.Now;
+            stored.RevokedAt = dateTimeContext.Now;
             stored.ReplacedByTokenHash = nextHash;
 
             RefreshTokenEntity nextToken = refreshTokenStore.Create(
@@ -161,7 +161,7 @@ namespace Faryma.Composer.Api.Features.Auth.Services
                 issuer: options.Value.Issuer,
                 audience: options.Value.Audience,
                 claims: claims,
-                expires: dateTimeService.Now.AddMinutes(options.Value.ExpiryInMinutes),
+                expires: dateTimeContext.Now.AddMinutes(options.Value.ExpiryInMinutes),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
 

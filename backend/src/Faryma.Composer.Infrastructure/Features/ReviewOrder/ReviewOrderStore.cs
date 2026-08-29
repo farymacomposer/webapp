@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
-    public sealed class ReviewOrderStore(AppDbContext appDbContext, DateTimeService dateTimeService)
+    public sealed class ReviewOrderStore(AppDbContext appDbContext, DateTimeContext dateTimeContext)
     {
         public ReviewOrderEntity CreateOrder(
             ReviewOrderType type,
@@ -35,7 +35,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             return appDbContext.Add(new ReviewOrderEntity
             {
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 MainNickname = userNickname.Nickname,
                 MainNormalizedNickname = userNickname.NormalizedNickname,
                 Type = type,
@@ -93,7 +93,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             return appDbContext.Add(new ReviewOrderDetailedReviewPaymentEntity
             {
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 ReviewOrder = order,
                 Price = price,
                 CreatedByUser = createdByUser,
@@ -141,7 +141,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
         private async Task<ComposerStreamEntity> GetNearestStreamInternal(ComposerStreamType? type, CancellationToken ct)
         {
-            DateOnly today = dateTimeService.Today;
+            DateOnly today = dateTimeContext.Today;
 
             IQueryable<ComposerStreamEntity> query = appDbContext.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live

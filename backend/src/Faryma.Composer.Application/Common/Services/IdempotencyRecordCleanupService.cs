@@ -37,10 +37,10 @@ namespace Faryma.Composer.Application.Common.Services
             {
                 using IServiceScope scope = scopeFactory.CreateScope();
                 AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                DateTimeService dateTimeService = scope.ServiceProvider.GetRequiredService<DateTimeService>();
+                DateTimeContext dateTimeContext = scope.ServiceProvider.GetRequiredService<DateTimeContext>();
 
                 int deleted = await appDbContext.IdempotencyRecords
-                    .Where(x => x.ExpiresAt <= dateTimeService.Now)
+                    .Where(x => x.ExpiresAt <= dateTimeContext.Now)
                     .ExecuteDeleteAsync(ct);
 
                 if (deleted > 0)

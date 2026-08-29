@@ -5,16 +5,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.OrderQueue
 {
-    public sealed class OrderQueueStore(
-        AppDbContext appDbContext,
-        DateTimeService dateTimeService)
+    public sealed class OrderQueueStore(AppDbContext appDbContext, DateTimeContext dateTimeContext)
     {
         /// <summary>
         /// Возвращает дату ближайшего доступного стрима или DateOnly.MinValue, если стримов нет
         /// </summary>
         public async Task<DateOnly> FindNearestStreamDate()
         {
-            DateOnly today = dateTimeService.Today;
+            DateOnly today = dateTimeContext.Today;
 
             IOrderedQueryable<ComposerStreamEntity> query = appDbContext.ComposerStreams
                 .AsNoTracking()

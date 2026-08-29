@@ -3,7 +3,7 @@ using Faryma.Composer.Domain.Entities.TransactionSources;
 
 namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
-    public sealed class ReviewStore(AppDbContext appDbContext, DateTimeService dateTimeService)
+    public sealed class ReviewStore(AppDbContext appDbContext, DateTimeContext dateTimeContext)
     {
         public ReviewEntity CreateReview(
             ReviewOrderEntity inProgressOrder,
@@ -14,8 +14,8 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
             {
                 ReviewOrder = inProgressOrder,
                 RatingValue = rating,
-                CreatedAt = dateTimeService.Now,
-                UpdatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
+                UpdatedAt = dateTimeContext.Now,
                 CreatedByUser = createdByUser,
             }).Entity;
         }

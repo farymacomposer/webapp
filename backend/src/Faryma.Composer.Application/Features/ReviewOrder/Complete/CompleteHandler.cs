@@ -14,7 +14,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
         ReviewOrderStore reviewOrderStore,
         UserStore userStore,
         ReviewStore reviewStore,
-        DateTimeService dateTimeService,
+        DateTimeContext dateTimeContext,
         AppDbContext appDbContext,
         OrderQueueEventChannel orderQueueEventChannel)
         : IRequestHandler<CompleteCommand, ReviewOrderEntity>
@@ -29,10 +29,10 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
                 return order;
             }
 
-            UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
+            UserEntity createdByUser = await userStore.GetUser(ct);
             ReviewEntity review = reviewStore.CreateReview(order, command.Rating, createdByUser);
 
-            order.Complete(review, dateTimeService.Now);
+            order.Complete(review, dateTimeContext.Now);
 
             await appDbContext.SaveChangesAsync(ct);
 

@@ -5,9 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.ComposerStream
 {
-    public sealed class ComposerStreamStore(
-        AppDbContext appDbContext,
-        DateTimeService dateTimeService)
+    public sealed class ComposerStreamStore(AppDbContext appDbContext, DateTimeContext dateTimeContext)
     {
         public ComposerStreamEntity CreateStream(DateOnly eventDate, ComposerStreamType type, UserEntity createdByUser)
         {
@@ -58,7 +56,7 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
         /// </summary>
         public async Task<IReadOnlyCollection<ComposerStreamEntity>> FindLiveAndPlannedStreams(CancellationToken ct)
         {
-            DateOnly today = dateTimeService.Today;
+            DateOnly today = dateTimeContext.Today;
 
             IQueryable<ComposerStreamEntity> query = appDbContext.ComposerStreams
                 .AsNoTracking()

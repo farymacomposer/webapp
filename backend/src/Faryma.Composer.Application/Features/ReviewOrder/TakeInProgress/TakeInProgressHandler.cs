@@ -14,7 +14,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
     public sealed class TakeInProgressHandler(
         ReviewOrderStore reviewOrderStore,
         OrderQueueService orderQueueService,
-        DateTimeService dateTimeService,
+        DateTimeContext dateTimeContext,
         AppDbContext appDbContext,
         OrderQueueEventChannel orderQueueEventChannel)
         : IRequestHandler<TakeInProgressCommand, ReviewOrderEntity>
@@ -42,7 +42,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
             order.TakeInProgress(
                 liveStream,
                 position.Category.QueueCategory,
-                dateTimeService.Now);
+                dateTimeContext.Now);
 
             await appDbContext.SaveChangesAsync(ct);
 

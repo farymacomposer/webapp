@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
 using System.Text.Json;
-using Faryma.Composer.Api.Common.Extensions;
 using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Infrastructure;
@@ -16,7 +15,8 @@ namespace Faryma.Composer.Api.Common.Filters
 {
     public sealed class IdempotentFilter(
         AppDbContext appDbContext,
-        DateTimeService dateTimeService,
+        DateTimeContext dateTimeContext,
+        CurrentUserContext currentUserContext,
         IOptions<JsonOptions> jsonOptions) : IAsyncActionFilter
     {
         private static readonly TimeSpan _expiration = TimeSpan.FromHours(1);
@@ -29,10 +29,10 @@ namespace Faryma.Composer.Api.Common.Filters
                 return;
             }
 
-            Guid userId = actionContext.HttpContext.User.GetUserId();
+            Guid userId = currentUserContext.GetRequiredUserId();
             string endpointKey = GetEndpointKey(actionContext.HttpContext);
             string requestHash = ComputeRequestHash(actionContext);
-            DateTime now = dateTimeService.Now;
+            DateTime now = dateTimeContext.Now;
             CancellationToken ct = actionContext.HttpContext.RequestAborted;
 
             IdempotencyRecordEntity? existing = await FindExistingRecord(endpointKey, userId, idempotencyKey, ct);

@@ -28,10 +28,5 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Pay
         /// Провайдер/канал пополнения счета пользователя
         /// </summary>
         public required AccountTopUpProvider TopUpProvider { get; init; }
-
-        /// <summary>
-        /// Id пользователя, создавшего платеж
-        /// </summary>
-        public required Guid CreatedByUserId { get; init; }
     }
 }

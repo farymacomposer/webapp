@@ -22,7 +22,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Create
         {
             try
             {
-                UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
+                UserEntity createdByUser = await userStore.GetUser(ct);
                 ComposerStreamEntity stream = composerStreamStore.CreateStream(command.EventDate, command.Type, createdByUser);
 
                 await appDbContext.SaveChangesAsync(ct);

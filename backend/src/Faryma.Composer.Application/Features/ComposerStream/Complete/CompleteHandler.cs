@@ -14,7 +14,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Complete
     public sealed class CompleteHandler(
         ComposerStreamStore composerStreamStore,
         ReviewOrderStore reviewOrderStore,
-        DateTimeService dateTimeService,
+        DateTimeContext dateTimeContext,
         AppDbContext appDbContext,
         OrderQueueEventChannel orderQueueEventChannel)
         : IRequestHandler<CompleteCommand, ComposerStreamEntity>
@@ -34,7 +34,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Complete
                 throw new ComposerStreamException($"Невозможно завершить стрим, пока заказ Id: {orderInProgress.Id} находится в работе", stream);
             }
 
-            stream.Complete(dateTimeService.Now);
+            stream.Complete(dateTimeContext.Now);
 
             await appDbContext.SaveChangesAsync(ct);
 

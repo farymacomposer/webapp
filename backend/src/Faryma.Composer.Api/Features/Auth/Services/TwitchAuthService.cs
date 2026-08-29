@@ -9,7 +9,7 @@ namespace Faryma.Composer.Api.Features.Auth.Services
 {
     public sealed class TwitchAuthService(
         UserManager<UserEntity> userManager,
-        DateTimeService dateTimeService)
+        DateTimeContext dateTimeContext)
     {
         public async Task<ClaimsPrincipal> CreateBrowserPrincipal(ClaimsPrincipal twitchPrincipal, CancellationToken ct)
         {
@@ -37,7 +37,7 @@ namespace Faryma.Composer.Api.Features.Auth.Services
             UserEntity result = new()
             {
                 Id = Guid.NewGuid(),
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 TwitchUserId = twitchUserId,
                 TwitchLogin = twitchLogin
             };

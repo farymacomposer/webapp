@@ -148,8 +148,8 @@ namespace Faryma.Composer.Api.Test.Common
             {
                 builder.ConfigureTestServices(services =>
                 {
-                    services.RemoveAll<DateTimeService>();
-                    services.AddSingleton(new DateTimeService(now));
+                    services.RemoveAll<DateTimeContext>();
+                    services.AddSingleton(new DateTimeContext(now));
                 });
             });
         }

@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Api.Common.Extensions;
-using Faryma.Composer.Api.Features.Auth;
+﻿using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Api.Features.ComposerStream.Cancel;
 using Faryma.Composer.Api.Features.ComposerStream.Complete;
 using Faryma.Composer.Api.Features.ComposerStream.Create;
@@ -70,13 +69,10 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [AuthorizeComposer]
         public async Task<ActionResult<CreateResponse>> Create(CreateRequest request, CancellationToken ct)
         {
-            Guid userId = User.GetUserId();
-
             ComposerStreamEntity stream = await mediator.Send(new CreateCommand
             {
                 EventDate = request.EventDate,
                 Type = request.Type,
-                CreatedByUserId = userId,
             }, ct);
 
             return Ok(new CreateResponse

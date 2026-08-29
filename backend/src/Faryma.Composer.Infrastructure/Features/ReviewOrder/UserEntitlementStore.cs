@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
-    public sealed class UserEntitlementStore(AppDbContext appDbContext, DateTimeService dateTimeService)
+    public sealed class UserEntitlementStore(AppDbContext appDbContext, DateTimeContext dateTimeContext)
     {
         public void CreateAndRedeemAdminCoverage(
             ReviewOrderEntity order,
@@ -40,7 +40,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             return appDbContext.Add(new UserEntitlementEntity
             {
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 Target = target,
                 UserNickname = userNickname,
                 CreatedByUser = createdByUser,
@@ -81,11 +81,11 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                 throw new InvalidOperationException("Право отменено");
             }
 
-            entitlement.RedeemedAt = dateTimeService.Now;
+            entitlement.RedeemedAt = dateTimeContext.Now;
 
             return appDbContext.Add(new UserEntitlementRedemptionEntity
             {
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 Target = target,
                 UserEntitlement = entitlement,
                 RedeemedByUser = redeemedByUser,

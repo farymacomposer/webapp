@@ -18,10 +18,5 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Create
         /// Тип стрима
         /// </summary>
         public required ComposerStreamType Type { get; init; }
-
-        /// <summary>
-        /// Id пользователя, создавшего стрим
-        /// </summary>
-        public required Guid CreatedByUserId { get; init; }
     }
 }

@@ -23,7 +23,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateCharity
     {
         public async ValueTask<ReviewOrderEntity> Handle(CreateCharityCommand command, CancellationToken ct)
         {
-            UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
+            UserEntity createdByUser = await userStore.GetUser(ct);
             ComposerStreamEntity liveStream = await reviewOrderStore.GetLiveCharityStream(ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
 

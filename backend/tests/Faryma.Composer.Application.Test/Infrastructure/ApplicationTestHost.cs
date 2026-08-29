@@ -74,8 +74,8 @@ namespace Faryma.Composer.Application.Test.Infrastructure
 
                 builder.Services.AddSingleton<IOrderQueueNotificationService, TestOrderQueueNotificationService>();
                 builder.Services.AddPersistence(builder.Configuration);
-                builder.Services.RemoveAll<DateTimeService>();
-                builder.Services.AddSingleton(new DateTimeService(fixedNow));
+                builder.Services.RemoveAll<DateTimeContext>();
+                builder.Services.AddSingleton(new DateTimeContext(fixedNow));
                 builder.Services
                     .AddIdentityCore<UserEntity>()
                     .AddRoles<IdentityRole<Guid>>()

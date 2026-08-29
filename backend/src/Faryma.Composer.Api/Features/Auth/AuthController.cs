@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Faryma.Composer.Api.Common.Extensions;
 using Faryma.Composer.Api.Features.Auth.BrowserAdminLogin;
 using Faryma.Composer.Api.Features.Auth.DesktopAdminLogin;
 using Faryma.Composer.Api.Features.Auth.Dtos;
@@ -7,6 +6,7 @@ using Faryma.Composer.Api.Features.Auth.Logout;
 using Faryma.Composer.Api.Features.Auth.Options;
 using Faryma.Composer.Api.Features.Auth.RefreshToken;
 using Faryma.Composer.Api.Features.Auth.Services;
+using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -26,7 +26,8 @@ namespace Faryma.Composer.Api.Features.Auth
     public sealed class AuthController(
         AuthTokenService authTokenService,
         IOptions<TwitchOptions> twitchOptions,
-        AdminAuthService adminAuthService) : ControllerBase
+        AdminAuthService adminAuthService,
+        CurrentUserContext currentUserContext) : ControllerBase
     {
         /// <summary>
         /// Выполняет десктопную аутентификацию администратора и возвращает JWT токен
@@ -126,7 +127,7 @@ namespace Faryma.Composer.Api.Features.Auth
         [EnableRateLimiting("auth-login")]
         public async Task<IActionResult> Logout(LogoutRequest request)
         {
-            Guid userId = User.GetUserId();
+            Guid userId = currentUserContext.GetRequiredUserId();
             await authTokenService.RevokeSession(userId, request.RefreshToken);
 
             return NoContent();
@@ -140,7 +141,7 @@ namespace Faryma.Composer.Api.Features.Auth
         [EnableRateLimiting("auth-login")]
         public async Task<IActionResult> LogoutAll()
         {
-            Guid userId = User.GetUserId();
+            Guid userId = currentUserContext.GetRequiredUserId();
             await authTokenService.RevokeAll(userId);
 
             return NoContent();

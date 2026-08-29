@@ -17,10 +17,5 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
         /// Оценка трека (0-26)
         /// </summary>
         public required int Rating { get; init; }
-
-        /// <summary>
-        /// Id пользователя, создавшего разбор
-        /// </summary>
-        public required Guid CreatedByUserId { get; init; }
     }
 }

@@ -5,10 +5,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.User
 {
-    public sealed class UserStore(UserManager<UserEntity> userManager)
+    public sealed class UserStore(
+        CurrentUserContext currentUserContext,
+        UserManager<UserEntity> userManager)
     {
-        public async Task<UserEntity> GetUser(Guid userId, CancellationToken ct)
+        public async Task<UserEntity> GetUser(CancellationToken ct)
         {
+            Guid userId = currentUserContext.GetRequiredUserId();
+
             return await userManager.Users.FirstOrDefaultAsync(x => x.Id == userId, ct)
                 ?? throw new NotFoundException($"Пользователь с id: {userId} не найден");
         }

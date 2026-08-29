@@ -2,7 +2,6 @@
 #pragma warning disable IDE0060 // Удалите неиспользуемый параметр
 
 using Faryma.Composer.Api.Common.Attributes;
-using Faryma.Composer.Api.Common.Extensions;
 using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Api.Features.ReviewOrder.AddTrackUrl;
 using Faryma.Composer.Api.Features.ReviewOrder.Cancel;
@@ -54,15 +53,12 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] CreateOutOfQueueRequest request,
             CancellationToken ct)
         {
-            Guid userId = User.GetUserId();
-
             ReviewOrderEntity order = await mediator.Send(new CreateOutOfQueueCommand
             {
                 UserNickname = request.UserNickname,
                 UserComment = request.UserComment,
                 TrackUrl = request.TrackUrl,
                 TrackDurationSeconds = request.TrackDurationSeconds,
-                CreatedByUserId = userId,
             }, ct);
 
             return Ok(new CreateOutOfQueueResponse
@@ -82,8 +78,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] CreateDonationRequest request,
             CancellationToken ct)
         {
-            Guid userId = User.GetUserId();
-
             ReviewOrderEntity order = await mediator.Send(new CreateDonationCommand
             {
                 UserNickname = request.UserNickname,
@@ -92,7 +86,6 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
                 TrackDurationSeconds = request.TrackDurationSeconds,
                 PaymentAmount = request.PaymentAmount,
                 TopUpProvider = request.TopUpProvider,
-                CreatedByUserId = userId,
             }, ct);
 
             return Ok(new CreateDonationResponse
@@ -112,15 +105,12 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] CreateFreeRequest request,
             CancellationToken ct)
         {
-            Guid userId = User.GetUserId();
-
             ReviewOrderEntity order = await mediator.Send(new CreateFreeCommand
             {
                 UserNickname = request.UserNickname,
                 UserComment = request.UserComment,
                 TrackUrl = request.TrackUrl,
                 TrackDurationSeconds = request.TrackDurationSeconds,
-                CreatedByUserId = userId,
             }, ct);
 
             return Ok(new CreateFreeResponse
@@ -140,15 +130,12 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] CreateCharityRequest request,
             CancellationToken ct)
         {
-            Guid userId = User.GetUserId();
-
             ReviewOrderEntity order = await mediator.Send(new CreateCharityCommand
             {
                 UserNickname = request.UserNickname,
                 UserComment = request.UserComment,
                 TrackUrl = request.TrackUrl,
                 TrackDurationSeconds = request.TrackDurationSeconds,
-                CreatedByUserId = userId,
             }, ct);
 
             return Ok(new CreateCharityResponse
@@ -168,15 +155,12 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
             [FromBody] PayRequest request,
             CancellationToken ct)
         {
-            Guid userId = User.GetUserId();
-
             ReviewOrderEntity order = await mediator.Send(new PayCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Nickname = request.Nickname.Trim(),
                 PaymentAmount = request.PaymentAmount,
                 TopUpProvider = request.TopUpProvider,
-                CreatedByUserId = userId,
             }, ct);
 
             return Ok(new PayResponse
@@ -230,13 +214,10 @@ namespace Faryma.Composer.Api.Features.ReviewOrder
         [AuthorizeAdmins]
         public async Task<ActionResult<CompleteResponse>> Complete(CompleteRequest request, CancellationToken ct)
         {
-            Guid userId = User.GetUserId();
-
             ReviewOrderEntity order = await mediator.Send(new CompleteCommand
             {
                 ReviewOrderId = request.ReviewOrderId,
                 Rating = request.Rating,
-                CreatedByUserId = userId,
             }, ct);
 
             return Ok(new CompleteResponse

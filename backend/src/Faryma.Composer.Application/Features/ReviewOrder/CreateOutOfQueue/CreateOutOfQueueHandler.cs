@@ -24,7 +24,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateOutOfQueue
     {
         public async ValueTask<ReviewOrderEntity> Handle(CreateOutOfQueueCommand command, CancellationToken ct = default)
         {
-            UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
+            UserEntity createdByUser = await userStore.GetUser(ct);
             ComposerStreamEntity nearestStream = await reviewOrderStore.GetNearestStream(ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
 

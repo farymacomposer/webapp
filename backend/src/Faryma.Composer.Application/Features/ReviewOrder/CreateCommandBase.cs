@@ -24,10 +24,5 @@
         /// Длительность трека в секундах
         /// </summary>
         public required int? TrackDurationSeconds { get; init; }
-
-        /// <summary>
-        /// Id пользователя, создавшего заказ
-        /// </summary>
-        public required Guid CreatedByUserId { get; init; }
     }
 }

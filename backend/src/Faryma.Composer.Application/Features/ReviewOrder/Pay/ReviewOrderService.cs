@@ -26,7 +26,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Pay
             ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
-            UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
+            UserEntity createdByUser = await userStore.GetUser(ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
 
             transactionStore.CreateAccountTopUpAndPayment(

@@ -25,7 +25,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateDonation
     {
         public async ValueTask<ReviewOrderEntity> Handle(CreateDonationCommand command, CancellationToken ct)
         {
-            UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
+            UserEntity createdByUser = await userStore.GetUser(ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
             ComposerStreamEntity nearestStream = await reviewOrderStore.HasOrders(userNickname, ct)
                 ? await reviewOrderStore.GetNearestStream(ComposerStreamType.Donation, ct)

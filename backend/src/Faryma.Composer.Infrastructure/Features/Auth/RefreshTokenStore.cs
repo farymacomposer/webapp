@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.Auth
 {
-    public sealed class RefreshTokenStore(AppDbContext appDbContext, DateTimeService dateTimeService)
+    public sealed class RefreshTokenStore(AppDbContext appDbContext, DateTimeContext dateTimeContext)
     {
         public RefreshTokenEntity Create(string tokenHash, Guid familyId, int expiryInDays, UserEntity user)
         {
-            DateTime now = dateTimeService.Now;
+            DateTime now = dateTimeContext.Now;
 
             return appDbContext.Add(new RefreshTokenEntity
             {
@@ -30,7 +30,7 @@ namespace Faryma.Composer.Infrastructure.Features.Auth
             return appDbContext.RefreshTokens
                 .Where(x => x.FamilyId == familyId && x.RevokedAt == null)
                 .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(x => x.RevokedAt, dateTimeService.Now));
+                    .SetProperty(x => x.RevokedAt, dateTimeContext.Now));
         }
 
         public Task RevokeAllForUser(Guid userId)
@@ -38,7 +38,7 @@ namespace Faryma.Composer.Infrastructure.Features.Auth
             return appDbContext.RefreshTokens
                 .Where(x => x.UserId == userId && x.RevokedAt == null)
                 .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(x => x.RevokedAt, dateTimeService.Now));
+                    .SetProperty(x => x.RevokedAt, dateTimeContext.Now));
         }
     }
 }

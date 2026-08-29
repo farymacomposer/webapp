@@ -35,7 +35,8 @@ namespace Faryma.Composer.Infrastructure.DependencyInjection
                 .PersistKeysToDbContext<AppDbContext>();
 
             services
-                .AddScoped<DateTimeService>()
+                .AddScoped<DateTimeContext>()
+                .AddScoped<CurrentUserContext>()
 
                 // Auth
                 .AddScoped<RefreshTokenStore>()

@@ -11,7 +11,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Start
 {
     public sealed class StartHandler(
         ComposerStreamStore composerStreamStore,
-        DateTimeService dateTimeService,
+        DateTimeContext dateTimeContext,
         AppDbContext appDbContext,
         OrderQueueEventChannel orderQueueEventChannel)
         : IRequestHandler<StartCommand, ComposerStreamEntity>
@@ -33,7 +33,7 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Start
                 throw new ComposerStreamException($"Невозможно начать стрим, пока стрим на дату: {live.EventDate} запущен", stream);
             }
 
-            stream.Start(dateTimeService.Now);
+            stream.Start(dateTimeContext.Now);
 
             await appDbContext.SaveChangesAsync(ct);
 

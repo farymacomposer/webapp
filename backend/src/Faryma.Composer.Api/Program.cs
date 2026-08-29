@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Api.Common.DependencyInjection;
 using Faryma.Composer.Api.Common.Extensions;
 using Faryma.Composer.Api.Common.Logging;
+using Faryma.Composer.Api.Common.Middleware;
 using Faryma.Composer.Api.Common.Startup;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
@@ -45,6 +46,7 @@ namespace Faryma.Composer.Api
             app.UseRateLimiter();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMiddleware<RequestContextMiddleware>();
 
             app.MapControllers();
             app.MapHub<OrderQueueNotificationHub>(IOrderQueueNotificationServer.RoutePattern);

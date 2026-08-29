@@ -4,7 +4,7 @@ using Faryma.Composer.Domain.Enums;
 
 namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
-    public sealed class TransactionStore(AppDbContext appDbContext, DateTimeService dateTimeService)
+    public sealed class TransactionStore(AppDbContext appDbContext, DateTimeContext dateTimeContext)
     {
         public void CreateAccountTopUpAndPayment(
             AccountTopUpProvider topUpProvider,
@@ -40,7 +40,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             AccountTopUpEntity source = new()
             {
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 Provider = topUpProvider,
                 UserNicknameAccount = account,
                 CreatedByUser = createdByUser,
@@ -50,7 +50,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             return appDbContext.Add(new TransactionEntity
             {
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 Kind = TransactionKind.AccountTopUp,
                 UserNicknameAccount = account,
                 Credit = amount,
@@ -74,7 +74,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             return appDbContext.Add(new TransactionEntity
             {
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 Kind = TransactionKind.Payment,
                 UserNicknameAccount = account,
                 Credit = 0,
@@ -95,7 +95,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
             TransactionReversalEntity source = new()
             {
                 Reason = reason,
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 CreatedByUser = createdByUser,
                 ReversedTransaction = reversedTransaction,
             };
@@ -104,7 +104,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             TransactionEntity result = new()
             {
-                CreatedAt = dateTimeService.Now,
+                CreatedAt = dateTimeContext.Now,
                 Kind = TransactionKind.Reversal,
                 Credit = reversedTransaction.Debit,
                 Debit = reversedTransaction.Credit,
