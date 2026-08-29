@@ -13,7 +13,7 @@
             configuration.Add("POSTGRES:PORT", "5432");
             configuration.Add("POSTGRES:DATABASE", "unused_api_test");
             configuration.Add("POSTGRES:USERNAME", "unused");
-            configuration.Add("POSTGRES:PASSWORD", "unused");
+            configuration.Add("POSTGRES:PASSWORD", "unused-password");
 
             return configuration;
         }

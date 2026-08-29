@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Application.Features.ReviewOrder;
-using Faryma.Composer.Application.Features.ReviewOrder.Complete;
+﻿using Faryma.Composer.Application.Features.ReviewOrder.Complete;
 using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
@@ -30,7 +29,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 inProgressAt: app.FixedNow);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().Complete(new CompleteCommand
+                services.Send(new CompleteCommand
                 {
                     ReviewOrderId = order.Id,
                     Rating = 26,
@@ -61,7 +60,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 reviewRating: 12);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().Complete(new CompleteCommand
+                services.Send(new CompleteCommand
                 {
                     ReviewOrderId = order.Id,
                     Rating = 20,
@@ -94,7 +93,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().Complete(new CompleteCommand
+                    services.Send(new CompleteCommand
                     {
                         ReviewOrderId = order.Id,
                         Rating = 15,
@@ -111,9 +110,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             await using ApplicationTestHost app = await CreateAppAsync();
             UserEntity user = await app.Data.CreateUserAsync("admin");
 
-            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+            await Assert.ThrowsAsync<NotFoundException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().Complete(new CompleteCommand
+                    services.Send(new CompleteCommand
                     {
                         ReviewOrderId = long.MaxValue,
                         Rating = 15,

@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Application.Features.AppSettings;
-using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl;
+using Faryma.Composer.Infrastructure.Features.ReviewOrder;
 using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
@@ -26,7 +26,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 totalPaymentAmount: 750);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                services.Send(new AddTrackUrlCommand
                 {
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/new-track",
@@ -34,10 +34,10 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
-            Assert.Equal(ReviewOrderStatus.Pending, result.Status);
+            Assert.Equal(ReviewOrderStatus.AwaitingPayment, result.Status);
             Assert.Equal("https://example.com/new-track", result.TrackUrl);
             Assert.Equal(60, result.TrackDurationSeconds);
-            Assert.Equal(ReviewOrderStatus.Pending, persisted.Status);
+            Assert.Equal(ReviewOrderStatus.AwaitingPayment, persisted.Status);
             Assert.Equal("https://example.com/new-track", persisted.TrackUrl);
             Assert.Equal(60, persisted.TrackDurationSeconds);
         }
@@ -57,7 +57,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 totalPaymentAmount: 750);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                services.Send(new AddTrackUrlCommand
                 {
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/long-track",
@@ -89,7 +89,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 totalPaymentAmount: 1_200);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                services.Send(new AddTrackUrlCommand
                 {
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/longer-track",
@@ -97,8 +97,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
-            Assert.Equal(1_110, result.PayableAmount);
-            Assert.Equal(1_110, persisted.PayableAmount);
+            Assert.Equal(160, result.PayableAmount);
+            Assert.Equal(160, persisted.PayableAmount);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             {
                 await ConfigurePricing(services, extraTimeAmountPerSecond: 5, detailedReviewAmount: 1_000);
 
-                return await services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                return await services.Send(new AddTrackUrlCommand
                 {
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/snapshot-track",
@@ -133,15 +133,13 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             {
                 await ConfigurePricing(services, extraTimeAmountPerSecond: 1, detailedReviewAmount: 1_000);
 
-                return await services.GetRequiredService<UnitOfWork>()
-                    .ReviewOrderStore
-                    .FindById(order.Id)
+                return await services.GetRequiredService<ReviewOrderStore>().FindOrderById(order.Id, CancellationToken.None)
                     ?? throw new InvalidOperationException("Заказ не найден");
             });
 
-            Assert.Equal(ReviewOrderStatus.Pending, result.Status);
-            Assert.Equal(1_350, result.PayableAmount);
-            Assert.Equal(1_350, persistedAfterSettingsChange.PayableAmount);
+            Assert.Equal(ReviewOrderStatus.AwaitingPayment, result.Status);
+            Assert.Equal(250, result.PayableAmount);
+            Assert.Equal(250, persistedAfterSettingsChange.PayableAmount);
         }
 
         /// <summary>
@@ -160,7 +158,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 totalPaymentAmount: status == ReviewOrderStatus.Pending ? 750 : 0);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                services.Send(new AddTrackUrlCommand
                 {
                     ReviewOrderId = order.Id,
                     TrackUrl = "https://example.com/updated-track",
@@ -168,10 +166,14 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 }));
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
-            Assert.Equal(status, result.Status);
+            ReviewOrderStatus expectedStatus = status == ReviewOrderStatus.Pending
+                ? ReviewOrderStatus.AwaitingPayment
+                : status;
+
+            Assert.Equal(expectedStatus, result.Status);
             Assert.Equal("https://example.com/updated-track", result.TrackUrl);
             Assert.Equal(60, result.TrackDurationSeconds);
-            Assert.Equal(status, persisted.Status);
+            Assert.Equal(expectedStatus, persisted.Status);
             Assert.Equal("https://example.com/updated-track", persisted.TrackUrl);
             Assert.Equal(60, persisted.TrackDurationSeconds);
         }
@@ -198,7 +200,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                    services.Send(new AddTrackUrlCommand
                     {
                         ReviewOrderId = order.Id,
                         TrackUrl = "https://example.com/fail-track",
@@ -214,9 +216,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         {
             await using ApplicationTestHost app = await CreateAppAsync();
 
-            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+            await Assert.ThrowsAsync<NotFoundException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().AddTrackUrl(new AddTrackUrlCommand
+                    services.Send(new AddTrackUrlCommand
                     {
                         ReviewOrderId = long.MaxValue,
                         TrackUrl = "https://example.com/missing-track",
@@ -230,11 +232,12 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
             long detailedReviewAmount)
         {
             AppSettingsService appSettingsService = services.GetRequiredService<AppSettingsService>();
-            await appSettingsService.Update(new AppSettingsDto
+            await appSettingsService.Update(new AppSettingsEntity
             {
-                ReviewOrderNominalAmount = appSettingsService.Settings.ReviewOrderNominalPrice,
-                ReviewOrderExtraTimeAmountPerSecond = extraTimeAmountPerSecond,
-                ReviewOrderDetailedReviewAmount = detailedReviewAmount,
+                ReviewOrderNominalPrice = appSettingsService.Settings.ReviewOrderNominalPrice,
+                IncludedTrackDurationSeconds = appSettingsService.Settings.IncludedTrackDurationSeconds,
+                ReviewOrderExtraTrackSecondPrice = extraTimeAmountPerSecond,
+                ReviewOrderDetailedPrice = detailedReviewAmount,
             }, CancellationToken.None);
         }
     }

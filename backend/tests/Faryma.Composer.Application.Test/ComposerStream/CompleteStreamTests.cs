@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Application.Test.Infrastructure;
+﻿using Faryma.Composer.Application.Features.ComposerStream.Complete;
+using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Domain.Exceptions;
@@ -20,8 +21,10 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 status: ComposerStreamStatus.Live,
                 startedAt: app.FixedNow);
 
-            ComposerStreamEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ComposerStreamService>().Complete(stream.Id));
+            ComposerStreamEntity result = await app.SendAsync(new CompleteCommand
+            {
+                ComposerStreamId = stream.Id,
+            });
 
             ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
             Assert.Equal(ComposerStreamStatus.Completed, result.Status);
@@ -44,8 +47,10 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 completedAt: originalCompletedAt);
 
             int beforeUpdates = app.QueueUpdateCount;
-            ComposerStreamEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ComposerStreamService>().Complete(stream.Id));
+            ComposerStreamEntity result = await app.SendAsync(new CompleteCommand
+            {
+                ComposerStreamId = stream.Id,
+            });
             ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
 
             Assert.Equal(stream.Id, result.Id);
@@ -75,8 +80,10 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 inProgressAt: app.FixedNow);
 
             await Assert.ThrowsAsync<ComposerStreamException>(() =>
-                app.RunScopeAsync(services =>
-                    services.GetRequiredService<ComposerStreamService>().Complete(stream.Id)));
+                app.SendAsync(new CompleteCommand
+                {
+                    ComposerStreamId = stream.Id,
+                }));
         }
 
         /// <summary>
@@ -106,8 +113,10 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 inProgressAt: app.FixedNow);
 
             await Assert.ThrowsAsync<ComposerStreamException>(() =>
-                app.RunScopeAsync(services =>
-                    services.GetRequiredService<ComposerStreamService>().Complete(liveStream.Id)));
+                app.SendAsync(new CompleteCommand
+                {
+                    ComposerStreamId = liveStream.Id,
+                }));
         }
 
         /// <summary>
@@ -125,8 +134,10 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 status: status);
 
             await Assert.ThrowsAsync<ComposerStreamException>(() =>
-                app.RunScopeAsync(services =>
-                    services.GetRequiredService<ComposerStreamService>().Complete(stream.Id)));
+                app.SendAsync(new CompleteCommand
+                {
+                    ComposerStreamId = stream.Id,
+                }));
         }
 
         /// <summary>
@@ -137,9 +148,11 @@ namespace Faryma.Composer.Application.Test.ComposerStream
         {
             await using ApplicationTestHost app = await CreateAppAsync();
 
-            await Assert.ThrowsAsync<ComposerStreamException>(() =>
-                app.RunScopeAsync(services =>
-                    services.GetRequiredService<ComposerStreamService>().Complete(long.MaxValue)));
+            await Assert.ThrowsAsync<NotFoundException>(() =>
+                app.SendAsync(new CompleteCommand
+                {
+                    ComposerStreamId = long.MaxValue,
+                }));
         }
     }
 }

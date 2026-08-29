@@ -1,4 +1,5 @@
-﻿using Faryma.Composer.Application.Test.Infrastructure;
+﻿using Faryma.Composer.Application.Features.ComposerStream.Create;
+using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Domain.Exceptions;
@@ -17,13 +18,12 @@ namespace Faryma.Composer.Application.Test.ComposerStream
             UserEntity user = await app.Data.CreateUserAsync("composer");
             DateOnly eventDate = app.Today.AddDays(5);
 
-            ComposerStreamEntity stream = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ComposerStreamService>().Create(new CreateCommand
-                {
-                    EventDate = eventDate,
-                    Type = ComposerStreamType.Donation,
-                    CreatedByUserId = user.Id,
-                }));
+            ComposerStreamEntity stream = await app.SendAsync(new CreateCommand
+            {
+                EventDate = eventDate,
+                Type = ComposerStreamType.Donation,
+                CreatedByUserId = user.Id,
+            });
             ComposerStreamEntity persisted = await app.GetStreamAsync(stream.Id);
 
             Assert.Equal(ComposerStreamStatus.Planned, stream.Status);
@@ -53,13 +53,12 @@ namespace Faryma.Composer.Application.Test.ComposerStream
                 type: ComposerStreamType.Donation);
 
             await Assert.ThrowsAsync<ComposerStreamException>(() =>
-                app.RunScopeAsync(services =>
-                    services.GetRequiredService<ComposerStreamService>().Create(new CreateCommand
-                    {
-                        EventDate = eventDate,
-                        Type = ComposerStreamType.Charity,
-                        CreatedByUserId = user.Id,
-                    })));
+                app.SendAsync(new CreateCommand
+                {
+                    EventDate = eventDate,
+                    Type = ComposerStreamType.Charity,
+                    CreatedByUserId = user.Id,
+                }));
         }
 
         /// <summary>
@@ -70,14 +69,13 @@ namespace Faryma.Composer.Application.Test.ComposerStream
         {
             await using ApplicationTestHost app = await CreateAppAsync();
 
-            await Assert.ThrowsAsync<ComposerStreamException>(() =>
-                app.RunScopeAsync(services =>
-                    services.GetRequiredService<ComposerStreamService>().Create(new CreateCommand
-                    {
-                        EventDate = app.Today.AddDays(1),
-                        Type = ComposerStreamType.Donation,
-                        CreatedByUserId = Guid.NewGuid(),
-                    })));
+            await Assert.ThrowsAsync<NotFoundException>(() =>
+                app.SendAsync(new CreateCommand
+                {
+                    EventDate = app.Today.AddDays(1),
+                    Type = ComposerStreamType.Donation,
+                    CreatedByUserId = Guid.NewGuid(),
+                }));
         }
     }
 }

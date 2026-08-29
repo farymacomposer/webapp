@@ -1,4 +1,5 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueue;
+using Faryma.Composer.Application.Features.OrderQueue.Models;
 
 namespace Faryma.Composer.Application.Test.Infrastructure
 {

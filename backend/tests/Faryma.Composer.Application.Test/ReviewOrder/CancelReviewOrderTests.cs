@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Application.Features.ReviewOrder;
-using Faryma.Composer.Application.Features.ReviewOrder.Cancel;
+﻿using Faryma.Composer.Application.Features.ReviewOrder.Cancel;
 using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
@@ -31,7 +30,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 inProgressAt: app.FixedNow);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
+                services.Send(new CancelCommand
                 {
                     ReviewOrderId = order.Id,
                     CancelReason = "дубликат",
@@ -62,7 +61,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 cancelReason: "причина");
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
+                services.Send(new CancelCommand
                 {
                     ReviewOrderId = order.Id,
                     CancelReason = "другая причина",
@@ -92,7 +91,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
+                    services.Send(new CancelCommand
                     {
                         ReviewOrderId = order.Id,
                         CancelReason = "поздняя отмена",
@@ -118,7 +117,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 cancelReason: null);
 
             ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
+                services.Send(new CancelCommand
                 {
                     ReviewOrderId = order.Id,
                     CancelReason = "ручная отмена",
@@ -145,9 +144,9 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         {
             await using ApplicationTestHost app = await CreateAppAsync();
 
-            await Assert.ThrowsAsync<ReviewOrderException>(() =>
+            await Assert.ThrowsAsync<NotFoundException>(() =>
                 app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().Cancel(new CancelCommand
+                    services.Send(new CancelCommand
                     {
                         ReviewOrderId = long.MaxValue,
                         CancelReason = "поздняя отмена",

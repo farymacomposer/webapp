@@ -5,6 +5,9 @@ using Faryma.Composer.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Infrastructure.DependencyInjection;
+using Faryma.Composer.Infrastructure.Features.ComposerStream;
+using Faryma.Composer.Infrastructure.Features.ReviewOrder;
+using Mediator;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -98,6 +101,12 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         }
 
         /// <summary>
+        /// Отправляет команду или запрос через Mediator в отдельном DI scope.
+        /// </summary>
+        public Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request) =>
+            RunScopeAsync(services => services.GetRequiredService<ISender>().Send(request).AsTask());
+
+        /// <summary>
         /// Выполняет действие в отдельном DI scope и возвращает результат.
         /// </summary>
         public async Task<T> RunScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
@@ -132,22 +141,17 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         /// </summary>
         public Task<ReviewOrderEntity> GetOrderAsync(long orderId) => RunScopeAsync(async services =>
         {
-            UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
+            ReviewOrderStore store = services.GetRequiredService<ReviewOrderStore>();
 
-            return await uow.ReviewOrderStore.FindById(orderId)
+            return await store.FindOrderById(orderId, CancellationToken.None)
                 ?? throw new InvalidOperationException($"Заказ {orderId} не найден");
         });
 
         /// <summary>
         /// Загружает стрим из базы для проверки сохраненных изменений.
         /// </summary>
-        public Task<ComposerStreamEntity> GetStreamAsync(long streamId) => RunScopeAsync(async services =>
-        {
-            UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
-
-            return await uow.ComposerStreamStore.FindById(streamId)
-                ?? throw new InvalidOperationException($"Стрим {streamId} не найден");
-        });
+        public Task<ComposerStreamEntity> GetStreamAsync(long streamId) => RunScopeAsync(services =>
+            services.GetRequiredService<ComposerStreamStore>().GetStream(streamId, CancellationToken.None));
 
         /// <summary>
         /// Возвращает транзакции заказа, чтобы проверить финансовые эффекты сценария.

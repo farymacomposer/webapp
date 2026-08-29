@@ -1,6 +1,9 @@
 ﻿using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Infrastructure.Features.ComposerStream;
+using Faryma.Composer.Infrastructure.Features.ReviewOrder;
+using Faryma.Composer.Infrastructure.Features.UserNickname;
 using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.Infrastructure
@@ -49,11 +52,12 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             DateTime? completedAt = null) =>
             app.RunScopeAsync(async services =>
             {
-                UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
+                ComposerStreamStore composerStreamStore = services.GetRequiredService<ComposerStreamStore>();
                 UserManager<UserEntity> userManager = services.GetRequiredService<UserManager<UserEntity>>();
+                AppDbContext db = services.GetRequiredService<AppDbContext>();
 
                 UserEntity createdByUser = await GetOrCreateUserAsync(userManager, createdByUserId, "stream");
-                ComposerStreamEntity stream = uow.ComposerStreamStore.Create(
+                ComposerStreamEntity stream = composerStreamStore.CreateStream(
                     eventDate ?? GetNextStreamDate(),
                     type,
                     createdByUser);
@@ -62,7 +66,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 stream.StartedAt = startedAt;
                 stream.CompletedAt = completedAt;
 
-                await uow.SaveChanges();
+                await db.SaveChangesAsync();
 
                 return stream;
             });
@@ -91,13 +95,27 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             int? reviewRating = null) =>
             app.RunScopeAsync(async services =>
             {
-                UnitOfWork uow = services.GetRequiredService<UnitOfWork>();
+                ComposerStreamStore composerStreamStore = services.GetRequiredService<ComposerStreamStore>();
+                ReviewOrderStore reviewOrderStore = services.GetRequiredService<ReviewOrderStore>();
+                ReviewStore reviewStore = services.GetRequiredService<ReviewStore>();
+                TransactionStore transactionStore = services.GetRequiredService<TransactionStore>();
+                UserNicknameStore userNicknameStore = services.GetRequiredService<UserNicknameStore>();
                 UserManager<UserEntity> userManager = services.GetRequiredService<UserManager<UserEntity>>();
+                AppDbContext db = services.GetRequiredService<AppDbContext>();
 
                 UserEntity createdByUser = await GetOrCreateUserAsync(userManager, createdByUserId, "order");
-                ComposerStreamEntity creationStream = await GetOrCreateCreationStreamAsync(uow, createdByUser, creationStreamId);
-                ComposerStreamEntity? processingStream = await GetOrCreateProcessingStreamAsync(uow, createdByUser, processingStreamId, status);
-                UserNicknameEntity userNickname = await GetOrCreateNicknameAsync(uow, nickname);
+                ComposerStreamEntity creationStream = await GetOrCreateCreationStreamAsync(
+                    composerStreamStore,
+                    db,
+                    createdByUser,
+                    creationStreamId);
+                ComposerStreamEntity? processingStream = await GetOrCreateProcessingStreamAsync(
+                    composerStreamStore,
+                    db,
+                    createdByUser,
+                    processingStreamId,
+                    status);
+                UserNicknameEntity userNickname = await GetOrCreateNicknameAsync(userNicknameStore, db, nickname);
 
                 string? initialTrackUrl = trackUrl ?? (status == ReviewOrderStatus.Preorder ? null : _defaultTrackUrl);
                 int? initialTrackDurationSeconds = initialTrackUrl is null ? null : trackDurationSeconds ?? 60;
@@ -105,7 +123,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                     ? payableAmount
                     : 0;
 
-                ReviewOrderEntity order = uow.ReviewOrderStore.Create(
+                ReviewOrderEntity order = reviewOrderStore.CreateOrder(
                     type,
                     status,
                     initialTrackUrl,
@@ -134,13 +152,13 @@ namespace Faryma.Composer.Application.Test.Infrastructure
 
                 if (totalPaymentAmount > 0)
                 {
-                    uow.TransactionStore.CreateAccountTopUp(
+                    transactionStore.CreateAccountTopUp(
                         AccountTopUpProvider.Manual,
                         totalPaymentAmount,
                         userNickname.Account,
                         createdByUser);
 
-                    uow.TransactionStore.CreatePayment(
+                    transactionStore.CreatePayment(
                         totalPaymentAmount,
                         userNickname.Account,
                         order);
@@ -148,24 +166,27 @@ namespace Faryma.Composer.Application.Test.Infrastructure
 
                 if (reviewRating is not null)
                 {
-                    order.Review = uow.ReviewStore.Create(order, reviewRating.Value, createdByUser);
+                    order.Review = reviewStore.CreateReview(order, reviewRating.Value, createdByUser);
                 }
 
-                await uow.SaveChanges();
+                await db.SaveChangesAsync();
 
                 return order;
             });
 
-        private static async Task<UserNicknameEntity> GetOrCreateNicknameAsync(UnitOfWork uow, string nickname)
+        private static async Task<UserNicknameEntity> GetOrCreateNicknameAsync(
+            UserNicknameStore userNicknameStore,
+            AppDbContext db,
+            string nickname)
         {
-            UserNicknameEntity? existing = await uow.UserNicknameStore.FindByNickname(nickname);
+            UserNicknameEntity? existing = await userNicknameStore.FindByNickname(nickname, CancellationToken.None);
             if (existing is not null)
             {
                 return existing;
             }
 
-            UserNicknameEntity created = uow.UserNicknameStore.Create(nickname);
-            await uow.SaveChanges();
+            UserNicknameEntity created = userNicknameStore.Create(nickname);
+            await db.SaveChangesAsync();
 
             return created;
         }
@@ -198,32 +219,35 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         }
 
         private async Task<ComposerStreamEntity> GetOrCreateCreationStreamAsync(
-            UnitOfWork uow,
+            ComposerStreamStore composerStreamStore,
+            AppDbContext db,
             UserEntity createdByUser,
             long? creationStreamId)
         {
             if (creationStreamId is long existingStreamId)
             {
-                return await uow.ComposerStreamStore.FindById(existingStreamId)
-                    ?? throw new InvalidOperationException($"Стрим создания {existingStreamId} не найден");
+                return await composerStreamStore.GetStream(existingStreamId, CancellationToken.None);
             }
 
-            ComposerStreamEntity stream = uow.ComposerStreamStore.Create(GetNextStreamDate(), ComposerStreamType.Donation, createdByUser);
-            await uow.SaveChanges();
+            ComposerStreamEntity stream = composerStreamStore.CreateStream(
+                GetNextStreamDate(),
+                ComposerStreamType.Donation,
+                createdByUser);
+            await db.SaveChangesAsync();
 
             return stream;
         }
 
         private async Task<ComposerStreamEntity?> GetOrCreateProcessingStreamAsync(
-            UnitOfWork uow,
+            ComposerStreamStore composerStreamStore,
+            AppDbContext db,
             UserEntity createdByUser,
             long? processingStreamId,
             ReviewOrderStatus status)
         {
             if (processingStreamId is long existingStreamId)
             {
-                return await uow.ComposerStreamStore.FindById(existingStreamId)
-                    ?? throw new InvalidOperationException($"Стрим обработки {existingStreamId} не найден");
+                return await composerStreamStore.GetStream(existingStreamId, CancellationToken.None);
             }
 
             if (status is not (ReviewOrderStatus.InProgress or ReviewOrderStatus.Completed))
@@ -231,11 +255,14 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 return null;
             }
 
-            ComposerStreamEntity stream = uow.ComposerStreamStore.Create(GetNextStreamDate(), ComposerStreamType.Donation, createdByUser);
+            ComposerStreamEntity stream = composerStreamStore.CreateStream(
+                GetNextStreamDate(),
+                ComposerStreamType.Donation,
+                createdByUser);
             stream.Status = ComposerStreamStatus.Live;
             stream.StartedAt = app.FixedNow;
 
-            await uow.SaveChanges();
+            await db.SaveChangesAsync();
 
             return stream;
         }

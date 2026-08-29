@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Application.Features.ReviewOrder;
+﻿using Faryma.Composer.Application.Features.ReviewOrder.Unfreeze;
 using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
@@ -26,8 +26,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 isFrozen: true,
                 trackUrl: status == ReviewOrderStatus.Preorder ? null : "https://example.com/track");
 
-            ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().Unfreeze(order.Id));
+            ReviewOrderEntity result = await app.SendAsync(new UnfreezeCommand { ReviewOrderId = order.Id });
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.False(result.IsFrozen);
@@ -47,8 +46,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 status: ReviewOrderStatus.Pending,
                 isFrozen: false);
 
-            ReviewOrderEntity result = await app.RunScopeAsync(services =>
-                services.GetRequiredService<ReviewOrderService>().Unfreeze(order.Id));
+            ReviewOrderEntity result = await app.SendAsync(new UnfreezeCommand { ReviewOrderId = order.Id });
             ReviewOrderEntity persisted = await app.GetOrderAsync(order.Id);
 
             Assert.False(result.IsFrozen);
@@ -77,8 +75,7 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
                 reviewRating: status == ReviewOrderStatus.Completed ? 10 : null);
 
             await Assert.ThrowsAsync<ReviewOrderException>(() =>
-                app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().Unfreeze(order.Id)));
+                app.SendAsync(new UnfreezeCommand { ReviewOrderId = order.Id }));
         }
 
         /// <summary>
@@ -89,9 +86,8 @@ namespace Faryma.Composer.Application.Test.ReviewOrder
         {
             await using ApplicationTestHost app = await CreateAppAsync();
 
-            await Assert.ThrowsAsync<ReviewOrderException>(() =>
-                app.RunScopeAsync(services =>
-                    services.GetRequiredService<ReviewOrderService>().Unfreeze(long.MaxValue)));
+            await Assert.ThrowsAsync<NotFoundException>(() =>
+                app.SendAsync(new UnfreezeCommand { ReviewOrderId = long.MaxValue }));
         }
     }
 }
