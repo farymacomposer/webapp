@@ -1,6 +1,7 @@
 ﻿using Faryma.Composer.Domain.Entities.Abstractions;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Domain.Exceptions;
 
 namespace Faryma.Composer.Domain.Entities
 {
@@ -52,5 +53,37 @@ namespace Faryma.Composer.Domain.Entities
         /// Заказы, взятые в работу в этом стриме
         /// </summary>
         public ICollection<ReviewOrderEntity> ProcessedReviewOrders { get; set; } = [];
+
+        public void Start(DateTime now)
+        {
+            if (Status != ComposerStreamStatus.Planned)
+            {
+                throw new ComposerStreamException($"Невозможно начать стрим в статусе '{Status}'", this);
+            }
+
+            Status = ComposerStreamStatus.Live;
+            StartedAt = now;
+        }
+
+        public void Complete(DateTime now)
+        {
+            if (Status != ComposerStreamStatus.Live)
+            {
+                throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{Status}'", this);
+            }
+
+            Status = ComposerStreamStatus.Completed;
+            CompletedAt = now;
+        }
+
+        public void Cancel()
+        {
+            if (Status != ComposerStreamStatus.Planned)
+            {
+                throw new ComposerStreamException($"Невозможно отменить стрим в статусе '{Status}'", this);
+            }
+
+            Status = ComposerStreamStatus.Canceled;
+        }
     }
 }

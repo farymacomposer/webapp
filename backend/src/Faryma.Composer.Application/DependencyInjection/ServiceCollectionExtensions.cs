@@ -1,6 +1,5 @@
 ﻿using Faryma.Composer.Application.Common.Services;
 using Faryma.Composer.Application.Features.AppSettings;
-using Faryma.Composer.Application.Features.ComposerStream;
 using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Features.UserNickname;
@@ -20,7 +19,6 @@ namespace Faryma.Composer.Application.DependencyInjection
                 .AddHostedService<OrderQueueBackgroundWorker>()
                 .AddHostedService<IdempotencyRecordCleanupService>()
 
-                .AddScoped<ComposerStreamService>()
                 .AddScoped<ReviewOrderService>()
                 .AddScoped<UserNicknameService>();
 

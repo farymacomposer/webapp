@@ -6,7 +6,7 @@ namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.FindLiveAndPlann
     /// <summary>
     /// Ответ на запрос текущего и запланированных стримов
     /// </summary>
-    public sealed record FindLiveAndPlannedStreamsResponse
+    public sealed record FindLiveAndPlannedResponse
     {
         /// <summary>
         /// Список стримов

@@ -7,7 +7,6 @@
   <Folder Name="/deploy/">
     <File Path="../.env" />
     <File Path="../.github/workflows/backend.yml" />
-    <File Path="../.github/workflows/desktop-zip-artifact.yml" />
     <File Path="../backend.Dockerfile" />
     <File Path="../docker-compose.yml" />
     <File Path="entrypoint.sh" />

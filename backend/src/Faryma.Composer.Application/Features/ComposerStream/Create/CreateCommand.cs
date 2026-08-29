@@ -1,11 +1,13 @@
-﻿using Faryma.Composer.Domain.Enums;
+﻿using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Enums;
+using Mediator;
 
-namespace Faryma.Composer.Application.Features.ComposerStream.Commands
+namespace Faryma.Composer.Application.Features.ComposerStream.Create
 {
     /// <summary>
     /// Команда создания стрима
     /// </summary>
-    public sealed record CreateCommand
+    public sealed record CreateCommand : IRequest<ComposerStreamEntity>
     {
         /// <summary>
         /// Дата проведения стрима

@@ -7,10 +7,15 @@ using Faryma.Composer.Api.Contracts.Features.ComposerStream.FindLiveAndPlanned;
 using Faryma.Composer.Api.Contracts.Features.ComposerStream.Start;
 using Faryma.Composer.Api.Contracts.Shared.Dto;
 using Faryma.Composer.Api.Features.Auth;
-using Faryma.Composer.Application.Features.ComposerStream;
-using Faryma.Composer.Application.Features.ComposerStream.Commands;
+using Faryma.Composer.Application.Features.ComposerStream.Cancel;
+using Faryma.Composer.Application.Features.ComposerStream.Complete;
+using Faryma.Composer.Application.Features.ComposerStream.Create;
+using Faryma.Composer.Application.Features.ComposerStream.Find;
+using Faryma.Composer.Application.Features.ComposerStream.FindLiveAndPlanned;
+using Faryma.Composer.Application.Features.ComposerStream.Start;
 using Faryma.Composer.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using AppMediator = Mediator.Mediator;
 
 namespace Faryma.Composer.Api.Features.ComposerStream
 {
@@ -20,8 +25,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
     [ApiController]
     [Route("api/composer-streams")]
     [Produces("application/json")]
-    public sealed class ComposerStreamController(
-        ComposerStreamService composerStreamService) : ControllerBase
+    public sealed class ComposerStreamController(AppMediator mediator) : ControllerBase
     {
         /// <summary>
         /// Возвращает список стримов
@@ -29,7 +33,11 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [HttpGet]
         public async Task<ActionResult<FindStreamsResponse>> FindStreams([FromQuery] FindStreamsRequest request, CancellationToken ct)
         {
-            List<ComposerStreamEntity> streams = await composerStreamService.Find(request.DateFrom, request.DateTo, ct);
+            IReadOnlyCollection<ComposerStreamEntity> streams = await mediator.Send(new FindQuery
+            {
+                DateFrom = request.DateFrom,
+                DateTo = request.DateTo,
+            }, ct);
 
             return Ok(new FindStreamsResponse
             {
@@ -41,11 +49,11 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// Возвращает текущий и запланированные стримы
         /// </summary>
         [HttpGet("live-and-planned")]
-        public async Task<ActionResult<FindLiveAndPlannedStreamsResponse>> FindLiveAndPlanned(CancellationToken ct)
+        public async Task<ActionResult<FindLiveAndPlannedResponse>> FindLiveAndPlanned(CancellationToken ct)
         {
-            List<ComposerStreamEntity> streams = await composerStreamService.FindLiveAndPlanned(ct);
+            IReadOnlyCollection<ComposerStreamEntity> streams = await mediator.Send(new FindLiveAndPlannedQuery(), ct);
 
-            return Ok(new FindLiveAndPlannedStreamsResponse
+            return Ok(new FindLiveAndPlannedResponse
             {
                 Streams = streams.Select(ComposerStreamDto.Map)
             });
@@ -60,11 +68,11 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         {
             Guid userId = User.GetUserId();
 
-            ComposerStreamEntity stream = await composerStreamService.Create(new CreateCommand
+            ComposerStreamEntity stream = await mediator.Send(new CreateCommand
             {
                 EventDate = request.EventDate,
                 Type = request.Type,
-                CreatedByUserId = userId
+                CreatedByUserId = userId,
             }, ct);
 
             return Ok(new CreateStreamResponse
@@ -80,7 +88,10 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [AuthorizeComposer]
         public async Task<ActionResult<StartStreamResponse>> StartStream(StartStreamRequest request, CancellationToken ct)
         {
-            ComposerStreamEntity stream = await composerStreamService.Start(request.ComposerStreamId, ct);
+            ComposerStreamEntity stream = await mediator.Send(new StartCommand
+            {
+                ComposerStreamId = request.ComposerStreamId
+            }, ct);
 
             return Ok(new StartStreamResponse
             {
@@ -95,7 +106,10 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [AuthorizeComposer]
         public async Task<ActionResult<CompleteStreamResponse>> CompleteStream(CompleteStreamRequest request, CancellationToken ct)
         {
-            ComposerStreamEntity stream = await composerStreamService.Complete(request.ComposerStreamId, ct);
+            ComposerStreamEntity stream = await mediator.Send(new CompleteCommand
+            {
+                ComposerStreamId = request.ComposerStreamId
+            }, ct);
 
             return Ok(new CompleteStreamResponse
             {
@@ -110,7 +124,10 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         [AuthorizeComposer]
         public async Task<ActionResult<CancelStreamResponse>> CancelStream(CancelStreamRequest request, CancellationToken ct)
         {
-            ComposerStreamEntity stream = await composerStreamService.Cancel(request.ComposerStreamId, ct);
+            ComposerStreamEntity stream = await mediator.Send(new CancelCommand
+            {
+                ComposerStreamId = request.ComposerStreamId
+            }, ct);
 
             return Ok(new CancelStreamResponse
             {
