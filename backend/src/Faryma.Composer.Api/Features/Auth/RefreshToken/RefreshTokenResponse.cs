@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Faryma.Composer.Api.Features.Auth.Dtos;
 
 namespace Faryma.Composer.Api.Features.Auth.RefreshToken
 {
@@ -7,10 +8,10 @@ namespace Faryma.Composer.Api.Features.Auth.RefreshToken
     /// </summary>
     public sealed record RefreshTokenResponse
     {
+        /// <summary>
+        /// Новая пара JWT токенов
+        /// </summary>
         [Required]
-        public required string AccessToken { get; init; }
-
-        [Required]
-        public required string RefreshToken { get; init; }
+        public required AuthTokensDto Tokens { get; init; }
     }
 }

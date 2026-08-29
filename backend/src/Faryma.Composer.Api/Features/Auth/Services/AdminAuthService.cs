@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Faryma.Composer.Api.Features.Auth.Login;
 using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -8,11 +7,11 @@ namespace Faryma.Composer.Api.Features.Auth.Services
 {
     public sealed class AdminAuthService(UserManager<UserEntity> userManager)
     {
-        public async Task<AuthenticatedAdmin?> Authenticate(LoginRequest request, CancellationToken ct)
+        public async Task<AuthenticatedAdmin?> Authenticate(string userName, string password, CancellationToken ct)
         {
-            string userName = request.UserName.Trim();
+            userName = userName.Trim();
             UserEntity? user = await userManager.FindByNameAsync(userName);
-            if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
+            if (user is null || !await userManager.CheckPasswordAsync(user, password))
             {
                 await DelayFailedAuthentication(ct);
 

@@ -21,6 +21,8 @@ namespace Faryma.Composer.Api.Test.Smoke
             string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
             Assert.Contains("\"openapi\"", content, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("Faryma.Composer.Api.Features.ReviewOrder.Complete.CompleteRequest", content, StringComparison.Ordinal);
+            Assert.Contains("Faryma.Composer.Api.Features.ComposerStream.Complete.CompleteRequest", content, StringComparison.Ordinal);
         }
     }
 }

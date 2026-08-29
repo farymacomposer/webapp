@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using Faryma.Composer.Api.Common.Extensions;
-using Faryma.Composer.Api.Features.Auth.Login;
+using Faryma.Composer.Api.Features.Auth.BrowserAdminLogin;
+using Faryma.Composer.Api.Features.Auth.DesktopAdminLogin;
+using Faryma.Composer.Api.Features.Auth.Dtos;
 using Faryma.Composer.Api.Features.Auth.Logout;
 using Faryma.Composer.Api.Features.Auth.Options;
 using Faryma.Composer.Api.Features.Auth.RefreshToken;
@@ -29,11 +31,11 @@ namespace Faryma.Composer.Api.Features.Auth
         /// <summary>
         /// Выполняет десктопную аутентификацию администратора и возвращает JWT токен
         /// </summary>
-        [HttpPost("sessions/desktop-admin")]
+        [HttpPost]
         [EnableRateLimiting("auth-login")]
-        public async Task<ActionResult<LoginResponse>> DesktopAdminLogin(LoginRequest request, CancellationToken ct)
+        public async Task<ActionResult<DesktopAdminLoginResponse>> DesktopAdminLogin(DesktopAdminLoginRequest request, CancellationToken ct)
         {
-            AuthenticatedAdmin? admin = await adminAuthService.Authenticate(request, ct);
+            AuthenticatedAdmin? admin = await adminAuthService.Authenticate(request.Credentials.UserName, request.Credentials.Password, ct);
             if (admin is null)
             {
                 return Unauthorized();
@@ -41,17 +43,24 @@ namespace Faryma.Composer.Api.Features.Auth
 
             (string accessToken, string refreshToken) = await authTokenService.IssueForUser(admin.User, ct);
 
-            return Ok(new LoginResponse { AccessToken = accessToken, RefreshToken = refreshToken });
+            return Ok(new DesktopAdminLoginResponse
+            {
+                Tokens = new AuthTokensDto
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                }
+            });
         }
 
         /// <summary>
         /// Выполняет браузерную аутентификацию администратора через логин и пароль
         /// </summary>
-        [HttpPost("sessions/browser-admin")]
+        [HttpPost]
         [EnableRateLimiting("auth-login")]
-        public async Task<IActionResult> BrowserAdminLogin(LoginRequest request, CancellationToken ct)
+        public async Task<IActionResult> BrowserAdminLogin(BrowserAdminLoginRequest request, CancellationToken ct)
         {
-            AuthenticatedAdmin? admin = await adminAuthService.Authenticate(request, ct);
+            AuthenticatedAdmin? admin = await adminAuthService.Authenticate(request.Credentials.UserName, request.Credentials.Password, ct);
             if (admin is null)
             {
                 return Unauthorized();
@@ -66,9 +75,9 @@ namespace Faryma.Composer.Api.Features.Auth
         /// <summary>
         /// Инициирует вход пользователя через Twitch OIDC
         /// </summary>
-        [HttpGet("oauth/twitch")]
+        [HttpGet]
         [EnableRateLimiting("auth-login")]
-        public IActionResult BrowserLogin()
+        public IActionResult TwitchLogin()
         {
             return Challenge(
                 new AuthenticationProperties
@@ -81,7 +90,7 @@ namespace Faryma.Composer.Api.Features.Auth
         /// <summary>
         /// Выполняет локальный выход браузерной сессии
         /// </summary>
-        [HttpPost("sessions/browser/logout")]
+        [HttpPost]
         [EnableRateLimiting("auth-login")]
         public async Task<IActionResult> BrowserLogout()
         {
@@ -93,19 +102,26 @@ namespace Faryma.Composer.Api.Features.Auth
         /// <summary>
         /// Обновляет access token
         /// </summary>
-        [HttpPost("tokens/refresh")]
+        [HttpPost]
         [EnableRateLimiting("auth-login")]
         public async Task<ActionResult<RefreshTokenResponse>> RefreshToken(RefreshTokenRequest request)
         {
             (string accessToken, string refreshToken) = await authTokenService.Refresh(request.RefreshToken);
 
-            return Ok(new RefreshTokenResponse { AccessToken = accessToken, RefreshToken = refreshToken });
+            return Ok(new RefreshTokenResponse
+            {
+                Tokens = new AuthTokensDto
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                }
+            });
         }
 
         /// <summary>
         /// Выполняет выход пользователя из системы
         /// </summary>
-        [HttpPost("tokens/revoke")]
+        [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableRateLimiting("auth-login")]
         public async Task<IActionResult> Logout(LogoutRequest request)
@@ -119,7 +135,7 @@ namespace Faryma.Composer.Api.Features.Auth
         /// <summary>
         /// Выполняет выход пользователя из всех сессий
         /// </summary>
-        [HttpPost("tokens/revoke-all")]
+        [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableRateLimiting("auth-login")]
         public async Task<IActionResult> LogoutAll()

@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -245,7 +246,22 @@ namespace Faryma.Composer.Api.Common.DependencyInjection
                         });
                     });
                 })
-                .AddOpenApi()
+                .AddOpenApi(options =>
+                {
+                    options.CreateSchemaReferenceId = jsonTypeInfo =>
+                    {
+                        string? defaultId = OpenApiOptions.CreateDefaultSchemaReferenceId(jsonTypeInfo);
+                        if (defaultId is null)
+                        {
+                            return null;
+                        }
+
+                        string? fullName = jsonTypeInfo.Type.FullName;
+                        return string.IsNullOrEmpty(fullName)
+                            ? defaultId
+                            : fullName.Replace('+', '.');
+                    };
+                })
                 .Configure<JsonOptions>(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()))
                 .AddAsyncApiSpecification(environment);
 

@@ -1,0 +1,22 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace Faryma.Composer.Api.Features.ReviewOrder.Complete
+{
+    /// <summary>
+    /// Запрос выполнения заказа
+    /// </summary>
+    public sealed record CompleteRequest
+    {
+        /// <summary>
+        /// Id заказа разбора трека
+        /// </summary>
+        [Range(1, long.MaxValue, ErrorMessage = "Id заказа должен быть больше нуля")]
+        public required long ReviewOrderId { get; init; }
+
+        /// <summary>
+        /// Оценка трека (0-26)
+        /// </summary>
+        [Range(0, 26, ErrorMessage = "Оценка должна быть от 0 до 26")]
+        public required int Rating { get; init; }
+    }
+}

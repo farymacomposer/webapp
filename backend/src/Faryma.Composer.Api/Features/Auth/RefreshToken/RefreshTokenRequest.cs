@@ -7,6 +7,9 @@ namespace Faryma.Composer.Api.Features.Auth.RefreshToken
     /// </summary>
     public sealed record RefreshTokenRequest
     {
+        /// <summary>
+        /// Refresh token текущей сессии
+        /// </summary>
         [Required]
         [StringLength(512, MinimumLength = 1)]
         public required string RefreshToken { get; init; }

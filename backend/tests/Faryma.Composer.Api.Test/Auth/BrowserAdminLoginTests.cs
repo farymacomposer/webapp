@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using Faryma.Composer.Api.Features.Auth.Login;
+using Faryma.Composer.Api.Features.Auth.BrowserAdminLogin;
+using Faryma.Composer.Api.Features.Auth.DesktopAdminLogin;
+using Faryma.Composer.Api.Features.Auth.Dtos;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
 using Faryma.Composer.Domain;
@@ -9,9 +11,9 @@ namespace Faryma.Composer.Api.Test.Auth
 {
     public sealed class BrowserAdminLoginTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
     {
-        private const string _adminRoute = "/api/app-settings";
-        private const string _browserAdminLoginRoute = "/api/auth/sessions/browser-admin";
-        private const string _jwtLoginRoute = "/api/auth/sessions/desktop-admin";
+        private const string _adminRoute = "/api/AppSettings/Get";
+        private const string _browserAdminLoginRoute = "/api/Auth/BrowserAdminLogin";
+        private const string _jwtLoginRoute = "/api/Auth/DesktopAdminLogin";
 
         [Fact]
         public async Task Browser_admin_login_sets_cookie_and_allows_admin_endpoint()
@@ -62,10 +64,13 @@ namespace Faryma.Composer.Api.Test.Auth
             SeededAuthUser admin = await SeedAdmin(app);
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.PostAsJsonAsync(_browserAdminLoginRoute, new LoginRequest
+            using HttpResponseMessage response = await client.PostAsJsonAsync(_browserAdminLoginRoute, new BrowserAdminLoginRequest
             {
-                UserName = admin.UserName,
-                Password = "WrongPassword123!",
+                Credentials = new AdminCredentialsDto
+                {
+                    UserName = admin.UserName,
+                    Password = "WrongPassword123!",
+                }
             }, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -83,9 +88,9 @@ namespace Faryma.Composer.Api.Test.Auth
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            LoginResponse login = await response.Content.ReadFromJsonAsync<LoginResponse>(cancellationToken: TestContext.Current.CancellationToken) ?? throw new InvalidOperationException("Ответ входа оказался пустым");
-            Assert.False(string.IsNullOrWhiteSpace(login.AccessToken));
-            Assert.False(string.IsNullOrWhiteSpace(login.RefreshToken));
+            DesktopAdminLoginResponse login = await response.Content.ReadFromJsonAsync<DesktopAdminLoginResponse>(cancellationToken: TestContext.Current.CancellationToken) ?? throw new InvalidOperationException("Ответ входа оказался пустым");
+            Assert.False(string.IsNullOrWhiteSpace(login.Tokens.AccessToken));
+            Assert.False(string.IsNullOrWhiteSpace(login.Tokens.RefreshToken));
         }
 
         private static async Task<SeededAuthUser> SeedAdmin(CustomWebApplicationFactory app)
@@ -107,10 +112,13 @@ namespace Faryma.Composer.Api.Test.Auth
         {
             return client.PostAsJsonAsync(
                 route,
-                new LoginRequest
+                new BrowserAdminLoginRequest
                 {
-                    UserName = user.UserName,
-                    Password = user.Password ?? throw new InvalidOperationException("У тестового пользователя нет пароля"),
+                    Credentials = new AdminCredentialsDto
+                    {
+                        UserName = user.UserName,
+                        Password = user.Password ?? throw new InvalidOperationException("У тестового пользователя нет пароля"),
+                    }
                 });
         }
 

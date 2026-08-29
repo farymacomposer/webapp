@@ -34,7 +34,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// </summary>
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<FindStreamsResponse>> FindStreams([FromQuery] FindStreamsRequest request, CancellationToken ct)
+        public async Task<ActionResult<FindResponse>> Find([FromQuery] FindRequest request, CancellationToken ct)
         {
             IReadOnlyCollection<ComposerStreamEntity> streams = await mediator.Send(new FindStreamsQuery
             {
@@ -42,7 +42,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
                 DateTo = request.DateTo,
             }, ct);
 
-            return Ok(new FindStreamsResponse
+            return Ok(new FindResponse
             {
                 Streams = streams.Select(ComposerStreamDto.Map)
             });
@@ -68,7 +68,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// </summary>
         [HttpPost]
         [AuthorizeComposer]
-        public async Task<ActionResult<CreateStreamResponse>> CreateStream(CreateStreamRequest request, CancellationToken ct)
+        public async Task<ActionResult<CreateResponse>> Create(CreateRequest request, CancellationToken ct)
         {
             Guid userId = User.GetUserId();
 
@@ -79,7 +79,7 @@ namespace Faryma.Composer.Api.Features.ComposerStream
                 CreatedByUserId = userId,
             }, ct);
 
-            return Ok(new CreateStreamResponse
+            return Ok(new CreateResponse
             {
                 ComposerStream = ComposerStreamDto.Map(stream)
             });
@@ -90,14 +90,14 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// </summary>
         [HttpPost]
         [AuthorizeComposer]
-        public async Task<ActionResult<StartStreamResponse>> StartStream(StartStreamRequest request, CancellationToken ct)
+        public async Task<ActionResult<StartResponse>> Start(StartRequest request, CancellationToken ct)
         {
             ComposerStreamEntity stream = await mediator.Send(new StartCommand
             {
                 ComposerStreamId = request.ComposerStreamId
             }, ct);
 
-            return Ok(new StartStreamResponse
+            return Ok(new StartResponse
             {
                 ComposerStream = ComposerStreamDto.Map(stream)
             });
@@ -108,14 +108,14 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// </summary>
         [HttpPost]
         [AuthorizeComposer]
-        public async Task<ActionResult<CompleteStreamResponse>> CompleteStream(CompleteStreamRequest request, CancellationToken ct)
+        public async Task<ActionResult<CompleteResponse>> Complete(CompleteRequest request, CancellationToken ct)
         {
             ComposerStreamEntity stream = await mediator.Send(new CompleteCommand
             {
                 ComposerStreamId = request.ComposerStreamId
             }, ct);
 
-            return Ok(new CompleteStreamResponse
+            return Ok(new CompleteResponse
             {
                 ComposerStream = ComposerStreamDto.Map(stream)
             });
@@ -126,14 +126,14 @@ namespace Faryma.Composer.Api.Features.ComposerStream
         /// </summary>
         [HttpPost]
         [AuthorizeComposer]
-        public async Task<ActionResult<CancelStreamResponse>> CancelStream(CancelStreamRequest request, CancellationToken ct)
+        public async Task<ActionResult<CancelResponse>> Cancel(CancelRequest request, CancellationToken ct)
         {
             ComposerStreamEntity stream = await mediator.Send(new CancelCommand
             {
                 ComposerStreamId = request.ComposerStreamId
             }, ct);
 
-            return Ok(new CancelStreamResponse
+            return Ok(new CancelResponse
             {
                 ComposerStream = ComposerStreamDto.Map(stream)
             });
