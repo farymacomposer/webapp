@@ -9,7 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Faryma.Composer.Application.SharedContracts\Faryma.Composer.Application.SharedContracts.csproj" />
     <ProjectReference Include="..\Faryma.Composer.Infrastructure\Faryma.Composer.Infrastructure.csproj" />
   </ItemGroup>
 

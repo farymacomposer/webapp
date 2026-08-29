@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Domain.Entities;
 
-namespace Faryma.Composer.Api.Contracts.Features.AppSettings
+namespace Faryma.Composer.Api.Features.AppSettings
 {
     /// <summary>
     /// Настройки приложения

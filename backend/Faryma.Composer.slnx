@@ -20,15 +20,11 @@
     </Project>
     <Project Path="src/Faryma.Composer.MigrationsBundle/Faryma.Composer.MigrationsBundle.csproj" />
   </Folder>
-  <Folder Name="/src/02 Contracts/">
-    <Project Path="src/Faryma.Composer.Api.Contracts/Faryma.Composer.Api.Contracts.csproj" />
-    <Project Path="src/Faryma.Composer.Application.SharedContracts/Faryma.Composer.Application.SharedContracts.csproj" />
-  </Folder>
-  <Folder Name="/src/03 Core/">
+  <Folder Name="/src/02 Core/">
     <Project Path="src/Faryma.Composer.Application/Faryma.Composer.Application.csproj" />
     <Project Path="src/Faryma.Composer.Domain/Faryma.Composer.Domain.csproj" />
   </Folder>
-  <Folder Name="/src/04 Infrastructure/">
+  <Folder Name="/src/03 Infrastructure/">
     <Project Path="src/Faryma.Composer.Infrastructure/Faryma.Composer.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">

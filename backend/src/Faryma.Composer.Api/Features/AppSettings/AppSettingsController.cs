@@ -1,5 +1,4 @@
-﻿using Faryma.Composer.Api.Contracts.Features.AppSettings;
-using Faryma.Composer.Api.Features.Auth;
+﻿using Faryma.Composer.Api.Features.Auth;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
