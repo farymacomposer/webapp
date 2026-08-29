@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.Find
+namespace Faryma.Composer.Api.Features.ComposerStream.Find
 {
     /// <summary>
     /// Запрос поиска стримов

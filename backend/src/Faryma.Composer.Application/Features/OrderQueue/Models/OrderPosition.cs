@@ -1,8 +1,9 @@
-﻿using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
+﻿using Faryma.Composer.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 
-namespace Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models
+namespace Faryma.Composer.Application.Features.OrderQueue.Models
 {
     /// <summary>
     /// Представляет позицию заказа в очереди, включая сам заказ и историю перемещений

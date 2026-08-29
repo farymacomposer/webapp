@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Contracts.Shared.Dto;
+using Faryma.Composer.Api.SharedDto;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Cancel
+namespace Faryma.Composer.Api.Features.ReviewOrder.Cancel
 {
     /// <summary>
     /// Ответ на запрос отмены заказа

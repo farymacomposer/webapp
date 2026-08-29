@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Configuration;
 
-namespace Faryma.Composer.Api.Contracts.Features.Auth.Options
+namespace Faryma.Composer.Api.Features.Auth.Options
 {
     public sealed record AdminBootstrapOptions : IValidatableObject
     {

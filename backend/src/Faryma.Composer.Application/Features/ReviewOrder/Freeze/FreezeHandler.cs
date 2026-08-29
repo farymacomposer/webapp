@@ -1,5 +1,5 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueue;
-using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
+using Faryma.Composer.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Infrastructure;

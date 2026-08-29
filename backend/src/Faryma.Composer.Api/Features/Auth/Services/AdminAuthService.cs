@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Faryma.Composer.Api.Contracts.Features.Auth.Login;
+using Faryma.Composer.Api.Features.Auth.Login;
 using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Microsoft.AspNetCore.Identity;

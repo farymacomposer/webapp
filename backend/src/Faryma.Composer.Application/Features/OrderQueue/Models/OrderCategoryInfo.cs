@@ -1,6 +1,6 @@
 ﻿using Faryma.Composer.Domain.Enums;
 
-namespace Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models
+namespace Faryma.Composer.Application.Features.OrderQueue.Models
 {
     /// <summary>
     /// Содержит информацию о категории заказа, включая тип категории и номер (для долговых категорий)

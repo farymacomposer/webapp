@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Contracts.Shared.Dto;
+using Faryma.Composer.Api.SharedDto;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Create
+namespace Faryma.Composer.Api.Features.ReviewOrder.Create
 {
     /// <summary>
     /// Ответ на запрос создания заказа на разбор

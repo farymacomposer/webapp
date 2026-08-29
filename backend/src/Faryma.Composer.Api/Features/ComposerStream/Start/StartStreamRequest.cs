@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.Start
+namespace Faryma.Composer.Api.Features.ComposerStream.Start
 {
     /// <summary>
     /// Запрос запуска стрима

@@ -3,16 +3,16 @@
 
 using Faryma.Composer.Api.Common.Attributes;
 using Faryma.Composer.Api.Common.Extensions;
-using Faryma.Composer.Api.Contracts.Features.ReviewOrder.AddTrackUrl;
-using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Cancel;
-using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Complete;
-using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Create;
-using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Freeze;
-using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Pay;
-using Faryma.Composer.Api.Contracts.Features.ReviewOrder.TakeInProgress;
-using Faryma.Composer.Api.Contracts.Features.ReviewOrder.Unfreeze;
-using Faryma.Composer.Api.Contracts.Shared.Dto;
 using Faryma.Composer.Api.Features.Auth;
+using Faryma.Composer.Api.Features.ReviewOrder.AddTrackUrl;
+using Faryma.Composer.Api.Features.ReviewOrder.Cancel;
+using Faryma.Composer.Api.Features.ReviewOrder.Complete;
+using Faryma.Composer.Api.Features.ReviewOrder.Create;
+using Faryma.Composer.Api.Features.ReviewOrder.Freeze;
+using Faryma.Composer.Api.Features.ReviewOrder.Pay;
+using Faryma.Composer.Api.Features.ReviewOrder.TakeInProgress;
+using Faryma.Composer.Api.Features.ReviewOrder.Unfreeze;
+using Faryma.Composer.Api.SharedDto;
 using Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl;
 using Faryma.Composer.Application.Features.ReviewOrder.Cancel;
 using Faryma.Composer.Application.Features.ReviewOrder.Complete;

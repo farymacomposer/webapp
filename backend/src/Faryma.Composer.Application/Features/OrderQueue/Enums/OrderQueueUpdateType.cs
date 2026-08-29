@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums
+﻿namespace Faryma.Composer.Application.Features.OrderQueue.Enums
 {
     /// <summary>
     /// Тип обновления очереди

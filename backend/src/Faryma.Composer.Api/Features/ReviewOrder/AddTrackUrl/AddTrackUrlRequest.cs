@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.AddTrackUrl
+namespace Faryma.Composer.Api.Features.ReviewOrder.AddTrackUrl
 {
     /// <summary>
     /// Запрос добавления ссылки на трек в заказ

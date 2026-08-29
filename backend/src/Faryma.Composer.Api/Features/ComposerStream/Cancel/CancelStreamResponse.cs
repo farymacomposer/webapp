@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Contracts.Shared.Dto;
+using Faryma.Composer.Api.SharedDto;
 
-namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.Cancel
+namespace Faryma.Composer.Api.Features.ComposerStream.Cancel
 {
     /// <summary>
     /// Ответ на запрос отмены стрима

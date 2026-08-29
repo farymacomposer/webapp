@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Api.Contracts.Features.OrderQueue
+﻿namespace Faryma.Composer.Api.Features.OrderQueue
 {
     public interface IOrderQueueNotificationServer
     {

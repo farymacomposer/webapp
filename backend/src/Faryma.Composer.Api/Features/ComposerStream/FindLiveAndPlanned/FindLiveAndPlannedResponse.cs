@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Contracts.Shared.Dto;
+using Faryma.Composer.Api.SharedDto;
 
-namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.FindLiveAndPlanned
+namespace Faryma.Composer.Api.Features.ComposerStream.FindLiveAndPlanned
 {
     /// <summary>
     /// Ответ на запрос текущего и запланированных стримов

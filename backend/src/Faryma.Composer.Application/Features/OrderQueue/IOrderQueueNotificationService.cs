@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
+﻿using Faryma.Composer.Application.Features.OrderQueue.Models;
 
 namespace Faryma.Composer.Application.Features.OrderQueue
 {

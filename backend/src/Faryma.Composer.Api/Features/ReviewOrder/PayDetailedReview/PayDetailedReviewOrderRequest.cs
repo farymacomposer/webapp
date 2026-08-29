@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Domain.Enums;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.PayDetailedReview
+namespace Faryma.Composer.Api.Features.ReviewOrder.PayDetailedReview
 {
     /// <summary>
     /// Запрос оплаты подробного разбора заказа

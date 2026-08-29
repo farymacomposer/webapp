@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Freeze
+namespace Faryma.Composer.Api.Features.ReviewOrder.Freeze
 {
     /// <summary>
     /// Запрос заморозки заказа

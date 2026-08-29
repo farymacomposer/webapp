@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums
+namespace Faryma.Composer.Application.Features.OrderQueue.Enums
 {
     /// <summary>
     /// Статус активности заказа

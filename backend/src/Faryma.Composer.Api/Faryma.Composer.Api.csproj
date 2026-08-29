@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Faryma.Composer.Api.Contracts\Faryma.Composer.Api.Contracts.csproj" />
     <ProjectReference Include="..\Faryma.Composer.Application\Faryma.Composer.Application.csproj" />
   </ItemGroup>
 

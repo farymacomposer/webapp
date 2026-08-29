@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.Cancel
+namespace Faryma.Composer.Api.Features.ComposerStream.Cancel
 {
     /// <summary>
     /// Запрос отмены стрима

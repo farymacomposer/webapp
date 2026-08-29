@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.Auth.Logout
+namespace Faryma.Composer.Api.Features.Auth.Logout
 {
     /// <summary>
     /// Запрос выхода из системы

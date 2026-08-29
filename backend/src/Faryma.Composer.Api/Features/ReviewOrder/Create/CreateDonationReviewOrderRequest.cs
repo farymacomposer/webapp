@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Domain.Enums;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Create
+namespace Faryma.Composer.Api.Features.ReviewOrder.Create
 {
     /// <summary>
     /// Запрос создания донатного заказа на разбор

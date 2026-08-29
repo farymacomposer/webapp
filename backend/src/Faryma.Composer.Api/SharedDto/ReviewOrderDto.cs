@@ -2,7 +2,7 @@
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 
-namespace Faryma.Composer.Api.Contracts.Shared.Dto
+namespace Faryma.Composer.Api.SharedDto
 {
     /// <summary>
     /// Заказ разбора трека

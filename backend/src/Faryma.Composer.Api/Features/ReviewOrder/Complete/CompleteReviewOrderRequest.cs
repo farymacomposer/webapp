@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Complete
+namespace Faryma.Composer.Api.Features.ReviewOrder.Complete
 {
     /// <summary>
     /// Запрос выполнения заказа

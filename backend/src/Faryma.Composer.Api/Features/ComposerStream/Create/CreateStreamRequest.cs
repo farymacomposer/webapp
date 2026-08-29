@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Domain.Enums;
 
-namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.Create
+namespace Faryma.Composer.Api.Features.ComposerStream.Create
 {
     /// <summary>
     /// Запрос создания стрима

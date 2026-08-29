@@ -1,6 +1,6 @@
 ﻿using System.Threading.Channels;
+using Faryma.Composer.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Application.Features.OrderQueue.Events;
-using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;

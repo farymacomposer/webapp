@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.Complete
+namespace Faryma.Composer.Api.Features.ComposerStream.Complete
 {
     /// <summary>
     /// Запрос завершения стрима

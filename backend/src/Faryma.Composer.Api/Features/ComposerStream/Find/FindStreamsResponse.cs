@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Contracts.Shared.Dto;
+using Faryma.Composer.Api.SharedDto;
 
-namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.Find
+namespace Faryma.Composer.Api.Features.ComposerStream.Find
 {
     /// <summary>
     /// Ответ на запрос поиска стримов

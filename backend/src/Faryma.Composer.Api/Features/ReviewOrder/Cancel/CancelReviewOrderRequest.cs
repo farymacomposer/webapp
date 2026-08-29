@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Cancel
+namespace Faryma.Composer.Api.Features.ReviewOrder.Cancel
 {
     /// <summary>
     /// Запрос отмены заказа

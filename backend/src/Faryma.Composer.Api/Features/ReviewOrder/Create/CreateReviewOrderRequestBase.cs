@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Faryma.Composer.Domain;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Create
+namespace Faryma.Composer.Api.Features.ReviewOrder.Create
 {
     /// <summary>
     /// Общие поля запроса создания заказа на разбор

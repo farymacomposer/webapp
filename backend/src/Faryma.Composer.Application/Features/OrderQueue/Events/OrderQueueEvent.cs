@@ -1,4 +1,4 @@
-﻿using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
+﻿using Faryma.Composer.Application.Features.OrderQueue.Enums;
 
 namespace Faryma.Composer.Application.Features.OrderQueue.Events
 {

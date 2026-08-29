@@ -1,4 +1,4 @@
-﻿namespace Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models
+﻿namespace Faryma.Composer.Application.Features.OrderQueue.Models
 {
     /// <summary>
     /// Представляет историю изменений позиции заказа в очереди, включая предыдущее и текущее состояние

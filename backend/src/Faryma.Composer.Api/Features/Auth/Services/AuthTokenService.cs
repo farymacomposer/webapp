@@ -4,7 +4,7 @@ using System.Security.Authentication;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Faryma.Composer.Api.Contracts.Features.Auth.Options;
+using Faryma.Composer.Api.Features.Auth.Options;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Infrastructure;
 using Microsoft.AspNetCore.Identity;

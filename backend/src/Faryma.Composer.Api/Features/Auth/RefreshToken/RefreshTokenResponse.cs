@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.Auth.RefreshToken
+namespace Faryma.Composer.Api.Features.Auth.RefreshToken
 {
     /// <summary>
     /// Ответ на запрос обновления access token

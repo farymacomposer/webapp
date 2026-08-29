@@ -2,7 +2,6 @@
 using Faryma.Composer.Api.Common.Extensions;
 using Faryma.Composer.Api.Common.Logging;
 using Faryma.Composer.Api.Common.Startup;
-using Faryma.Composer.Api.Contracts.Features.OrderQueue;
 using Faryma.Composer.Api.Features.OrderQueue;
 using Faryma.Composer.Application.DependencyInjection;
 

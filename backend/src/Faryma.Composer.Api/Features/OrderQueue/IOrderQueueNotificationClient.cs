@@ -1,6 +1,6 @@
-﻿using Faryma.Composer.Api.Contracts.Features.OrderQueue.AsyncContracts;
+﻿using Faryma.Composer.Api.Features.OrderQueue.AsyncContracts;
 
-namespace Faryma.Composer.Api.Contracts.Features.OrderQueue
+namespace Faryma.Composer.Api.Features.OrderQueue
 {
     public interface IOrderQueueNotificationClient
     {

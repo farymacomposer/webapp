@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.TakeInProgress
+namespace Faryma.Composer.Api.Features.ReviewOrder.TakeInProgress
 {
     /// <summary>
     /// Запрос взятия заказа в работу

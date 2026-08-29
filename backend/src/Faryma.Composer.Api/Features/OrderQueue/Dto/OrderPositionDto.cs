@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Contracts.Shared.Dto;
-using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
+using Faryma.Composer.Api.SharedDto;
+using Faryma.Composer.Application.Features.OrderQueue.Models;
 
-namespace Faryma.Composer.Api.Contracts.Features.OrderQueue.Dto
+namespace Faryma.Composer.Api.Features.OrderQueue.Dto
 {
     /// <summary>
     /// Представляет позицию заказа в очереди, включая сам заказ и историю перемещений

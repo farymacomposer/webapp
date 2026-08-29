@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Contracts.Shared.Dto;
+using Faryma.Composer.Api.SharedDto;
 
-namespace Faryma.Composer.Api.Contracts.Features.ComposerStream.Create
+namespace Faryma.Composer.Api.Features.ComposerStream.Create
 {
     /// <summary>
     /// Ответ на запрос создания стрима

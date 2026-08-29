@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Contracts.Features.OrderQueue.Dto;
-using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Enums;
-using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
+using Faryma.Composer.Api.Features.OrderQueue.Dto;
+using Faryma.Composer.Application.Features.OrderQueue.Enums;
+using Faryma.Composer.Application.Features.OrderQueue.Models;
 
-namespace Faryma.Composer.Api.Contracts.Features.OrderQueue.AsyncContracts
+namespace Faryma.Composer.Api.Features.OrderQueue.AsyncContracts
 {
     /// <summary>
     /// Сообщение о состоянии очереди

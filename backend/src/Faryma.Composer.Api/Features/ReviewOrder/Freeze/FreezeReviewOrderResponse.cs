@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Faryma.Composer.Api.Contracts.Shared.Dto;
+using Faryma.Composer.Api.SharedDto;
 
-namespace Faryma.Composer.Api.Contracts.Features.ReviewOrder.Freeze
+namespace Faryma.Composer.Api.Features.ReviewOrder.Freeze
 {
     /// <summary>
     /// Ответ на запрос заморозки заказа
