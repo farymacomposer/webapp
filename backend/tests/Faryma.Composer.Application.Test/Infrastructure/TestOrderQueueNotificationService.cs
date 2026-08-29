@@ -1,5 +1,4 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueue;
-using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 
 namespace Faryma.Composer.Application.Test.Infrastructure
 {
@@ -8,7 +7,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
     /// </summary>
     public sealed class TestOrderQueueNotificationService : IOrderQueueNotificationService
     {
-        private readonly object _sync = new();
+        private readonly Lock _sync = new();
         private readonly List<OrderQueueSnapshot> _snapshots = [];
         private TaskCompletionSource _nextUpdate = CreateWaitSource();
 

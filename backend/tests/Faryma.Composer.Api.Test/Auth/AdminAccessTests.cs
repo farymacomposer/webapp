@@ -15,7 +15,7 @@ namespace Faryma.Composer.Api.Test.Auth
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.GetAsync(_adminProbeRoute);
+            using HttpResponseMessage response = await client.GetAsync(_adminProbeRoute, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
@@ -24,9 +24,9 @@ namespace Faryma.Composer.Api.Test.Auth
         public async Task Browser_user_without_admin_role_gets_403_for_admin_only_endpoint()
         {
             await using CustomWebApplicationFactory app = CreateApp();
-            using HttpClient client = await app.CreateBrowserUserClientAsync();
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
 
-            using HttpResponseMessage response = await client.GetAsync(_adminProbeRoute);
+            using HttpResponseMessage response = await client.GetAsync(_adminProbeRoute, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
@@ -40,9 +40,9 @@ namespace Faryma.Composer.Api.Test.Auth
                 UserName = "composer_admin_access",
                 Password = "TestComposerPass123!",
                 Roles = [AppRoles.Composer],
-            });
+            }, ct: TestContext.Current.CancellationToken);
 
-            using HttpResponseMessage response = await client.GetAsync(_adminProbeRoute);
+            using HttpResponseMessage response = await client.GetAsync(_adminProbeRoute, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }

@@ -3,7 +3,6 @@ using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Application.Features.ReviewOrder;
 using Faryma.Composer.Application.Features.ReviewOrder.CreateDonation;
 using Faryma.Composer.Application.Features.ReviewOrder.Pay;
-using Faryma.Composer.Application.SharedContracts.Features.OrderQueue.Models;
 using Faryma.Composer.Application.Test.Infrastructure;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;

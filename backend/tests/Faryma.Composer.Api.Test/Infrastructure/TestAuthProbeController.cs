@@ -31,9 +31,6 @@ namespace Faryma.Composer.Api.Test.Infrastructure
 
         [HttpPost("rate-limited-login")]
         [EnableRateLimiting("auth-login")]
-        public IActionResult RateLimitedLogin()
-        {
-            return Unauthorized();
-        }
+        public IActionResult RateLimitedLogin() => Unauthorized();
     }
 }

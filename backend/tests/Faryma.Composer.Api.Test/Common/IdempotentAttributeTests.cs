@@ -19,7 +19,7 @@ namespace Faryma.Composer.Api.Test.Common
         {
             string scenario = NewScenario();
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync();
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
             Guid idempotencyKey = Guid.NewGuid();
             TestIdempotencyRequest request = new(scenario, "same-payload");
 
@@ -40,7 +40,7 @@ namespace Faryma.Composer.Api.Test.Common
         {
             string scenario = NewScenario();
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync();
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
             Guid idempotencyKey = Guid.NewGuid();
             TestIdempotencyRequest request = new(scenario, "same-payload", DelayMilliseconds: 200);
 
@@ -64,7 +64,7 @@ namespace Faryma.Composer.Api.Test.Common
         {
             string scenario = NewScenario();
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync();
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
             Guid idempotencyKey = Guid.NewGuid();
 
             using HttpResponseMessage firstResponse = await SendAsync(client, idempotencyKey, new TestIdempotencyRequest(scenario, "first"));
@@ -80,7 +80,7 @@ namespace Faryma.Composer.Api.Test.Common
         {
             string scenario = NewScenario();
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync();
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
             Guid idempotencyKey = Guid.NewGuid();
             TestIdempotencyRequest request = new(scenario, "retry-after-error");
             TestIdempotencyController.FailNext(scenario);
@@ -106,11 +106,11 @@ namespace Faryma.Composer.Api.Test.Common
             TestIdempotencyRequest request = new(scenario, "expired-key");
 
             CustomWebApplicationFactory firstApp = CreateAppWithNow(app, now);
-            using HttpClient firstClient = await firstApp.CreateBrowserUserClientAsync();
+            using HttpClient firstClient = await firstApp.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
             using HttpResponseMessage firstResponse = await SendAsync(firstClient, idempotencyKey, request);
 
             CustomWebApplicationFactory laterApp = CreateAppWithNow(app, now.AddHours(2));
-            using HttpClient laterClient = await laterApp.CreateBrowserUserClientAsync();
+            using HttpClient laterClient = await laterApp.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
             using HttpResponseMessage laterResponse = await SendAsync(laterClient, idempotencyKey, request);
 
             TestIdempotencyResponse first = await ReadResponseAsync(firstResponse);
@@ -127,7 +127,7 @@ namespace Faryma.Composer.Api.Test.Common
         public async Task IdempotentEndpoint_Throws_WhenActionReturnsUnsupportedResult()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync();
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
 
             using HttpResponseMessage response = await SendUnsupportedResultAsync(client, Guid.NewGuid());
 

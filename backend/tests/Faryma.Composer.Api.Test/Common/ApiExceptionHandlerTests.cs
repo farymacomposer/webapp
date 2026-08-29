@@ -13,10 +13,10 @@ namespace Faryma.Composer.Api.Test.Common
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/app");
+            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/app", TestContext.Current.CancellationToken);
 
             Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
             Assert.Equal(nameof(TestApiException), json.RootElement.GetProperty("ExceptionType").GetString());
             Assert.Equal("Тестовая ошибка API", json.RootElement.GetProperty("Message").GetString());
         }
@@ -27,10 +27,10 @@ namespace Faryma.Composer.Api.Test.Common
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/authentication");
+            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/authentication", TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
             Assert.Equal("Ошибка аутентификации", json.RootElement.GetProperty("Message").GetString());
         }
 
@@ -40,10 +40,10 @@ namespace Faryma.Composer.Api.Test.Common
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/unhandled");
+            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/unhandled", TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
             Assert.Equal("Произошла непредвиденная ошибка", json.RootElement.GetProperty("title").GetString());
             Assert.Equal(500, json.RootElement.GetProperty("status").GetInt32());
         }

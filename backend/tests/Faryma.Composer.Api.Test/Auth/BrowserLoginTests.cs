@@ -17,7 +17,7 @@ namespace Faryma.Composer.Api.Test.Auth
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = CreateBrowserLoginClient(app);
 
-            using HttpResponseMessage response = await client.GetAsync("/api/auth/oauth/twitch");
+            using HttpResponseMessage response = await client.GetAsync("/api/auth/oauth/twitch", TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.Found, response.StatusCode);
             Assert.NotNull(response.Headers.Location);

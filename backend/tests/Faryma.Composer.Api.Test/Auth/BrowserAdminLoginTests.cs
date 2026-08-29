@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using Faryma.Composer.Api.Contracts.Features.Auth.Login;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
 using Faryma.Composer.Domain;
@@ -28,7 +27,7 @@ namespace Faryma.Composer.Api.Test.Auth
             using HttpRequestMessage adminRequest = new(HttpMethod.Get, _adminRoute);
             adminRequest.Headers.Add("Cookie", authCookie);
 
-            using HttpResponseMessage adminResponse = await client.SendAsync(adminRequest);
+            using HttpResponseMessage adminResponse = await client.SendAsync(adminRequest, TestContext.Current.CancellationToken);
 
             Assert.Equal(HttpStatusCode.OK, adminResponse.StatusCode);
         }
@@ -46,7 +45,7 @@ namespace Faryma.Composer.Api.Test.Auth
                     TwitchUserId = "browser-password-user-id",
                     TwitchLogin = "browser_password_user",
                 },
-            });
+            }, ct: TestContext.Current.CancellationToken);
             using HttpClient client = app.CreateAnonymousClient();
 
             using HttpResponseMessage response = await Login(client, _browserAdminLoginRoute, users.Browser);
@@ -85,8 +84,7 @@ namespace Faryma.Composer.Api.Test.Auth
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            LoginResponse login = await response.Content.ReadFromJsonAsync<LoginResponse>()
-                ?? throw new InvalidOperationException("Ответ входа оказался пустым");
+            LoginResponse login = await response.Content.ReadFromJsonAsync<LoginResponse>(cancellationToken: TestContext.Current.CancellationToken) ?? throw new InvalidOperationException("Ответ входа оказался пустым");
             Assert.False(string.IsNullOrWhiteSpace(login.AccessToken));
             Assert.False(string.IsNullOrWhiteSpace(login.RefreshToken));
         }

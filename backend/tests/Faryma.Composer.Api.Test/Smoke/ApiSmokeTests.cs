@@ -15,10 +15,10 @@ namespace Faryma.Composer.Api.Test.Smoke
                 AllowAutoRedirect = false,
             });
 
-            HttpResponseMessage response = await client.GetAsync("/openapi/v1.json");
+            HttpResponseMessage response = await client.GetAsync("/openapi/v1.json", TestContext.Current.CancellationToken);
 
             response.EnsureSuccessStatusCode();
-            string content = await response.Content.ReadAsStringAsync();
+            string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
             Assert.Contains("\"openapi\"", content, StringComparison.OrdinalIgnoreCase);
         }
