@@ -118,26 +118,28 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                 ?? throw new NotFoundException("Нет запущенного благотворительного стрима");
         }
 
+        public Task<bool> HasReviewOrders(UserNicknameEntity userNickname, CancellationToken ct) =>
+            appDbContext.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0, ct);
+
         /// <summary>
         /// Возвращает ближайший доступный стрим: Live или ближайший Planned на сегодня/будущее
         /// </summary>
-        public async Task<ComposerStreamEntity> GetNearestStream(CancellationToken ct)
-        {
-            DateOnly today = dateTimeService.Today;
-
-            IOrderedQueryable<ComposerStreamEntity> query = appDbContext.ComposerStreams
-                .Where(x => x.Status == ComposerStreamStatus.Live
-                    || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
-                .OrderBy(x => x.EventDate);
-
-            return await query.FirstOrDefaultAsync(ct)
-                ?? throw new NotFoundException("Нет доступного ближайшего стрима");
-        }
+        public Task<ComposerStreamEntity> GetNearestStream(CancellationToken ct) => GetNearestStreamInternal(type: null, ct);
 
         /// <summary>
-        /// Возвращает ближайший доступный стрим: Live или ближайший Planned на сегодня/будущее, с учетом заказов пользователя
+        /// Возвращает ближайший доступный стрим указанного типа: Live или ближайший Planned на сегодня/будущее
         /// </summary>
-        public async Task<ComposerStreamEntity> GetNearestStream(UserNicknameEntity userNickname, CancellationToken ct)
+        public Task<ComposerStreamEntity> GetNearestStream(ComposerStreamType type, CancellationToken ct)
+        {
+            if (!Enum.IsDefined(type) || type == ComposerStreamType.Unspecified)
+            {
+                throw new ArgumentException("Тип стрима должен быть указан", nameof(type));
+            }
+
+            return GetNearestStreamInternal(type, ct);
+        }
+
+        private async Task<ComposerStreamEntity> GetNearestStreamInternal(ComposerStreamType? type, CancellationToken ct)
         {
             DateOnly today = dateTimeService.Today;
 
@@ -145,15 +147,12 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today));
 
-            bool userNicknameHasOrders = await appDbContext.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0, ct);
-            if (userNicknameHasOrders)
+            if (type is { } streamType)
             {
-                query = query.Where(x => x.Type == ComposerStreamType.Donation);
+                query = query.Where(x => x.Type == streamType);
             }
 
-            query = query.OrderBy(x => x.EventDate);
-
-            return await query.FirstOrDefaultAsync(ct)
+            return await query.OrderBy(x => x.EventDate).FirstOrDefaultAsync(ct)
                 ?? throw new NotFoundException("Нет доступного ближайшего стрима");
         }
     }

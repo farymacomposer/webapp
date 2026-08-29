@@ -26,7 +26,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateFree
         {
             UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
-            ComposerStreamEntity nearestStream = await reviewOrderStore.GetNearestStream(userNickname, ct);
+            ComposerStreamEntity nearestStream = await reviewOrderStore.HasReviewOrders(userNickname, ct)
+                ? await reviewOrderStore.GetNearestStream(ComposerStreamType.Donation, ct)
+                : await reviewOrderStore.GetNearestStream(ct);
 
             ReviewOrderStatus status = command.TrackUrl is null
                 ? ReviewOrderStatus.Preorder
