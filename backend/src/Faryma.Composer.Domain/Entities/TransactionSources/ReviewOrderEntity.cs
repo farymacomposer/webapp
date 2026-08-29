@@ -142,14 +142,7 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
                 throw new ReviewOrderException("Тип заказа не поддерживает денежную оплату", this);
             }
 
-            long paymentAmount = GetPaymentAmount(Transactions);
-
-            (ReviewOrderStatus status, long payableAmount) = requiredAmount > paymentAmount
-                ? (ReviewOrderStatus.AwaitingPayment, requiredAmount - paymentAmount)
-                : (ReviewOrderStatus.Pending, 0);
-
-            Status = status;
-            PayableAmount = payableAmount;
+            RecalculatePaymentState(requiredAmount);
         }
 
         public void AddTrackUrl(string trackUrl, int trackDurationSeconds, long requiredAmount)
@@ -159,16 +152,9 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
                 throw new ReviewOrderException("Невозможно добавить/изменить ссылку на трек", this);
             }
 
-            long paymentAmount = GetPaymentAmount(Transactions);
-
-            (ReviewOrderStatus status, long payableAmount) = requiredAmount > paymentAmount
-                ? (ReviewOrderStatus.AwaitingPayment, requiredAmount - paymentAmount)
-                : (ReviewOrderStatus.Pending, 0);
-
-            Status = status;
-            PayableAmount = payableAmount;
             TrackUrl = trackUrl;
             TrackDurationSeconds = trackDurationSeconds;
+            RecalculatePaymentState(requiredAmount);
         }
 
         public void TakeInProgress(ComposerStreamEntity liveStream, QueueCategory queueCategory, DateTime now)
@@ -272,6 +258,28 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
             return transactions
                 .Where(x => x.Kind == TransactionKind.Payment)
                 .Sum(x => x.Debit);
+        }
+
+        private void RecalculatePaymentState(long requiredAmount)
+        {
+            long paymentAmount = GetPaymentAmount(Transactions);
+            long payableAmount = requiredAmount > paymentAmount
+                ? requiredAmount - paymentAmount
+                : 0;
+
+            if (TrackUrl is null)
+            {
+                Status = ReviewOrderStatus.Preorder;
+                PayableAmount = payableAmount;
+
+                return;
+            }
+
+            Status = payableAmount > 0
+                ? ReviewOrderStatus.AwaitingPayment
+                : ReviewOrderStatus.Pending;
+
+            PayableAmount = payableAmount;
         }
     }
 }

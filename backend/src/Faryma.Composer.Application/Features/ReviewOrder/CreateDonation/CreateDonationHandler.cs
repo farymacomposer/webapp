@@ -31,19 +31,13 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateDonation
 
             long requiredAmount = reviewOrderService.GetTrackRequiredAmount(command.TrackDurationSeconds);
 
-            (ReviewOrderStatus status, long payableAmount) = command.TrackUrl is null
-                ? (ReviewOrderStatus.Preorder, requiredAmount)
-                : requiredAmount > command.PaymentAmount
-                    ? (ReviewOrderStatus.AwaitingPayment, requiredAmount - command.PaymentAmount)
-                    : (ReviewOrderStatus.Pending, 0);
-
             ReviewOrderEntity order = reviewOrderStore.CreateOrder(
                 ReviewOrderType.Donation,
-                status,
+                ReviewOrderStatus.Preorder,
                 command.TrackUrl,
                 command.TrackDurationSeconds,
                 appSettingsService.Settings.ReviewOrderNominalPrice,
-                payableAmount,
+                payableAmount: 0,
                 command.UserComment,
                 nearestStream,
                 userNickname,
@@ -55,6 +49,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateDonation
                 createdByUser,
                 userNickname,
                 order);
+
+            order.Pay(requiredAmount);
 
             await appDbContext.SaveChangesAsync(ct);
 
