@@ -62,7 +62,25 @@ namespace Faryma.Composer.Api.Features.Auth.Services
             if (stored.IsExpired(dateTimeService.Now))
             {
                 stored.RevokedAt = dateTimeService.Now;
-                await appDbContext.SaveChangesAsync();
+                try
+                {
+                    await appDbContext.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException ex) when (ex.Entries.Any(entry => entry.Entity is RefreshTokenEntity token && token.Id == stored.Id))
+                {
+                    appDbContext.ChangeTracker.Clear();
+
+                    RefreshTokenEntity? current = await refreshTokenStore.FindByHash(hash);
+                    if (current is { RevokedAt: null })
+                    {
+                        throw;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(current?.ReplacedByTokenHash))
+                    {
+                        await refreshTokenStore.RevokeFamily(current.FamilyId);
+                    }
+                }
 
                 throw new AuthenticationException("Refresh token истек");
             }
@@ -83,7 +101,24 @@ namespace Faryma.Composer.Api.Features.Auth.Services
                 user);
 
             string accessToken = await GenerateAccessToken(user);
-            await appDbContext.SaveChangesAsync();
+            try
+            {
+                await appDbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex) when (ex.Entries.Any(entry => entry.Entity is RefreshTokenEntity token && token.Id == stored.Id))
+            {
+                Guid familyId = stored.FamilyId;
+                appDbContext.ChangeTracker.Clear();
+
+                RefreshTokenEntity? current = await refreshTokenStore.FindByHash(hash);
+                if (current is not { RevokedAt: not null, ReplacedByTokenHash: not null })
+                {
+                    throw;
+                }
+
+                await refreshTokenStore.RevokeFamily(familyId);
+                throw new AuthenticationException("Refresh token повторно использован");
+            }
 
             return (accessToken, nextRefresh);
         }
