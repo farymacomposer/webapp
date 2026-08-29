@@ -7,6 +7,7 @@ using System.Text;
 using Faryma.Composer.Api.Features.Auth.Options;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.Features.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -15,7 +16,8 @@ using Microsoft.IdentityModel.Tokens;
 namespace Faryma.Composer.Api.Features.Auth.Services
 {
     public sealed class AuthTokenService(
-        UnitOfWork uow,
+        AppDbContext appDbContext,
+        RefreshTokenStore refreshTokenStore,
         UserManager<UserEntity> userManager,
         DateTimeService dateTimeService,
         IOptions<JwtOptions> options)
@@ -25,13 +27,13 @@ namespace Faryma.Composer.Api.Features.Auth.Services
             string accessToken = await GenerateAccessToken(user);
             string refreshToken = GenerateRefreshToken();
 
-            uow.RefreshTokenStore.Create(
+            refreshTokenStore.Create(
                 tokenHash: Hash(refreshToken),
                 familyId: Guid.NewGuid(),
                 options.Value.RefreshExpiryInDays,
                 user);
 
-            await uow.SaveChanges(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             return (accessToken, refreshToken);
         }
@@ -44,14 +46,14 @@ namespace Faryma.Composer.Api.Features.Auth.Services
             }
 
             string hash = Hash(refreshToken);
-            RefreshTokenEntity stored = await uow.RefreshTokenStore.FindByHash(hash)
+            RefreshTokenEntity stored = await refreshTokenStore.FindByHash(hash)
                 ?? throw new AuthenticationException("Refresh token не найден");
 
             if (stored.RevokedAt is not null)
             {
                 if (!string.IsNullOrWhiteSpace(stored.ReplacedByTokenHash))
                 {
-                    await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId);
+                    await refreshTokenStore.RevokeFamily(stored.FamilyId);
                 }
 
                 throw new AuthenticationException("Refresh token отозван");
@@ -60,7 +62,7 @@ namespace Faryma.Composer.Api.Features.Auth.Services
             if (stored.IsExpired(dateTimeService.Now))
             {
                 stored.RevokedAt = dateTimeService.Now;
-                await uow.SaveChanges();
+                await appDbContext.SaveChangesAsync();
 
                 throw new AuthenticationException("Refresh token истек");
             }
@@ -74,14 +76,14 @@ namespace Faryma.Composer.Api.Features.Auth.Services
             stored.RevokedAt = dateTimeService.Now;
             stored.ReplacedByTokenHash = nextHash;
 
-            RefreshTokenEntity nextToken = uow.RefreshTokenStore.Create(
+            RefreshTokenEntity nextToken = refreshTokenStore.Create(
                 nextHash,
                 stored.FamilyId,
                 options.Value.RefreshExpiryInDays,
                 user);
 
             string accessToken = await GenerateAccessToken(user);
-            await uow.SaveChanges();
+            await appDbContext.SaveChangesAsync();
 
             return (accessToken, nextRefresh);
         }
@@ -94,17 +96,17 @@ namespace Faryma.Composer.Api.Features.Auth.Services
             }
 
             string tokenHash = Hash(refreshToken);
-            RefreshTokenEntity? stored = await uow.RefreshTokenStore.FindByUserIdAndHash(userId, tokenHash);
+            RefreshTokenEntity? stored = await refreshTokenStore.FindByUserIdAndHash(userId, tokenHash);
 
             if (stored is null)
             {
                 return;
             }
 
-            await uow.RefreshTokenStore.RevokeFamily(stored.FamilyId);
+            await refreshTokenStore.RevokeFamily(stored.FamilyId);
         }
 
-        public Task RevokeAll(Guid userId) => uow.RefreshTokenStore.RevokeAllForUser(userId);
+        public Task RevokeAll(Guid userId) => refreshTokenStore.RevokeAllForUser(userId);
 
         private async Task<string> GenerateAccessToken(UserEntity user)
         {
