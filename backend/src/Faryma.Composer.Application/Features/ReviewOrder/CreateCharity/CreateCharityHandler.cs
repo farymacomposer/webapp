@@ -13,18 +13,19 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ReviewOrder.CreateCharity
 {
     public sealed class CreateCharityHandler(
-        AppDbContext context,
         UserStore userStore,
-        UserNicknameService userNicknameService,
         ReviewOrderStore reviewOrderStore,
+        UserNicknameService userNicknameService,
         AppSettingsService appSettingsService,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CreateCharityCommand, ReviewOrderEntity>
+        AppDbContext appDbContext,
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<CreateCharityCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(CreateCharityCommand command, CancellationToken ct)
         {
             UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
-            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
             ComposerStreamEntity liveStream = await reviewOrderStore.GetLiveCharityStream(ct);
+            UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
 
             ReviewOrderStatus status = command.TrackUrl is null
                 ? ReviewOrderStatus.Preorder
@@ -42,7 +43,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateCharity
                 userNickname,
                 createdByUser);
 
-            await context.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified);
 

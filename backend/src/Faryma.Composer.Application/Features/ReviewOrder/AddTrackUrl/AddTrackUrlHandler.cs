@@ -9,10 +9,11 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl
 {
     public sealed class AddTrackUrlHandler(
-        AppDbContext context,
         ReviewOrderStore reviewOrderStore,
         ReviewOrderService reviewOrderService,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<AddTrackUrlCommand, ReviewOrderEntity>
+        AppDbContext appDbContext,
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<AddTrackUrlCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(AddTrackUrlCommand command, CancellationToken ct)
         {
@@ -23,7 +24,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.AddTrackUrl
 
             order.AddTrackUrl(command.TrackUrl, command.TrackDurationSeconds, requiredAmount);
 
-            await context.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(order, OrderQueueUpdateType.TrackUrlAdded, previousStatus);
 

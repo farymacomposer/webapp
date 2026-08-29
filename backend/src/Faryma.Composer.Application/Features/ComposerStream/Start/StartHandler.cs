@@ -13,7 +13,8 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Start
         ComposerStreamStore composerStreamStore,
         DateTimeService dateTimeService,
         AppDbContext appDbContext,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<StartCommand, ComposerStreamEntity>
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<StartCommand, ComposerStreamEntity>
     {
         public async ValueTask<ComposerStreamEntity> Handle(StartCommand command, CancellationToken ct)
         {

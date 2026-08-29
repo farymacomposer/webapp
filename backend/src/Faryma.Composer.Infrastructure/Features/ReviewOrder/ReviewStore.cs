@@ -3,14 +3,14 @@ using Faryma.Composer.Domain.Entities.TransactionSources;
 
 namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
-    public sealed class ReviewStore(AppDbContext context, DateTimeService dateTimeService)
+    public sealed class ReviewStore(AppDbContext appDbContext, DateTimeService dateTimeService)
     {
-        public ReviewEntity Create(
+        public ReviewEntity CreateReview(
             ReviewOrderEntity inProgressOrder,
             int rating,
             UserEntity createdByUser)
         {
-            return context.Reviews.Add(new ReviewEntity
+            return appDbContext.Reviews.Add(new ReviewEntity
             {
                 ReviewOrder = inProgressOrder,
                 RatingValue = rating,

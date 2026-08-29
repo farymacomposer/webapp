@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.UserNickname
 {
-    public sealed class UserNicknameStore(AppDbContext context, ILookupNormalizer normalizer)
+    public sealed class UserNicknameStore(AppDbContext appDbContext, ILookupNormalizer normalizer)
     {
         public UserNicknameEntity Create(string nickname)
         {
@@ -16,8 +16,8 @@ namespace Faryma.Composer.Infrastructure.Features.UserNickname
                 NormalizedNickname = normalizer.NormalizeName(nickname),
             };
 
-            context.Add(result);
-            context.Add(new UserNicknameAccountEntity
+            appDbContext.Add(result);
+            appDbContext.Add(new UserNicknameAccountEntity
             {
                 UserNickname = result
             });
@@ -29,7 +29,7 @@ namespace Faryma.Composer.Infrastructure.Features.UserNickname
         {
             string normalized = normalizer.NormalizeName(nickname);
 
-            return context.UserNicknames
+            return appDbContext.UserNicknames
                 .Include(x => x.Account)
                 .FirstOrDefaultAsync(x => x.NormalizedNickname == normalized, ct);
         }

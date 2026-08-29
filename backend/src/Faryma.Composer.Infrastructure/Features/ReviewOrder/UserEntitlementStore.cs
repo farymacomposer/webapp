@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
-    public sealed class UserEntitlementStore(AppDbContext context, DateTimeService dateTimeService)
+    public sealed class UserEntitlementStore(AppDbContext appDbContext, DateTimeService dateTimeService)
     {
         public void CreateAndRedeemAdminCoverage(
             ReviewOrderEntity order,
@@ -38,7 +38,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
         {
             ValidateTarget(target);
 
-            return context.Add(new UserEntitlementEntity
+            return appDbContext.Add(new UserEntitlementEntity
             {
                 CreatedAt = dateTimeService.Now,
                 Target = target,
@@ -49,7 +49,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
         public Task<UserEntitlementEntity?> FindById(long id, CancellationToken ct)
         {
-            IQueryable<UserEntitlementEntity> query = context.UserEntitlements
+            IQueryable<UserEntitlementEntity> query = appDbContext.UserEntitlements
                 .Include(x => x.UserNickname)
                 .Include(x => x.Redemption)
                 .Where(x => x.Id == id);
@@ -83,7 +83,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             entitlement.RedeemedAt = dateTimeService.Now;
 
-            return context.Add(new UserEntitlementRedemptionEntity
+            return appDbContext.Add(new UserEntitlementRedemptionEntity
             {
                 CreatedAt = dateTimeService.Now,
                 Target = target,

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
-    public sealed class ReviewOrderStore(AppDbContext context, DateTimeService dateTimeService)
+    public sealed class ReviewOrderStore(AppDbContext appDbContext, DateTimeService dateTimeService)
     {
         public ReviewOrderEntity CreateOrder(
             ReviewOrderType type,
@@ -33,7 +33,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                 throw new ArgumentException("Статус заказа должен быть указан", nameof(type));
             }
 
-            return context.Add(new ReviewOrderEntity
+            return appDbContext.Add(new ReviewOrderEntity
             {
                 CreatedAt = dateTimeService.Now,
                 MainNickname = userNickname.Nickname,
@@ -61,7 +61,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
         public Task<ReviewOrderEntity?> FindOrderById(long id, CancellationToken ct)
         {
-            IQueryable<ReviewOrderEntity> query = context.ReviewOrders
+            IQueryable<ReviewOrderEntity> query = appDbContext.ReviewOrders
                 .Include(x => x.CreationStream)
                 .Include(x => x.ProcessingStream)
                 .Include(x => x.Transactions)
@@ -79,9 +79,34 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
         /// </summary>
         public Task<ReviewOrderEntity?> FindOrderInProgress(CancellationToken ct)
         {
-            return context.ReviewOrders
+            return appDbContext.ReviewOrders
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct);
+        }
+
+        public ReviewOrderDetailedReviewPaymentEntity CreateDetailedReviewPayment(
+            ReviewOrderEntity order,
+            long price,
+            UserEntity createdByUser)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
+
+            return appDbContext.Add(new ReviewOrderDetailedReviewPaymentEntity
+            {
+                CreatedAt = dateTimeService.Now,
+                ReviewOrder = order,
+                Price = price,
+                CreatedByUser = createdByUser,
+            }).Entity;
+        }
+
+        /// <summary>
+        /// Возвращает запущенный стрим
+        /// </summary>
+        public async Task<ComposerStreamEntity> GetLiveStream(CancellationToken ct)
+        {
+            return await appDbContext.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct)
+                ?? throw new NotFoundException("Нет запущенного стрима");
         }
 
         /// <summary>
@@ -89,8 +114,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
         /// </summary>
         public async Task<ComposerStreamEntity> GetLiveCharityStream(CancellationToken ct)
         {
-            return await context.ComposerStreams
-                .FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live && x.Type == ComposerStreamType.Charity, ct)
+            return await appDbContext.ComposerStreams.FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live && x.Type == ComposerStreamType.Charity, ct)
                 ?? throw new NotFoundException("Нет запущенного благотворительного стрима");
         }
 
@@ -101,7 +125,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
         {
             DateOnly today = dateTimeService.Today;
 
-            IOrderedQueryable<ComposerStreamEntity> query = context.ComposerStreams
+            IOrderedQueryable<ComposerStreamEntity> query = appDbContext.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
                 .OrderBy(x => x.EventDate);
@@ -113,15 +137,15 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
         /// <summary>
         /// Возвращает ближайший доступный стрим: Live или ближайший Planned на сегодня/будущее, с учетом заказов пользователя
         /// </summary>
-        public async Task<ComposerStreamEntity?> FindNearestStream(UserNicknameEntity userNickname, CancellationToken ct)
+        public async Task<ComposerStreamEntity> GetNearestStream(UserNicknameEntity userNickname, CancellationToken ct)
         {
             DateOnly today = dateTimeService.Today;
 
-            IQueryable<ComposerStreamEntity> query = context.ComposerStreams
+            IQueryable<ComposerStreamEntity> query = appDbContext.ComposerStreams
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today));
 
-            bool userNicknameHasOrders = await context.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0, ct);
+            bool userNicknameHasOrders = await appDbContext.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0, ct);
             if (userNicknameHasOrders)
             {
                 query = query.Where(x => x.Type == ComposerStreamType.Donation);
@@ -129,23 +153,8 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             query = query.OrderBy(x => x.EventDate);
 
-            return await query.FirstOrDefaultAsync(ct);
-        }
-
-        public ReviewOrderDetailedReviewPaymentEntity CreateDetailedReviewPayment(
-            ReviewOrderEntity order,
-            long price,
-            UserEntity createdByUser)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(price);
-
-            return context.Add(new ReviewOrderDetailedReviewPaymentEntity
-            {
-                CreatedAt = dateTimeService.Now,
-                ReviewOrder = order,
-                Price = price,
-                CreatedByUser = createdByUser,
-            }).Entity;
+            return await query.FirstOrDefaultAsync(ct)
+                ?? throw new NotFoundException("Нет доступного ближайшего стрима");
         }
     }
 }

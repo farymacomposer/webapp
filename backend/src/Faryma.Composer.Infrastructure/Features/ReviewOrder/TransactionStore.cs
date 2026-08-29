@@ -4,7 +4,7 @@ using Faryma.Composer.Domain.Enums;
 
 namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 {
-    public sealed class TransactionStore(AppDbContext context, DateTimeService dateTimeService)
+    public sealed class TransactionStore(AppDbContext appDbContext, DateTimeService dateTimeService)
     {
         public void CreateAccountTopUpAndPayment(
             AccountTopUpProvider topUpProvider,
@@ -46,9 +46,9 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                 CreatedByUser = createdByUser,
             };
 
-            context.Add(source);
+            appDbContext.Add(source);
 
-            return context.Add(new TransactionEntity
+            return appDbContext.Add(new TransactionEntity
             {
                 CreatedAt = dateTimeService.Now,
                 Kind = TransactionKind.AccountTopUp,
@@ -72,7 +72,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                 throw new ArgumentException($"Недопустимый источник платежа '{source.GetType().Name}'", nameof(source));
             }
 
-            return context.Add(new TransactionEntity
+            return appDbContext.Add(new TransactionEntity
             {
                 CreatedAt = dateTimeService.Now,
                 Kind = TransactionKind.Payment,
@@ -100,7 +100,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                 ReversedTransaction = reversedTransaction,
             };
 
-            context.Add(source);
+            appDbContext.Add(source);
 
             TransactionEntity result = new()
             {
@@ -112,7 +112,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                 TransactionSource = source
             };
 
-            context.Add(result);
+            appDbContext.Add(result);
             source.ReversalTransaction = result;
 
             return result;

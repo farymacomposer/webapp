@@ -5,7 +5,6 @@ using Faryma.Composer.Application.Features.UserNickname;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Features.ReviewOrder;
 using Faryma.Composer.Infrastructure.Features.User;
@@ -14,21 +13,20 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ReviewOrder.CreateFree
 {
     public sealed class CreateFreeHandler(
-        AppDbContext context,
         UserStore userStore,
         UserNicknameService userNicknameService,
-        AppSettingsService appSettingsService,
         ReviewOrderStore reviewOrderStore,
+        AppSettingsService appSettingsService,
         UserEntitlementStore userEntitlementStore,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CreateFreeCommand, ReviewOrderEntity>
+        AppDbContext appDbContext,
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<CreateFreeCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(CreateFreeCommand command, CancellationToken ct = default)
         {
             UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.UserNickname, ct);
-
-            ComposerStreamEntity nearestStream = await reviewOrderStore.FindNearestStream(userNickname, ct)
-                ?? throw new ReviewOrderException("Нет доступного ближайшего стрима");
+            ComposerStreamEntity nearestStream = await reviewOrderStore.GetNearestStream(userNickname, ct);
 
             ReviewOrderStatus status = command.TrackUrl is null
                 ? ReviewOrderStatus.Preorder
@@ -51,7 +49,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.CreateFree
                 userNickname,
                 createdByUser);
 
-            await context.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderCreated, ReviewOrderStatus.Unspecified);
 

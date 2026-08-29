@@ -13,13 +13,14 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ReviewOrder.CreateOutOfQueue
 {
     public sealed class CreateOutOfQueueHandler(
-        AppDbContext appDbContext,
         UserStore userStore,
         ReviewOrderStore reviewOrderStore,
         UserNicknameService userNicknameService,
         AppSettingsService appSettingsService,
         UserEntitlementStore userEntitlementStore,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CreateOutOfQueueCommand, ReviewOrderEntity>
+        AppDbContext appDbContext,
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<CreateOutOfQueueCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(CreateOutOfQueueCommand command, CancellationToken ct = default)
         {

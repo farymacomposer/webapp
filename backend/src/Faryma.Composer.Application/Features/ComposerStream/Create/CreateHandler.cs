@@ -15,7 +15,8 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Create
         UserStore userStore,
         ComposerStreamStore composerStreamStore,
         AppDbContext appDbContext,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CreateCommand, ComposerStreamEntity>
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<CreateCommand, ComposerStreamEntity>
     {
         public async ValueTask<ComposerStreamEntity> Handle(CreateCommand command, CancellationToken ct)
         {

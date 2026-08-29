@@ -6,29 +6,29 @@ namespace Faryma.Composer.Infrastructure
     public static class AppDbContextSeedingExtensions
     {
         public static DbContextOptionsBuilder UseAppDataSeeding(this DbContextOptionsBuilder options) => options
-            .UseSeeding((context, _) => SeedAppSettings((AppDbContext)context))
-            .UseAsyncSeeding((context, _, ct) => SeedAppSettingsAsync((AppDbContext)context, ct));
+            .UseSeeding((appDbContext, _) => SeedAppSettings((AppDbContext)appDbContext))
+            .UseAsyncSeeding((appDbContext, _, ct) => SeedAppSettingsAsync((AppDbContext)appDbContext, ct));
 
-        private static void SeedAppSettings(AppDbContext context)
+        private static void SeedAppSettings(AppDbContext appDbContext)
         {
-            if (context.AppSettings.Any())
+            if (appDbContext.AppSettings.Any())
             {
                 return;
             }
 
-            context.AppSettings.Add(CreateDefaultAppSettings());
-            context.SaveChanges();
+            appDbContext.AppSettings.Add(CreateDefaultAppSettings());
+            appDbContext.SaveChanges();
         }
 
-        private static async Task SeedAppSettingsAsync(AppDbContext context, CancellationToken ct)
+        private static async Task SeedAppSettingsAsync(AppDbContext appDbContext, CancellationToken ct)
         {
-            if (await context.AppSettings.AnyAsync(ct))
+            if (await appDbContext.AppSettings.AnyAsync(ct))
             {
                 return;
             }
 
-            context.AppSettings.Add(CreateDefaultAppSettings());
-            await context.SaveChangesAsync(ct);
+            appDbContext.AppSettings.Add(CreateDefaultAppSettings());
+            await appDbContext.SaveChangesAsync(ct);
         }
 
         private static AppSettingsEntity CreateDefaultAppSettings()

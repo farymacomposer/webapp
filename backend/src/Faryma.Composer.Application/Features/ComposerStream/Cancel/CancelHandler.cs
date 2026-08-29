@@ -12,7 +12,8 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Cancel
     public sealed class CancelHandler(
         ComposerStreamStore composerStreamStore,
         AppDbContext appDbContext,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CancelCommand, ComposerStreamEntity>
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<CancelCommand, ComposerStreamEntity>
     {
         public async ValueTask<ComposerStreamEntity> Handle(CancelCommand command, CancellationToken ct)
         {

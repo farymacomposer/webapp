@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Faryma.Composer.Infrastructure.Features.ComposerStream
 {
     public sealed class ComposerStreamStore(
-        AppDbContext context,
+        AppDbContext appDbContext,
         DateTimeService dateTimeService)
     {
         public ComposerStreamEntity CreateStream(DateOnly eventDate, ComposerStreamType type, UserEntity createdByUser)
@@ -16,7 +16,7 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
                 throw new ArgumentException("Тип стрима должен быть указан", nameof(type));
             }
 
-            return context.Add(new ComposerStreamEntity
+            return appDbContext.Add(new ComposerStreamEntity
             {
                 EventDate = eventDate,
                 Status = ComposerStreamStatus.Planned,
@@ -27,7 +27,7 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
 
         public async Task<ComposerStreamEntity> GetStream(long id, CancellationToken ct)
         {
-            return await context.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id, ct)
+            return await appDbContext.ComposerStreams.FirstOrDefaultAsync(x => x.Id == id, ct)
                 ?? throw new NotFoundException($"Стрим id: {id} не найден");
         }
 
@@ -36,7 +36,7 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
         /// </summary>
         public Task<ComposerStreamEntity?> FindLiveStream(CancellationToken ct)
         {
-            return context.ComposerStreams
+            return appDbContext.ComposerStreams
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Status == ComposerStreamStatus.Live, ct);
         }
@@ -46,7 +46,7 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
         /// </summary>
         public async Task<IReadOnlyCollection<ComposerStreamEntity>> FindStreams(DateOnly dateFrom, DateOnly dateTo, CancellationToken ct)
         {
-            return await context.ComposerStreams
+            return await appDbContext.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.EventDate >= dateFrom && x.EventDate <= dateTo)
                 .OrderBy(x => x.EventDate)
@@ -60,7 +60,7 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
         {
             DateOnly today = dateTimeService.Today;
 
-            IQueryable<ComposerStreamEntity> query = context.ComposerStreams
+            IQueryable<ComposerStreamEntity> query = appDbContext.ComposerStreams
                 .AsNoTracking()
                 .Where(x => x.Status == ComposerStreamStatus.Live
                     || (x.Status == ComposerStreamStatus.Planned && x.EventDate >= today))
@@ -74,7 +74,7 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
         /// </summary>
         public Task<bool> ExistsActiveCreatedOrdersForStream(long streamId, CancellationToken ct)
         {
-            return context.ReviewOrders
+            return appDbContext.ReviewOrders
                 .AsNoTracking()
                 .AnyAsync(x => x.CreationStreamId == streamId
                     && (x.Status == ReviewOrderStatus.Preorder
@@ -87,7 +87,7 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
         /// </summary>
         public async Task<long?> FindIdOrderInProgress(CancellationToken ct)
         {
-            return (await context.ReviewOrders
+            return (await appDbContext.ReviewOrders
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Status == ReviewOrderStatus.InProgress, ct))
                 ?.Id;

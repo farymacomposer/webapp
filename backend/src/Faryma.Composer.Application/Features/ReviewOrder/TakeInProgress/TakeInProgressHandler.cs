@@ -6,20 +6,22 @@ using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.Features.ReviewOrder;
 using Mediator;
 
 namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
 {
     public sealed class TakeInProgressHandler(
-        UnitOfWork uow,
-        ReviewOrderService reviewOrderService,
+        ReviewOrderStore reviewOrderStore,
         OrderQueueService orderQueueService,
-        OrderQueueEventChannel orderQueueEventChannel,
-        DateTimeService dateTimeService) : IRequestHandler<TakeInProgressCommand, ReviewOrderEntity>
+        DateTimeService dateTimeService,
+        AppDbContext appDbContext,
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<TakeInProgressCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(TakeInProgressCommand command, CancellationToken ct = default)
         {
-            ReviewOrderEntity order = await uow.ReviewOrderStore.Get(command.ReviewOrderId, ct);
+            ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
             if (order.Status == ReviewOrderStatus.InProgress)
@@ -27,13 +29,12 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
                 return order;
             }
 
-            ComposerStreamEntity liveStream = await uow.ComposerStreamStore.FindLive(ct)
-                ?? throw new ReviewOrderException("Невозможно взять в работу заказ вне активного стрима", order);
+            ComposerStreamEntity liveStream = await reviewOrderStore.GetLiveStream(ct);
 
-            long? idOrderInProgress = await reviewOrderService.FindInProgress(ct);
-            if (idOrderInProgress is not null && idOrderInProgress != command.ReviewOrderId)
+            ReviewOrderEntity? orderInProgress = await reviewOrderStore.FindOrderInProgress(ct);
+            if (orderInProgress is not null && orderInProgress.Id != command.ReviewOrderId)
             {
-                throw new ReviewOrderException($"Невозможно взять в работу заказ, пока заказ Id: {idOrderInProgress} находится в работе", order);
+                throw new ReviewOrderException($"Невозможно взять в работу заказ, пока заказ Id: {orderInProgress.Id} находится в работе", order);
             }
 
             OrderQueuePosition position = await orderQueueService.GetCurrentQueuePosition(order);
@@ -43,7 +44,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
                 position.Category.QueueCategory,
                 dateTimeService.Now);
 
-            await uow.SaveChanges(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderTaken, previousStatus);
 

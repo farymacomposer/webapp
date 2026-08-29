@@ -12,8 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Faryma.Composer.Application.Features.OrderQueue
 {
     public sealed class OrderQueueService(
-        IOrderQueueNotificationService notificationService,
-        IServiceScopeFactory scopeFactory)
+        IServiceScopeFactory scopeFactory,
+        IOrderQueueNotificationService notificationService)
     {
         private readonly SemaphoreLocker _locker = new();
         private OrderQueueManager _queueManager = null!;

@@ -9,10 +9,11 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ReviewOrder.Cancel
 {
     public sealed class CancelHandler(
-        AppDbContext context,
-        DateTimeService dateTimeService,
         ReviewOrderStore reviewOrderStore,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CancelCommand, ReviewOrderEntity>
+        DateTimeService dateTimeService,
+        AppDbContext appDbContext,
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<CancelCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(CancelCommand command, CancellationToken ct)
         {
@@ -26,7 +27,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Cancel
 
             order.Cancel(command.CancelReason, dateTimeService.Now);
 
-            await context.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderCanceled, previousStatus);
 

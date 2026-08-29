@@ -5,25 +5,31 @@ using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Infrastructure;
+using Faryma.Composer.Infrastructure.Features.ReviewOrder;
+using Faryma.Composer.Infrastructure.Features.User;
 using Mediator;
 
 namespace Faryma.Composer.Application.Features.ReviewOrder.Pay
 {
     public sealed class PayHandler(
-        UnitOfWork uow,
-        ReviewOrderService reviewOrderService,
+        ReviewOrderStore reviewOrderStore,
+        UserStore userStore,
         UserNicknameService userNicknameService,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<PayCommand, ReviewOrderEntity>
+        TransactionStore transactionStore,
+        ReviewOrderService reviewOrderService,
+        AppDbContext appDbContext,
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<PayCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(PayCommand command, CancellationToken ct = default)
         {
-            ReviewOrderEntity order = await uow.ReviewOrderStore.Get(command.ReviewOrderId, ct);
+            ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
-            UserEntity createdByUser = await reviewOrderService.GetUser(command.CreatedByUserId, ct);
+            UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
             UserNicknameEntity userNickname = await userNicknameService.GetOrCreate(command.Nickname, ct);
 
-            reviewOrderService.CreateAccountTopUpAndPayment(
+            transactionStore.CreateAccountTopUpAndPayment(
                 command.TopUpProvider,
                 command.PaymentAmount,
                 createdByUser,
@@ -34,7 +40,7 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Pay
 
             order.Pay(requiredAmount);
 
-            await uow.SaveChanges(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderMovedUp, previousStatus);
 

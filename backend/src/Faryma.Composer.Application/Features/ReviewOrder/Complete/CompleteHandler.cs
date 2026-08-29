@@ -11,12 +11,13 @@ using Mediator;
 namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
 {
     public sealed class CompleteHandler(
-        AppDbContext context,
-        DateTimeService dateTimeService,
+        ReviewOrderStore reviewOrderStore,
         UserStore userStore,
         ReviewStore reviewStore,
-        ReviewOrderStore reviewOrderStore,
-        OrderQueueEventChannel orderQueueEventChannel) : IRequestHandler<CompleteCommand, ReviewOrderEntity>
+        DateTimeService dateTimeService,
+        AppDbContext appDbContext,
+        OrderQueueEventChannel orderQueueEventChannel)
+        : IRequestHandler<CompleteCommand, ReviewOrderEntity>
     {
         public async ValueTask<ReviewOrderEntity> Handle(CompleteCommand command, CancellationToken ct)
         {
@@ -29,11 +30,11 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
             }
 
             UserEntity createdByUser = await userStore.GetUser(command.CreatedByUserId, ct);
-            ReviewEntity review = reviewStore.Create(order, command.Rating, createdByUser);
+            ReviewEntity review = reviewStore.CreateReview(order, command.Rating, createdByUser);
 
             order.Complete(review, dateTimeService.Now);
 
-            await context.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
 
             orderQueueEventChannel.Write(order, OrderQueueUpdateType.OrderCompleted, previousStatus);
 

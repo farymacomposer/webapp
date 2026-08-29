@@ -15,7 +15,7 @@ using Npgsql;
 namespace Faryma.Composer.Api.Common.Filters
 {
     public sealed class IdempotentFilter(
-        AppDbContext dbContext,
+        AppDbContext appDbContext,
         DateTimeService dateTimeService,
         IOptions<JsonOptions> jsonOptions) : IAsyncActionFilter
     {
@@ -48,7 +48,7 @@ namespace Faryma.Composer.Api.Common.Filters
                 await DeleteExpiredRecord(endpointKey, userId, idempotencyKey, now, ct);
             }
 
-            await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync(ct);
+            await using IDbContextTransaction transaction = await appDbContext.Database.BeginTransactionAsync(ct);
 
             IdempotencyRecordEntity record = new()
             {
@@ -60,15 +60,15 @@ namespace Faryma.Composer.Api.Common.Filters
                 ExpiresAt = now.Add(_expiration),
             };
 
-            dbContext.IdempotencyRecords.Add(record);
+            appDbContext.IdempotencyRecords.Add(record);
 
             try
             {
-                await dbContext.SaveChangesAsync(ct);
+                await appDbContext.SaveChangesAsync(ct);
             }
             catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == PostgresErrorCodes.UniqueViolation)
             {
-                dbContext.Entry(record).State = EntityState.Detached;
+                appDbContext.Entry(record).State = EntityState.Detached;
                 await transaction.RollbackAsync(ct);
                 IdempotencyRecordEntity? conflicting = await FindExistingRecord(endpointKey, userId, idempotencyKey, ct);
                 actionContext.Result = conflicting is null
@@ -96,7 +96,7 @@ namespace Faryma.Composer.Api.Common.Filters
             record.StatusCode = statusCode;
             record.ResponseJson = responseJson;
 
-            await dbContext.SaveChangesAsync(ct);
+            await appDbContext.SaveChangesAsync(ct);
             await transaction.CommitAsync(ct);
         }
 
@@ -170,7 +170,7 @@ namespace Faryma.Composer.Api.Common.Filters
             DateTime now,
             CancellationToken ct)
         {
-            await dbContext.IdempotencyRecords
+            await appDbContext.IdempotencyRecords
                 .Where(x => x.EndpointKey == endpointKey
                     && x.UserId == userId
                     && x.IdempotencyKey == idempotencyKey
@@ -221,7 +221,7 @@ namespace Faryma.Composer.Api.Common.Filters
             Guid idempotencyKey,
             CancellationToken ct)
         {
-            return dbContext.IdempotencyRecords
+            return appDbContext.IdempotencyRecords
                 .AsNoTracking()
                 .SingleOrDefaultAsync(x => x.EndpointKey == endpointKey
                     && x.UserId == userId
