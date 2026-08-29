@@ -24,8 +24,8 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Cancel
                 return stream;
             }
 
-            bool hasActiveCreatedOrders = await composerStreamStore.ExistsActiveCreatedOrdersForStream(stream.Id, ct);
-            if (hasActiveCreatedOrders)
+            bool hasActiveOrders = await composerStreamStore.HasActiveOrders(stream.Id, ct);
+            if (hasActiveOrders)
             {
                 throw new ComposerStreamException("Невозможно отменить стрим: для него существуют активные заказы", stream);
             }

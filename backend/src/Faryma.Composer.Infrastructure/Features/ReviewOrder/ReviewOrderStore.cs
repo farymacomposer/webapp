@@ -118,7 +118,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
                 ?? throw new NotFoundException("Нет запущенного благотворительного стрима");
         }
 
-        public Task<bool> HasReviewOrders(UserNicknameEntity userNickname, CancellationToken ct) =>
+        public Task<bool> HasOrders(UserNicknameEntity userNickname, CancellationToken ct) =>
             appDbContext.UserNicknames.AnyAsync(x => x.Id == userNickname.Id && x.ReviewOrders.Count > 0, ct);
 
         /// <summary>

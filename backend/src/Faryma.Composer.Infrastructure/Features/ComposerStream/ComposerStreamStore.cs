@@ -72,7 +72,7 @@ namespace Faryma.Composer.Infrastructure.Features.ComposerStream
         /// <summary>
         /// Проверяет, есть-ли у стрима активные созданные заказы
         /// </summary>
-        public Task<bool> ExistsActiveCreatedOrdersForStream(long streamId, CancellationToken ct)
+        public Task<bool> HasActiveOrders(long streamId, CancellationToken ct)
         {
             return appDbContext.ReviewOrders
                 .AsNoTracking()
