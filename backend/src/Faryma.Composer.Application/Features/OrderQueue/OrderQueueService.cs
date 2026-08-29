@@ -28,12 +28,12 @@ namespace Faryma.Composer.Application.Features.OrderQueue
             await using AsyncServiceScope scope = scopeFactory.CreateAsyncScope();
             OrderQueueStore orderQueueQueries = scope.ServiceProvider.GetRequiredService<OrderQueueStore>();
 
-            DateOnly nearestStreamDate = await orderQueueQueries.GetNearestStreamDate();
+            DateOnly nearestStreamDate = await orderQueueQueries.FindNearestStreamDate();
             ReviewOrderEntity? lastTakenOrder = await orderQueueQueries.FindLastTaken();
             ReviewOrderEntity? lastTakenDebt = await orderQueueQueries.FindLastTakenDebt();
             ReviewOrderEntity? lastTakenOutOfQueue = await orderQueueQueries.FindLastTakenOutOfQueue();
-            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await orderQueueQueries.GetLastNicknamesByStreamDate();
-            List<ReviewOrderEntity> orders = await orderQueueQueries.GetOrdersInQueue();
+            Dictionary<DateOnly, string> lastNicknamesByStreamDate = await orderQueueQueries.FindLastNicknamesByStreamDate();
+            List<ReviewOrderEntity> orders = await orderQueueQueries.FindOrdersInQueue();
 
             _queueManager = new OrderQueueManager
             {
@@ -135,21 +135,21 @@ namespace Faryma.Composer.Application.Features.OrderQueue
                 }
                 case OrderQueueUpdateType.StreamStarted:
                 {
-                    List<ReviewOrderEntity> orders = await orderQueueQueries.GetOrdersToStartStream(stream.Id);
+                    List<ReviewOrderEntity> orders = await orderQueueQueries.FindOrdersToStartStream(stream.Id);
                     _queueManager.NearestStreamDate = stream.EventDate;
                     _queueManager.UpdateOrders(orders);
                     break;
                 }
                 case OrderQueueUpdateType.StreamCompleted:
                 {
-                    List<ReviewOrderEntity> orders = await orderQueueQueries.GetOrdersToCompleteStream(stream.Id);
-                    _queueManager.NearestStreamDate = await orderQueueQueries.GetNearestStreamDate();
+                    List<ReviewOrderEntity> orders = await orderQueueQueries.FindOrdersToCompleteStream(stream.Id);
+                    _queueManager.NearestStreamDate = await orderQueueQueries.FindNearestStreamDate();
                     _queueManager.UpdateOrders(orders);
                     break;
                 }
                 case OrderQueueUpdateType.StreamCanceled:
                 {
-                    _queueManager.NearestStreamDate = await orderQueueQueries.GetNearestStreamDate();
+                    _queueManager.NearestStreamDate = await orderQueueQueries.FindNearestStreamDate();
                     _queueManager.UpdateOrders();
                     break;
                 }

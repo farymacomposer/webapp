@@ -30,7 +30,7 @@ namespace Faryma.Composer.Infrastructure.Features.ReviewOrder
 
             if (!Enum.IsDefined(status) || status == ReviewOrderStatus.Unspecified)
             {
-                throw new ArgumentException("Статус заказа должен быть указан", nameof(type));
+                throw new ArgumentException("Статус заказа должен быть указан", nameof(status));
             }
 
             return appDbContext.Add(new ReviewOrderEntity

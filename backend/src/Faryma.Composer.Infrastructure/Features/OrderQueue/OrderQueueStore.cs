@@ -12,7 +12,7 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// <summary>
         /// Возвращает дату ближайшего доступного стрима или DateOnly.MinValue, если стримов нет
         /// </summary>
-        public async Task<DateOnly> GetNearestStreamDate()
+        public async Task<DateOnly> FindNearestStreamDate()
         {
             DateOnly today = dateTimeService.Today;
 
@@ -30,7 +30,7 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// <summary>
         /// Возвращает последний выданный никнейм по каждой дате стрима для приоритетного алгоритма очереди
         /// </summary>
-        public Task<Dictionary<DateOnly, string>> GetLastNicknamesByStreamDate()
+        public Task<Dictionary<DateOnly, string>> FindLastNicknamesByStreamDate()
         {
             var query = appDbContext.ComposerStreams
                 .AsNoTracking()
@@ -102,7 +102,7 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// <summary>
         /// Возвращает заказы, которые участвуют в расчете текущей очереди
         /// </summary>
-        public Task<List<ReviewOrderEntity>> GetOrdersInQueue()
+        public Task<List<ReviewOrderEntity>> FindOrdersInQueue()
         {
             IQueryable<ReviewOrderEntity> query = appDbContext.ReviewOrders
                 .AsNoTracking()
@@ -122,7 +122,7 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// <summary>
         /// Возвращает заказы, которые нужно обновить при старте стрима
         /// </summary>
-        public Task<List<ReviewOrderEntity>> GetOrdersToStartStream(long streamId)
+        public Task<List<ReviewOrderEntity>> FindOrdersToStartStream(long streamId)
         {
             IQueryable<ReviewOrderEntity> query = appDbContext.ReviewOrders
                 .AsNoTracking()
@@ -138,7 +138,7 @@ namespace Faryma.Composer.Infrastructure.Features.OrderQueue
         /// <summary>
         /// Возвращает заказы, которые нужно обновить при завершении стрима
         /// </summary>
-        public Task<List<ReviewOrderEntity>> GetOrdersToCompleteStream(long streamId)
+        public Task<List<ReviewOrderEntity>> FindOrdersToCompleteStream(long streamId)
         {
             IQueryable<ReviewOrderEntity> query = appDbContext.ReviewOrders
                 .AsNoTracking()
