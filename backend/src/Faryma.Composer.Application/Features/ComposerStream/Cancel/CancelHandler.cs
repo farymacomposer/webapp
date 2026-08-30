@@ -19,17 +19,17 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Cancel
         {
             ComposerStreamEntity stream = await composerStreamStore.GetStream(command.ComposerStreamId, ct);
 
+            if (stream.Status == ComposerStreamStatus.Canceled)
+            {
+                return stream;
+            }
+
             stream.ThrowIfCannotBeCancel();
 
             bool hasActiveOrders = await composerStreamStore.HasActiveOrders(stream.Id, ct);
             if (hasActiveOrders)
             {
                 throw new ComposerStreamException("Невозможно отменить стрим: для него существуют активные заказы", stream);
-            }
-
-            if (stream.Status == ComposerStreamStatus.Canceled)
-            {
-                return stream;
             }
 
             stream.Cancel();
