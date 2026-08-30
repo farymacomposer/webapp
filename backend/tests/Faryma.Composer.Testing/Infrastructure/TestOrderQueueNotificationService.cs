@@ -27,6 +27,20 @@ namespace Faryma.Composer.Testing.Infrastructure
         }
 
         /// <summary>
+        /// Возвращает полученные снимки очереди в порядке поступления.
+        /// </summary>
+        public IReadOnlyList<OrderQueueSnapshot> Snapshots
+        {
+            get
+            {
+                lock (_sync)
+                {
+                    return [.. _snapshots];
+                }
+            }
+        }
+
+        /// <summary>
         /// Фиксирует новое состояние очереди для последующей проверки в тесте.
         /// </summary>
         public Task NotifyQueueUpdated(OrderQueueSnapshot snapshot)
