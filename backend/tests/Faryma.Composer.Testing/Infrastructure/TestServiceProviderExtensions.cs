@@ -5,7 +5,6 @@ using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Features.ComposerStream;
 using Faryma.Composer.Infrastructure.Features.ReviewOrder;
-using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,9 +24,6 @@ namespace Faryma.Composer.Testing.Infrastructure
             await using AsyncServiceScope scope = services.CreateAsyncScope();
             await action(scope.ServiceProvider);
         }
-
-        public static void SetCurrentUser(this IServiceProvider services, Guid userId) =>
-            services.GetRequiredService<CurrentUserContext>().SetUserId(userId);
 
         public static async Task DrainOrderQueueEventsAsync(this IServiceProvider services)
         {
@@ -71,8 +67,5 @@ namespace Faryma.Composer.Testing.Infrastructure
 
                 return await context.ComposerStreams.CountAsync(cancellationToken);
             });
-
-        public static Task<TResponse> Send<TResponse>(this IServiceProvider services, IRequest<TResponse> request) =>
-            services.GetRequiredService<ISender>().Send(request).AsTask();
     }
 }

@@ -23,11 +23,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Faryma.Composer.Application\Faryma.Composer.Application.csproj" />
-    <ProjectReference Include="..\Faryma.Composer.Testing\Faryma.Composer.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Faryma.Composer.Testing.Infrastructure" />
     <Using Include="Xunit" />
   </ItemGroup>
 
