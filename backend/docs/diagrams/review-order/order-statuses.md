@@ -73,6 +73,7 @@ flowchart TB
 
         ACTIVE -->|"freeze"| FROZEN_ACTIVITY
         SCHEDULED -->|"freeze"| FROZEN_ACTIVITY
+        UNSPECIFIED_ACTIVITY -->|"freeze"| FROZEN_ACTIVITY
         FROZEN_ACTIVITY -->|"unfreeze:<br/>новый пересчёт"| STREAM_DATE
 
         PROCESSING_COMPLETED -->|"нет"| COMPLETED_ACTIVITY
