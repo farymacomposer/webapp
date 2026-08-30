@@ -20,6 +20,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Cancel
             ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
+            order.ThrowIfCannotBeCancel();
+
             if (order.Status == ReviewOrderStatus.Canceled)
             {
                 return order;

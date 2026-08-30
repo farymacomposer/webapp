@@ -24,13 +24,9 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
             ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
-            if (order.Status == ReviewOrderStatus.InProgress)
-            {
-                return order;
-            }
+            order.ThrowIfCannotBeTakeInProgress();
 
             ComposerStreamEntity liveStream = await reviewOrderStore.GetLiveStream(ct);
-
             ReviewOrderEntity? orderInProgress = await reviewOrderStore.FindOrderInProgress(ct);
             if (orderInProgress is not null && orderInProgress.Id != command.ReviewOrderId)
             {
@@ -38,6 +34,11 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.TakeInProgress
             }
 
             OrderQueuePosition position = await orderQueueService.GetCurrentQueuePosition(order);
+
+            if (order.Status == ReviewOrderStatus.InProgress)
+            {
+                return order;
+            }
 
             order.TakeInProgress(
                 liveStream,

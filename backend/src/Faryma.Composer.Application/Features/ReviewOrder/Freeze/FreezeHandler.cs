@@ -19,6 +19,8 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Freeze
             ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
+            order.ThrowIfCannotBeFreeze();
+
             if (order.IsFrozen)
             {
                 return order;

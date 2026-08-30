@@ -54,34 +54,49 @@ namespace Faryma.Composer.Domain.Entities
         /// </summary>
         public ICollection<ReviewOrderEntity> ProcessedReviewOrders { get; set; } = [];
 
-        public void Start(DateTime now)
+        public void ThrowIfCannotBeStart()
         {
             if (Status != ComposerStreamStatus.Planned)
             {
                 throw new ComposerStreamException($"Невозможно начать стрим в статусе '{Status}'", this);
             }
+        }
+
+        public void Start(DateTime now)
+        {
+            ThrowIfCannotBeStart();
 
             Status = ComposerStreamStatus.Live;
             StartedAt = now;
         }
 
-        public void Complete(DateTime now)
+        public void ThrowIfCannotBeComplete()
         {
             if (Status != ComposerStreamStatus.Live)
             {
                 throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{Status}'", this);
             }
+        }
+
+        public void Complete(DateTime now)
+        {
+            ThrowIfCannotBeComplete();
 
             Status = ComposerStreamStatus.Completed;
             CompletedAt = now;
         }
 
-        public void Cancel()
+        public void ThrowIfCannotBeCancel()
         {
             if (Status != ComposerStreamStatus.Planned)
             {
                 throw new ComposerStreamException($"Невозможно отменить стрим в статусе '{Status}'", this);
             }
+        }
+
+        public void Cancel()
+        {
+            ThrowIfCannotBeCancel();
 
             Status = ComposerStreamStatus.Canceled;
         }

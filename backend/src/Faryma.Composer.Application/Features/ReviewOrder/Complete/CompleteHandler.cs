@@ -24,13 +24,15 @@ namespace Faryma.Composer.Application.Features.ReviewOrder.Complete
             ReviewOrderEntity order = await reviewOrderStore.GetOrder(command.ReviewOrderId, ct);
             ReviewOrderStatus previousStatus = order.Status;
 
+            order.ThrowIfCannotBeComplete();
+
+            UserEntity createdByUser = await userStore.GetUser(ct);
+            ReviewEntity review = reviewStore.CreateReview(order, command.Rating, createdByUser);
+
             if (order.Status == ReviewOrderStatus.Completed)
             {
                 return order;
             }
-
-            UserEntity createdByUser = await userStore.GetUser(ct);
-            ReviewEntity review = reviewStore.CreateReview(order, command.Rating, createdByUser);
 
             order.Complete(review, dateTimeContext.Now);
 

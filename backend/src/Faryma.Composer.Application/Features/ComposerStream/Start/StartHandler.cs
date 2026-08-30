@@ -22,15 +22,17 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Start
 
             ComposerStreamEntity stream = await composerStreamStore.GetStream(command.ComposerStreamId, ct);
 
-            if (stream.Status == ComposerStreamStatus.Live)
-            {
-                return stream;
-            }
+            stream.ThrowIfCannotBeStart();
 
             ComposerStreamEntity? live = await composerStreamStore.FindLiveStream(ct);
             if (live is not null && live.Id != command.ComposerStreamId)
             {
                 throw new ComposerStreamException($"Невозможно начать стрим, пока стрим на дату: {live.EventDate} запущен", stream);
+            }
+
+            if (stream.Status == ComposerStreamStatus.Live)
+            {
+                return stream;
             }
 
             stream.Start(dateTimeContext.Now);

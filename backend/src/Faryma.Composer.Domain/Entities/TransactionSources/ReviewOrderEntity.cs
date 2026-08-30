@@ -130,9 +130,9 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
         /// </summary>
         public UserEntitlementRedemptionEntity? CoverageRedemption { get; set; }
 
-        public void Pay(long requiredAmount)
+        public void ThrowIfCannotBePaid()
         {
-            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
+            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.AwaitingPayment or ReviewOrderStatus.Pending))
             {
                 throw new ReviewOrderException("Невозможно оплатить заказ", this);
             }
@@ -141,28 +141,43 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
             {
                 throw new ReviewOrderException("Тип заказа не поддерживает денежную оплату", this);
             }
+        }
+
+        public void Pay(long requiredAmount)
+        {
+            ThrowIfCannotBePaid();
 
             RecalculatePaymentState(requiredAmount);
         }
 
-        public void AddTrackUrl(string trackUrl, int trackDurationSeconds, long requiredAmount)
+        public void ThrowIfCannotBeAddTrackUrl()
         {
-            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
+            if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.AwaitingPayment or ReviewOrderStatus.Pending))
             {
                 throw new ReviewOrderException("Невозможно добавить/изменить ссылку на трек", this);
             }
+        }
+
+        public void AddTrackUrl(string trackUrl, int trackDurationSeconds, long requiredAmount)
+        {
+            ThrowIfCannotBeAddTrackUrl();
 
             TrackUrl = trackUrl;
             TrackDurationSeconds = trackDurationSeconds;
             RecalculatePaymentState(requiredAmount);
         }
 
-        public void TakeInProgress(ComposerStreamEntity liveStream, QueueCategory queueCategory, DateTime now)
+        public void ThrowIfCannotBeTakeInProgress()
         {
             if (IsFrozen || Status != ReviewOrderStatus.Pending)
             {
                 throw new ReviewOrderException("Невозможно взять в работу заказ", this);
             }
+        }
+
+        public void TakeInProgress(ComposerStreamEntity liveStream, QueueCategory queueCategory, DateTime now)
+        {
+            ThrowIfCannotBeTakeInProgress();
 
             QueueCategory = queueCategory;
             ProcessingStream = liveStream;
@@ -170,44 +185,64 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
             InProgressAt = now;
         }
 
-        public void Complete(ReviewEntity review, DateTime now)
+        public void ThrowIfCannotBeComplete()
         {
             if (Status != ReviewOrderStatus.InProgress)
             {
                 throw new ReviewOrderException("Невозможно выполнить заказ", this);
             }
+        }
+
+        public void Complete(ReviewEntity review, DateTime now)
+        {
+            ThrowIfCannotBeComplete();
 
             Review = review;
             CompletedAt = now;
             Status = ReviewOrderStatus.Completed;
         }
 
-        public void Freeze()
+        public void ThrowIfCannotBeFreeze()
         {
             if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
             {
                 throw new ReviewOrderException("Невозможно заморозить заказ", this);
             }
+        }
+
+        public void Freeze()
+        {
+            ThrowIfCannotBeFreeze();
 
             IsFrozen = true;
         }
 
-        public void Unfreeze()
+        public void ThrowIfCannotBeUnfreeze()
         {
             if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment))
             {
                 throw new ReviewOrderException("Невозможно разморозить заказ", this);
             }
+        }
+
+        public void Unfreeze()
+        {
+            ThrowIfCannotBeUnfreeze();
 
             IsFrozen = false;
         }
 
-        public void Cancel(string cancelReason, DateTime now)
+        public void ThrowIfCannotBeCancel()
         {
             if (Status is not (ReviewOrderStatus.Preorder or ReviewOrderStatus.Pending or ReviewOrderStatus.AwaitingPayment or ReviewOrderStatus.InProgress))
             {
                 throw new ReviewOrderException("Невозможно отменить заказ", this);
             }
+        }
+
+        public void Cancel(string cancelReason, DateTime now)
+        {
+            ThrowIfCannotBeCancel();
 
             CanceledAt = now;
             CancelReason = cancelReason;
@@ -216,8 +251,6 @@ namespace Faryma.Composer.Domain.Entities.TransactionSources
             Status = ReviewOrderStatus.Canceled;
             InProgressAt = null;
         }
-
-        public long GetPaymentAmount() => GetPaymentAmount(Transactions);
 
         public long GetTotalAmount()
         {
