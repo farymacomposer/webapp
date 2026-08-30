@@ -28,8 +28,6 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Complete
                 return stream;
             }
 
-            stream.ThrowIfCannotBeComplete();
-
             ReviewOrderEntity? orderInProgress = await reviewOrderStore.FindOrderInProgress(ct);
             if (orderInProgress is not null)
             {

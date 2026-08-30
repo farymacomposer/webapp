@@ -54,7 +54,7 @@ namespace Faryma.Composer.Domain.Entities
         /// </summary>
         public ICollection<ReviewOrderEntity> ProcessedReviewOrders { get; set; } = [];
 
-        public void ThrowIfCannotBeStart(DateTime now)
+        public void Start(DateTime now)
         {
             if (Status != ComposerStreamStatus.Planned)
             {
@@ -66,43 +66,28 @@ namespace Faryma.Composer.Domain.Entities
             {
                 throw new ComposerStreamException($"Невозможно начать стрим: дата проведения {EventDate} не совпадает с сегодняшней {today}", this);
             }
-        }
-
-        public void Start(DateTime now)
-        {
-            ThrowIfCannotBeStart(now);
 
             Status = ComposerStreamStatus.Live;
             StartedAt = now;
         }
 
-        public void ThrowIfCannotBeComplete()
+        public void Complete(DateTime now)
         {
             if (Status != ComposerStreamStatus.Live)
             {
                 throw new ComposerStreamException($"Невозможно завершить стрим в статусе '{Status}'", this);
             }
-        }
-
-        public void Complete(DateTime now)
-        {
-            ThrowIfCannotBeComplete();
 
             Status = ComposerStreamStatus.Completed;
             CompletedAt = now;
         }
 
-        public void ThrowIfCannotBeCancel()
+        public void Cancel()
         {
             if (Status != ComposerStreamStatus.Planned)
             {
                 throw new ComposerStreamException($"Невозможно отменить стрим в статусе '{Status}'", this);
             }
-        }
-
-        public void Cancel()
-        {
-            ThrowIfCannotBeCancel();
 
             Status = ComposerStreamStatus.Canceled;
         }

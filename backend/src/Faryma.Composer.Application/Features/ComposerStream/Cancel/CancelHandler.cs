@@ -24,8 +24,6 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Cancel
                 return stream;
             }
 
-            stream.ThrowIfCannotBeCancel();
-
             bool hasActiveOrders = await composerStreamStore.HasActiveOrders(stream.Id, ct);
             if (hasActiveOrders)
             {

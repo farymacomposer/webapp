@@ -25,8 +25,6 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Start
                 return stream;
             }
 
-            stream.ThrowIfCannotBeStart(dateTimeContext.Now);
-
             ComposerStreamEntity? live = await composerStreamStore.FindLiveStream(ct);
             if (live is not null)
             {
