@@ -1,8 +1,10 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Domain.Entities;
+using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Features.ComposerStream;
+using Faryma.Composer.Infrastructure.Features.ReviewOrder;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,6 +50,13 @@ namespace Faryma.Composer.Testing.Infrastructure
             CancellationToken cancellationToken = default) =>
             services.RunInScopeAsync(scoped =>
                 scoped.GetRequiredService<ComposerStreamStore>().GetStream(streamId, cancellationToken));
+
+        public static Task<ReviewOrderEntity> GetOrderAsync(
+            this IServiceProvider services,
+            long orderId,
+            CancellationToken cancellationToken = default) =>
+            services.RunInScopeAsync(scoped =>
+                scoped.GetRequiredService<ReviewOrderStore>().GetOrder(orderId, cancellationToken));
 
         public static Task<int> CountStreamsAsync(
             this IServiceProvider services,

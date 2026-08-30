@@ -23,17 +23,17 @@ namespace Faryma.Composer.Application.Features.ComposerStream.Complete
         {
             ComposerStreamEntity stream = await composerStreamStore.GetStream(command.ComposerStreamId, ct);
 
+            if (stream.Status == ComposerStreamStatus.Completed)
+            {
+                return stream;
+            }
+
             stream.ThrowIfCannotBeComplete();
 
             ReviewOrderEntity? orderInProgress = await reviewOrderStore.FindOrderInProgress(ct);
             if (orderInProgress is not null)
             {
                 throw new ComposerStreamException($"Невозможно завершить стрим, пока заказ Id: {orderInProgress.Id} находится в работе", stream);
-            }
-
-            if (stream.Status == ComposerStreamStatus.Completed)
-            {
-                return stream;
             }
 
             stream.Complete(dateTimeContext.Now);
