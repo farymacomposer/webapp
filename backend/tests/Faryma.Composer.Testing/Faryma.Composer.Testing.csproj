@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.14.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
@@ -20,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Faryma.Composer.Application\Faryma.Composer.Application.csproj" />
     <ProjectReference Include="..\..\src\Faryma.Composer.Infrastructure\Faryma.Composer.Infrastructure.csproj" />
   </ItemGroup>
 

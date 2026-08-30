@@ -3,10 +3,6 @@ using System.Net.Http.Json;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
 using Faryma.Composer.Domain;
-using Faryma.Composer.Infrastructure;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Faryma.Composer.Api.Test.Common
 {
@@ -142,17 +138,8 @@ namespace Faryma.Composer.Api.Test.Common
             return scenario;
         }
 
-        private static CustomWebApplicationFactory CreateAppWithNow(CustomWebApplicationFactory app, DateTime now)
-        {
-            return app.CreateDerivedFactory(builder =>
-            {
-                builder.ConfigureTestServices(services =>
-                {
-                    services.RemoveAll<DateTimeContext>();
-                    services.AddSingleton(new DateTimeContext(now));
-                });
-            });
-        }
+        private static CustomWebApplicationFactory CreateAppWithNow(CustomWebApplicationFactory app, DateTime now) =>
+            app.WithFixedDateTime(now);
 
         private static Task<HttpResponseMessage> SendAsync(
             HttpClient client,

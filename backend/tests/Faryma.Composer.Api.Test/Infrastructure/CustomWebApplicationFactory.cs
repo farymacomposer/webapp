@@ -16,21 +16,21 @@ namespace Faryma.Composer.Api.Test.Infrastructure
     public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         private readonly IReadOnlyDictionary<string, string?> _configuration;
+        private readonly string _databaseName;
         private readonly Action<IWebHostBuilder>? _configureWebHost;
         private readonly List<CustomWebApplicationFactory> _ownedFactories = [];
         private bool _ownedFactoriesDisposed;
 
-        public string DatabaseName { get; }
         public bool UsesDatabase { get; }
 
         private CustomWebApplicationFactory(
-            IReadOnlyDictionary<string, string?> configuration,
+                    IReadOnlyDictionary<string, string?> configuration,
             string databaseName,
             bool usesDatabase,
             Action<IWebHostBuilder>? configureWebHost = null)
         {
             _configuration = configuration;
-            DatabaseName = databaseName;
+            _databaseName = databaseName;
             UsesDatabase = usesDatabase;
             _configureWebHost = configureWebHost;
         }
@@ -59,6 +59,9 @@ namespace Faryma.Composer.Api.Test.Infrastructure
             AllowAutoRedirect = false,
         });
 
+        public CustomWebApplicationFactory WithFixedDateTime(DateTime now) =>
+            CreateDerivedFactory(builder => builder.ConfigureTestServices(services => services.AddFixedDateTimeContext(now)));
+
         public override async ValueTask DisposeAsync()
         {
             await DisposeOwnedFactoriesAsync();
@@ -71,7 +74,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure
 
             CustomWebApplicationFactory child = new(
                 _configuration,
-                DatabaseName,
+                _databaseName,
                 UsesDatabase,
                 CombineConfigureActions(_configureWebHost, configureWebHost));
             _ownedFactories.Add(child);
@@ -87,6 +90,7 @@ namespace Faryma.Composer.Api.Test.Infrastructure
             {
                 // Фоновый worker не нужен для smoke tests и добавляет лишнюю недетерминированность startup.
                 services.RemoveAll<IHostedService>();
+                services.AddTestOrderQueueNotificationService();
                 services.AddControllers().AddApplicationPart(typeof(TestAuthProbeController).Assembly);
 
                 if (!UsesDatabase)
@@ -124,11 +128,6 @@ namespace Faryma.Composer.Api.Test.Infrastructure
             configurationManager.AddInMemoryCollection(configuration);
 
             await PostgreSqlSchemaInitializer.EnsureCreatedAsync(configurationManager);
-        }
-
-        private sealed class NoDatabaseStartupInitializer : IApplicationStartupInitializer
-        {
-            public Task Initialize(IServiceProvider services) => Task.CompletedTask;
         }
 
         private static Action<IWebHostBuilder> CombineConfigureActions(
@@ -174,6 +173,11 @@ namespace Faryma.Composer.Api.Test.Infrastructure
             }
 
             _ownedFactories.Clear();
+        }
+
+        private sealed class NoDatabaseStartupInitializer : IApplicationStartupInitializer
+        {
+            public Task Initialize(IServiceProvider services) => Task.CompletedTask;
         }
     }
 }

@@ -1,17 +1,20 @@
 ﻿using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
+using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.Features.ComposerStream;
 using Faryma.Composer.Infrastructure.Features.ReviewOrder;
 using Faryma.Composer.Infrastructure.Features.UserNickname;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Faryma.Composer.Application.Test.Infrastructure
+namespace Faryma.Composer.Testing.Infrastructure
 {
     /// <summary>
-    /// Готовит тестовые данные для сценариев application-слоя.
+    /// Готовит тестовые данные для сценариев application- и API-слоя.
     /// </summary>
-    public sealed class TestDataBuilder(ApplicationTestHost app)
+    public sealed class TestDataBuilder(IServiceProvider services)
     {
         private const string _defaultTrackUrl = "https://example.com/track";
         private int _streamSequence;
@@ -19,9 +22,10 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         /// <summary>
         /// Создает пользователя для проверки сценариев, завязанных на автора действий.
         /// </summary>
-        public Task<UserEntity> CreateUserAsync(string? userName = null) => app.RunScopeAsync(async services =>
+        public Task<UserEntity> CreateUserAsync(string? userName = null) => services.RunInScopeAsync(async scoped =>
         {
-            UserManager<UserEntity> userManager = services.GetRequiredService<UserManager<UserEntity>>();
+            UserManager<UserEntity> userManager = scoped.GetRequiredService<UserManager<UserEntity>>();
+            DateTimeContext clock = scoped.GetRequiredService<DateTimeContext>();
             string actualUserName = userName ?? $"user-{Guid.NewGuid():N}";
 
             UserEntity user = new()
@@ -29,7 +33,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 Id = Guid.NewGuid(),
                 UserName = actualUserName,
                 Email = $"{actualUserName}@example.com",
-                CreatedAt = app.FixedNow,
+                CreatedAt = clock.Now,
             };
 
             IdentityResult result = await userManager.CreateAsync(user);
@@ -50,15 +54,16 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             ComposerStreamStatus status = ComposerStreamStatus.Planned,
             DateTime? startedAt = null,
             DateTime? completedAt = null) =>
-            app.RunScopeAsync(async services =>
+            services.RunInScopeAsync(async scoped =>
             {
-                ComposerStreamStore composerStreamStore = services.GetRequiredService<ComposerStreamStore>();
-                UserManager<UserEntity> userManager = services.GetRequiredService<UserManager<UserEntity>>();
-                AppDbContext db = services.GetRequiredService<AppDbContext>();
+                ComposerStreamStore composerStreamStore = scoped.GetRequiredService<ComposerStreamStore>();
+                UserManager<UserEntity> userManager = scoped.GetRequiredService<UserManager<UserEntity>>();
+                DateTimeContext clock = scoped.GetRequiredService<DateTimeContext>();
+                AppDbContext db = scoped.GetRequiredService<AppDbContext>();
 
-                UserEntity createdByUser = await GetOrCreateUserAsync(userManager, createdByUserId, "stream");
+                UserEntity createdByUser = await GetOrCreateUserAsync(userManager, clock.Now, createdByUserId, "stream");
                 ComposerStreamEntity stream = composerStreamStore.CreateStream(
-                    eventDate ?? GetNextStreamDate(),
+                    eventDate ?? GetNextStreamDate(clock.Today),
                     type,
                     createdByUser);
 
@@ -93,26 +98,29 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             DateTime? canceledAt = null,
             string? cancelReason = null,
             int? reviewRating = null) =>
-            app.RunScopeAsync(async services =>
+            services.RunInScopeAsync(async scoped =>
             {
-                ComposerStreamStore composerStreamStore = services.GetRequiredService<ComposerStreamStore>();
-                ReviewOrderStore reviewOrderStore = services.GetRequiredService<ReviewOrderStore>();
-                ReviewStore reviewStore = services.GetRequiredService<ReviewStore>();
-                TransactionStore transactionStore = services.GetRequiredService<TransactionStore>();
-                UserNicknameStore userNicknameStore = services.GetRequiredService<UserNicknameStore>();
-                UserManager<UserEntity> userManager = services.GetRequiredService<UserManager<UserEntity>>();
-                AppDbContext db = services.GetRequiredService<AppDbContext>();
+                ComposerStreamStore composerStreamStore = scoped.GetRequiredService<ComposerStreamStore>();
+                ReviewOrderStore reviewOrderStore = scoped.GetRequiredService<ReviewOrderStore>();
+                ReviewStore reviewStore = scoped.GetRequiredService<ReviewStore>();
+                TransactionStore transactionStore = scoped.GetRequiredService<TransactionStore>();
+                UserNicknameStore userNicknameStore = scoped.GetRequiredService<UserNicknameStore>();
+                UserManager<UserEntity> userManager = scoped.GetRequiredService<UserManager<UserEntity>>();
+                DateTimeContext clock = scoped.GetRequiredService<DateTimeContext>();
+                AppDbContext db = scoped.GetRequiredService<AppDbContext>();
 
-                UserEntity createdByUser = await GetOrCreateUserAsync(userManager, createdByUserId, "order");
+                UserEntity createdByUser = await GetOrCreateUserAsync(userManager, clock.Now, createdByUserId, "order");
                 ComposerStreamEntity creationStream = await GetOrCreateCreationStreamAsync(
                     composerStreamStore,
                     db,
                     createdByUser,
+                    clock.Today,
                     creationStreamId);
                 ComposerStreamEntity? processingStream = await GetOrCreateProcessingStreamAsync(
                     composerStreamStore,
                     db,
                     createdByUser,
+                    clock,
                     processingStreamId,
                     status);
                 UserNicknameEntity userNickname = await GetOrCreateNicknameAsync(userNicknameStore, db, nickname);
@@ -191,8 +199,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             return created;
         }
 
-        private async Task<UserEntity> GetOrCreateUserAsync(
+        private static async Task<UserEntity> GetOrCreateUserAsync(
             UserManager<UserEntity> userManager,
+            DateTime createdAt,
             Guid? userId,
             string prefix)
         {
@@ -207,7 +216,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 Id = Guid.NewGuid(),
                 UserName = actualUserName,
                 Email = $"{actualUserName}@example.com",
-                CreatedAt = app.FixedNow,
+                CreatedAt = createdAt,
             };
 
             IdentityResult result = await userManager.CreateAsync(user);
@@ -222,6 +231,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             ComposerStreamStore composerStreamStore,
             AppDbContext db,
             UserEntity createdByUser,
+            DateOnly today,
             long? creationStreamId)
         {
             if (creationStreamId is long existingStreamId)
@@ -230,7 +240,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             }
 
             ComposerStreamEntity stream = composerStreamStore.CreateStream(
-                GetNextStreamDate(),
+                GetNextStreamDate(today),
                 ComposerStreamType.Donation,
                 createdByUser);
             await db.SaveChangesAsync();
@@ -242,6 +252,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             ComposerStreamStore composerStreamStore,
             AppDbContext db,
             UserEntity createdByUser,
+            DateTimeContext clock,
             long? processingStreamId,
             ReviewOrderStatus status)
         {
@@ -256,17 +267,17 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             }
 
             ComposerStreamEntity stream = composerStreamStore.CreateStream(
-                GetNextStreamDate(),
+                GetNextStreamDate(clock.Today),
                 ComposerStreamType.Donation,
                 createdByUser);
             stream.Status = ComposerStreamStatus.Live;
-            stream.StartedAt = app.FixedNow;
+            stream.StartedAt = clock.Now;
 
             await db.SaveChangesAsync();
 
             return stream;
         }
 
-        private DateOnly GetNextStreamDate() => app.Today.AddDays(Interlocked.Increment(ref _streamSequence) - 1);
+        private DateOnly GetNextStreamDate(DateOnly today) => today.AddDays(Interlocked.Increment(ref _streamSequence) - 1);
     }
 }

@@ -1,4 +1,4 @@
-namespace Faryma.Composer.Testing.Infrastructure
+﻿namespace Faryma.Composer.Testing.Infrastructure
 {
     public static class PostgreSqlTestConfiguration
     {

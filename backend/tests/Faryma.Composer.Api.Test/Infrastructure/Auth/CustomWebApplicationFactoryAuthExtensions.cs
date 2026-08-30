@@ -50,13 +50,15 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
                 throw new InvalidOperationException("Для вспомогательного метода создания bearer-клиента администратора требуется тестовый пароль");
             }
 
-            await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
-            AuthTokenService authTokenService = scope.ServiceProvider.GetRequiredService<AuthTokenService>();
-            UserManager<UserEntity> userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
-            UserEntity user = await userManager.FindByIdAsync(admin.UserId.ToString())
-                ?? throw new InvalidOperationException($"Не удалось загрузить тестового администратора '{admin.UserName}'");
+            (string accessToken, _) = await app.Services.RunInScopeAsync(async scoped =>
+            {
+                AuthTokenService authTokenService = scoped.GetRequiredService<AuthTokenService>();
+                UserManager<UserEntity> userManager = scoped.GetRequiredService<UserManager<UserEntity>>();
+                UserEntity user = await userManager.FindByIdAsync(admin.UserId.ToString())
+                    ?? throw new InvalidOperationException($"Не удалось загрузить тестового администратора '{admin.UserName}'");
 
-            (string accessToken, _) = await authTokenService.IssueForUser(user, ct);
+                return await authTokenService.IssueForUser(user, ct);
+            });
 
             HttpClient client = app.CreateAnonymousClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -136,72 +138,72 @@ namespace Faryma.Composer.Api.Test.Infrastructure.Auth
                 seed.Roles);
         }
 
-        private static async Task<SeededAuthUser> EnsureUserAsync(
+        private static Task<SeededAuthUser> EnsureUserAsync(
             this CustomWebApplicationFactory app,
             TestAuthUserSeed seed,
-            CancellationToken ct)
-        {
-            await using AsyncServiceScope scope = app.Services.CreateAsyncScope();
-            UserManager<UserEntity> userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
-            RoleManager<IdentityRole<Guid>> roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-
-            UserEntity? user = await userManager.FindByNameAsync(seed.UserName);
-            if (user is null && !string.IsNullOrWhiteSpace(seed.TwitchUserId))
+            CancellationToken ct) =>
+            app.Services.RunInScopeAsync(async scoped =>
             {
-                user = await userManager.Users.FirstOrDefaultAsync(x => x.TwitchUserId == seed.TwitchUserId, ct);
-            }
+                UserManager<UserEntity> userManager = scoped.GetRequiredService<UserManager<UserEntity>>();
+                RoleManager<IdentityRole<Guid>> roleManager = scoped.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
-            if (user is null)
-            {
-                user = new UserEntity
+                UserEntity? user = await userManager.FindByNameAsync(seed.UserName);
+                if (user is null && !string.IsNullOrWhiteSpace(seed.TwitchUserId))
                 {
-                    Id = Guid.NewGuid(),
-                    UserName = seed.UserName,
-                    NormalizedUserName = userManager.NormalizeName(seed.UserName),
-                    TwitchUserId = seed.TwitchUserId,
-                    TwitchLogin = seed.TwitchLogin,
-                    CreatedAt = DateTime.UtcNow,
-                };
-
-                await EnsureSuccess(await userManager.CreateAsync(user), $"Не удалось создать тестового пользователя '{seed.UserName}'");
-            }
-            else
-            {
-                var changed = false;
-
-                if (!string.Equals(user.UserName, seed.UserName, StringComparison.Ordinal))
-                {
-                    user.UserName = seed.UserName;
-                    user.NormalizedUserName = userManager.NormalizeName(seed.UserName);
-                    changed = true;
+                    user = await userManager.Users.FirstOrDefaultAsync(x => x.TwitchUserId == seed.TwitchUserId, ct);
                 }
 
-                if (!string.Equals(user.TwitchUserId, seed.TwitchUserId, StringComparison.Ordinal))
+                if (user is null)
                 {
-                    user.TwitchUserId = seed.TwitchUserId;
-                    changed = true;
+                    user = new UserEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        UserName = seed.UserName,
+                        NormalizedUserName = userManager.NormalizeName(seed.UserName),
+                        TwitchUserId = seed.TwitchUserId,
+                        TwitchLogin = seed.TwitchLogin,
+                        CreatedAt = DateTime.UtcNow,
+                    };
+
+                    await EnsureSuccess(await userManager.CreateAsync(user), $"Не удалось создать тестового пользователя '{seed.UserName}'");
+                }
+                else
+                {
+                    var changed = false;
+
+                    if (!string.Equals(user.UserName, seed.UserName, StringComparison.Ordinal))
+                    {
+                        user.UserName = seed.UserName;
+                        user.NormalizedUserName = userManager.NormalizeName(seed.UserName);
+                        changed = true;
+                    }
+
+                    if (!string.Equals(user.TwitchUserId, seed.TwitchUserId, StringComparison.Ordinal))
+                    {
+                        user.TwitchUserId = seed.TwitchUserId;
+                        changed = true;
+                    }
+
+                    if (!string.Equals(user.TwitchLogin, seed.TwitchLogin, StringComparison.Ordinal))
+                    {
+                        user.TwitchLogin = seed.TwitchLogin;
+                        changed = true;
+                    }
+
+                    if (changed)
+                    {
+                        await EnsureSuccess(await userManager.UpdateAsync(user), $"Не удалось обновить тестового пользователя '{seed.UserName}'");
+                    }
                 }
 
-                if (!string.Equals(user.TwitchLogin, seed.TwitchLogin, StringComparison.Ordinal))
+                if (!string.IsNullOrWhiteSpace(seed.Password))
                 {
-                    user.TwitchLogin = seed.TwitchLogin;
-                    changed = true;
+                    await SyncPasswordAsync(userManager, user, seed.Password);
                 }
 
-                if (changed)
-                {
-                    await EnsureSuccess(await userManager.UpdateAsync(user), $"Не удалось обновить тестового пользователя '{seed.UserName}'");
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(seed.Password))
-            {
-                await SyncPasswordAsync(userManager, user, seed.Password);
-            }
-
-            IReadOnlyCollection<string> roles = await SyncRolesAsync(userManager, roleManager, user, seed.Roles);
-            return new SeededAuthUser(user.Id, user.UserName!, seed.Password, user.TwitchUserId, user.TwitchLogin, roles);
-        }
+                IReadOnlyCollection<string> roles = await SyncRolesAsync(userManager, roleManager, user, seed.Roles);
+                return new SeededAuthUser(user.Id, user.UserName!, seed.Password, user.TwitchUserId, user.TwitchLogin, roles);
+            });
 
         private static async Task SyncPasswordAsync(
             UserManager<UserEntity> userManager,

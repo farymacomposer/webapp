@@ -100,15 +100,15 @@ namespace Faryma.Composer.Api.Test.Auth
             using HttpClient client = concurrentApp.CreateAnonymousClient();
             AuthTokensDto tokens = await Login(client, admin);
 
-            await using (AsyncServiceScope scope = concurrentApp.Services.CreateAsyncScope())
+            await concurrentApp.Services.RunInScopeAsync(async scoped =>
             {
-                AppDbContext appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                AppDbContext appDbContext = scoped.GetRequiredService<AppDbContext>();
                 RefreshTokenEntity stored = await appDbContext.RefreshTokens.SingleAsync(
                     token => token.UserId == admin.UserId,
                     TestContext.Current.CancellationToken);
                 stored.ExpiresAt = DateTime.UtcNow.AddMinutes(-1);
                 await appDbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
-            }
+            });
 
             barrier.Arm();
             Task<HttpResponseMessage> firstTask = Refresh(client, tokens.RefreshToken);

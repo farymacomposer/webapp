@@ -1,4 +1,4 @@
-using Faryma.Composer.Infrastructure;
+﻿using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

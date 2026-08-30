@@ -1,18 +1,20 @@
 ﻿using Faryma.Composer.Application.DependencyInjection;
 using Faryma.Composer.Application.Features.AppSettings;
 using Faryma.Composer.Application.Features.OrderQueue;
-using Faryma.Composer.Application.Features.OrderQueue.Events;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
+using Faryma.Composer.Infrastructure;
 using Faryma.Composer.Infrastructure.DependencyInjection;
-using Faryma.Composer.Infrastructure.Features.ComposerStream;
 using Faryma.Composer.Infrastructure.Features.ReviewOrder;
 using Mediator;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
-namespace Faryma.Composer.Application.Test.Infrastructure
+namespace Faryma.Composer.Testing.Infrastructure
 {
     /// <summary>
     /// Поднимает тестовый host приложения с изолированной базой и фиксированным временем.
@@ -20,8 +22,6 @@ namespace Faryma.Composer.Application.Test.Infrastructure
     public sealed class ApplicationTestHost : IAsyncDisposable
     {
         private readonly IHost _host;
-        private readonly OrderQueueService _orderQueueService;
-        private readonly OrderQueueEventChannel _orderQueueEventChannel;
 
         /// <summary>
         /// Возвращает фиксированный момент времени, используемый в проверках.
@@ -53,9 +53,7 @@ namespace Faryma.Composer.Application.Test.Infrastructure
             _host = host;
             FixedNow = fixedNow;
             Notifications = (TestOrderQueueNotificationService)_host.Services.GetRequiredService<IOrderQueueNotificationService>();
-            _orderQueueService = _host.Services.GetRequiredService<OrderQueueService>();
-            _orderQueueEventChannel = _host.Services.GetRequiredService<OrderQueueEventChannel>();
-            Data = new TestDataBuilder(this);
+            Data = new TestDataBuilder(_host.Services);
         }
 
         /// <summary>
@@ -72,10 +70,9 @@ namespace Faryma.Composer.Application.Test.Infrastructure
                 HostApplicationBuilder builder = Host.CreateApplicationBuilder();
                 builder.Configuration.AddInMemoryCollection(PostgreSqlTestConfiguration.CreatePostgreSqlSettings(fixture, databaseName));
 
-                builder.Services.AddSingleton<IOrderQueueNotificationService, TestOrderQueueNotificationService>();
+                builder.Services.AddTestOrderQueueNotificationService();
                 builder.Services.AddPersistence(builder.Configuration);
-                builder.Services.RemoveAll<DateTimeContext>();
-                builder.Services.AddSingleton(new DateTimeContext(fixedNow));
+                builder.Services.AddFixedDateTimeContext(fixedNow);
                 builder.Services
                     .AddIdentityCore<UserEntity>()
                     .AddRoles<IdentityRole<Guid>>()
@@ -109,32 +106,19 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         /// <summary>
         /// Выполняет действие в отдельном DI scope и возвращает результат.
         /// </summary>
-        public async Task<T> RunScopeAsync<T>(Func<IServiceProvider, Task<T>> action)
-        {
-            await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
-
-            return await action(scope.ServiceProvider);
-        }
+        public Task<T> RunScopeAsync<T>(Func<IServiceProvider, Task<T>> action) =>
+            _host.Services.RunInScopeAsync(action);
 
         /// <summary>
         /// Выполняет действие в отдельном DI scope без возвращаемого значения.
         /// </summary>
-        public async Task RunScopeAsync(Func<IServiceProvider, Task> action)
-        {
-            await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
-            await action(scope.ServiceProvider);
-        }
+        public Task RunScopeAsync(Func<IServiceProvider, Task> action) =>
+            _host.Services.RunInScopeAsync(action);
 
         /// <summary>
         /// Обрабатывает накопленные события очереди перед проверкой результата.
         /// </summary>
-        public async Task DrainQueueEventsAsync()
-        {
-            while (_orderQueueEventChannel.TryRead(out OrderQueueEvent? evt) && evt is not null)
-            {
-                await _orderQueueService.HandleEvent(evt);
-            }
-        }
+        public Task DrainQueueEventsAsync() => _host.Services.DrainOrderQueueEventsAsync();
 
         /// <summary>
         /// Загружает заказ из базы для последующей проверки его состояния.
@@ -150,8 +134,8 @@ namespace Faryma.Composer.Application.Test.Infrastructure
         /// <summary>
         /// Загружает стрим из базы для проверки сохраненных изменений.
         /// </summary>
-        public Task<ComposerStreamEntity> GetStreamAsync(long streamId) => RunScopeAsync(services =>
-            services.GetRequiredService<ComposerStreamStore>().GetStream(streamId, CancellationToken.None));
+        public Task<ComposerStreamEntity> GetStreamAsync(long streamId) =>
+            _host.Services.GetStreamAsync(streamId);
 
         /// <summary>
         /// Возвращает транзакции заказа, чтобы проверить финансовые эффекты сценария.

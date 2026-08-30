@@ -1,7 +1,7 @@
 ﻿using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Application.Features.OrderQueue.Models;
 
-namespace Faryma.Composer.Application.Test.Infrastructure
+namespace Faryma.Composer.Testing.Infrastructure
 {
     /// <summary>
     /// Сохраняет уведомления очереди, чтобы тесты могли проверить факт обновления.
