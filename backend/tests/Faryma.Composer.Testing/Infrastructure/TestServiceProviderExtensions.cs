@@ -44,6 +44,9 @@ namespace Faryma.Composer.Testing.Infrastructure
             }
         }
 
+        public static TestOrderQueueNotificationService GetOrderQueueNotifications(this IServiceProvider services) =>
+            (TestOrderQueueNotificationService)services.GetRequiredService<IOrderQueueNotificationService>();
+
         public static Task<ComposerStreamEntity> GetStreamAsync(
             this IServiceProvider services,
             long streamId,

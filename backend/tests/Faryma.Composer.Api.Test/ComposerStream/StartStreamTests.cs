@@ -1,17 +1,14 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Faryma.Composer.Api.Features.ComposerStream.Start;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
-using Faryma.Composer.Application.Features.OrderQueue;
 using Faryma.Composer.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Domain.Exceptions;
-using Microsoft.Extensions.DependencyInjection;
+using static Faryma.Composer.Api.Test.Infrastructure.DateTimeTestAssertions;
 
 namespace Faryma.Composer.Api.Test.ComposerStream
 {
@@ -21,11 +18,6 @@ namespace Faryma.Composer.Api.Test.ComposerStream
 
         private static readonly DateTime _now = TruncateToMilliseconds(DateTime.UtcNow);
         private static readonly DateOnly _today = DateOnly.FromDateTime(_now);
-
-        private static readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
-        {
-            Converters = { new JsonStringEnumConverter() },
-        };
 
         [Theory]
         [InlineData(ComposerStreamType.Donation)]
@@ -56,7 +48,7 @@ namespace Faryma.Composer.Api.Test.ComposerStream
             AssertSameInstant(_now, persisted.StartedAt);
             Assert.Null(persisted.CompletedAt);
 
-            TestOrderQueueNotificationService notifications = GetNotifications(timed);
+            TestOrderQueueNotificationService notifications = timed.Services.GetOrderQueueNotifications();
             Assert.Equal(1, notifications.UpdateCount);
             Assert.Equal(OrderQueueUpdateType.StreamStarted, notifications.Snapshots.Single().OrderQueueUpdateType);
         }
@@ -87,7 +79,7 @@ namespace Faryma.Composer.Api.Test.ComposerStream
             Assert.Equal(ComposerStreamStatus.Live, persisted.Status);
             AssertSameInstant(_now, persisted.StartedAt);
 
-            TestOrderQueueNotificationService notifications = GetNotifications(timed);
+            TestOrderQueueNotificationService notifications = timed.Services.GetOrderQueueNotifications();
             Assert.Equal(1, notifications.UpdateCount);
             Assert.Equal(OrderQueueUpdateType.StreamStarted, notifications.Snapshots.Single().OrderQueueUpdateType);
         }
@@ -117,7 +109,7 @@ namespace Faryma.Composer.Api.Test.ComposerStream
             ComposerStreamEntity persisted = await timed.Services.GetStreamAsync(stream.Id, TestContext.Current.CancellationToken);
             Assert.Equal(ComposerStreamStatus.Live, persisted.Status);
             AssertSameInstant(startedAt, persisted.StartedAt);
-            Assert.Equal(0, GetNotifications(timed).UpdateCount);
+            Assert.Equal(0, timed.Services.GetOrderQueueNotifications().UpdateCount);
         }
 
         [Theory]
@@ -136,13 +128,12 @@ namespace Faryma.Composer.Api.Test.ComposerStream
             await timed.Services.DrainOrderQueueEventsAsync();
 
             Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-            Assert.Equal(nameof(ComposerStreamException), json.RootElement.GetProperty("ExceptionType").GetString());
+            await response.AssertApiErrorAsync(nameof(ComposerStreamException));
 
             ComposerStreamEntity persisted = await timed.Services.GetStreamAsync(stream.Id, TestContext.Current.CancellationToken);
             Assert.Equal(ComposerStreamStatus.Planned, persisted.Status);
             Assert.Null(persisted.StartedAt);
-            Assert.Equal(0, GetNotifications(timed).UpdateCount);
+            Assert.Equal(0, timed.Services.GetOrderQueueNotifications().UpdateCount);
         }
 
         [Fact]
@@ -163,8 +154,7 @@ namespace Faryma.Composer.Api.Test.ComposerStream
             await timed.Services.DrainOrderQueueEventsAsync();
 
             Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-            Assert.Equal(nameof(ComposerStreamException), json.RootElement.GetProperty("ExceptionType").GetString());
+            await response.AssertApiErrorAsync(nameof(ComposerStreamException));
 
             ComposerStreamEntity persistedLive = await timed.Services.GetStreamAsync(live.Id, TestContext.Current.CancellationToken);
             ComposerStreamEntity persistedPlanned = await timed.Services.GetStreamAsync(planned.Id, TestContext.Current.CancellationToken);
@@ -172,7 +162,7 @@ namespace Faryma.Composer.Api.Test.ComposerStream
             AssertSameInstant(liveStartedAt, persistedLive.StartedAt);
             Assert.Equal(ComposerStreamStatus.Planned, persistedPlanned.Status);
             Assert.Null(persistedPlanned.StartedAt);
-            Assert.Equal(0, GetNotifications(timed).UpdateCount);
+            Assert.Equal(0, timed.Services.GetOrderQueueNotifications().UpdateCount);
         }
 
         [Theory]
@@ -196,14 +186,13 @@ namespace Faryma.Composer.Api.Test.ComposerStream
             await timed.Services.DrainOrderQueueEventsAsync();
 
             Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-            Assert.Equal(nameof(ComposerStreamException), json.RootElement.GetProperty("ExceptionType").GetString());
+            await response.AssertApiErrorAsync(nameof(ComposerStreamException));
 
             ComposerStreamEntity persisted = await timed.Services.GetStreamAsync(stream.Id, TestContext.Current.CancellationToken);
             Assert.Equal(status, persisted.Status);
             AssertSameInstant(startedAt, persisted.StartedAt);
             AssertSameInstant(completedAt, persisted.CompletedAt);
-            Assert.Equal(0, GetNotifications(timed).UpdateCount);
+            Assert.Equal(0, timed.Services.GetOrderQueueNotifications().UpdateCount);
         }
 
         [Fact]
@@ -217,10 +206,9 @@ namespace Faryma.Composer.Api.Test.ComposerStream
             await timed.Services.DrainOrderQueueEventsAsync();
 
             Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-            Assert.Equal(nameof(NotFoundException), json.RootElement.GetProperty("ExceptionType").GetString());
+            await response.AssertApiErrorAsync(nameof(NotFoundException));
             Assert.Equal(0, await timed.Services.CountStreamsAsync(TestContext.Current.CancellationToken));
-            Assert.Equal(0, GetNotifications(timed).UpdateCount);
+            Assert.Equal(0, timed.Services.GetOrderQueueNotifications().UpdateCount);
         }
 
         [Fact]
@@ -235,7 +223,7 @@ namespace Faryma.Composer.Api.Test.ComposerStream
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             Assert.Equal(0, await timed.Services.CountStreamsAsync(TestContext.Current.CancellationToken));
-            Assert.Equal(0, GetNotifications(timed).UpdateCount);
+            Assert.Equal(0, timed.Services.GetOrderQueueNotifications().UpdateCount);
         }
 
         [Fact]
@@ -275,31 +263,13 @@ namespace Faryma.Composer.Api.Test.ComposerStream
                 {
                     ComposerStreamId = composerStreamId,
                 },
-                _jsonOptions,
+                TestJsonSerializerOptions.Web,
                 TestContext.Current.CancellationToken);
 
         private static async Task<StartResponse> ReadStartResponseAsync(HttpResponseMessage response)
         {
-            return await response.Content.ReadFromJsonAsync<StartResponse>(_jsonOptions, TestContext.Current.CancellationToken)
+            return await response.Content.ReadFromJsonAsync<StartResponse>(TestJsonSerializerOptions.Web, TestContext.Current.CancellationToken)
                 ?? throw new InvalidOperationException("Не удалось десериализовать ответ запуска стрима");
         }
-
-        private static TestOrderQueueNotificationService GetNotifications(CustomWebApplicationFactory app) =>
-            (TestOrderQueueNotificationService)app.Services.GetRequiredService<IOrderQueueNotificationService>();
-
-        private static void AssertSameInstant(DateTime? expected, DateTime? actual)
-        {
-            if (expected is null)
-            {
-                Assert.Null(actual);
-                return;
-            }
-
-            Assert.NotNull(actual);
-            Assert.Equal(TruncateToMilliseconds(expected.Value), TruncateToMilliseconds(actual.Value));
-        }
-
-        private static DateTime TruncateToMilliseconds(DateTime value) =>
-            new(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second, value.Millisecond, DateTimeKind.Utc);
     }
 }
