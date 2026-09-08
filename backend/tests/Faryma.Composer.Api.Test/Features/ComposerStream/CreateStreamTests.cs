@@ -7,7 +7,6 @@ using Faryma.Composer.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Domain.Exceptions;
 
 namespace Faryma.Composer.Api.Test.Features.ComposerStream
 {
@@ -129,8 +128,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostCreateAsync(client, eventDate, ComposerStreamType.Charity);
             await app.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            string? message = await response.AssertApiErrorAsync(nameof(ComposerStreamException));
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            string? message = await response.AssertApiErrorAsync("composer_stream");
             Assert.Contains("уже существует", message, StringComparison.Ordinal);
             Assert.Equal(1, await app.Services.CountStreamsAsync(TestContext.Current.CancellationToken));
             Assert.Equal(0, app.Services.GetOrderQueueNotifications().UpdateCount);
@@ -149,8 +148,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             await app.Services.DrainOrderQueueEventsAsync();
 
             Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
-            Assert.Equal(AppException.StatusCode, (int)secondResponse.StatusCode);
-            string? message = await secondResponse.AssertApiErrorAsync(nameof(ComposerStreamException));
+            Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
+            string? message = await secondResponse.AssertApiErrorAsync("composer_stream");
             Assert.DoesNotContain(first.ComposerStream.Id.ToString(), message, StringComparison.Ordinal);
             Assert.Equal(1, await app.Services.CountStreamsAsync(TestContext.Current.CancellationToken));
             Assert.Equal(1, app.Services.GetOrderQueueNotifications().UpdateCount);

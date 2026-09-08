@@ -1,8 +1,7 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Faryma.Composer.Domain.Exceptions
+﻿namespace Faryma.Composer.Domain.Exceptions
 {
-    public sealed class NotFoundException(string? message, [CallerMemberName] string callerMemberName = null!) : AppException(message, callerMemberName)
+    public sealed class NotFoundException(string? message) : AppException(message)
     {
+        public override int StatusCode => 404;
     }
 }

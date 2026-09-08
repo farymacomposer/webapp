@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Security.Authentication;
+﻿using System.Security.Authentication;
 using Faryma.Composer.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +18,5 @@ namespace Faryma.Composer.Api.Test.Infrastructure
         public IActionResult ThrowUnhandledException() => throw new InvalidOperationException("Тестовая непредвиденная ошибка");
     }
 
-    internal sealed class TestApiException([CallerMemberName] string callerMemberName = "")
-        : AppException("Тестовая ошибка API", callerMemberName);
+    internal sealed class TestApiException() : AppException("Тестовая ошибка API");
 }

@@ -86,7 +86,7 @@ namespace Faryma.Composer.Api.Test.Common
 
             TestIdempotencyResponse retry = await ReadResponseAsync(retryResponse);
 
-            Assert.Equal(666, (int)failedResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Conflict, failedResponse.StatusCode);
             Assert.Equal(HttpStatusCode.OK, retryResponse.StatusCode);
             Assert.Equal(new TestIdempotencyResponse(scenario, "retry-after-error", 1), retry);
             Assert.Equal(1, TestIdempotencyController.GetExecutionCount(scenario));

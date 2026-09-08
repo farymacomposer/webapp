@@ -29,9 +29,24 @@ namespace Faryma.Composer.Api.Common.Exceptions
                 }
                 case AppException appException:
                 {
-                    await WriteJson(httpContext, AppException.StatusCode, appException.GetResultObject(), cancellationToken);
+                    logger.LogInformation("Business error {Code}: {Message} {@Context}", appException.Code, appException.Message, appException.Context);
 
-                    return true;
+                    ProblemDetails problemDetails = new()
+                    {
+                        Type = $"urn:composer:error:{appException.Code}",
+                        Title = "Ошибка бизнес-логики",
+                        Status = appException.StatusCode,
+                        Detail = appException.Message,
+                    };
+
+                    httpContext.Response.StatusCode = appException.StatusCode;
+
+                    return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+                    {
+                        HttpContext = httpContext,
+                        Exception = exception,
+                        ProblemDetails = problemDetails
+                    });
                 }
                 default:
                 {

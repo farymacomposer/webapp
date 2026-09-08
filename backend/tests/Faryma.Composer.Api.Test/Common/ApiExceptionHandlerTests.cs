@@ -1,24 +1,25 @@
 ﻿using System.Net;
 using System.Text.Json;
 using Faryma.Composer.Api.Test.Infrastructure;
-using Faryma.Composer.Domain.Exceptions;
 
 namespace Faryma.Composer.Api.Test.Common
 {
     public sealed class ApiExceptionHandlerTests : TestBase
     {
         [Fact]
-        public async Task AppException_IsMappedToLegacyApiErrorPayload()
+        public async Task AppException_IsMappedToProblemDetails()
         {
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
             using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/app", TestContext.Current.CancellationToken);
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-            Assert.Equal(nameof(TestApiException), json.RootElement.GetProperty("ExceptionType").GetString());
-            Assert.Equal("Тестовая ошибка API", json.RootElement.GetProperty("Message").GetString());
+            Assert.Equal("urn:composer:error:test_api", json.RootElement.GetProperty("type").GetString());
+            Assert.Equal("Ошибка бизнес-логики", json.RootElement.GetProperty("title").GetString());
+            Assert.Equal(409, json.RootElement.GetProperty("status").GetInt32());
+            Assert.Equal("Тестовая ошибка API", json.RootElement.GetProperty("detail").GetString());
         }
 
         [Fact]

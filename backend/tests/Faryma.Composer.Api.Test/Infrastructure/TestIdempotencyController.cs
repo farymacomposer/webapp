@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 using Faryma.Composer.Api.Common.Attributes;
 using Faryma.Composer.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
@@ -52,6 +51,5 @@ namespace Faryma.Composer.Api.Test.Infrastructure
 
     public sealed record TestIdempotencyResponse(string Scenario, string Value, int Executions);
 
-    internal sealed class TestIdempotencyException([CallerMemberName] string callerMemberName = "")
-        : AppException("Тестовая ошибка идемпотентного endpoint", callerMemberName);
+    internal sealed class TestIdempotencyException() : AppException("Тестовая ошибка идемпотентного endpoint");
 }

@@ -11,7 +11,6 @@ using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Entities.TransactionSources;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Domain.Exceptions;
 using Faryma.Composer.Infrastructure.Features.OrderQueue;
 using Microsoft.Extensions.DependencyInjection;
 using static Faryma.Composer.Api.Test.Infrastructure.DateTimeTestAssertions;
@@ -187,8 +186,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostCancelAsync(client, stream.Id);
             await timed.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            string? activeOrderMessage = await response.AssertApiErrorAsync(nameof(ComposerStreamException));
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            string? activeOrderMessage = await response.AssertApiErrorAsync("composer_stream");
             Assert.Contains("невозможно отменить стрим", activeOrderMessage, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("активные заказы", activeOrderMessage, StringComparison.OrdinalIgnoreCase);
 
@@ -219,8 +218,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostCancelAsync(client, stream.Id);
             await timed.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            string? frozenMessage = await response.AssertApiErrorAsync(nameof(ComposerStreamException));
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            string? frozenMessage = await response.AssertApiErrorAsync("composer_stream");
             Assert.Contains("активные заказы", frozenMessage, StringComparison.OrdinalIgnoreCase);
 
             ComposerStreamEntity persisted = await timed.Services.GetStreamAsync(stream.Id, TestContext.Current.CancellationToken);
@@ -277,8 +276,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostCancelAsync(client, stream.Id);
             await timed.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            string? message = await response.AssertApiErrorAsync(nameof(ComposerStreamException));
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            string? message = await response.AssertApiErrorAsync("composer_stream");
             Assert.Contains("невозможно отменить стрим", message, StringComparison.OrdinalIgnoreCase);
 
             ComposerStreamEntity persisted = await timed.Services.GetStreamAsync(stream.Id, TestContext.Current.CancellationToken);
@@ -306,8 +305,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostCancelAsync(client, stream.Id);
             await timed.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            string? message = await response.AssertApiErrorAsync(nameof(ComposerStreamException));
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            string? message = await response.AssertApiErrorAsync("composer_stream");
             Assert.Contains("невозможно отменить стрим", message, StringComparison.OrdinalIgnoreCase);
 
             ComposerStreamEntity persisted = await timed.Services.GetStreamAsync(stream.Id, TestContext.Current.CancellationToken);
@@ -327,8 +326,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostCancelAsync(client, 999_999);
             await timed.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            await response.AssertApiErrorAsync(nameof(NotFoundException));
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            await response.AssertApiErrorAsync("not_found");
             Assert.Equal(0, await timed.Services.CountStreamsAsync(TestContext.Current.CancellationToken));
             Assert.Equal(0, timed.Services.GetOrderQueueNotifications().UpdateCount);
         }

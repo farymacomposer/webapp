@@ -7,7 +7,6 @@ using Faryma.Composer.Application.Features.OrderQueue.Enums;
 using Faryma.Composer.Domain;
 using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Enums;
-using Faryma.Composer.Domain.Exceptions;
 using static Faryma.Composer.Api.Test.Infrastructure.DateTimeTestAssertions;
 
 namespace Faryma.Composer.Api.Test.Features.ComposerStream
@@ -127,8 +126,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostStartAsync(client, stream.Id);
             await timed.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            await response.AssertApiErrorAsync(nameof(ComposerStreamException));
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            await response.AssertApiErrorAsync("composer_stream");
 
             ComposerStreamEntity persisted = await timed.Services.GetStreamAsync(stream.Id, TestContext.Current.CancellationToken);
             Assert.Equal(ComposerStreamStatus.Planned, persisted.Status);
@@ -153,8 +152,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostStartAsync(client, planned.Id);
             await timed.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            await response.AssertApiErrorAsync(nameof(ComposerStreamException));
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            await response.AssertApiErrorAsync("composer_stream");
 
             ComposerStreamEntity persistedLive = await timed.Services.GetStreamAsync(live.Id, TestContext.Current.CancellationToken);
             ComposerStreamEntity persistedPlanned = await timed.Services.GetStreamAsync(planned.Id, TestContext.Current.CancellationToken);
@@ -185,8 +184,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostStartAsync(client, stream.Id);
             await timed.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            await response.AssertApiErrorAsync(nameof(ComposerStreamException));
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            await response.AssertApiErrorAsync("composer_stream");
 
             ComposerStreamEntity persisted = await timed.Services.GetStreamAsync(stream.Id, TestContext.Current.CancellationToken);
             Assert.Equal(status, persisted.Status);
@@ -205,8 +204,8 @@ namespace Faryma.Composer.Api.Test.Features.ComposerStream
             using HttpResponseMessage response = await PostStartAsync(client, 999_999);
             await timed.Services.DrainOrderQueueEventsAsync();
 
-            Assert.Equal(AppException.StatusCode, (int)response.StatusCode);
-            await response.AssertApiErrorAsync(nameof(NotFoundException));
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            await response.AssertApiErrorAsync("not_found");
             Assert.Equal(0, await timed.Services.CountStreamsAsync(TestContext.Current.CancellationToken));
             Assert.Equal(0, timed.Services.GetOrderQueueNotifications().UpdateCount);
         }

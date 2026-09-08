@@ -6,12 +6,12 @@ namespace Faryma.Composer.Api.Test.Infrastructure
     {
         public static async Task<string?> AssertApiErrorAsync(
             this HttpResponseMessage response,
-            string exceptionType)
+            string code)
         {
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-            Assert.Equal(exceptionType, json.RootElement.GetProperty("ExceptionType").GetString());
+            Assert.Equal($"urn:composer:error:{code}", json.RootElement.GetProperty("type").GetString());
 
-            return json.RootElement.GetProperty("Message").GetString();
+            return json.RootElement.GetProperty("detail").GetString();
         }
     }
 }
