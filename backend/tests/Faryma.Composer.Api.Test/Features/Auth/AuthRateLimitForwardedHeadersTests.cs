@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Faryma.Composer.Api.Test.Auth
+namespace Faryma.Composer.Api.Test.Features.Auth
 {
     public sealed class AuthRateLimitForwardedHeadersTests : TestBase
     {

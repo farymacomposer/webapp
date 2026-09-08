@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using Faryma.Composer.Api.Features.ComposerStream.Create;
 using Faryma.Composer.Api.Test.Infrastructure;
@@ -9,7 +9,7 @@ using Faryma.Composer.Domain.Entities;
 using Faryma.Composer.Domain.Enums;
 using Faryma.Composer.Domain.Exceptions;
 
-namespace Faryma.Composer.Api.Test.ComposerStream
+namespace Faryma.Composer.Api.Test.Features.ComposerStream
 {
     public sealed class CreateStreamTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
     {

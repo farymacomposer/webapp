@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Faryma.Composer.Api.Test.Auth
+namespace Faryma.Composer.Api.Test.Features.Auth
 {
     public sealed class RefreshTokenTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
     {

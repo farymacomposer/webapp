@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using Faryma.Composer.Api.Features.ComposerStream.Complete;
 using Faryma.Composer.Api.Test.Infrastructure;
@@ -14,7 +14,7 @@ using Faryma.Composer.Domain.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using static Faryma.Composer.Api.Test.Infrastructure.DateTimeTestAssertions;
 
-namespace Faryma.Composer.Api.Test.ComposerStream
+namespace Faryma.Composer.Api.Test.Features.ComposerStream
 {
     public sealed class CompleteStreamTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
     {

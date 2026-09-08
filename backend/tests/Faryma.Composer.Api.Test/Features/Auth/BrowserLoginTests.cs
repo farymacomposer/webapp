@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
-namespace Faryma.Composer.Api.Test.Auth
+namespace Faryma.Composer.Api.Test.Features.Auth
 {
     public sealed class BrowserLoginTests : TestBase
     {

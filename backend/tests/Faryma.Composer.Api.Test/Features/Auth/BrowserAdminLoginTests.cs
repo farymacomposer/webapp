@@ -7,7 +7,7 @@ using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
 using Faryma.Composer.Domain;
 
-namespace Faryma.Composer.Api.Test.Auth
+namespace Faryma.Composer.Api.Test.Features.Auth
 {
     public sealed class BrowserAdminLoginTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
     {

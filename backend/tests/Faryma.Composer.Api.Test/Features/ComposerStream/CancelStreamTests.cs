@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using Faryma.Composer.Api.Features.ComposerStream.Cancel;
 using Faryma.Composer.Api.Features.ComposerStream.FindLiveAndPlanned;
@@ -16,7 +16,7 @@ using Faryma.Composer.Infrastructure.Features.OrderQueue;
 using Microsoft.Extensions.DependencyInjection;
 using static Faryma.Composer.Api.Test.Infrastructure.DateTimeTestAssertions;
 
-namespace Faryma.Composer.Api.Test.ComposerStream
+namespace Faryma.Composer.Api.Test.Features.ComposerStream
 {
     public sealed class CancelStreamTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
     {
