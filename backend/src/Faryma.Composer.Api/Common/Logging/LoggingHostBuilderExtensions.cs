@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Destructurama;
+using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
@@ -23,7 +24,7 @@ namespace Faryma.Composer.Api.Common.Logging
         {
             return host.UseSerilog((context, config) =>
             {
-                LogEventLevel level = Enum.TryParse(context.Configuration["LOG_LEVEL"], ignoreCase: true, out LogEventLevel parsed)
+                LogEventLevel level = (Enum.TryParse(context.Configuration["LOG_LEVEL"], ignoreCase: true, out LogEventLevel parsed) && Enum.IsDefined(parsed))
                     ? parsed
                     : LogEventLevel.Information;
 
@@ -31,12 +32,11 @@ namespace Faryma.Composer.Api.Common.Logging
                     .MinimumLevel.Is(level)
                     .MinimumLevel.Override("System", LogEventLevel.Information)
                     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                    .MinimumLevel.Override("Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware", LogEventLevel.Fatal)
                     .Enrich.FromLogContext()
                     .Enrich.WithExceptionDetails(new DestructuringOptionsBuilder()
                         .WithDefaultDestructurers()
                         .WithDestructurers([new DbUpdateExceptionDestructurer()]))
-                    .Destructure.With<AttributeBasedDestructuringPolicy>()
+                    .Destructure.UsingAttributes()
                     .WriteTo.Console(new ExpressionTemplate(_jsonTemplate));
 
                 if (context.HostingEnvironment.IsDevelopment())
