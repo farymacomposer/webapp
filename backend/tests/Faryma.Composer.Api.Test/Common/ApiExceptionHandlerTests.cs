@@ -4,49 +4,50 @@ using Faryma.Composer.Api.Test.Infrastructure;
 
 namespace Faryma.Composer.Api.Test.Common
 {
+    [TestClass]
     public sealed class ApiExceptionHandlerTests : TestBase
     {
-        [Fact]
+        [TestMethod]
         public async Task AppException_IsMappedToProblemDetails()
         {
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/app", TestContext.Current.CancellationToken);
+            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/app", TestContext.CancellationToken);
 
-            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-            Assert.Equal("urn:composer:error:test_api", json.RootElement.GetProperty("type").GetString());
-            Assert.Equal("Ошибка бизнес-логики", json.RootElement.GetProperty("title").GetString());
-            Assert.Equal(409, json.RootElement.GetProperty("status").GetInt32());
-            Assert.Equal("Тестовая ошибка API", json.RootElement.GetProperty("detail").GetString());
+            Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
+            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.CancellationToken));
+            Assert.AreEqual("urn:composer:error:test_api", json.RootElement.GetProperty("type").GetString());
+            Assert.AreEqual("Ошибка бизнес-логики", json.RootElement.GetProperty("title").GetString());
+            Assert.AreEqual(409, json.RootElement.GetProperty("status").GetInt32());
+            Assert.AreEqual("Тестовая ошибка API", json.RootElement.GetProperty("detail").GetString());
         }
 
-        [Fact]
+        [TestMethod]
         public async Task AuthenticationException_IsMappedToUnauthorizedPayload()
         {
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/authentication", TestContext.Current.CancellationToken);
+            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/authentication", TestContext.CancellationToken);
 
-            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-            Assert.Equal("Ошибка аутентификации", json.RootElement.GetProperty("Message").GetString());
+            Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.CancellationToken));
+            Assert.AreEqual("Ошибка аутентификации", json.RootElement.GetProperty("Message").GetString());
         }
 
-        [Fact]
+        [TestMethod]
         public async Task UnhandledException_IsMappedToProblemDetails()
         {
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = app.CreateAnonymousClient();
 
-            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/unhandled", TestContext.Current.CancellationToken);
+            using HttpResponseMessage response = await client.GetAsync("/api/_test/exceptions/unhandled", TestContext.CancellationToken);
 
-            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
-            Assert.Equal("Произошла непредвиденная ошибка", json.RootElement.GetProperty("title").GetString());
-            Assert.Equal(500, json.RootElement.GetProperty("status").GetInt32());
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+            using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.CancellationToken));
+            Assert.AreEqual("Произошла непредвиденная ошибка", json.RootElement.GetProperty("title").GetString());
+            Assert.AreEqual(500, json.RootElement.GetProperty("status").GetInt32());
         }
     }
 }

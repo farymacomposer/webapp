@@ -6,12 +6,12 @@ namespace Faryma.Composer.Api.Test.Infrastructure
         {
             if (expected is null)
             {
-                Assert.Null(actual);
+                Assert.IsNull(actual);
                 return;
             }
 
-            Assert.NotNull(actual);
-            Assert.Equal(TruncateToMilliseconds(expected.Value), TruncateToMilliseconds(actual.Value));
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(TruncateToMilliseconds(expected.Value), TruncateToMilliseconds(actual!.Value));
         }
 
         public static DateTime TruncateToMilliseconds(DateTime value) =>

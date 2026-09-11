@@ -37,9 +37,11 @@ namespace Faryma.Composer.Testing.Infrastructure
             };
 
             IdentityResult result = await userManager.CreateAsync(user);
-            Assert.True(
-                result.Succeeded,
-                $"Не удалось создать тестового пользователя: {string.Join(", ", result.Errors.Select(x => x.Description))}");
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    $"Не удалось создать тестового пользователя: {string.Join(", ", result.Errors.Select(x => x.Description))}");
+            }
 
             return user;
         });
@@ -220,9 +222,11 @@ namespace Faryma.Composer.Testing.Infrastructure
             };
 
             IdentityResult result = await userManager.CreateAsync(user);
-            Assert.True(
-                result.Succeeded,
-                $"Не удалось создать тестового пользователя: {string.Join(", ", result.Errors.Select(x => x.Description))}");
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    $"Не удалось создать тестового пользователя: {string.Join(", ", result.Errors.Select(x => x.Description))}");
+            }
 
             return user;
         }

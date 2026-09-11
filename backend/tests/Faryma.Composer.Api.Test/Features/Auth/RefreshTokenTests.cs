@@ -15,12 +15,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Faryma.Composer.Api.Test.Features.Auth
 {
-    public sealed class RefreshTokenTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
+    [TestClass]
+    [DoNotParallelize]
+    public sealed class RefreshTokenTests : DatabaseTestBase
     {
         private const string _loginRoute = "/api/Auth/DesktopAdminLogin";
         private const string _refreshRoute = "/api/Auth/RefreshToken";
 
-        [Fact]
+        [TestMethod]
         public async Task Refresh_rotates_token_and_returns_new_usable_token()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
@@ -29,14 +31,14 @@ namespace Faryma.Composer.Api.Test.Features.Auth
             AuthTokensDto initialTokens = await Login(client, admin);
 
             using HttpResponseMessage firstResponse = await Refresh(client, initialTokens.RefreshToken);
-            Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, firstResponse.StatusCode);
             AuthTokensDto rotatedTokens = await ReadTokens(firstResponse);
 
             using HttpResponseMessage secondResponse = await Refresh(client, rotatedTokens.RefreshToken);
-            Assert.Equal(HttpStatusCode.OK, secondResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, secondResponse.StatusCode);
         }
 
-        [Fact]
+        [TestMethod]
         public async Task Sequential_refresh_replay_revokes_token_family()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
@@ -45,17 +47,17 @@ namespace Faryma.Composer.Api.Test.Features.Auth
             AuthTokensDto initialTokens = await Login(client, admin);
 
             using HttpResponseMessage rotationResponse = await Refresh(client, initialTokens.RefreshToken);
-            Assert.Equal(HttpStatusCode.OK, rotationResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, rotationResponse.StatusCode);
             AuthTokensDto rotatedTokens = await ReadTokens(rotationResponse);
 
             using HttpResponseMessage replayResponse = await Refresh(client, initialTokens.RefreshToken);
-            Assert.Equal(HttpStatusCode.Unauthorized, replayResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Unauthorized, replayResponse.StatusCode);
 
             using HttpResponseMessage familyResponse = await Refresh(client, rotatedTokens.RefreshToken);
-            Assert.Equal(HttpStatusCode.Unauthorized, familyResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Unauthorized, familyResponse.StatusCode);
         }
 
-        [Fact]
+        [TestMethod]
         public async Task Concurrent_refresh_replay_revokes_family_and_returns_unauthorized()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
@@ -76,17 +78,17 @@ namespace Faryma.Composer.Api.Test.Features.Auth
 
             using HttpResponseMessage firstResponse = responses[0];
             using HttpResponseMessage secondResponse = responses[1];
-            Assert.Contains(responses, response => response.StatusCode == HttpStatusCode.OK);
-            Assert.Contains(responses, response => response.StatusCode == HttpStatusCode.Unauthorized);
+            Assert.IsTrue(responses.Any(response => response.StatusCode == HttpStatusCode.OK));
+            Assert.IsTrue(responses.Any(response => response.StatusCode == HttpStatusCode.Unauthorized));
 
             HttpResponseMessage successfulResponse = responses.Single(response => response.StatusCode == HttpStatusCode.OK);
             AuthTokensDto successfulTokens = await ReadTokens(successfulResponse);
 
             using HttpResponseMessage familyResponse = await Refresh(client, successfulTokens.RefreshToken);
-            Assert.Equal(HttpStatusCode.Unauthorized, familyResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Unauthorized, familyResponse.StatusCode);
         }
 
-        [Fact]
+        [TestMethod]
         public async Task Concurrent_expired_refresh_returns_unauthorized_for_both_requests()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
@@ -105,9 +107,9 @@ namespace Faryma.Composer.Api.Test.Features.Auth
                 AppDbContext appDbContext = scoped.GetRequiredService<AppDbContext>();
                 RefreshTokenEntity stored = await appDbContext.RefreshTokens.SingleAsync(
                     token => token.UserId == admin.UserId,
-                    TestContext.Current.CancellationToken);
+                    TestContext.CancellationToken);
                 stored.ExpiresAt = DateTime.UtcNow.AddMinutes(-1);
-                await appDbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+                await appDbContext.SaveChangesAsync(TestContext.CancellationToken);
             });
 
             barrier.Arm();
@@ -117,10 +119,13 @@ namespace Faryma.Composer.Api.Test.Features.Auth
 
             using HttpResponseMessage firstResponse = responses[0];
             using HttpResponseMessage secondResponse = responses[1];
-            Assert.All(responses, response => Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode));
+            foreach (HttpResponseMessage response in responses)
+            {
+                Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+            }
         }
 
-        private static async Task<SeededAuthUser> SeedAdmin(CustomWebApplicationFactory app)
+        private async Task<SeededAuthUser> SeedAdmin(CustomWebApplicationFactory app)
         {
             SeededAuthUsers users = await app.SeedUsersAsync(new AuthTestSeedOptions
             {
@@ -130,12 +135,12 @@ namespace Faryma.Composer.Api.Test.Features.Auth
                     Password = "TestComposerPass123!",
                     Roles = [AppRoles.Composer],
                 },
-            }, ct: TestContext.Current.CancellationToken);
+            }, ct: TestContext.CancellationToken);
 
             return users.Admin;
         }
 
-        private static async Task<AuthTokensDto> Login(HttpClient client, SeededAuthUser admin)
+        private async Task<AuthTokensDto> Login(HttpClient client, SeededAuthUser admin)
         {
             using HttpResponseMessage response = await client.PostAsJsonAsync(
                 _loginRoute,
@@ -147,29 +152,29 @@ namespace Faryma.Composer.Api.Test.Features.Auth
                         Password = admin.Password ?? throw new InvalidOperationException("У тестового пользователя нет пароля"),
                     }
                 },
-                TestContext.Current.CancellationToken);
+                TestContext.CancellationToken);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             DesktopAdminLoginResponse? login =
-                await response.Content.ReadFromJsonAsync<DesktopAdminLoginResponse>(cancellationToken: TestContext.Current.CancellationToken);
+                await response.Content.ReadFromJsonAsync<DesktopAdminLoginResponse>(cancellationToken: TestContext.CancellationToken);
 
             return login?.Tokens ?? throw new InvalidOperationException("Ответ входа оказался пустым");
         }
 
-        private static async Task<AuthTokensDto> ReadTokens(HttpResponseMessage response)
+        private async Task<AuthTokensDto> ReadTokens(HttpResponseMessage response)
         {
             RefreshTokenResponse? refresh =
-                await response.Content.ReadFromJsonAsync<RefreshTokenResponse>(cancellationToken: TestContext.Current.CancellationToken);
+                await response.Content.ReadFromJsonAsync<RefreshTokenResponse>(cancellationToken: TestContext.CancellationToken);
 
             return refresh?.Tokens ?? throw new InvalidOperationException("Ответ обновления токенов оказался пустым");
         }
 
-        private static Task<HttpResponseMessage> Refresh(HttpClient client, string refreshToken)
+        private Task<HttpResponseMessage> Refresh(HttpClient client, string refreshToken)
         {
             return client.PostAsJsonAsync(
                 _refreshRoute,
                 new RefreshTokenRequest { RefreshToken = refreshToken },
-                TestContext.Current.CancellationToken);
+                TestContext.CancellationToken);
         }
 
         private sealed class RefreshTokenReadBarrierInterceptor : DbCommandInterceptor

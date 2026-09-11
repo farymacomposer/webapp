@@ -1,0 +1,25 @@
+{
+  "stryker-config": {
+    "project": "Faryma.Composer.Application.csproj",
+    "reporters": [
+      "json",
+      "markdown"
+    ],
+    "coverage-analysis": "off",
+    "break-on-initial-test-failure": true,
+    "additional-timeout": 10000,
+    "thresholds": {
+      "high": 90,
+      "low": 60,
+      "break": 0
+    },
+    "ignore-methods": [
+      "*LogInformation",
+      "*LogWarning",
+      "*LogError",
+      "*LogCritical",
+      "*LogDebug",
+      "*LogTrace"
+    ]
+  }
+}

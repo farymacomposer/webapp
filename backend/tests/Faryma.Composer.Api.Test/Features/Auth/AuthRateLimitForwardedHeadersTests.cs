@@ -8,12 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Faryma.Composer.Api.Test.Features.Auth
 {
+    [TestClass]
     public sealed class AuthRateLimitForwardedHeadersTests : TestBase
     {
         private const int _loginPermitLimit = 10;
         private const string _loginRateLimitedRoute = "/api/_test/auth/rate-limited-login";
 
-        [Fact]
+        [TestMethod]
         public async Task Trusted_forwarded_for_partitions_auth_login_rate_limit_by_client_ip()
         {
             await using CustomWebApplicationFactory app = CreateApp();
@@ -29,17 +30,17 @@ namespace Faryma.Composer.Api.Test.Features.Auth
             {
                 using HttpResponseMessage response = await PostInvalidLogin(client, "203.0.113.10");
 
-                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+                Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
             }
 
             using HttpResponseMessage otherClientResponse = await PostInvalidLogin(client, "203.0.113.11");
-            Assert.Equal(HttpStatusCode.Unauthorized, otherClientResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Unauthorized, otherClientResponse.StatusCode);
 
             using HttpResponseMessage limitedResponse = await PostInvalidLogin(client, "203.0.113.10");
-            Assert.Equal(HttpStatusCode.TooManyRequests, limitedResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.TooManyRequests, limitedResponse.StatusCode);
         }
 
-        [Fact]
+        [TestMethod]
         public async Task Untrusted_forwarded_for_does_not_partition_auth_login_rate_limit()
         {
             await using CustomWebApplicationFactory app = CreateApp();
@@ -55,11 +56,11 @@ namespace Faryma.Composer.Api.Test.Features.Auth
             {
                 using HttpResponseMessage response = await PostInvalidLogin(client, "203.0.113.10");
 
-                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+                Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
             }
 
             using HttpResponseMessage limitedResponse = await PostInvalidLogin(client, "203.0.113.11");
-            Assert.Equal(HttpStatusCode.TooManyRequests, limitedResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.TooManyRequests, limitedResponse.StatusCode);
         }
 
         private static HttpClient CreateForwardedHeadersClient(

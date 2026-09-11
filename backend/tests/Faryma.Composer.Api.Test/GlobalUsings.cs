@@ -1,2 +1,2 @@
 ﻿global using Microsoft.EntityFrameworkCore;
-global using Xunit;
+global using Microsoft.VisualStudio.TestTools.UnitTesting;

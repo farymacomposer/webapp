@@ -1,8 +1,9 @@
-﻿using Testcontainers.PostgreSql;
+﻿using DotNet.Testcontainers.Containers;
+using Testcontainers.PostgreSql;
 
 namespace Faryma.Composer.Testing.Infrastructure
 {
-    public sealed class PostgreSqlFixture : IAsyncLifetime
+    public sealed class PostgreSqlFixture
     {
         private const string _password = "postgres-test";
 
@@ -25,7 +26,11 @@ namespace Faryma.Composer.Testing.Infrastructure
             ArgumentException.ThrowIfNullOrWhiteSpace(prefix);
 
             string databaseName = $"{prefix}_{Guid.NewGuid():N}";
-            await _container.ExecScriptAsync($"""CREATE DATABASE "{databaseName}";""");
+            ExecResult result = await _container.ExecScriptAsync($"""CREATE DATABASE "{databaseName}";""");
+            if (result.ExitCode != 0)
+            {
+                throw new InvalidOperationException($"Не удалось создать тестовую БД: {result.Stderr}");
+            }
 
             return databaseName;
         }

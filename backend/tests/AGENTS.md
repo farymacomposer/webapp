@@ -7,7 +7,7 @@
 | Задача | Точка входа |
 | --- | --- |
 | Проверить HTTP, права доступа, middleware, обработку исключений без обращения к БД | `TestBase` → `CreateApp()` |
-| Проверить endpoint с чтением/записью данных, настоящую выдачу токенов или идемпотентность | `DatabaseTestBase(fixture)` → `await CreateAppAsync()` |
+| Проверить endpoint с чтением/записью данных, настоящую выдачу токенов или идемпотентность | `DatabaseTestBase` → `await CreateAppAsync()` |
 | Отправить запрос анонимно | `app.CreateAnonymousClient()` |
 | Отправить запрос с JWT администратора | `await app.CreateAdminBearerClientAsync(...)` |
 | Подставить браузерного пользователя и его роли | `await app.CreateBrowserUserClientAsync(...)` |
@@ -17,7 +17,7 @@
 | Перечитать сохранённое состояние | `app.Services.GetStreamAsync(id)`, `GetOrderAsync(id)`, `CountStreamsAsync()` |
 | Выполнить свою подготовку или запрос через scoped-сервисы | `app.Services.RunInScopeAsync(...)` |
 | Обработать накопленные события очереди и проверить уведомления | `DrainOrderQueueEventsAsync()` → `GetOrderQueueNotifications()` |
-| Проверить код бизнес-ошибки HTTP | `response.AssertApiErrorAsync(code)`; HTTP-статус проверяется отдельно |
+| Проверить код бизнес-ошибки HTTP | `response.AssertApiErrorAsync(code, TestContext.CancellationToken)`; HTTP-статус проверяется отдельно |
 | Сравнить даты с точностью до миллисекунд | `DateTimeTestAssertions.AssertSameInstant(expected, actual)` |
 | Отправить/прочитать JSON со строковыми enum | `TestJsonSerializerOptions.Web` |
 
@@ -28,19 +28,21 @@
 | [`tests/Faryma.Composer.Api.Test`](../tests/Faryma.Composer.Api.Test/) | HTTP-тесты и API-специфичная инфраструктура. Основные помощники: `Faryma.Composer.Api.Test.Infrastructure`; auth-помощники: `Faryma.Composer.Api.Test.Infrastructure.Auth`. |
 | [`tests/Faryma.Composer.Testing`](../tests/Faryma.Composer.Testing/) | Общая инфраструктура PostgreSQL, подготовки данных, DI и уведомлений. Все классы находятся в `Faryma.Composer.Testing.Infrastructure`. В проекте установлено `IsTestProject=false`. |
 
-Оба проекта используют .NET 10 и xUnit v3. API-тесты ссылаются на API приложения и общий проект `Testing`. В API-проекте уже глобально подключены `Xunit`, `Microsoft.EntityFrameworkCore` и `Faryma.Composer.Testing.Infrastructure`; пространства имён API-помощников нужно подключать самостоятельно.
+`Faryma.Composer.Api.Test` и `Faryma.Composer.Application.Test` используют .NET 10, MSTest 4 и платформу VSTest. `Faryma.Composer.Testing` — обычная библиотека тестовой инфраструктуры без тестового фреймворка (`IsTestProject=false`). API-тесты ссылаются на API приложения и общий проект `Testing`. В API-проекте уже глобально подключены `Microsoft.VisualStudio.TestTools.UnitTesting`, `Microsoft.EntityFrameworkCore` и `Faryma.Composer.Testing.Infrastructure`; пространства имён API-помощников нужно подключать самостоятельно.
 
 ## 2. API host, базовые классы и изоляция
 
-Источники: [CollectionFixture.cs][api-fixture], [CustomWebApplicationFactory.cs][api-factory], [TestConfiguration.cs][api-config].
+Источники: [TestBases.cs][api-fixture], [AssemblyParallelization.cs][parallelization], [CustomWebApplicationFactory.cs][api-factory], [TestConfiguration.cs][api-config].
 
 ### Базовые классы
 
 | Класс / метод | Как использовать |
 | --- | --- |
 | `TestBase.CreateApp()` | `protected`, возвращает `CustomWebApplicationFactory` в режиме без БД. Наследуй тестовый класс от `TestBase`. |
-| `DatabaseTestBase(PostgreSqlFixture fixture).CreateAppAsync()` | `protected`, возвращает `Task<CustomWebApplicationFactory>` с новой БД. Передай fixture через конструктор тестового класса. |
-| `CollectionFixture` | xUnit collection fixture для `PostgreSqlFixture`. Атрибут `[Collection(nameof(CollectionFixture))]` уже стоит на `DatabaseTestBase`. Контейнер общий для этой коллекции, БД создаётся на каждый вызов `CreateAppAsync()`. |
+| `TestBase.TestContext` | MSTest устанавливает `TestContext` для каждого теста. Для отмены async-операций используй `TestContext.CancellationToken`. |
+| `DatabaseTestBase.CreateAppAsync()` | `protected`, возвращает `Task<CustomWebApplicationFactory>` с новой БД. Конструкторная инъекция fixture не нужна: метод получает общий контейнер через `PostgreSqlTestFixture.GetAsync()`. |
+| `PostgreSqlTestFixture` | Лениво запускает один `PostgreSqlFixture` на процесс testhost и освобождает его через `[AssemblyCleanup]`. Если DB-тесты не запускались, Docker не используется. |
+| `AssemblyParallelization.cs` | Сохраняет параллелизм классов через `[assembly: Parallelize(... ClassLevel)]`. DB-классы помечены `[DoNotParallelize]`, поэтому выполняются последовательно. |
 
 ### `CustomWebApplicationFactory`
 
@@ -63,7 +65,7 @@
 - В режиме с БД выполняется обычный `ApplicationStartupInitializer`: bootstrap администраторов, загрузка настроек и инициализация очереди. Поэтому в БД уже могут быть пользователи, созданные startup, до вызова `SeedUsersAsync()`.
 - В режиме без БД startup-initializer заменён на пустой, Data Protection использует ephemeral provider. Регистрации persistence остаются: для вызова репозиториев, seeding или endpoint, работающего с БД, выбирай `CreateAppAsync()`.
 
-**Граница изоляции:** отдельный `CreateAppAsync()` — отдельная БД. Производные фабрики используют ту же БД и конфигурацию, но создают отдельные host и DI-контейнеры. Их singleton-сервисы, включая очередь и накопитель уведомлений, имеют отдельное состояние. Родитель освобождает дочерние host; созданные БД живут до удаления контейнера fixture.
+**Граница изоляции:** отдельный `CreateAppAsync()` — отдельная БД. Производные фабрики используют ту же БД и конфигурацию, но создают отдельные host и DI-контейнеры. Их singleton-сервисы, включая очередь и накопитель уведомлений, имеют отдельное состояние. Родитель освобождает дочерние host; созданные БД живут до `[AssemblyCleanup]`, который удаляет общий Testcontainers-контейнер.
 
 ### Минимальный тест без БД
 
@@ -72,19 +74,20 @@ using System.Net;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
 
+[TestClass]
 public sealed class MyAuthorizationTests : TestBase
 {
-    [Fact]
+    [TestMethod]
     public async Task Browser_user_without_admin_role_is_forbidden()
     {
         await using CustomWebApplicationFactory app = CreateApp();
         using HttpClient client = await app.CreateBrowserUserClientAsync(
-            ct: TestContext.Current.CancellationToken);
+            ct: TestContext.CancellationToken);
 
         using HttpResponseMessage response = await client.GetAsync(
-            "/api/_test/auth/admin", TestContext.Current.CancellationToken);
+            "/api/_test/auth/admin", TestContext.CancellationToken);
 
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
     }
 }
 ```
@@ -96,20 +99,21 @@ using System.Net;
 using Faryma.Composer.Api.Test.Infrastructure;
 using Faryma.Composer.Api.Test.Infrastructure.Auth;
 
-public sealed class MyDatabaseApiTests(PostgreSqlFixture fixture)
-    : DatabaseTestBase(fixture)
+[TestClass]
+[DoNotParallelize]
+public sealed class MyDatabaseApiTests : DatabaseTestBase
 {
-    [Fact]
+    [TestMethod]
     public async Task Admin_can_read_settings()
     {
         await using CustomWebApplicationFactory app = await CreateAppAsync();
         using HttpClient client = await app.CreateAdminBearerClientAsync(
-            ct: TestContext.Current.CancellationToken);
+            ct: TestContext.CancellationToken);
 
         using HttpResponseMessage response = await client.GetAsync(
-            "/api/AppSettings/Get", TestContext.Current.CancellationToken);
+            "/api/AppSettings/Get", TestContext.CancellationToken);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
     }
 }
 ```
@@ -149,7 +153,7 @@ SeededAuthUsers users = await app.SeedUsersAsync(new AuthTestSeedOptions
         Password = "TestComposerPass123!",
         Roles = [AppRoles.Composer],
     },
-}, ct: TestContext.Current.CancellationToken);
+}, ct: TestContext.CancellationToken);
 
 using HttpClient client = app.CreateAnonymousClient();
 // users.Admin.UserName / Password передаются в Credentials login-запроса.
@@ -230,7 +234,7 @@ await using CustomWebApplicationFactory root = await CreateAppAsync();
 DateTime now = DateTime.UtcNow;
 CustomWebApplicationFactory app = root.WithFixedDateTime(now);
 SeededAuthUsers users = await app.SeedUsersAsync(
-    ct: TestContext.Current.CancellationToken);
+    ct: TestContext.CancellationToken);
 TestDataBuilder data = new(app.Services);
 
 var stream = await data.CreateStreamAsync(
@@ -248,7 +252,7 @@ var order = await data.CreateReviewOrderAsync(
 
 // После проверяемой операции перечитай состояние из БД:
 var stored = await app.Services.GetOrderAsync(
-    order.Id, TestContext.Current.CancellationToken);
+    order.Id, TestContext.CancellationToken);
 ```
 
 ## 5. Scoped-сервисы, время и очередь
@@ -274,10 +278,10 @@ await app.Services.RunInScopeAsync(async scoped =>
 {
     AppDbContext db = scoped.GetRequiredService<AppDbContext>();
     var stored = await db.ReviewOrders.SingleAsync(
-        x => x.Id == order.Id, TestContext.Current.CancellationToken);
+        x => x.Id == order.Id, TestContext.CancellationToken);
     stored.TrackUrl = null;
     stored.TrackDurationSeconds = null;
-    await db.SaveChangesAsync(TestContext.Current.CancellationToken);
+    await db.SaveChangesAsync(TestContext.CancellationToken);
 });
 ```
 
@@ -316,7 +320,7 @@ await app.Services.RunInScopeAsync(async scoped =>
 
 | Класс / метод | Как использовать |
 | --- | --- |
-| [ApiErrorAssertions][api-errors].`AssertApiErrorAsync(this HttpResponseMessage response, string code)` → `Task<string?>` | Разбирает JSON, проверяет `type == "urn:composer:error:" + code`, возвращает `detail`. Передавай код без URN-префикса. Статус, title и detail при необходимости проверяй отдельно. |
+| [ApiErrorAssertions][api-errors].`AssertApiErrorAsync(this HttpResponseMessage response, string code, CancellationToken cancellationToken = default)` → `Task<string?>` | Разбирает JSON, проверяет `type == "urn:composer:error:" + code`, возвращает `detail`. Передавай код без URN-префикса и `TestContext.CancellationToken`. Статус, title и detail при необходимости проверяй отдельно. |
 | [DateTimeTestAssertions][date-assertions].`AssertSameInstant(DateTime? expected, DateTime? actual)` | Если expected — `null`, проверяет actual на `null`; иначе сравнивает оба значения после усечения до миллисекунд. |
 | `DateTimeTestAssertions.TruncateToMilliseconds(DateTime value)` → `DateTime` | Собирает дату из компонентов до миллисекунд с `DateTimeKind.Utc`. Передавай уже UTC-значения: преобразования часового пояса здесь нет. |
 | [TestJsonSerializerOptions][json-options].`Web` | Общие `JsonSerializerOptions(JsonSerializerDefaults.Web)` с `JsonStringEnumConverter`. Передавай в `PostAsJsonAsync`, `ReadFromJsonAsync` и другие операции сериализации DTO с enum. |
@@ -325,11 +329,11 @@ await app.Services.RunInScopeAsync(async scoped =>
 
 ```csharp
 using HttpResponseMessage response = await client.GetAsync(
-    "/api/_test/exceptions/app", TestContext.Current.CancellationToken);
+    "/api/_test/exceptions/app", TestContext.CancellationToken);
 
-Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
-string? detail = await response.AssertApiErrorAsync("test_api");
-Assert.Equal("Тестовая ошибка API", detail);
+Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
+string? detail = await response.AssertApiErrorAsync("test_api", TestContext.CancellationToken);
+Assert.AreEqual("Тестовая ошибка API", detail);
 ```
 
 `AssertApiErrorAsync` рассчитан на указанный формат бизнес-ошибки. Например, ответ на `AuthenticationException` в существующих тестах содержит поле `Message`, а не `type` / `detail`; его проверяют отдельно.
@@ -339,7 +343,7 @@ Assert.Equal("Тестовая ошибка API", detail);
 ```csharp
 var body = await response.Content.ReadFromJsonAsync<TestRequestContextResponse>(
     TestJsonSerializerOptions.Web,
-    TestContext.Current.CancellationToken);
+    TestContext.CancellationToken);
 ```
 
 ## 7. Низкоуровневые помощники PostgreSQL
@@ -348,17 +352,19 @@ var body = await response.Content.ReadFromJsonAsync<TestRequestContextResponse>(
 
 | Класс / метод | Назначение |
 | --- | --- |
-| [PostgreSqlFixture][postgres-fixture] : `IAsyncLifetime` | Содержит Testcontainers-контейнер `postgres:18-alpine`. `InitializeAsync()` запускает, `DisposeAsync()` освобождает контейнер. При использовании collection fixture жизненным циклом управляет xUnit. |
+| [PostgreSqlFixture][postgres-fixture] | Содержит Testcontainers-контейнер `postgres:18-alpine`. `InitializeAsync()` запускает, `DisposeAsync()` освобождает контейнер. Сам класс не зависит от тестового фреймворка. |
+| [PostgreSqlTestFixture][api-fixture].`GetAsync()` | Лениво запускает и возвращает общий контейнер для DB-тестов текущего testhost; `[AssemblyCleanup]` освобождает его после прогона. |
 | `PostgreSqlFixture.Host`, `Port`, `Username`, `Password` | Параметры доступа к контейнеру; `Port` — динамически опубликованный порт. |
-| `PostgreSqlFixture.CreateDatabaseAsync(string prefix)` → `Task<string>` | Создаёт БД `<prefix>_<GUID>` и возвращает её имя. Fixture должна быть запущена; prefix должен быть непустым. Схему этот метод не создаёт. |
+| `PostgreSqlFixture.CreateDatabaseAsync(string prefix)` → `Task<string>` | Создаёт БД `<prefix>_<GUID>` и возвращает её имя. Fixture должна быть запущена; prefix должен быть непустым. Результат `ExecScriptAsync` проверяется по `ExitCode`; схему этот метод не создаёт. |
 | [PostgreSqlTestConfiguration][postgres-config].`CreatePostgreSqlSettings(PostgreSqlFixture fixture, string databaseName)` | Возвращает `IReadOnlyDictionary<string, string?>` с `POSTGRES:HOST`, `PORT`, `DATABASE`, `USERNAME`, `PASSWORD`, `POOLING=false`. Подключается через `AddInMemoryCollection`. |
 | [PostgreSqlSchemaInitializer][postgres-schema].`EnsureCreatedAsync(IConfiguration configuration)` | Собирает временный provider через `AddPersistence`, получает `IDbContextFactory<AppDbContext>` и вызывает `context.Database.EnsureCreatedAsync()`. Это создание схемы по модели EF; миграции этим методом не прогоняются. |
 | `TestConfiguration.CreateNoDatabase()` / `CreatePostgreSql(fixture, databaseName)` | `internal` API-специфичная конфигурация. Добавляет JWT, Twitch, bootstrap-credentials; для режима без БД содержит фиктивные PostgreSQL-настройки. Константы `JwtIssuer`, `JwtAudience`, `JwtSecretKey` согласованы с bearer-helper. |
 
-Минимальная цепочка вне API-фабрики, при уже инициализированном `fixture`:
+Минимальная цепочка вне API-фабрики:
 
 ```csharp
 // using Microsoft.Extensions.Configuration;
+PostgreSqlFixture fixture = await PostgreSqlTestFixture.GetAsync();
 string databaseName = await fixture.CreateDatabaseAsync("custom_test");
 ConfigurationManager configuration = new();
 configuration.AddInMemoryCollection(
@@ -404,7 +410,7 @@ request.Headers.Add(Globals.IdempotencyKey, key.ToString("D"));
 request.Content = JsonContent.Create(new TestIdempotencyRequest(scenario, "payload"));
 
 using HttpResponseMessage response = await client.SendAsync(
-    request, TestContext.Current.CancellationToken);
+    request, TestContext.CancellationToken);
 ```
 
 Для replay создай новый `HttpRequestMessage` с тем же ключом, телом и пользователем. Для проверки восстановления после ошибки вызови `FailNext(scenario)` перед первым запросом. Полные последовательные и конкурентные сценарии находятся в `IdempotentAttributeTests`.
@@ -431,18 +437,20 @@ using HttpResponseMessage response = await client.SendAsync(
 Из каталога `backend`, при установленном .NET 10 SDK и доступном Docker для PostgreSQL-сценариев:
 
 ```powershell
-dotnet run --project tests/Faryma.Composer.Api.Test/Faryma.Composer.Api.Test.csproj
+dotnet test tests/Faryma.Composer.Application.Test/Faryma.Composer.Application.Test.csproj
+dotnet test tests/Faryma.Composer.Api.Test/Faryma.Composer.Api.Test.csproj
 ```
 
-Для одного класса через xUnit v3 in-process runner:
+Для одного класса через VSTest-фильтр MSTest:
 
 ```powershell
-dotnet run --project tests/Faryma.Composer.Api.Test/Faryma.Composer.Api.Test.csproj -- -class Faryma.Composer.Api.Test.Common.IdempotentAttributeTests
+dotnet test tests/Faryma.Composer.Api.Test/Faryma.Composer.Api.Test.csproj --filter "ClassName=Faryma.Composer.Api.Test.Common.IdempotentAttributeTests"
 ```
 
-Результат обычного прогона ищи в `TEST EXECUTION SUMMARY`: `Total`, `Failed`, `Errors`, `Skipped`. Общий проект `Faryma.Composer.Testing` предоставляет инфраструктуру; запускать сценарии следует из использующего её тестового проекта.
+Итоговая строка VSTest сообщает количество пройденных, не пройденных, пропущенных и всего обнаруженных тестов. Общий проект `Faryma.Composer.Testing` предоставляет инфраструктуру и не является тестовым проектом; запускать сценарии следует из использующего её тестового проекта.
 
-[api-fixture]: ../tests/Faryma.Composer.Api.Test/Infrastructure/CollectionFixture.cs
+[api-fixture]: ../tests/Faryma.Composer.Api.Test/Infrastructure/TestBases.cs
+[parallelization]: ../tests/Faryma.Composer.Api.Test/Infrastructure/AssemblyParallelization.cs
 [api-factory]: ../tests/Faryma.Composer.Api.Test/Infrastructure/CustomWebApplicationFactory.cs
 [api-config]: ../tests/Faryma.Composer.Api.Test/Infrastructure/TestConfiguration.cs
 [auth-extensions]: ../tests/Faryma.Composer.Api.Test/Infrastructure/Auth/CustomWebApplicationFactoryAuthExtensions.cs

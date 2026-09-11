@@ -9,13 +9,15 @@ using Faryma.Composer.Domain;
 
 namespace Faryma.Composer.Api.Test.Features.Auth
 {
-    public sealed class BrowserAdminLoginTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
+    [TestClass]
+    [DoNotParallelize]
+    public sealed class BrowserAdminLoginTests : DatabaseTestBase
     {
         private const string _adminRoute = "/api/AppSettings/Get";
         private const string _browserAdminLoginRoute = "/api/Auth/BrowserAdminLogin";
         private const string _jwtLoginRoute = "/api/Auth/DesktopAdminLogin";
 
-        [Fact]
+        [TestMethod]
         public async Task Browser_admin_login_sets_cookie_and_allows_admin_endpoint()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
@@ -24,18 +26,18 @@ namespace Faryma.Composer.Api.Test.Features.Auth
 
             using HttpResponseMessage loginResponse = await Login(client, _browserAdminLoginRoute, admin);
 
-            Assert.Equal(HttpStatusCode.NoContent, loginResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.NoContent, loginResponse.StatusCode);
 
             string authCookie = GetBrowserAuthCookie(loginResponse);
             using HttpRequestMessage adminRequest = new(HttpMethod.Get, _adminRoute);
             adminRequest.Headers.Add("Cookie", authCookie);
 
-            using HttpResponseMessage adminResponse = await client.SendAsync(adminRequest, TestContext.Current.CancellationToken);
+            using HttpResponseMessage adminResponse = await client.SendAsync(adminRequest, TestContext.CancellationToken);
 
-            Assert.Equal(HttpStatusCode.OK, adminResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, adminResponse.StatusCode);
         }
 
-        [Fact]
+        [TestMethod]
         public async Task Browser_admin_login_rejects_non_admin_user()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
@@ -48,16 +50,16 @@ namespace Faryma.Composer.Api.Test.Features.Auth
                     TwitchUserId = "browser-password-user-id",
                     TwitchLogin = "browser_password_user",
                 },
-            }, ct: TestContext.Current.CancellationToken);
+            }, ct: TestContext.CancellationToken);
             using HttpClient client = app.CreateAnonymousClient();
 
             using HttpResponseMessage response = await Login(client, _browserAdminLoginRoute, users.Browser);
 
-            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-            Assert.False(response.Headers.TryGetValues("Set-Cookie", out _));
+            Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.IsFalse(response.Headers.TryGetValues("Set-Cookie", out _));
         }
 
-        [Fact]
+        [TestMethod]
         public async Task Browser_admin_login_rejects_invalid_password()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
@@ -71,13 +73,13 @@ namespace Faryma.Composer.Api.Test.Features.Auth
                     UserName = admin.UserName,
                     Password = "WrongPassword123!",
                 }
-            }, cancellationToken: TestContext.Current.CancellationToken);
+            }, cancellationToken: TestContext.CancellationToken);
 
-            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-            Assert.False(response.Headers.TryGetValues("Set-Cookie", out _));
+            Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+            Assert.IsFalse(response.Headers.TryGetValues("Set-Cookie", out _));
         }
 
-        [Fact]
+        [TestMethod]
         public async Task Jwt_login_still_returns_tokens_for_admin()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
@@ -86,11 +88,11 @@ namespace Faryma.Composer.Api.Test.Features.Auth
 
             using HttpResponseMessage response = await Login(client, _jwtLoginRoute, admin);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
-            DesktopAdminLoginResponse login = await response.Content.ReadFromJsonAsync<DesktopAdminLoginResponse>(cancellationToken: TestContext.Current.CancellationToken) ?? throw new InvalidOperationException("Ответ входа оказался пустым");
-            Assert.False(string.IsNullOrWhiteSpace(login.Tokens.AccessToken));
-            Assert.False(string.IsNullOrWhiteSpace(login.Tokens.RefreshToken));
+            DesktopAdminLoginResponse login = await response.Content.ReadFromJsonAsync<DesktopAdminLoginResponse>(cancellationToken: TestContext.CancellationToken) ?? throw new InvalidOperationException("Ответ входа оказался пустым");
+            Assert.IsFalse(string.IsNullOrWhiteSpace(login.Tokens.AccessToken));
+            Assert.IsFalse(string.IsNullOrWhiteSpace(login.Tokens.RefreshToken));
         }
 
         private static async Task<SeededAuthUser> SeedAdmin(CustomWebApplicationFactory app)
@@ -124,11 +126,11 @@ namespace Faryma.Composer.Api.Test.Features.Auth
 
         private static string GetBrowserAuthCookie(HttpResponseMessage response)
         {
-            Assert.True(response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string>? cookies));
+            Assert.IsTrue(response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string>? cookies));
+            Assert.IsNotNull(cookies);
 
-            string cookie = Assert.Single(
-                cookies,
-                value => value.StartsWith("faryma_browser_auth=", StringComparison.Ordinal));
+            string cookie = Assert.ContainsSingle(
+                cookies!.Where(value => value.StartsWith("faryma_browser_auth=", StringComparison.Ordinal)));
 
             return cookie.Split(';', 2)[0];
         }

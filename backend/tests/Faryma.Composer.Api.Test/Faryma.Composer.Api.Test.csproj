@@ -15,21 +15,22 @@
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.11" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+    <PackageReference Include="MSTest.TestAdapter" Version="4.4.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="xunit.v3" Version="4.0.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Faryma.Composer.Api\Faryma.Composer.Api.csproj" />
+    <ProjectReference Include="..\..\src\Faryma.Composer.Application\Faryma.Composer.Application.csproj" />
     <ProjectReference Include="..\Faryma.Composer.Testing\Faryma.Composer.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Faryma.Composer.Testing.Infrastructure" />
-    <Using Include="Xunit" />
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
 
 </Project>

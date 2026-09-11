@@ -9,28 +9,29 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace Faryma.Composer.Api.Test.Features.Auth
 {
+    [TestClass]
     public sealed class BrowserLoginTests : TestBase
     {
-        [Fact]
+        [TestMethod]
         public async Task Browser_login_challenges_twitch_oidc_authorize_endpoint()
         {
             await using CustomWebApplicationFactory app = CreateApp();
             using HttpClient client = CreateBrowserLoginClient(app);
 
-            using HttpResponseMessage response = await client.GetAsync("/api/Auth/TwitchLogin", TestContext.Current.CancellationToken);
+            using HttpResponseMessage response = await client.GetAsync("/api/Auth/TwitchLogin", TestContext.CancellationToken);
 
-            Assert.Equal(HttpStatusCode.Found, response.StatusCode);
-            Assert.NotNull(response.Headers.Location);
+            Assert.AreEqual(HttpStatusCode.Found, response.StatusCode);
+            Assert.IsNotNull(response.Headers.Location);
 
             Uri location = response.Headers.Location!;
             Dictionary<string, StringValues> query = QueryHelpers.ParseQuery(location.Query);
 
-            Assert.Equal("https", location.Scheme);
-            Assert.Equal("id.twitch.tv", location.Host);
-            Assert.Equal("/oauth2/authorize", location.AbsolutePath);
-            Assert.Equal("test-twitch-client-id-1234567890", query["client_id"].ToString());
-            Assert.Equal("https://localhost/signin-oidc", query["redirect_uri"].ToString());
-            Assert.Equal("code", query["response_type"].ToString());
+            Assert.AreEqual("https", location.Scheme);
+            Assert.AreEqual("id.twitch.tv", location.Host);
+            Assert.AreEqual("/oauth2/authorize", location.AbsolutePath);
+            Assert.AreEqual("test-twitch-client-id-1234567890", query["client_id"].ToString());
+            Assert.AreEqual("https://localhost/signin-oidc", query["redirect_uri"].ToString());
+            Assert.AreEqual("code", query["response_type"].ToString());
             Assert.Contains("openid", query["scope"].ToString().Split(' ', StringSplitOptions.RemoveEmptyEntries));
         }
 

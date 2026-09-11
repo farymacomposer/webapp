@@ -6,16 +6,18 @@ using Faryma.Composer.Domain;
 
 namespace Faryma.Composer.Api.Test.Common
 {
-    public sealed class IdempotentAttributeTests(PostgreSqlFixture fixture) : DatabaseTestBase(fixture)
+    [TestClass]
+    [DoNotParallelize]
+    public sealed class IdempotentAttributeTests : DatabaseTestBase
     {
         private const string _route = "/api/_test/idempotency";
 
-        [Fact]
+        [TestMethod]
         public async Task IdempotentEndpoint_ReplaysStoredResponse_ForSameIdempotencyKey()
         {
             string scenario = NewScenario();
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.CancellationToken);
             Guid idempotencyKey = Guid.NewGuid();
             TestIdempotencyRequest request = new(scenario, "same-payload");
 
@@ -25,18 +27,18 @@ namespace Faryma.Composer.Api.Test.Common
             TestIdempotencyResponse first = await ReadResponseAsync(firstResponse);
             TestIdempotencyResponse second = await ReadResponseAsync(secondResponse);
 
-            Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
-            Assert.Equal(HttpStatusCode.OK, secondResponse.StatusCode);
-            Assert.Equal(first, second);
-            Assert.Equal(1, TestIdempotencyController.GetExecutionCount(scenario));
+            Assert.AreEqual(HttpStatusCode.OK, firstResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, secondResponse.StatusCode);
+            Assert.AreEqual(first, second);
+            Assert.AreEqual(1, TestIdempotencyController.GetExecutionCount(scenario));
         }
 
-        [Fact]
+        [TestMethod]
         public async Task IdempotentEndpoint_ExecutesOnce_ForConcurrentSameIdempotencyKey()
         {
             string scenario = NewScenario();
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.CancellationToken);
             Guid idempotencyKey = Guid.NewGuid();
             TestIdempotencyRequest request = new(scenario, "same-payload", DelayMilliseconds: 200);
 
@@ -50,33 +52,37 @@ namespace Faryma.Composer.Api.Test.Common
             TestIdempotencyResponse first = await ReadResponseAsync(firstResponse);
             TestIdempotencyResponse second = await ReadResponseAsync(secondResponse);
 
-            Assert.All(responses, response => Assert.Equal(HttpStatusCode.OK, response.StatusCode));
-            Assert.Equal(first, second);
-            Assert.Equal(1, TestIdempotencyController.GetExecutionCount(scenario));
+            foreach (HttpResponseMessage response in responses)
+            {
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            }
+
+            Assert.AreEqual(first, second);
+            Assert.AreEqual(1, TestIdempotencyController.GetExecutionCount(scenario));
         }
 
-        [Fact]
+        [TestMethod]
         public async Task IdempotentEndpoint_ReturnsConflict_WhenSameKeyUsesDifferentPayload()
         {
             string scenario = NewScenario();
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.CancellationToken);
             Guid idempotencyKey = Guid.NewGuid();
 
             using HttpResponseMessage firstResponse = await SendAsync(client, idempotencyKey, new TestIdempotencyRequest(scenario, "first"));
             using HttpResponseMessage secondResponse = await SendAsync(client, idempotencyKey, new TestIdempotencyRequest(scenario, "second"));
 
-            Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
-            Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
-            Assert.Equal(1, TestIdempotencyController.GetExecutionCount(scenario));
+            Assert.AreEqual(HttpStatusCode.OK, firstResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.Conflict, secondResponse.StatusCode);
+            Assert.AreEqual(1, TestIdempotencyController.GetExecutionCount(scenario));
         }
 
-        [Fact]
+        [TestMethod]
         public async Task IdempotentEndpoint_DoesNotStoreIdempotencyRecord_WhenActionFails()
         {
             string scenario = NewScenario();
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.CancellationToken);
             Guid idempotencyKey = Guid.NewGuid();
             TestIdempotencyRequest request = new(scenario, "retry-after-error");
             TestIdempotencyController.FailNext(scenario);
@@ -86,13 +92,13 @@ namespace Faryma.Composer.Api.Test.Common
 
             TestIdempotencyResponse retry = await ReadResponseAsync(retryResponse);
 
-            Assert.Equal(HttpStatusCode.Conflict, failedResponse.StatusCode);
-            Assert.Equal(HttpStatusCode.OK, retryResponse.StatusCode);
-            Assert.Equal(new TestIdempotencyResponse(scenario, "retry-after-error", 1), retry);
-            Assert.Equal(1, TestIdempotencyController.GetExecutionCount(scenario));
+            Assert.AreEqual(HttpStatusCode.Conflict, failedResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, retryResponse.StatusCode);
+            Assert.AreEqual(new TestIdempotencyResponse(scenario, "retry-after-error", 1), retry);
+            Assert.AreEqual(1, TestIdempotencyController.GetExecutionCount(scenario));
         }
 
-        [Fact]
+        [TestMethod]
         public async Task IdempotentEndpoint_ExecutesAgain_WhenIdempotencyKeyExpired()
         {
             string scenario = NewScenario();
@@ -102,32 +108,32 @@ namespace Faryma.Composer.Api.Test.Common
             TestIdempotencyRequest request = new(scenario, "expired-key");
 
             CustomWebApplicationFactory firstApp = CreateAppWithNow(app, now);
-            using HttpClient firstClient = await firstApp.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
+            using HttpClient firstClient = await firstApp.CreateBrowserUserClientAsync(ct: TestContext.CancellationToken);
             using HttpResponseMessage firstResponse = await SendAsync(firstClient, idempotencyKey, request);
 
             CustomWebApplicationFactory laterApp = CreateAppWithNow(app, now.AddHours(2));
-            using HttpClient laterClient = await laterApp.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
+            using HttpClient laterClient = await laterApp.CreateBrowserUserClientAsync(ct: TestContext.CancellationToken);
             using HttpResponseMessage laterResponse = await SendAsync(laterClient, idempotencyKey, request);
 
             TestIdempotencyResponse first = await ReadResponseAsync(firstResponse);
             TestIdempotencyResponse later = await ReadResponseAsync(laterResponse);
 
-            Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
-            Assert.Equal(HttpStatusCode.OK, laterResponse.StatusCode);
-            Assert.Equal(1, first.Executions);
-            Assert.Equal(2, later.Executions);
-            Assert.Equal(2, TestIdempotencyController.GetExecutionCount(scenario));
+            Assert.AreEqual(HttpStatusCode.OK, firstResponse.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, laterResponse.StatusCode);
+            Assert.AreEqual(1, first.Executions);
+            Assert.AreEqual(2, later.Executions);
+            Assert.AreEqual(2, TestIdempotencyController.GetExecutionCount(scenario));
         }
 
-        [Fact]
+        [TestMethod]
         public async Task IdempotentEndpoint_Throws_WhenActionReturnsUnsupportedResult()
         {
             await using CustomWebApplicationFactory app = await CreateAppAsync();
-            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.Current.CancellationToken);
+            using HttpClient client = await app.CreateBrowserUserClientAsync(ct: TestContext.CancellationToken);
 
             using HttpResponseMessage response = await SendUnsupportedResultAsync(client, Guid.NewGuid());
 
-            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
 
         private static string NewScenario()

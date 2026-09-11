@@ -9,11 +9,12 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Faryma.Composer.Application.Test.OrderQueue
 {
+    [TestClass]
     public class OrderQueueManagerTest
     {
         private readonly UpperInvariantLookupNormalizer _normalizer = new();
 
-        [Fact]
+        [TestMethod]
         public void Donat()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -33,7 +34,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_AwaitingPayment_IsActiveInQueue()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -49,7 +50,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             ], queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Alt()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -69,7 +70,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -96,7 +97,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt_Alt()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -123,7 +124,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt_Alt1()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -150,7 +151,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt_IsOnlyNicknameLeft()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -177,7 +178,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt_X2()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -211,7 +212,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt_X2_Alt()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -245,7 +246,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt_X2_Alt1()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -279,7 +280,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt_X2_Alt2()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -319,7 +320,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt_X3()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -366,7 +367,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Donat_Debt_X3_Alt()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -413,7 +414,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Debt_X2()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -440,7 +441,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Debt_X3()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -474,7 +475,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Debt_X4()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -515,7 +516,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Debt_X4_Alt()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -558,7 +559,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Debt_X4_Alt1()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -597,7 +598,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void Debt_X4_Alt2()
         {
             OrderQueueManager queueManager = GetManager("04.10.2025");
@@ -638,7 +639,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void OutOfQueue()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -658,7 +659,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void OutOfQueue_Donat()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -685,7 +686,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void OutOfQueue_Donat_Alt()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -712,7 +713,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void OutOfQueue_Debt_X3()
         {
             OrderQueueManager queueManager = GetManager("20.01.2000");
@@ -759,7 +760,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void OutOfQueue_Debt_X3_Alt()
         {
             OrderQueueManager queueManager = GetManager("20.01.2000");
@@ -806,7 +807,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void OutOfQueue_FutureDonat_Debt_X2_Inactive()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -878,7 +879,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             Check(expected, queueManager);
         }
 
-        [Fact]
+        [TestMethod]
         public void TakeOrderOutOfTurn()
         {
             OrderQueueManager queueManager = GetManager("10.01.2000");
@@ -904,7 +905,9 @@ namespace Faryma.Composer.Application.Test.OrderQueue
 
         private static void ProcessActiveOrders(OrderQueueManager queueManager)
         {
-            while (true)
+            int guard = queueManager.OrderPositionsById.Count + 1;
+
+            while (guard-- > 0)
             {
                 OrderPosition? current = queueManager.OrderPositionsById
                     .Select(x => x.Value)
@@ -914,11 +917,18 @@ namespace Faryma.Composer.Application.Test.OrderQueue
 
                 if (current is null)
                 {
-                    break;
+                    return;
                 }
 
                 ProcessOrder(queueManager, current.Order);
+
+                if (current.PositionHistory.Current.ActivityStatus == OrderActivityStatus.Active)
+                {
+                    Assert.Fail($"Заказ {current.Order.Id} остаётся активным после обработки — очередь не продвигается");
+                }
             }
+
+            Assert.Fail("Обработка активных заказов не завершилась — очередь не опустошается");
         }
 
         private static OrderQueueManager GetManager(string currentStreamDate)
@@ -976,7 +986,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             {
                 OrderPosition item = queueManager.OrderPositionsById[id];
 
-                Assert.Equal(
+                Assert.AreEqual(
                     (index, id, _normalizer.NormalizeName(nick)),
                     (item.PositionHistory.Current.QueueIndex, id, item.Order.MainNormalizedNickname));
 
@@ -990,7 +1000,7 @@ namespace Faryma.Composer.Application.Test.OrderQueue
             {
                 OrderPosition item = queueManager.OrderPositionsById[id];
 
-                Assert.Equal(
+                Assert.AreEqual(
                     (index, id, status, _normalizer.NormalizeName(nick)),
                     (item.PositionHistory.Current.QueueIndex, id, item.PositionHistory.Current.ActivityStatus, item.Order.MainNormalizedNickname));
             }
